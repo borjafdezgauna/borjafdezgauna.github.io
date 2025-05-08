@@ -1,0 +1,293 @@
+Total written by this student: 9% lines / 9% characters
+
+Condition.cs (40) : case ColumnDefinition.DataType.Int:
+Condition.cs (43) : int valor1 = int.Parse(LiteralValue);
+Condition.cs (47) : case ">":
+Condition.cs (56) : case "<":
+Condition.cs (64) : if (valor1 == valor)
+Condition.cs (71) : Console.WriteLine("Solucion no contemplada " + Operator);
+Condition.cs (75) : case ColumnDefinition.DataType.Double:
+Condition.cs (76) : double valorD = double.Parse(value, CultureInfo.InvariantCulture);
+Condition.cs (77) : double valorD1 = double.Parse(LiteralValue, CultureInfo.InvariantCulture);
+Condition.cs (80) : case ">":
+Condition.cs (82) : if (valorD1 < valorD)
+Condition.cs (89) : case "<":
+Condition.cs (90) : if (valorD1 > valorD)
+Condition.cs (98) : if (valorD1 == valorD)
+Condition.cs (106) : Console.WriteLine("Solucion no contemplada " + Operator);
+Condition.cs (111) : case ColumnDefinition.DataType.String:
+Condition.cs (114) : case ">":
+Condition.cs (116) : if (string.Compare(LiteralValue, value) < 0)
+Condition.cs (123) : case "<":
+Condition.cs (124) : if (string.Compare(LiteralValue, value) > 0)
+Condition.cs (132) : if (string.Compare(LiteralValue, value) == 0)
+Condition.cs (140) : Console.WriteLine("Solucion no contemplada " + Operator);
+Condition.cs (147) : Console.WriteLine("Dato no contemplado");
+Condition.cs (148) : return false;
+Table.cs (236) : //cuando no hay condicion hay q devlver toda la tabla y cuando la columna seleccionada no existe se devuelve una tabla vacia
+ConditionTests.cs (1) : using DbManager;
+ConditionTests.cs (2) : using System;
+ConditionTests.cs (10) : public void TestConditionInt()
+ConditionTests.cs (12) : Condition condition = new Condition("Edad", "<", "19");
+ConditionTests.cs (13) : Assert.True(condition.IsTrue("18", ColumnDefinition.DataType.Int));
+ConditionTests.cs (14) : Condition condition2 = new Condition("Edad", ">", "33");
+ConditionTests.cs (15) : Assert.False(condition2.IsTrue("31", ColumnDefinition.DataType.Int));
+ConditionTests.cs (16) : Condition condition3 = new Condition("Edad", "=", "33");
+ConditionTests.cs (17) : Assert.True(condition3.IsTrue("33", ColumnDefinition.DataType.Int));
+ConditionTests.cs (18) : Assert.False(condition3.IsTrue("31", ColumnDefinition.DataType.Int));
+ConditionTests.cs (19) : }
+ConditionTests.cs (21) : [Fact]
+ConditionTests.cs (22) : public void TestConditionDouble()
+ConditionTests.cs (23) : {
+ConditionTests.cs (24) : Condition condition = new Condition("Precio", "<", "19.3");
+ConditionTests.cs (25) : Assert.True(condition.IsTrue("18.1", ColumnDefinition.DataType.Double));
+ConditionTests.cs (26) : Condition condition2 = new Condition("Precio", ">", "33.2");
+ConditionTests.cs (27) : Assert.False(condition2.IsTrue("31.7", ColumnDefinition.DataType.Double));
+ConditionTests.cs (28) : Condition condition3 = new Condition("Precio", "=", "33.44");
+ConditionTests.cs (29) : Assert.True(condition3.IsTrue("33.44", ColumnDefinition.DataType.Double));
+ConditionTests.cs (30) : Assert.False(condition3.IsTrue("31.4", ColumnDefinition.DataType.Double));
+ConditionTests.cs (33) : [Fact]
+ConditionTests.cs (34) : public void TestConditionString()
+ConditionTests.cs (35) : {
+ConditionTests.cs (36) : Condition condition = new Condition("Nombre", "<", "ab");
+ConditionTests.cs (37) : Assert.False(condition.IsTrue("cd", ColumnDefinition.DataType.String));
+ConditionTests.cs (38) : Condition condition2 = new Condition("Nombre", ">", "zzd");
+ConditionTests.cs (39) : Assert.False(condition2.IsTrue("wfd", ColumnDefinition.DataType.String));
+ConditionTests.cs (40) : Assert.True(condition2.IsTrue("zzzd", ColumnDefinition.DataType.String));
+ConditionTests.cs (41) : Condition condition3 = new Condition("Nombre", ">", "Jon");
+ConditionTests.cs (42) : Assert.True(condition3.IsTrue("Julen", ColumnDefinition.DataType.String));
+ConditionTests.cs (44) : }
+MiniSQLParserTest.cs (1) : using DbManager;
+MiniSQLParserTest.cs (2) : using DbManager.Parser;
+MiniSQLParserTest.cs (3) : using System.Collections.Generic;
+MiniSQLParserTest.cs (4) : using System.Text.RegularExpressions;
+MiniSQLParserTest.cs (6) : namespace OurTests
+MiniSQLParserTest.cs (7) : {
+MiniSQLParserTest.cs (8) : public class MiniSQLParserTest
+MiniSQLParserTest.cs (9) : {
+MiniSQLParserTest.cs (11) : [Fact]
+MiniSQLParserTest.cs (12) : public void TestUpdateSimple()
+MiniSQLParserTest.cs (13) : {
+MiniSQLParserTest.cs (15) : Update query = MiniSQLParser.Parse("UPDATE users SET name='Andoni',age='20' WHERE id='5'") as Update;
+MiniSQLParserTest.cs (16) : Assert.NotNull(query);
+MiniSQLParserTest.cs (17) : query = MiniSQLParser.Parse("UPDATE Table1 SET name= 'Paco' ") as Update;
+MiniSQLParserTest.cs (18) : Assert.Null(query);
+MiniSQLParserTest.cs (19) : query = MiniSQLParser.Parse("UPDATE Table1") as Update;
+MiniSQLParserTest.cs (20) : Assert.Null(query);
+MiniSQLParserTest.cs (21) : query = MiniSQLParser.Parse("UPDATE Table1 SET name= 'Jon' ") as Update;
+MiniSQLParserTest.cs (22) : Assert.Null(query);
+MiniSQLParserTest.cs (23) : query = MiniSQLParser.Parse("UPDATE MyTable SET column1 = '123' WHERE id= '123'") as Update;
+MiniSQLParserTest.cs (24) : Assert.Null(query);
+MiniSQLParserTest.cs (25) : query = MiniSQLParser.Parse("UPDATE Table1 SET nombre='Jon' WHERE salario > 1300") as Update;
+MiniSQLParserTest.cs (26) : Assert.Null(query);
+MiniSQLParserTest.cs (27) : query = MiniSQLParser.Parse("UPDATE Table1 SET nombre='Jon' WHERE salario>'1200.42'") as Update;
+MiniSQLParserTest.cs (28) : Assert.NotNull(query);
+MiniSQLParserTest.cs (30) : }
+MiniSQLParserTest.cs (34) : [Fact]
+MiniSQLParserTest.cs (35) : public void TestDropTableSimple()
+MiniSQLParserTest.cs (36) : {
+MiniSQLParserTest.cs (38) : string miniSQLQuery = "DROP TABLE users";
+MiniSQLParserTest.cs (40) : DropTable query = MiniSQLParser.Parse("DROP TABLE users") as DropTable;
+MiniSQLParserTest.cs (41) : Assert.NotNull(query);
+MiniSQLParserTest.cs (42) : }
+MiniSQLParserTest.cs (45) : [Fact]
+MiniSQLParserTest.cs (46) : public void TestDeleteSimple()
+MiniSQLParserTest.cs (47) : {
+MiniSQLParserTest.cs (49) : string miniSQLQuery = "DELETE FROM users WHERE name='Andoni'";
+MiniSQLParserTest.cs (51) : Delete query = MiniSQLParser.Parse(miniSQLQuery) as Delete;
+MiniSQLParserTest.cs (52) : Assert.NotNull(query);
+MiniSQLParserTest.cs (53) : query = MiniSQLParser.Parse("DELETE FROM users WHERE id='5'") as Delete;
+MiniSQLParserTest.cs (54) : Assert.NotNull(query);
+MiniSQLParserTest.cs (55) : query = MiniSQLParser.Parse("DELETE FROM users WHERE id ='5'") as Delete;
+MiniSQLParserTest.cs (56) : Assert.Null(query);
+MiniSQLParserTest.cs (57) : query = MiniSQLParser.Parse("DELETE FROM users WHERE id= '5'") as Delete;
+MiniSQLParserTest.cs (58) : Assert.Null(query);
+MiniSQLParserTest.cs (61) : }
+MiniSQLParserTest.cs (64) : [Fact]
+MiniSQLParserTest.cs (65) : public void TestSelectSimple()
+MiniSQLParserTest.cs (66) : {
+MiniSQLParserTest.cs (69) : Select query = MiniSQLParser.Parse("SELECT column1 FROM Table1") as Select;
+MiniSQLParserTest.cs (70) : Assert.NotNull(query);
+MiniSQLParserTest.cs (72) : query = MiniSQLParser.Parse("SELECT column1 FROM MyTable WHERE column1='123'") as Select;
+MiniSQLParserTest.cs (73) : Assert.NotNull(query);
+MiniSQLParserTest.cs (75) : query = MiniSQLParser.Parse("SELECT column1 FROM Table2 WHERE column1 > '3.42'") as Select;
+MiniSQLParserTest.cs (76) : Assert.NotNull(query);
+MiniSQLParserTest.cs (78) : //query = MiniSQLParser.Parse("SELECT column 1 FROM MyTable") as Select;
+MiniSQLParserTest.cs (79) : //Assert.Null(query);
+MiniSQLParserTest.cs (81) : //query = MiniSQLParser.Parse("SELECT column1 FROM My_Table") as Select;
+MiniSQLParserTest.cs (82) : //Assert.Null(query);
+MiniSQLParserTest.cs (84) : query = MiniSQLParser.Parse("SELECT column1 FROM table1 WHERE column1=123") as Select;
+MiniSQLParserTest.cs (85) : Assert.Null(query);
+MiniSQLParserTest.cs (88) : }
+MiniSQLParserTest.cs (91) : [Fact]
+MiniSQLParserTest.cs (92) : public void TestInsertSimple()
+MiniSQLParserTest.cs (93) : {
+MiniSQLParserTest.cs (95) : Insert query = MiniSQLParser.Parse("INSERT INTO users VALUES ('Mikel','bvn')") as Insert;
+MiniSQLParserTest.cs (96) : Assert.NotNull(query);
+MiniSQLParserTest.cs (98) : }
+MiniSQLParserTest.cs (100) : [Fact]
+MiniSQLParserTest.cs (101) : public void TestCreateSimple()
+MiniSQLParserTest.cs (102) : {
+MiniSQLParserTest.cs (103) : CreateTable query = MiniSQLParser.Parse("CREATE TABLE Table1 (col1 DOUBLE,col2 INT)") as CreateTable;
+MiniSQLParserTest.cs (104) : Assert.NotNull(query);
+MiniSQLParserTest.cs (105) : query = MiniSQLParser.Parse("CREATE TABLE_1 (id INT, name TEXT)") as CreateTable;
+MiniSQLParserTest.cs (106) : Assert.Null(query);
+MiniSQLParserTest.cs (107) : query = MiniSQLParser.Parse("create table MyTable (id INT, name TEXT)") as CreateTable;
+MiniSQLParserTest.cs (108) : Assert.Null(query);
+MiniSQLParserTest.cs (109) : query = MiniSQLParser.Parse("CREATE TABLE Test (a INT,b TEXT)") as CreateTable;
+MiniSQLParserTest.cs (110) : Assert.NotNull(query);
+MiniSQLParserTest.cs (111) : query = MiniSQLParser.Parse("create table MyTable (id INT, name TEXT)") as CreateTable;
+MiniSQLParserTest.cs (112) : Assert.Null(query);
+MiniSQLParserTest.cs (113) : query = MiniSQLParser.Parse("CREATE TABLE MyTable (column1INT)") as CreateTable;
+MiniSQLParserTest.cs (114) : Assert.Null(query);
+MiniSQLParserTest.cs (115) : query = MiniSQLParser.Parse("CREATE TABLE User (Name TEXT)") as CreateTable;
+MiniSQLParserTest.cs (116) : Assert.NotNull(query);
+MiniSQLParserTest.cs (117) : query = MiniSQLParser.Parse("CREATE TABLE Test (col1 INT, , col3 DOUBLE)") as CreateTable;
+MiniSQLParserTest.cs (118) : Assert.Null(query);
+MiniSQLParserTest.cs (145) : }
+MiniSQLParserTest.cs (146) : }
+MiniSQLParserTest.cs (147) : }
+TableTests.cs (218) : Condition condition = new Condition("Age", ">", "50");
+CreateTable.cs (18) : Table = table;
+CreateTable.cs (19) : ColumnsParameters = columns;
+Delete.cs (15) : Table = table;
+Delete.cs (16) : Where = where;
+DropTable.cs (16) : Table = table;
+Insert.cs (18) : Table = table;
+Insert.cs (19) : Values = values;
+MiniSQLParser.cs (12) : const string selectPattern = @"^SELECT\s+([\w\s]+(?:,[\w\s]+)*)\s+FROM\s+([\w_]+)(?:\s+WHERE\s+((\w+\s*(?:=|<|>)\s*'[^']+')))?$";
+MiniSQLParser.cs (14) : const string insertPattern = @"^INSERT\s+INTO\s+([\w_]+)\s+VALUES\s+\(('(?:[^']*)'(?:,'[^']*')*)\)$";
+MiniSQLParser.cs (16) : const string dropTablePattern = @"^DROP\s+TABLE\s+([\w_]+)$";
+MiniSQLParser.cs (18) : const string createTablePattern = @"CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s*\(\s*(.*?)\s*\)";
+MiniSQLParser.cs (20) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z][a-zA-Z0-9]*)\s+SET\s+((?:[a-zA-Z][a-zA-Z0-9]*='[^']*')(?:,[a-zA-Z][a-zA-Z0-9]*='[^']*')*)(?:\s+WHERE\s+([a-zA-Z_]+)(=|!=|<|>)('[^']*'))?$";
+MiniSQLParser.cs (22) : const string deletePattern = @"^DELETE\s+FROM\s+([\w\d_]+)\s+WHERE\s+([\w\d_]+)*(=|<|>)*'([^']+)'$";
+MiniSQLParser.cs (44) : Match match = null;
+MiniSQLParser.cs (47) : //select
+MiniSQLParser.cs (48) : match = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (49) : if (match.Success)
+MiniSQLParser.cs (50) : {
+MiniSQLParser.cs (51) : List<string> columns = new List<string>(match.Groups[1].Value.Split(','));
+MiniSQLParser.cs (52) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (55) : string expresionCondition = @"(\w+)\s*(=|<|>)\s*'(.+)'";
+MiniSQLParser.cs (56) : Match match2 = Regex.Match(miniSQLQuery, expresionCondition);
+MiniSQLParser.cs (57) : Condition condition = null;
+MiniSQLParser.cs (58) : if (match2.Success)
+MiniSQLParser.cs (59) : {
+MiniSQLParser.cs (60) : string columnName = match2.Groups[1].Value.Trim();
+MiniSQLParser.cs (61) : string op = match2.Groups[2].Value.Trim();
+MiniSQLParser.cs (62) : string literalValue = match2.Groups[3].Value.Trim();
+MiniSQLParser.cs (64) : condition = new Condition(columnName, op, literalValue);
+MiniSQLParser.cs (66) : }
+MiniSQLParser.cs (67) : return new Select(table, columns, condition);
+MiniSQLParser.cs (69) : }
+MiniSQLParser.cs (71) : //insert
+MiniSQLParser.cs (72) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (73) : if (match.Success)
+MiniSQLParser.cs (74) : {
+MiniSQLParser.cs (75) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (78) : string valuesStr = match.Groups[2].Value.Trim();
+MiniSQLParser.cs (81) : string[] splitValues = valuesStr.Split(',');
+MiniSQLParser.cs (82) : List<string> values = new List<string>();
+MiniSQLParser.cs (85) : foreach (var value in splitValues)
+MiniSQLParser.cs (86) : {
+MiniSQLParser.cs (87) : values.Add(value.Trim().Trim('\''));
+MiniSQLParser.cs (88) : }
+MiniSQLParser.cs (90) : return new Insert(tableName, values);
+MiniSQLParser.cs (91) : }
+MiniSQLParser.cs (95) : //delete
+MiniSQLParser.cs (96) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (97) : if (match.Success)
+MiniSQLParser.cs (98) : {
+MiniSQLParser.cs (99) : Condition condition = null;
+MiniSQLParser.cs (100) : if (match.Groups[2].Success)
+MiniSQLParser.cs (101) : {
+MiniSQLParser.cs (102) : string columnName = match.Groups[2].Value.Trim();
+MiniSQLParser.cs (103) : string op = match.Groups[3].Value.Trim();
+MiniSQLParser.cs (104) : string literalValue = match.Groups[4].Value.Trim();
+MiniSQLParser.cs (106) : condition = new Condition(columnName, op, literalValue);
+MiniSQLParser.cs (108) : }
+MiniSQLParser.cs (110) : return new Delete(match.Groups[1].Value, condition);
+MiniSQLParser.cs (111) : }
+MiniSQLParser.cs (113) : //drop table
+MiniSQLParser.cs (114) : match = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (115) : if (match.Success)
+MiniSQLParser.cs (116) : {
+MiniSQLParser.cs (117) : return new DropTable(match.Groups[1].Value);
+MiniSQLParser.cs (118) : }
+MiniSQLParser.cs (123) : //update
+MiniSQLParser.cs (124) : match = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (125) : if (match.Success)
+MiniSQLParser.cs (126) : {
+MiniSQLParser.cs (128) : List<SetValue> columns = new List<SetValue>();
+MiniSQLParser.cs (130) : string[] columnAssignments = match.Groups[2].Value.Split(',');
+MiniSQLParser.cs (132) : foreach (var assignment in columnAssignments)
+MiniSQLParser.cs (133) : {
+MiniSQLParser.cs (134) : var parts = assignment.Split('=');
+MiniSQLParser.cs (135) : if (parts.Length == 2)
+MiniSQLParser.cs (136) : {
+MiniSQLParser.cs (137) : columns.Add(new SetValue(parts[0].Trim(), parts[1].Trim('\'')));
+MiniSQLParser.cs (138) : }
+MiniSQLParser.cs (139) : }
+MiniSQLParser.cs (141) : Condition condition = null;
+MiniSQLParser.cs (144) : if (match.Groups[3].Success)
+MiniSQLParser.cs (145) : {
+MiniSQLParser.cs (146) : string columnName = match.Groups[3].Value.Trim();
+MiniSQLParser.cs (147) : string op = match.Groups[4].Value.Trim();
+MiniSQLParser.cs (148) : string literalValue = match.Groups[5].Value.Trim('\'');
+MiniSQLParser.cs (150) : condition = new Condition(columnName, op, literalValue);
+MiniSQLParser.cs (151) : }
+MiniSQLParser.cs (154) : return new Update(match.Groups[1].Value, columns, condition);
+MiniSQLParser.cs (155) : }
+MiniSQLParser.cs (158) : match = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (159) : if (match.Success)
+MiniSQLParser.cs (160) : {
+MiniSQLParser.cs (161) : string columnsStr = match.Groups[2].Value.Trim();
+MiniSQLParser.cs (163) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+MiniSQLParser.cs (164) : string[] columnSplit = Regex.Split(columnsStr, ",");
+MiniSQLParser.cs (166) : for (int i = 0; i < columnSplit.Length; i++)
+MiniSQLParser.cs (167) : {
+MiniSQLParser.cs (168) : string[] column = Regex.Split(columnSplit[i].Trim(), @"\s+");
+MiniSQLParser.cs (170) : if (column.Length != 2)
+MiniSQLParser.cs (171) : {
+MiniSQLParser.cs (172) : return null;
+MiniSQLParser.cs (173) : }
+MiniSQLParser.cs (175) : string name = column[0];
+MiniSQLParser.cs (176) : string DataType = column[1];
+MiniSQLParser.cs (178) : ColumnDefinition.DataType type;
+MiniSQLParser.cs (179) : if (DataType.Equals("TEXT"))
+MiniSQLParser.cs (180) : {
+MiniSQLParser.cs (181) : type = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (182) : }
+MiniSQLParser.cs (183) : else if (DataType.Equals("INT"))
+MiniSQLParser.cs (184) : {
+MiniSQLParser.cs (185) : type = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (186) : }
+MiniSQLParser.cs (187) : else if (DataType.Equals("DOUBLE"))
+MiniSQLParser.cs (188) : {
+MiniSQLParser.cs (189) : type = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (190) : }
+MiniSQLParser.cs (191) : else
+MiniSQLParser.cs (192) : {
+MiniSQLParser.cs (193) : return null;
+MiniSQLParser.cs (194) : }
+MiniSQLParser.cs (196) : ColumnDefinition newColumn = new ColumnDefinition(type, name);
+MiniSQLParser.cs (197) : columns.Add(newColumn);
+MiniSQLParser.cs (198) : }
+MiniSQLParser.cs (200) : if (columns.Count == 0)
+MiniSQLParser.cs (201) : {
+MiniSQLParser.cs (202) : return null;
+MiniSQLParser.cs (203) : }
+MiniSQLParser.cs (205) : return new CreateTable(match.Groups[1].Value, columns);
+MiniSQLParser.cs (206) : }
+MiniSQLParser.cs (310) : return null;
+Select.cs (20) : Table = table;
+Select.cs (21) : Columns = columns;
+Select.cs (22) : Where = condition;
+SetValue.cs (18) : ColumnName = column;
+SetValue.cs (19) : Value = value;
+Update.cs (16) : Table = table;
+Update.cs (17) : Columns = columnNames;
+Update.cs (18) : Where = where;
+Manager.cs (28) : {
+Manager.cs (40) : {
+Manager.cs (48) : }

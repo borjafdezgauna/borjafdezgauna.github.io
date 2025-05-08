@@ -1,0 +1,954 @@
+Total written by this student: 25% lines / 22% characters
+
+Database.cs (29) : this.m_username = adminUsername;
+Database.cs (40) : if (table != null)
+Database.cs (41) : {
+Database.cs (42) : Tables.Add(table);
+Database.cs (43) : return true;
+Database.cs (44) : }
+Database.cs (56) : foreach (Table t in Tables)
+Database.cs (57) : {
+Database.cs (58) : if (t.Name.Equals(tableName))
+Database.cs (59) : {
+Database.cs (60) : return t;
+Database.cs (61) : }
+Database.cs (62) : }
+Database.cs (75) : foreach (Table t in Tables)
+Database.cs (76) : {
+Database.cs (77) : if (t.Name.Equals(tableName))
+Database.cs (78) : {
+Database.cs (79) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (81) : }
+Database.cs (82) : }
+Database.cs (84) : if (ColumnDefinition == null || ColumnDefinition.Count == 0)
+Database.cs (85) : {
+Database.cs (86) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (90) : else
+Database.cs (91) : {
+Database.cs (92) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (93) : return AddTable(new Table(tableName, ColumnDefinition));
+Database.cs (94) : }
+Database.cs (101) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (102) : {
+Database.cs (103) : if (Tables[i].Name.Equals(tableName))
+Database.cs (104) : {
+Database.cs (105) : Tables.RemoveAt(i);
+Database.cs (106) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (107) : return true;
+Database.cs (108) : }
+Database.cs (109) : }
+Database.cs (110) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (119) : {
+Database.cs (122) : Table t = TableByName(tableName);
+Database.cs (124) : if (t == null)
+Database.cs (125) : {
+Database.cs (126) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (127) : return false;
+Database.cs (128) : }
+Database.cs (129) : else if (t.Insert(values))
+Database.cs (130) : {
+Database.cs (131) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (132) : return true;
+Database.cs (133) : }
+Database.cs (134) : else
+Database.cs (135) : {
+Database.cs (136) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (137) : return false;
+Database.cs (138) : }
+Database.cs (140) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (141) : return false;
+Database.cs (142) : }
+Table.cs (233) : if(values == null)
+Table.cs (234) : {
+Table.cs (235) : return false;
+Table.cs (236) : }
+Table.cs (237) : else if (ColumnDefinitions.Count != values.Count)
+Table.cs (238) : {
+Table.cs (240) : }
+Table.cs (241) : else
+Table.cs (242) : {
+Table.cs (243) : Row insertRow = new Row(ColumnDefinitions, values);
+Table.cs (244) : AddRow(insertRow);
+Table.cs (245) : return true;
+Table.cs (246) : }
+CreateSecurityProfileTests.cs (1) : ﻿using DbManager;
+CreateSecurityProfileTests.cs (2) : using DbManager.Parser;
+CreateSecurityProfileTests.cs (3) : using DbManager.Security;
+CreateSecurityProfileTests.cs (4) : using System;
+CreateSecurityProfileTests.cs (5) : using System.Collections.Generic;
+CreateSecurityProfileTests.cs (6) : using System.Linq;
+CreateSecurityProfileTests.cs (7) : using System.Text;
+CreateSecurityProfileTests.cs (8) : using System.Threading.Tasks;
+CreateSecurityProfileTests.cs (10) : namespace OurTests
+CreateSecurityProfileTests.cs (11) : {
+CreateSecurityProfileTests.cs (12) : public class CreateSecurityProfileTests
+CreateSecurityProfileTests.cs (13) : {
+CreateSecurityProfileTests.cs (15) : [Fact]
+CreateSecurityProfileTests.cs (16) : public void CreateSecurityProfile()
+CreateSecurityProfileTests.cs (17) : {
+CreateSecurityProfileTests.cs (18) : string query = "CREATE SECURITY PROFILE Alex";
+CreateSecurityProfileTests.cs (19) : string query2 = "CREATE SECURITY PROFILE ANDER";
+CreateSecurityProfileTests.cs (20) : string query3 = "CREATE   SECURITY   PROFILE   alma";
+CreateSecurityProfileTests.cs (22) : var securityProf = MiniSQLParser.Parse(query);
+CreateSecurityProfileTests.cs (23) : Assert.NotNull(securityProf);
+CreateSecurityProfileTests.cs (24) : Assert.IsType<CreateSecurityProfile>(securityProf);
+CreateSecurityProfileTests.cs (26) : securityProf = MiniSQLParser.Parse(query2);
+CreateSecurityProfileTests.cs (27) : Assert.NotNull(securityProf);
+CreateSecurityProfileTests.cs (28) : Assert.IsType<CreateSecurityProfile>(securityProf);
+CreateSecurityProfileTests.cs (30) : securityProf = MiniSQLParser.Parse(query3);
+CreateSecurityProfileTests.cs (31) : Assert.NotNull(securityProf);
+CreateSecurityProfileTests.cs (32) : Assert.IsType<CreateSecurityProfile>(securityProf);
+CreateSecurityProfileTests.cs (34) : }
+CreateSecurityProfileTests.cs (36) : [Fact]
+CreateSecurityProfileTests.cs (37) : public void CreateSecurityProfileNotAcceptedTypes()
+CreateSecurityProfileTests.cs (38) : {
+CreateSecurityProfileTests.cs (39) : string query = "CREATE SECURITY PROFILE AA2lex";
+CreateSecurityProfileTests.cs (40) : string query2 = "CREATE SECURITY PROFILE 23";
+CreateSecurityProfileTests.cs (41) : string query3 = "CREATE   SECURITY   PROFILE ";
+CreateSecurityProfileTests.cs (43) : var securityProf = MiniSQLParser.Parse(query);
+CreateSecurityProfileTests.cs (44) : Assert.Null(securityProf);
+CreateSecurityProfileTests.cs (46) : securityProf = MiniSQLParser.Parse(query2);
+CreateSecurityProfileTests.cs (47) : Assert.Null(securityProf);
+CreateSecurityProfileTests.cs (49) : securityProf = MiniSQLParser.Parse(query3);
+CreateSecurityProfileTests.cs (50) : Assert.Null(securityProf);
+CreateSecurityProfileTests.cs (51) : }
+CreateSecurityProfileTests.cs (53) : [Fact]
+CreateSecurityProfileTests.cs (54) : public void Correct()
+CreateSecurityProfileTests.cs (55) : {
+CreateSecurityProfileTests.cs (56) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE profile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (57) : Assert.Equal("profile", query.ProfileName);
+CreateSecurityProfileTests.cs (59) : query = MiniSQLParser.Parse("CREATE SECURITY PROFILE OtherProfile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (60) : Assert.Equal("OtherProfile", query.ProfileName);
+CreateSecurityProfileTests.cs (61) : }
+CreateSecurityProfileTests.cs (63) : [Fact]
+CreateSecurityProfileTests.cs (64) : public void CorrectWithSpaces()
+CreateSecurityProfileTests.cs (65) : {
+CreateSecurityProfileTests.cs (66) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE     SECURITY PROFILE      profile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (67) : Assert.Equal("profile", query.ProfileName);
+CreateSecurityProfileTests.cs (69) : query = MiniSQLParser.Parse("CREATE SECURITY     PROFILE OtherProfile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (70) : Assert.Equal("OtherProfile", query.ProfileName);
+CreateSecurityProfileTests.cs (71) : }
+CreateSecurityProfileTests.cs (73) : [Fact]
+CreateSecurityProfileTests.cs (74) : public void IncorrectCapitalization()
+CreateSecurityProfileTests.cs (75) : {
+CreateSecurityProfileTests.cs (76) : CreateSecurityProfile query = MiniSQLParser.Parse("Create SECURITY PROFILE profile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (77) : Assert.Null(query);
+CreateSecurityProfileTests.cs (79) : query = MiniSQLParser.Parse("create security profile OtherProfile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (80) : Assert.Null(query);
+CreateSecurityProfileTests.cs (81) : }
+CreateSecurityProfileTests.cs (83) : [Fact]
+CreateSecurityProfileTests.cs (84) : public void IncorrectProfileWithForbiddenChars()
+CreateSecurityProfileTests.cs (85) : {
+CreateSecurityProfileTests.cs (86) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE pro-file") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (87) : Assert.Null(query);
+CreateSecurityProfileTests.cs (89) : query = MiniSQLParser.Parse("CREATE SECURITY PROFILE Pro file") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (90) : Assert.Null(query);
+CreateSecurityProfileTests.cs (91) : }
+CreateSecurityProfileTests.cs (93) : [Fact]
+CreateSecurityProfileTests.cs (94) : public void IncorrectWithoutProfile()
+CreateSecurityProfileTests.cs (95) : {
+CreateSecurityProfileTests.cs (96) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE ") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (97) : Assert.Null(query);
+CreateSecurityProfileTests.cs (99) : query = MiniSQLParser.Parse("CREATE SECURITY PROFILE") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (100) : Assert.Null(query);
+CreateSecurityProfileTests.cs (101) : }
+CreateSecurityProfileTests.cs (103) : [Fact]
+CreateSecurityProfileTests.cs (104) : public void CreateSecurityProfileSuccess()
+CreateSecurityProfileTests.cs (105) : {
+CreateSecurityProfileTests.cs (106) : Database db = new Database("Admin", "Password");
+CreateSecurityProfileTests.cs (108) : CreateSecurityProfile createSP = new CreateSecurityProfile("TestProfile");
+CreateSecurityProfileTests.cs (109) : Assert.Equal(Constants.CreateSecurityProfileSuccess, createSP.Execute(db));
+CreateSecurityProfileTests.cs (110) : }
+CreateSecurityProfileTests.cs (112) : [Fact]
+CreateSecurityProfileTests.cs (113) : public void CreateSecurityProfileNonAdmin()
+CreateSecurityProfileTests.cs (114) : {
+CreateSecurityProfileTests.cs (115) : Database db = new Database("NoSoy", "Password");
+CreateSecurityProfileTests.cs (116) : db.SecurityManager.RemoveProfile(db.SecurityManager.ProfileByUser("NoSoy").Name);
+CreateSecurityProfileTests.cs (118) : CreateSecurityProfile createSP = new CreateSecurityProfile("Test");
+CreateSecurityProfileTests.cs (119) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, createSP.Execute(db));
+CreateSecurityProfileTests.cs (120) : }
+CreateSecurityProfileTests.cs (122) : }
+CreateSecurityProfileTests.cs (124) : }
+CreateTableTests.cs (1) : ﻿using DbManager;
+CreateTableTests.cs (2) : using DbManager.Parser;
+CreateTableTests.cs (3) : using System;
+CreateTableTests.cs (4) : using System.Collections.Generic;
+CreateTableTests.cs (5) : using System.Linq;
+CreateTableTests.cs (6) : using System.Text;
+CreateTableTests.cs (7) : using System.Threading.Tasks;
+CreateTableTests.cs (9) : namespace OurTests
+CreateTableTests.cs (10) : {
+CreateTableTests.cs (11) : public class CreateTableTests
+CreateTableTests.cs (12) : {
+CreateTableTests.cs (14) : private Database db;
+CreateTableTests.cs (15) : private Table table;
+CreateTableTests.cs (16) : private List<ColumnDefinition> columns;
+CreateTableTests.cs (17) : private List<string> values;
+CreateTableTests.cs (20) : public CreateTableTests()
+CreateTableTests.cs (21) : {
+CreateTableTests.cs (22) : SetUp();
+CreateTableTests.cs (23) : }
+CreateTableTests.cs (25) : public void SetUp()
+CreateTableTests.cs (26) : {
+CreateTableTests.cs (27) : db = new Database("user", "1234");
+CreateTableTests.cs (28) : columns = new List<ColumnDefinition>
+CreateTableTests.cs (29) : {
+CreateTableTests.cs (30) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+CreateTableTests.cs (31) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+CreateTableTests.cs (32) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Height")
+CreateTableTests.cs (33) : };
+CreateTableTests.cs (36) : values = new List<string> { "Ainara", "21", "1.65" };
+CreateTableTests.cs (37) : table = new Table("TestTable", columns);
+CreateTableTests.cs (38) : Row row = new Row(columns, values);
+CreateTableTests.cs (39) : table.AddRow(row);
+CreateTableTests.cs (40) : db.AddTable(table);
+CreateTableTests.cs (41) : }
+CreateTableTests.cs (45) : [Fact]
+CreateTableTests.cs (46) : public void CreateTableSimpleOneColumnTable()
+CreateTableTests.cs (47) : {
+CreateTableTests.cs (49) : // Checking that the return value is not Null and is type CreateTable
+CreateTableTests.cs (50) : var create1 = MiniSQLParser.Parse("CREATE TABLE TestTable1 (Name TEXT)");
+CreateTableTests.cs (51) : Assert.NotNull(create1);
+CreateTableTests.cs (52) : Assert.IsType<CreateTable>(create1);
+CreateTableTests.cs (54) : // Checking that the table name and the number of columns are correct
+CreateTableTests.cs (55) : CreateTable create2 = (CreateTable) MiniSQLParser.Parse("CREATE TABLE TestTable1 (Name TEXT)");
+CreateTableTests.cs (56) : Assert.Equal("TestTable1", create2.Table);
+CreateTableTests.cs (57) : Assert.True(1 == create2.ColumnsParameters.Count);
+CreateTableTests.cs (59) : // Checking that the values for the column definition are correct
+CreateTableTests.cs (60) : ColumnDefinition colDef = create2.ColumnsParameters[0];
+CreateTableTests.cs (61) : Assert.Equal("Name->String", colDef.AsText());
+CreateTableTests.cs (62) : }
+CreateTableTests.cs (64) : // Check that a simple table with one column has been created correctly.
+CreateTableTests.cs (65) : public bool isCorrect(string parser, string tableName, string columName, string columType)
+CreateTableTests.cs (66) : {
+CreateTableTests.cs (68) : var create = MiniSQLParser.Parse(parser);
+CreateTableTests.cs (69) : Assert.NotNull(create);
+CreateTableTests.cs (70) : Assert.IsType<CreateTable>(create);
+CreateTableTests.cs (72) : CreateTable ct = (CreateTable)MiniSQLParser.Parse(parser);
+CreateTableTests.cs (73) : Assert.Equal(tableName, ct.Table);
+CreateTableTests.cs (74) : Assert.True(1 == ct.ColumnsParameters.Count);
+CreateTableTests.cs (76) : ColumnDefinition colDef = ct.ColumnsParameters[0];
+CreateTableTests.cs (77) : Assert.Equal(columName + "->" + columType, colDef.AsText());
+CreateTableTests.cs (79) : return true;
+CreateTableTests.cs (80) : }
+CreateTableTests.cs (82) : [Fact]
+CreateTableTests.cs (83) : public void CreateTableSimpleOneColumnTableWithSpaces()
+CreateTableTests.cs (84) : {
+CreateTableTests.cs (85) : Assert.True(isCorrect("CREATE  TABLE testTable1 (Age INT)", "testTable1", "Age", "Int"));
+CreateTableTests.cs (86) : Assert.True(isCorrect("CREATE  TABLE  testTable2 (Name TEXT)", "testTable2", "Name", "String"));
+CreateTableTests.cs (87) : Assert.True(isCorrect("CREATE  TABLE  testTable3  (2height DOUBLE)", "testTable3", "2height", "Double"));
+CreateTableTests.cs (88) : Assert.True(isCorrect("CREATE  TABLE  testTable4  (PlCE2s  TEXT)", "testTable4", "PlCE2s", "String"));
+CreateTableTests.cs (89) : Assert.True(isCorrect("CREATE  TABLE  testTable5  (2Age INT)", "testTable5", "2Age", "Int"));
+CreateTableTests.cs (90) : Assert.True(isCorrect("CREATE TABLE testTable6 (Name2      TEXT)", "testTable6", "Name2", "String"));
+CreateTableTests.cs (91) : Assert.True(isCorrect("CREATE   TABLE testTable7  (HEIGHT   DOUBLE)", "testTable7", "HEIGHT", "Double"));
+CreateTableTests.cs (92) : }
+CreateTableTests.cs (94) : [Fact]
+CreateTableTests.cs (95) : public void CreateTableCorrectWithMultipleColumns()
+CreateTableTests.cs (96) : {
+CreateTableTests.cs (97) : // Checking that the return value is not Null and is type CreateTable
+CreateTableTests.cs (98) : var create1 = MiniSQLParser.Parse("CREATE TABLE TestTable1 (Name TEXT,Age INT,Height DOUBLE)");
+CreateTableTests.cs (99) : Assert.NotNull(create1);
+CreateTableTests.cs (100) : Assert.IsType<CreateTable>(create1);
+CreateTableTests.cs (102) : // Checking that the table name and the number of columns are correct
+CreateTableTests.cs (103) : CreateTable create2 = (CreateTable)MiniSQLParser.Parse("CREATE TABLE TestTable1 (Name TEXT,Age INT,Height DOUBLE)");
+CreateTableTests.cs (104) : Assert.Equal("TestTable1", create2.Table);
+CreateTableTests.cs (105) : Assert.True(3 == create2.ColumnsParameters.Count);
+CreateTableTests.cs (107) : // Checking that the values for the column definition are correct
+CreateTableTests.cs (108) : ColumnDefinition colDef = create2.ColumnsParameters[0];
+CreateTableTests.cs (109) : Assert.Equal("Name->String", colDef.AsText());
+CreateTableTests.cs (110) : colDef = create2.ColumnsParameters[1];
+CreateTableTests.cs (111) : Assert.Equal("Age->Int", colDef.AsText());
+CreateTableTests.cs (112) : colDef = create2.ColumnsParameters[2];
+CreateTableTests.cs (113) : Assert.Equal("Height->Double", colDef.AsText());
+CreateTableTests.cs (114) : }
+CreateTableTests.cs (116) : [Fact]
+CreateTableTests.cs (117) : public void CreateTableCorrectWithMultipleColumnsAndSpaces()
+CreateTableTests.cs (118) : {
+CreateTableTests.cs (119) : // Checking that the return value is not Null and is type CreateTable
+CreateTableTests.cs (120) : var create1 = MiniSQLParser.Parse("CREATE  TABLE  111  (Name  TEXT,Age  INT,Height  DOUBLE)");
+CreateTableTests.cs (121) : Assert.NotNull(create1);
+CreateTableTests.cs (122) : Assert.IsType<CreateTable>(create1);
+CreateTableTests.cs (124) : // Checking that the table name and the number of columns are correct
+CreateTableTests.cs (125) : CreateTable create2 = (CreateTable)MiniSQLParser.Parse("CREATE  TABLE  111  (Name  TEXT,Age  INT,Height  DOUBLE)");
+CreateTableTests.cs (126) : Assert.Equal("111", create2.Table);
+CreateTableTests.cs (127) : Assert.True(3 == create2.ColumnsParameters.Count);
+CreateTableTests.cs (129) : // Checking that the values for the column definition are correct
+CreateTableTests.cs (130) : ColumnDefinition colDef = create2.ColumnsParameters[0];
+CreateTableTests.cs (131) : Assert.Equal("Name->String", colDef.AsText());
+CreateTableTests.cs (132) : colDef = create2.ColumnsParameters[1];
+CreateTableTests.cs (133) : Assert.Equal("Age->Int", colDef.AsText());
+CreateTableTests.cs (134) : colDef = create2.ColumnsParameters[2];
+CreateTableTests.cs (135) : Assert.Equal("Height->Double", colDef.AsText());
+CreateTableTests.cs (136) : }
+CreateTableTests.cs (138) : [Fact]
+CreateTableTests.cs (139) : public void CreateTableIncorrectWays()
+CreateTableTests.cs (140) : {
+CreateTableTests.cs (141) : var createTable = MiniSQLParser.Parse("Create Table t1 (Name TEXT,Age INT)");
+CreateTableTests.cs (142) : var createTable2 = MiniSQLParser.Parse("CREATE TABLE T2 (Name TEXT,Age int)");
+CreateTableTests.cs (143) : var createTable3 = MiniSQLParser.Parse("CREATE TABLE T3 (Name TEXT, Age INT)");
+CreateTableTests.cs (144) : var createTable4 = MiniSQLParser.Parse("CREATE TABLE T4(Name TEXT,Age INT)");
+CreateTableTests.cs (145) : var createTable5 = MiniSQLParser.Parse("CREATE TABLE T5 (Name TEXT,Age INT, Height DOUBLE)");
+CreateTableTests.cs (146) : var createTable6 = MiniSQLParser.Parse("CREATE TABLE T6 (Name)");
+CreateTableTests.cs (147) : var createTable7 = MiniSQLParser.Parse("CREATE TABLE T7 (INT)");
+CreateTableTests.cs (148) : var createTable8 = MiniSQLParser.Parse("CREATE TABLE +-+ (Name TEXT)");
+CreateTableTests.cs (149) : Assert.Null(createTable);
+CreateTableTests.cs (150) : Assert.Null(createTable2);
+CreateTableTests.cs (151) : Assert.Null(createTable3);
+CreateTableTests.cs (152) : Assert.Null(createTable4);
+CreateTableTests.cs (153) : Assert.Null(createTable5);
+CreateTableTests.cs (154) : Assert.Null(createTable6);
+CreateTableTests.cs (155) : Assert.Null(createTable7);
+CreateTableTests.cs (156) : Assert.Null(createTable8);
+CreateTableTests.cs (157) : }
+CreateTableTests.cs (160) : [Fact]
+CreateTableTests.cs (161) : public void CreateTableExecuteNoDatabase()
+CreateTableTests.cs (162) : {
+CreateTableTests.cs (163) : CreateTable ct = new CreateTable("TestTable", columns);
+CreateTableTests.cs (164) : Database nuevaDb = null;
+CreateTableTests.cs (165) : Assert.Equal(Constants.Error ,ct.Execute(nuevaDb));
+CreateTableTests.cs (166) : }
+CreateTableTests.cs (168) : [Fact]
+CreateTableTests.cs (169) : public void CreateTableExecuteSuccessSingleColumn()
+CreateTableTests.cs (170) : {
+CreateTableTests.cs (171) : CreateTable ct = (CreateTable) MiniSQLParser.Parse("CREATE TABLE Test1 (Name TEXT)");
+CreateTableTests.cs (172) : Assert.Equal(Constants.CreateTableSuccess, ct.Execute(db));
+CreateTableTests.cs (174) : List<ColumnDefinition> cdef = new List<ColumnDefinition>()
+CreateTableTests.cs (175) : {
+CreateTableTests.cs (176) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Height")
+CreateTableTests.cs (177) : };
+CreateTableTests.cs (178) : CreateTable ct2 = new CreateTable("Table2", cdef);
+CreateTableTests.cs (179) : Assert.Equal(Constants.CreateTableSuccess, ct2.Execute(db));
+CreateTableTests.cs (180) : }
+CreateTableTests.cs (182) : [Fact]
+CreateTableTests.cs (183) : public void CreateTableExecuteSuccessMultipleColumns()
+CreateTableTests.cs (184) : {
+CreateTableTests.cs (185) : CreateTable ct = (CreateTable)MiniSQLParser.Parse("CREATE TABLE Test1 (Name TEXT,Age INT)");
+CreateTableTests.cs (186) : Assert.Equal(Constants.CreateTableSuccess, ct.Execute(db));
+CreateTableTests.cs (188) : CreateTable ct2 = new CreateTable("Table2", columns);
+CreateTableTests.cs (189) : Assert.Equal(Constants.CreateTableSuccess, ct2.Execute(db));
+CreateTableTests.cs (190) : }
+CreateTableTests.cs (193) : [Fact]
+CreateTableTests.cs (194) : public void CreateTableExecuteTableAlreadyExists()
+CreateTableTests.cs (195) : {
+CreateTableTests.cs (196) : CreateTable ct = new CreateTable("TestTable", columns);
+CreateTableTests.cs (197) : Assert.Equal(Constants.TableAlreadyExistsError, ct.Execute(db));
+CreateTableTests.cs (198) : }
+CreateTableTests.cs (201) : [Fact]
+CreateTableTests.cs (202) : public void CreateTableWithoutColumns()
+CreateTableTests.cs (203) : {
+CreateTableTests.cs (204) : var createTable = MiniSQLParser.Parse("CREATE TABLE t1 ()");
+CreateTableTests.cs (205) : Assert.NotNull(createTable);
+CreateTableTests.cs (206) : Assert.IsType<CreateTable>(createTable);
+CreateTableTests.cs (207) : }
+CreateTableTests.cs (209) : [Fact]
+CreateTableTests.cs (210) : public void CreateTableWithoutColumnsExecute()
+CreateTableTests.cs (211) : {
+CreateTableTests.cs (212) : CreateTable ct = (CreateTable)MiniSQLParser.Parse("CREATE TABLE t1 ()");
+CreateTableTests.cs (213) : Assert.Equal(Constants.DatabaseCreatedWithoutColumnsError, ct.Execute(db));
+CreateTableTests.cs (214) : }
+CreateTableTests.cs (216) : [Fact]
+CreateTableTests.cs (217) : public void CreateTableWithoutColumnsIncorrectFormat()
+CreateTableTests.cs (218) : {
+CreateTableTests.cs (219) : var createTable = MiniSQLParser.Parse("CREATE TABLE t1 ( )");
+CreateTableTests.cs (220) : Assert.Null(createTable);
+CreateTableTests.cs (222) : var createTable2 = MiniSQLParser.Parse("CREATE TABLE t1 (f)");
+CreateTableTests.cs (223) : Assert.Null(createTable2);
+CreateTableTests.cs (224) : }
+CreateTableTests.cs (228) : }
+CreateTableTests.cs (229) : }
+DatabaseTests.cs (11) : //AddTableTests
+DatabaseTests.cs (89) : }
+DatabaseTests.cs (91) : [Fact]
+DatabaseTests.cs (93) : {
+DatabaseTests.cs (94) : Database testDataBase = new Database("TestUser", "TestPassword");
+DatabaseTests.cs (98) : // TableByNameTests
+DatabaseTests.cs (99) : [Fact]
+DatabaseTests.cs (100) : public void TableByNameExists()
+DatabaseTests.cs (101) : {
+DatabaseTests.cs (102) : Database testDataBase = new Database("TestUser", "TestPassword");
+DatabaseTests.cs (103) : Table testTable1 = new Table("TestTableOne", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (104) : Table testTable2 = new Table("TestTableTwo", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (105) : Table testTable3 = new Table("TestTableThree", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (106) : testDataBase.AddTable(testTable1);
+DatabaseTests.cs (107) : testDataBase.AddTable(testTable2);
+DatabaseTests.cs (108) : testDataBase.AddTable(testTable3);
+DatabaseTests.cs (110) : Assert.Equal(testTable1, testDataBase.TableByName("TestTableOne"));
+DatabaseTests.cs (111) : Assert.Equal(testTable3, testDataBase.TableByName("TestTableThree"));
+DatabaseTests.cs (112) : Assert.Equal(testTable2, testDataBase.TableByName("TestTableTwo"));
+DatabaseTests.cs (113) : }
+DatabaseTests.cs (115) : [Fact]
+DatabaseTests.cs (116) : public void TableByNameNoTables()
+DatabaseTests.cs (117) : {
+DatabaseTests.cs (118) : Database testDataBase = new Database("TestUser", "TestPassword");
+DatabaseTests.cs (119) : Assert.Null(testDataBase.TableByName("TestTable"));
+DatabaseTests.cs (120) : }
+DatabaseTests.cs (122) : [Fact]
+DatabaseTests.cs (123) : public void TableByNameNullName()
+DatabaseTests.cs (124) : {
+DatabaseTests.cs (125) : Database testDataBase = new Database("TestUser", "TestPassword");
+DatabaseTests.cs (126) : Table testTable1 = new Table("TestTableOne", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (127) : Table testTable2 = new Table("TestTable1Two", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (128) : testDataBase.AddTable(testTable1);
+DatabaseTests.cs (129) : testDataBase.AddTable(testTable2);
+DatabaseTests.cs (131) : Assert.Null(testDataBase.TableByName(null));
+DatabaseTests.cs (132) : }
+DatabaseTests.cs (134) : [Fact]
+DatabaseTests.cs (135) : public void TableByNameNoTablesWithThatName()
+DatabaseTests.cs (136) : {
+DatabaseTests.cs (137) : Database testDataBase = new Database("TestUser", "TestPassword");
+DatabaseTests.cs (138) : Table testTable1 = new Table("TestTableOne", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (139) : Table testTable2 = new Table("TestTable1Two", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (140) : testDataBase.AddTable(testTable1);
+DatabaseTests.cs (141) : testDataBase.AddTable(testTable2);
+DatabaseTests.cs (143) : Assert.Null(testDataBase.TableByName("Tabla1"));
+DatabaseTests.cs (144) : }
+DatabaseTests.cs (146) : [Fact]
+DatabaseTests.cs (147) : public void TableByNameMinusMayusDifference()
+DatabaseTests.cs (149) : Database testDataBase = new Database("TestUser", "TestPassword");
+DatabaseTests.cs (150) : Table testTable1 = new Table("TestTableOne", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (151) : Table testTable2 = new Table("TestTable1Two", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (152) : testDataBase.AddTable(testTable1);
+DatabaseTests.cs (153) : testDataBase.AddTable(testTable2);
+DatabaseTests.cs (155) : Assert.Null(testDataBase.TableByName("testtableone"));
+DatabaseTests.cs (158) : /***********     DropTableTests     **********/
+DatabaseTests.cs (159) : [Fact]
+DatabaseTests.cs (160) : public void DropTableExistentTable()
+DatabaseTests.cs (161) : {
+DatabaseTests.cs (162) : Database testDataBase = new Database("TestUseer", "TestPassword");
+DatabaseTests.cs (163) : Table testTable1 = new Table("TestTableName", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre") });
+DatabaseTests.cs (164) : Table testTable2 = new Table("TestTableAge", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.Int, "Edad") });
+DatabaseTests.cs (165) : testDataBase.AddTable(testTable1);
+DatabaseTests.cs (166) : testDataBase.AddTable(testTable2);
+DatabaseTests.cs (168) : Assert.NotNull(testDataBase.TableByName("TestTableName"));
+DatabaseTests.cs (170) : Assert.True(testDataBase.DropTable("TestTableName"));
+DatabaseTests.cs (171) : String message = Constants.DropTableSuccess;
+DatabaseTests.cs (172) : Assert.Equal(message, testDataBase.LastErrorMessage);
+DatabaseTests.cs (174) : Assert.Null(testDataBase.TableByName("TestTableName"));
+DatabaseTests.cs (175) : }
+DatabaseTests.cs (177) : [Fact]
+DatabaseTests.cs (178) : public void DropTableNoTables()
+DatabaseTests.cs (179) : {
+DatabaseTests.cs (180) : Database testDataBase = new Database("TestUseer", "TestPassword");
+DatabaseTests.cs (182) : Assert.False(testDataBase.DropTable("TestTable"));
+DatabaseTests.cs (184) : String message = Constants.TableDoesNotExistError;
+DatabaseTests.cs (185) : Assert.Equal(message, testDataBase.LastErrorMessage);
+DatabaseTests.cs (187) : Assert.False(testDataBase.DropTable(null));
+DatabaseTests.cs (188) : Assert.Equal(message, testDataBase.LastErrorMessage);
+DatabaseTests.cs (189) : }
+DatabaseTests.cs (193) : /***********     CreateTableTests      **********/
+DatabaseTests.cs (194) : [Fact]
+DatabaseTests.cs (195) : public void CreateTableTest()
+DatabaseTests.cs (196) : {
+DatabaseTests.cs (197) : Database testDataBase = new Database("TestUseer", "TestPassword");
+DatabaseTests.cs (199) : List<ColumnDefinition> listColumDef = new List<ColumnDefinition>();
+DatabaseTests.cs (200) : ColumnDefinition c1 = new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre");
+DatabaseTests.cs (201) : ColumnDefinition c2 = new ColumnDefinition(ColumnDefinition.DataType.Int, "Age");
+DatabaseTests.cs (202) : listColumDef.Add(c1);
+DatabaseTests.cs (203) : listColumDef.Add(c2);
+DatabaseTests.cs (205) : Assert.True(testDataBase.CreateTable("TestTable", listColumDef));
+DatabaseTests.cs (206) : String message = Constants.CreateTableSuccess;
+DatabaseTests.cs (207) : Assert.Equal(message, testDataBase.LastErrorMessage);
+DatabaseTests.cs (210) : [Fact]
+DatabaseTests.cs (211) : public void CreateTableExistentTable()
+DatabaseTests.cs (212) : {
+DatabaseTests.cs (213) : Database testDataBase = new Database("TestUseer", "TestPassword");
+DatabaseTests.cs (215) : List<ColumnDefinition> listColumDef = new List<ColumnDefinition>();
+DatabaseTests.cs (216) : ColumnDefinition c1 = new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre");
+DatabaseTests.cs (217) : ColumnDefinition c2 = new ColumnDefinition(ColumnDefinition.DataType.Int, "Age");
+DatabaseTests.cs (218) : listColumDef.Add(c1);
+DatabaseTests.cs (219) : listColumDef.Add(c2);
+DatabaseTests.cs (221) : Assert.True(testDataBase.CreateTable("TestTable", listColumDef));
+DatabaseTests.cs (222) : String message = Constants.CreateTableSuccess;
+DatabaseTests.cs (223) : Assert.Equal(message, testDataBase.LastErrorMessage);
+DatabaseTests.cs (225) : Assert.False(testDataBase.CreateTable("TestTable", listColumDef));
+DatabaseTests.cs (226) : String message2 = Constants.TableAlreadyExistsError;
+DatabaseTests.cs (227) : Assert.Equal(message2, testDataBase.LastErrorMessage);
+DatabaseTests.cs (228) : }
+DatabaseTests.cs (230) : [Fact]
+DatabaseTests.cs (231) : public void CreateTableNoColumnDef()
+DatabaseTests.cs (232) : {
+DatabaseTests.cs (233) : Database testDataBase = new Database("TestUseer", "TestPassword");
+DatabaseTests.cs (235) : List<ColumnDefinition> listColumDef = new List<ColumnDefinition>();
+DatabaseTests.cs (237) : Assert.False(testDataBase.CreateTable("TestTable", listColumDef));
+DatabaseTests.cs (238) : String message = Constants.DatabaseCreatedWithoutColumnsError;
+DatabaseTests.cs (239) : Assert.Equal(message, testDataBase.LastErrorMessage);
+DatabaseTests.cs (241) : Assert.False(testDataBase.CreateTable("TestTable2", null));
+DatabaseTests.cs (243) : }
+DatabaseTests.cs (245) : [Fact]
+DatabaseTests.cs (246) : public void CreateTableSameNameMinusMayus()
+DatabaseTests.cs (247) : {
+DatabaseTests.cs (248) : Database testDataBase = new Database("TestUseer", "TestPassword");
+DatabaseTests.cs (250) : List<ColumnDefinition> listColumDef = new List<ColumnDefinition>();
+DatabaseTests.cs (251) : ColumnDefinition c1 = new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre");
+DatabaseTests.cs (252) : ColumnDefinition c2 = new ColumnDefinition(ColumnDefinition.DataType.Int, "Age");
+DatabaseTests.cs (253) : listColumDef.Add(c1);
+DatabaseTests.cs (254) : listColumDef.Add(c2);
+DatabaseTests.cs (256) : testDataBase.CreateTable("testtable", listColumDef);
+DatabaseTests.cs (258) : Assert.True(testDataBase.CreateTable("TestTable", listColumDef));
+DatabaseTests.cs (259) : String message = Constants.CreateTableSuccess;
+DatabaseTests.cs (260) : Assert.Equal(message, testDataBase.LastErrorMessage);
+DatabaseTests.cs (261) : }
+DatabaseTests.cs (264) : /***********     InsertTests      **********/
+DatabaseTests.cs (265) : [Fact]
+DatabaseTests.cs (266) : public void TestInsertTrue()
+DatabaseTests.cs (267) : {
+DatabaseTests.cs (268) : Database testDatabase = new Database("TestUser", "TPassword");
+DatabaseTests.cs (270) : String testTable = "tTable";
+DatabaseTests.cs (271) : List<String> tValues = new List<string> { "Kike", "15", "1.84" };
+DatabaseTests.cs (273) : List<ColumnDefinition> tColumDefs = new List<ColumnDefinition>();
+DatabaseTests.cs (274) : tColumDefs.Add(new ColumnDefinition(ColumnDefinition.DataType.String, "Name"));
+DatabaseTests.cs (275) : tColumDefs.Add(new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"));
+DatabaseTests.cs (276) : tColumDefs.Add(new ColumnDefinition(ColumnDefinition.DataType.Double, "Height"));
+DatabaseTests.cs (278) : testDatabase.CreateTable(testTable, tColumDefs);
+DatabaseTests.cs (280) : Assert.True(testDatabase.Insert(testTable, tValues));
+DatabaseTests.cs (281) : String message = Constants.InsertSuccess;
+DatabaseTests.cs (282) : Assert.Equal(message, testDatabase.LastErrorMessage);
+DatabaseTests.cs (284) : Table t = testDatabase.TableByName(testTable);
+DatabaseTests.cs (285) : Assert.Equal(1, t.NumRows());
+DatabaseTests.cs (286) : }
+DatabaseTests.cs (288) : [Fact]
+DatabaseTests.cs (289) : public void TestInsertTableDoesNotExists()
+DatabaseTests.cs (290) : {
+DatabaseTests.cs (291) : Database testDatabase = new Database("TestUser", "TestPassword");
+DatabaseTests.cs (293) : String testTableName = "testTable";
+DatabaseTests.cs (294) : List<String> testValues = new List<string> { "Kike", "20", "1.93" };
+DatabaseTests.cs (296) : Assert.False(testDatabase.Insert(testTableName, testValues));
+DatabaseTests.cs (297) : String message = Constants.TableDoesNotExistError;
+DatabaseTests.cs (298) : Assert.Equal(message, testDatabase.LastErrorMessage);
+DatabaseTests.cs (299) : }
+DatabaseTests.cs (301) : [Fact]
+DatabaseTests.cs (302) : public void TestInsertColumnsCountsDontMatch()
+DatabaseTests.cs (303) : {
+DatabaseTests.cs (304) : Database testDatabase = new Database("TUser", "TPassword");
+DatabaseTests.cs (306) : String tTable = "tTable";
+DatabaseTests.cs (307) : List<String> tValuesExcess = new List<string> { "Kike", "25", "1.84", "Donostia" };
+DatabaseTests.cs (308) : List<String> tValues = new List<string> { "Ramon", "23" };
+DatabaseTests.cs (310) : List<ColumnDefinition> tColumDefs = new List<ColumnDefinition>();
+DatabaseTests.cs (311) : tColumDefs.Add(new ColumnDefinition(ColumnDefinition.DataType.String, "Name"));
+DatabaseTests.cs (312) : tColumDefs.Add(new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"));
+DatabaseTests.cs (313) : tColumDefs.Add(new ColumnDefinition(ColumnDefinition.DataType.Double, "Height"));
+DatabaseTests.cs (315) : testDatabase.CreateTable(tTable, tColumDefs);
+DatabaseTests.cs (317) : Assert.False(testDatabase.Insert(tTable, tValuesExcess));
+DatabaseTests.cs (318) : String message = Constants.ColumnCountsDontMatch;
+DatabaseTests.cs (319) : Assert.Equal(message, testDatabase.LastErrorMessage);
+DatabaseTests.cs (321) : Assert.False(testDatabase.Insert(tTable, tValues));
+DatabaseTests.cs (322) : Assert.Equal(message, testDatabase.LastErrorMessage);
+DatabaseTests.cs (324) : Assert.False(testDatabase.Insert(tTable, null));
+DatabaseTests.cs (325) : Assert.Equal(message, testDatabase.LastErrorMessage);
+DatabaseTests.cs (327) : Table t = testDatabase.TableByName(tTable);
+DatabaseTests.cs (328) : Assert.Equal(0, t.NumRows());
+DatabaseTests.cs (329) : }
+DropSecurityProfileTests.cs (1) : ﻿using System;
+DropSecurityProfileTests.cs (2) : using System.Collections.Generic;
+DropSecurityProfileTests.cs (3) : using System.Linq;
+DropSecurityProfileTests.cs (4) : using System.Text;
+DropSecurityProfileTests.cs (5) : using System.Threading.Tasks;
+DropSecurityProfileTests.cs (6) : using DbManager;
+DropSecurityProfileTests.cs (7) : using DbManager.Security;
+DropSecurityProfileTests.cs (9) : namespace OurTests
+DropSecurityProfileTests.cs (10) : {
+DropSecurityProfileTests.cs (11) : public class DropSecurityProfileTests
+DropSecurityProfileTests.cs (12) : {
+DropSecurityProfileTests.cs (14) : [Fact]
+DropSecurityProfileTests.cs (15) : public void DropSecurityProfile()
+DropSecurityProfileTests.cs (16) : {
+DropSecurityProfileTests.cs (17) : string query = "DROP SECURITY PROFILE Alex";
+DropSecurityProfileTests.cs (18) : string query2 = "DROP SECURITY PROFILE ANDER";
+DropSecurityProfileTests.cs (19) : string query3 = "DROP   SECURITY   PROFILE   alma";
+DropSecurityProfileTests.cs (21) : var securityProf = MiniSQLParser.Parse(query);
+DropSecurityProfileTests.cs (22) : Assert.NotNull(securityProf);
+DropSecurityProfileTests.cs (23) : Assert.IsType<DropSecurityProfile>(securityProf);
+DropSecurityProfileTests.cs (25) : securityProf = MiniSQLParser.Parse(query2);
+DropSecurityProfileTests.cs (26) : Assert.NotNull(securityProf);
+DropSecurityProfileTests.cs (27) : Assert.IsType<DropSecurityProfile>(securityProf);
+DropSecurityProfileTests.cs (29) : securityProf = MiniSQLParser.Parse(query3);
+DropSecurityProfileTests.cs (30) : Assert.NotNull(securityProf);
+DropSecurityProfileTests.cs (31) : Assert.IsType<DropSecurityProfile>(securityProf);
+DropSecurityProfileTests.cs (32) : }
+DropSecurityProfileTests.cs (34) : [Fact]
+DropSecurityProfileTests.cs (35) : public void DropSecurityProfileNotAcceptedTypes()
+DropSecurityProfileTests.cs (36) : {
+DropSecurityProfileTests.cs (37) : string query = "DROP SECURITY PROFILE AA2lex";
+DropSecurityProfileTests.cs (38) : string query2 = "DROP SECURITY PROFILE 23";
+DropSecurityProfileTests.cs (39) : string query3 = "DROP   SECURITY   PROFILE ";
+DropSecurityProfileTests.cs (41) : var securityProf = MiniSQLParser.Parse(query);
+DropSecurityProfileTests.cs (42) : Assert.Null(securityProf);
+DropSecurityProfileTests.cs (44) : securityProf = MiniSQLParser.Parse(query2);
+DropSecurityProfileTests.cs (45) : Assert.Null(securityProf);
+DropSecurityProfileTests.cs (47) : securityProf = MiniSQLParser.Parse(query3);
+DropSecurityProfileTests.cs (48) : Assert.Null(securityProf);
+DropSecurityProfileTests.cs (49) : }
+DropSecurityProfileTests.cs (51) : [Fact]
+DropSecurityProfileTests.cs (52) : public void Correct()
+DropSecurityProfileTests.cs (53) : {
+DropSecurityProfileTests.cs (54) : DropSecurityProfile query = MiniSQLParser.Parse("DROP SECURITY PROFILE profile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (55) : Assert.Equal("profile", query.ProfileName);
+DropSecurityProfileTests.cs (57) : query = MiniSQLParser.Parse("DROP SECURITY PROFILE OtherProfile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (58) : Assert.Equal("OtherProfile", query.ProfileName);
+DropSecurityProfileTests.cs (59) : }
+DropSecurityProfileTests.cs (61) : [Fact]
+DropSecurityProfileTests.cs (62) : public void CorrectWithSpaces()
+DropSecurityProfileTests.cs (63) : {
+DropSecurityProfileTests.cs (64) : DropSecurityProfile query = MiniSQLParser.Parse("DROP     SECURITY PROFILE      profile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (65) : Assert.Equal("profile", query.ProfileName);
+DropSecurityProfileTests.cs (67) : query = MiniSQLParser.Parse("DROP SECURITY     PROFILE OtherProfile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (68) : Assert.Equal("OtherProfile", query.ProfileName);
+DropSecurityProfileTests.cs (69) : }
+DropSecurityProfileTests.cs (71) : [Fact]
+DropSecurityProfileTests.cs (72) : public void IncorrectCapitalization()
+DropSecurityProfileTests.cs (73) : {
+DropSecurityProfileTests.cs (74) : DropSecurityProfile query = MiniSQLParser.Parse("Create SECURITY PROFILE profile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (75) : Assert.Null(query);
+DropSecurityProfileTests.cs (77) : query = MiniSQLParser.Parse("create security profile OtherProfile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (78) : Assert.Null(query);
+DropSecurityProfileTests.cs (79) : }
+DropSecurityProfileTests.cs (81) : [Fact]
+DropSecurityProfileTests.cs (82) : public void IncorrectProfileWithForbiddenChars()
+DropSecurityProfileTests.cs (83) : {
+DropSecurityProfileTests.cs (84) : DropSecurityProfile query = MiniSQLParser.Parse("DROP SECURITY PROFILE pro-file") as DropSecurityProfile;
+DropSecurityProfileTests.cs (85) : Assert.Null(query);
+DropSecurityProfileTests.cs (87) : query = MiniSQLParser.Parse("DROP SECURITY PROFILE Pro file") as DropSecurityProfile;
+DropSecurityProfileTests.cs (88) : Assert.Null(query);
+DropSecurityProfileTests.cs (89) : }
+DropSecurityProfileTests.cs (91) : [Fact]
+DropSecurityProfileTests.cs (92) : public void IncorrectWithoutProfile()
+DropSecurityProfileTests.cs (93) : {
+DropSecurityProfileTests.cs (94) : DropSecurityProfile query = MiniSQLParser.Parse("DROP SECURITY PROFILE ") as DropSecurityProfile;
+DropSecurityProfileTests.cs (95) : Assert.Null(query);
+DropSecurityProfileTests.cs (97) : query = MiniSQLParser.Parse("DROP SECURITY PROFILE") as DropSecurityProfile;
+DropSecurityProfileTests.cs (98) : Assert.Null(query);
+DropSecurityProfileTests.cs (99) : }
+DropSecurityProfileTests.cs (102) : [Fact]
+DropSecurityProfileTests.cs (103) : public void ExecuteNonUserAdmin()
+DropSecurityProfileTests.cs (104) : {
+DropSecurityProfileTests.cs (105) : Database db = new Database("NoSoy", "Password");
+DropSecurityProfileTests.cs (106) : db.SecurityManager.RemoveProfile(db.SecurityManager.ProfileByUser("NoSoy").Name);
+DropSecurityProfileTests.cs (109) : DropSecurityProfile dropSP = new DropSecurityProfile("TestProfile");
+DropSecurityProfileTests.cs (110) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, dropSP.Execute(db));
+DropSecurityProfileTests.cs (111) : }
+DropSecurityProfileTests.cs (113) : [Fact]
+DropSecurityProfileTests.cs (114) : public void ExecuteDropSuccess()
+DropSecurityProfileTests.cs (115) : {
+DropSecurityProfileTests.cs (117) : Database db = new Database("Admin", "Password");
+DropSecurityProfileTests.cs (118) : db.SecurityManager.AddProfile(new Profile { Name = "TestProfile" });
+DropSecurityProfileTests.cs (119) : db.SecurityManager.AddProfile(new Profile { Name = "TestProfile2" });
+DropSecurityProfileTests.cs (122) : DropSecurityProfile dropSP = new DropSecurityProfile("TestProfile");
+DropSecurityProfileTests.cs (123) : Assert.Equal(Constants.DropSecurityProfileSuccess, dropSP.Execute(db));
+DropSecurityProfileTests.cs (125) : }
+DropSecurityProfileTests.cs (127) : [Fact]
+DropSecurityProfileTests.cs (128) : public void ExecuteProfileDoesNotExist()
+DropSecurityProfileTests.cs (129) : {
+DropSecurityProfileTests.cs (130) : Database db = new Database("Admin", "Password");
+DropSecurityProfileTests.cs (131) : db.SecurityManager.AddProfile(new Profile { Name = "TestProfile" });
+DropSecurityProfileTests.cs (132) : db.SecurityManager.AddProfile(new Profile { Name = "TestProfile2" });
+DropSecurityProfileTests.cs (135) : DropSecurityProfile dropSP = new DropSecurityProfile("TestProfile3");
+DropSecurityProfileTests.cs (136) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, dropSP.Execute(db));
+DropSecurityProfileTests.cs (137) : }
+DropSecurityProfileTests.cs (139) : [Fact]
+DropSecurityProfileTests.cs (140) : public void ExecuteProfileNonProfilesInList()
+DropSecurityProfileTests.cs (141) : {
+DropSecurityProfileTests.cs (143) : Database db = new Database("Admin", "Password");
+DropSecurityProfileTests.cs (145) : DropSecurityProfile dropSP = new DropSecurityProfile("TestProfile");
+DropSecurityProfileTests.cs (146) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, dropSP.Execute(db));
+DropSecurityProfileTests.cs (147) : }
+DropSecurityProfileTests.cs (148) : }
+DropSecurityProfileTests.cs (149) : }
+InsertTests.cs (1) : ﻿using DbManager;
+InsertTests.cs (2) : using DbManager.Parser;
+InsertTests.cs (3) : using System;
+InsertTests.cs (4) : using System.Collections.Generic;
+InsertTests.cs (5) : using System.Linq;
+InsertTests.cs (6) : using System.Text;
+InsertTests.cs (7) : using System.Threading.Tasks;
+InsertTests.cs (9) : namespace OurTests
+InsertTests.cs (10) : {
+InsertTests.cs (11) : public class InsertTests
+InsertTests.cs (12) : {
+InsertTests.cs (14) : private Database db;
+InsertTests.cs (15) : private Table table;
+InsertTests.cs (16) : private List<ColumnDefinition> columns;
+InsertTests.cs (17) : private List<string> values;
+InsertTests.cs (19) : public InsertTests()
+InsertTests.cs (20) : {
+InsertTests.cs (21) : SetUp();
+InsertTests.cs (22) : }
+InsertTests.cs (24) : public void SetUp()
+InsertTests.cs (25) : {
+InsertTests.cs (26) : db = new Database("user", "1234");
+InsertTests.cs (27) : columns = new List<ColumnDefinition>
+InsertTests.cs (28) : {
+InsertTests.cs (29) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+InsertTests.cs (30) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+InsertTests.cs (31) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Height")
+InsertTests.cs (32) : };
+InsertTests.cs (34) : table = new Table("People", columns);
+InsertTests.cs (36) : values = new List<string> { "Ainara", "21", "1.65" };
+InsertTests.cs (37) : table.AddRow(new Row(columns, values));
+InsertTests.cs (38) : values = new List<string> { "Mikel", "20", "184" };
+InsertTests.cs (39) : table.AddRow(new Row(columns, values));
+InsertTests.cs (41) : db.AddTable(table);
+InsertTests.cs (42) : }
+InsertTests.cs (45) : [Fact]
+InsertTests.cs (46) : public void InsertCorrect()
+InsertTests.cs (47) : {
+InsertTests.cs (48) : var insert = MiniSQLParser.Parse("INSERT INTO People VALUES ('Martin','20','1.78')");
+InsertTests.cs (49) : Assert.NotNull(insert);
+InsertTests.cs (50) : Assert.IsType<Insert>(insert);
+InsertTests.cs (53) : }
+InsertTests.cs (55) : [Fact]
+InsertTests.cs (56) : public void InsertCorrectWithSpaces()
+InsertTests.cs (57) : {
+InsertTests.cs (58) : var insert = MiniSQLParser.Parse("INSERT  INTO People VALUES ('Martin','20','1.78')");
+InsertTests.cs (59) : Assert.NotNull(insert);
+InsertTests.cs (60) : Assert.IsType<Insert>(insert);
+InsertTests.cs (62) : var insert2 = MiniSQLParser.Parse("INSERT  INTO  People VALUES ('Martin','20','1.78')");
+InsertTests.cs (63) : Assert.NotNull(insert2);
+InsertTests.cs (64) : Assert.IsType<Insert>(insert2);
+InsertTests.cs (66) : var insert3 = MiniSQLParser.Parse("INSERT  INTO  People  VALUES ('Martin','20','1.78')");
+InsertTests.cs (67) : Assert.NotNull(insert3);
+InsertTests.cs (68) : Assert.IsType<Insert>(insert3);
+InsertTests.cs (70) : var insert4 = MiniSQLParser.Parse("INSERT  INTO  People  VALUES  ('Martin','20','1.78')");
+InsertTests.cs (71) : Assert.NotNull(insert4);
+InsertTests.cs (72) : Assert.IsType<Insert>(insert4);
+InsertTests.cs (74) : var insert5 = MiniSQLParser.Parse("INSERT  INTO People VALUES ('Martin','20','1.78')");
+InsertTests.cs (75) : Assert.NotNull(insert5);
+InsertTests.cs (76) : Assert.IsType<Insert>(insert5);
+InsertTests.cs (78) : var insert6 = MiniSQLParser.Parse("INSERT INTO  People VALUES ('Martin','20','1.78')");
+InsertTests.cs (79) : Assert.NotNull(insert6);
+InsertTests.cs (80) : Assert.IsType<Insert>(insert6);
+InsertTests.cs (82) : var insert7 = MiniSQLParser.Parse("INSERT INTO  People VALUES  ('Martin','20','1.78')");
+InsertTests.cs (83) : Assert.NotNull(insert7);
+InsertTests.cs (84) : Assert.IsType<Insert>(insert7);
+InsertTests.cs (85) : }
+InsertTests.cs (87) : [Fact]
+InsertTests.cs (88) : public void InsertSimpleDoubleValue()
+InsertTests.cs (89) : {
+InsertTests.cs (90) : var insert = MiniSQLParser.Parse("INSERT INTO Height VALUES ('1.78')");
+InsertTests.cs (91) : Assert.NotNull(insert);
+InsertTests.cs (92) : Assert.IsType<Insert>(insert);
+InsertTests.cs (93) : }
+InsertTests.cs (95) : [Fact]
+InsertTests.cs (96) : public void InsertSimpleIntValues()
+InsertTests.cs (97) : {
+InsertTests.cs (98) : var insert = MiniSQLParser.Parse("INSERT INTO Ages2 VALUES ('21')");
+InsertTests.cs (99) : Assert.NotNull(insert);
+InsertTests.cs (100) : Assert.IsType<Insert>(insert);
+InsertTests.cs (101) : }
+InsertTests.cs (103) : [Fact]
+InsertTests.cs (104) : public void InsertSimpleStringValues()
+InsertTests.cs (105) : {
+InsertTests.cs (106) : var insert = MiniSQLParser.Parse("INSERT INTO Names VALUES ('Santiago')");
+InsertTests.cs (107) : Assert.NotNull(insert);
+InsertTests.cs (108) : Assert.IsType<Insert>(insert);
+InsertTests.cs (109) : }
+InsertTests.cs (111) : [Fact]
+InsertTests.cs (112) : public void InsertIncorrectMultipleTables()
+InsertTests.cs (113) : {
+InsertTests.cs (114) : var insert = MiniSQLParser.Parse("INSERT INTO A B VALUES ('Santiago')");
+InsertTests.cs (115) : Assert.Null(insert);
+InsertTests.cs (116) : }
+InsertTests.cs (118) : [Fact]
+InsertTests.cs (119) : public void InsertIncorrectSpacesOrMissingCommnas()
+InsertTests.cs (120) : {
+InsertTests.cs (121) : var insert = MiniSQLParser.Parse("INSERT INTO People VALUES ('Martin', '20','1.78')");
+InsertTests.cs (122) : Assert.Null(insert);
+InsertTests.cs (124) : var insert2 = MiniSQLParser.Parse("INSERT INTO People VALUES ('Martin','20', '1.78')");
+InsertTests.cs (125) : Assert.Null(insert2);
+InsertTests.cs (127) : var insert3 = MiniSQLParser.Parse("INSERT INTO People VALUES('Martin','20','1.78')");
+InsertTests.cs (128) : Assert.Null(insert3);
+InsertTests.cs (130) : var insert4 = MiniSQLParser.Parse("INSERT  INTO  People  VALUES  ( 'Martin','20','1.78')");
+InsertTests.cs (131) : Assert.Null(insert4);
+InsertTests.cs (133) : var insert5 = MiniSQLParser.Parse("INSERT  INTO People VALUES ( 'Martin')");
+InsertTests.cs (134) : Assert.Null(insert5);
+InsertTests.cs (136) : var insert6 = MiniSQLParser.Parse("INSERT INTO  People VALUES ('Martin','20',)");
+InsertTests.cs (137) : Assert.Null(insert6);
+InsertTests.cs (139) : var insert7 = MiniSQLParser.Parse("INSERT INTO  People VALUES  ('Martin' '20')");
+InsertTests.cs (140) : Assert.Null(insert7);
+InsertTests.cs (141) : }
+InsertTests.cs (144) : [Fact]
+InsertTests.cs (145) : public void InsertExecuteNullDatabase()
+InsertTests.cs (146) : {
+InsertTests.cs (147) : Database nuevaDB = null;
+InsertTests.cs (148) : Insert insert = new Insert("Test", values);
+InsertTests.cs (150) : Assert.Equal(Constants.Error, insert.Execute(nuevaDB));
+InsertTests.cs (152) : }
+InsertTests.cs (154) : [Fact]
+InsertTests.cs (155) : public void InsertExecuteTableDoesNotExistsError()
+InsertTests.cs (156) : {
+InsertTests.cs (158) : Insert insert = new Insert("Tabla", values);
+InsertTests.cs (159) : Assert.Equal(Constants.TableDoesNotExistError, insert.Execute(db));
+InsertTests.cs (161) : Insert insert2 = (Insert) MiniSQLParser.Parse("INSERT INTO Tabla2 VALUES ('Rafa','23','1.80')");
+InsertTests.cs (162) : Assert.Equal(Constants.TableDoesNotExistError, insert2.Execute(db));
+InsertTests.cs (163) : }
+InsertTests.cs (165) : [Fact]
+InsertTests.cs (166) : public void InsertExecuteSuccess()
+InsertTests.cs (167) : {
+InsertTests.cs (168) : values = new List<string> { "Clara", "22", "1.59" };
+InsertTests.cs (169) : Insert insert = new Insert("People", values);
+InsertTests.cs (170) : Assert.Equal(Constants.InsertSuccess, insert.Execute(db));
+InsertTests.cs (171) : Assert.True(3 == db.TableByName("People").NumRows());
+InsertTests.cs (173) : Insert insert2 = (Insert) MiniSQLParser.Parse("INSERT INTO People VALUES ('Rafa','23','1.80')");
+InsertTests.cs (174) : Assert.Equal(Constants.InsertSuccess, insert2.Execute(db));
+InsertTests.cs (175) : Assert.True(4 == db.TableByName("People").NumRows());
+InsertTests.cs (177) : }
+InsertTests.cs (179) : [Fact]
+InsertTests.cs (180) : public void InsertExecuteColumnsCountDontMatch()
+InsertTests.cs (181) : {
+InsertTests.cs (182) : values = new List<string> { "Pablo", "21" };
+InsertTests.cs (183) : Insert insert = new Insert("People", values);
+InsertTests.cs (184) : Assert.Equal(Constants.ColumnCountsDontMatch, insert.Execute(db));
+InsertTests.cs (186) : Insert insert2 = (Insert) MiniSQLParser.Parse("INSERT INTO People VALUES ('Rafa','23')");
+InsertTests.cs (187) : Assert.Equal(Constants.ColumnCountsDontMatch, insert2.Execute(db));
+InsertTests.cs (188) : }
+InsertTests.cs (191) : }
+InsertTests.cs (192) : }
+TableTests.cs (134) : //TestInsertContainsAllColumnsValues() check the number of rows increase and the result is true
+TableTests.cs (135) : [Fact]
+TableTests.cs (136) : public void TestInsertAllValues()
+TableTests.cs (137) : {
+TableTests.cs (138) : Table testTable = Table.CreateTestTable();
+TableTests.cs (139) : String name = "Adolf";
+TableTests.cs (140) : String height = "1.74";
+TableTests.cs (141) : String age = "56";
+TableTests.cs (142) : List<string> listValues = (new List<string>() { name, height, age });
+TableTests.cs (143) : bool result = testTable.Insert(listValues);
+TableTests.cs (145) : Assert.True(result);
+TableTests.cs (146) : Assert.Equal(4, testTable.NumRows());
+TableTests.cs (147) : }
+TableTests.cs (149) : [Fact]
+TableTests.cs (150) : public void TestInsertNoValues()
+TableTests.cs (151) : {
+TableTests.cs (152) : Table testTable = Table.CreateTestTable();
+TableTests.cs (154) : List<string> listValues = new List<string>();
+TableTests.cs (155) : bool result = testTable.Insert(listValues);
+TableTests.cs (156) : Assert.False(result);
+TableTests.cs (157) : }
+TableTests.cs (159) : //TestInsertNoContainsAllColumnsValues() check the result is false
+TableTests.cs (160) : [Fact]
+TableTests.cs (161) : public void TestInsertNoContainsAllColumnsValues()
+TableTests.cs (162) : {
+TableTests.cs (163) : Table testTable = Table.CreateTestTable();
+TableTests.cs (164) : String name = "Montoya";
+TableTests.cs (165) : String age = "31";
+TableTests.cs (166) : List<string> listValues = (new List<string>() { name, age });
+TableTests.cs (168) : bool result = testTable.Insert(listValues);
+TableTests.cs (169) : Assert.False(result);
+TableTests.cs (170) : }
+TableTests.cs (172) : //TestInserContainsMoreValuesThanColumns check the result is false
+TableTests.cs (173) : [Fact]
+TableTests.cs (174) : public void TestInserContainsMoreValuesThanColumns()
+TableTests.cs (175) : {
+TableTests.cs (176) : Table testTable = Table.CreateTestTable();
+TableTests.cs (177) : String name = "Hollow";
+TableTests.cs (178) : String age = "19";
+TableTests.cs (179) : String height = "1.50";
+TableTests.cs (180) : String eyes = "Green";
+TableTests.cs (181) : List<string> listValues = (new List<string>() { name, age, height, eyes });
+TableTests.cs (183) : bool result = testTable.Insert(listValues);
+TableTests.cs (184) : Assert.False(result);
+TableTests.cs (185) : }
+CreateSecurityProfile.cs (5) : using DbManager.Security;
+CreateSecurityProfile.cs (18) : this.ProfileName = profileName;
+CreateSecurityProfile.cs (26) : if (database.IsUserAdmin())
+CreateSecurityProfile.cs (27) : {
+CreateSecurityProfile.cs (28) : database.SecurityManager.AddProfile(new Profile {Name =  this.ProfileName });
+CreateSecurityProfile.cs (29) : return Constants.CreateSecurityProfileSuccess;
+CreateSecurityProfile.cs (30) : }
+CreateSecurityProfile.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateTable.cs (3) : using System.Net.Http.Headers;
+CreateTable.cs (18) : this.Table = table;
+CreateTable.cs (19) : this.ColumnsParameters = columns;
+DropSecurityProfile.cs (16) : this.ProfileName = profileName;
+DropSecurityProfile.cs (24) : if (database.IsUserAdmin())
+DropSecurityProfile.cs (25) : {
+DropSecurityProfile.cs (26) : if (database.SecurityManager.RemoveProfile(ProfileName))
+DropSecurityProfile.cs (27) : {
+DropSecurityProfile.cs (28) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (29) : }
+DropSecurityProfile.cs (30) : else
+DropSecurityProfile.cs (31) : {
+DropSecurityProfile.cs (32) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (33) : }
+DropSecurityProfile.cs (34) : }
+DropSecurityProfile.cs (35) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Insert.cs (16) : this.Table = table;
+Insert.cs (17) : this.Values = values;
+Insert.cs (27) : if (database == null)
+Insert.cs (28) : {
+Insert.cs (29) : return Constants.Error;
+Insert.cs (30) : }
+Insert.cs (32) : database.Insert(Table, Values);
+Insert.cs (34) : return database.LastErrorMessage;
+MiniSQLParser.cs (3) : using System;
+MiniSQLParser.cs (6) : using System.Diagnostics;
+MiniSQLParser.cs (18) : const string insertPattern = @"^INSERT\s+INTO\s+([a-zA-Z0-9]+)\s+VALUES\s+\((\'[^']+\'(,\'[^']+\')*)\)$";
+MiniSQLParser.cs (22) : const string createTablePattern = @"^CREATE\s+TABLE\s+(?<tableName>[a-zA-Z0-9]+)\s+\(((?<columns>[a-zA-Z0-9]+\s+(INT|DOUBLE|TEXT)(,[a-zA-Z0-9]+\s+(INT|DOUBLE|TEXT))*))*\)$";
+MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z]+)$";
+MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z]+)$";
+MiniSQLParser.cs (51) : if (Regex.IsMatch(miniSQLQuery, selectPattern))
+MiniSQLParser.cs (52) : {
+MiniSQLParser.cs (73) : }
+MiniSQLParser.cs (76) : }
+MiniSQLParser.cs (82) : else if (Regex.IsMatch(miniSQLQuery, insertPattern))
+MiniSQLParser.cs (83) : {
+MiniSQLParser.cs (84) : List<string> listValues = new List<string>();
+MiniSQLParser.cs (85) : Match match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (87) : string insertTableName = match.Groups[1].Value;
+MiniSQLParser.cs (88) : string insertLiteralValues = match.Groups[2].Value;
+MiniSQLParser.cs (91) : string[] literalValues = insertLiteralValues.Split(",");
+MiniSQLParser.cs (92) : for (int i = 0; i < literalValues.Length; i++)
+MiniSQLParser.cs (93) : {
+MiniSQLParser.cs (94) : string[] litValue = literalValues[i].Split("'");
+MiniSQLParser.cs (95) : listValues.Add(litValue[1]);
+MiniSQLParser.cs (96) : }
+MiniSQLParser.cs (98) : return new Insert(insertTableName, listValues);
+MiniSQLParser.cs (100) : }
+MiniSQLParser.cs (101) : else if (Regex.IsMatch(miniSQLQuery, dropTablePattern))
+MiniSQLParser.cs (102) : {
+MiniSQLParser.cs (106) : }
+MiniSQLParser.cs (107) : else if (Regex.IsMatch(miniSQLQuery, createTablePattern))
+MiniSQLParser.cs (108) : {
+MiniSQLParser.cs (109) : List<ColumnDefinition> listColumDef = new List<ColumnDefinition>();
+MiniSQLParser.cs (110) : Match matchQuery = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (116) : if (columGroup != null)
+MiniSQLParser.cs (117) : {
+MiniSQLParser.cs (122) : {
+MiniSQLParser.cs (123) : string[] typeAndName = separatedColumnsAndType[i].Split(" ");
+MiniSQLParser.cs (125) : if (typeAndName[typeAndName.Length - 1] == "TEXT") dataType = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (126) : else if (typeAndName[typeAndName.Length - 1] == "INT") dataType = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (127) : else if (typeAndName[typeAndName.Length - 1] == "DOUBLE") dataType = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (129) : }
+MiniSQLParser.cs (131) : }
+MiniSQLParser.cs (134) : return new CreateTable(tableName, listColumDef);
+MiniSQLParser.cs (136) : }
+MiniSQLParser.cs (137) : else if (Regex.IsMatch(miniSQLQuery, updateTablePattern))
+MiniSQLParser.cs (138) : {
+MiniSQLParser.cs (159) : }
+MiniSQLParser.cs (160) : else if (Regex.IsMatch(miniSQLQuery, deletePattern))
+MiniSQLParser.cs (161) : {
+MiniSQLParser.cs (170) : }
+MiniSQLParser.cs (175) : if (Regex.IsMatch(miniSQLQuery, createSecurityProfilePattern))
+MiniSQLParser.cs (176) : {
+MiniSQLParser.cs (177) : Match match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (178) : string newSecurityProfile = match.Groups[1].Value;
+MiniSQLParser.cs (180) : return new CreateSecurityProfile(newSecurityProfile);
+MiniSQLParser.cs (181) : }
+MiniSQLParser.cs (182) : else if (Regex.IsMatch(miniSQLQuery, dropSecurityProfilePattern))
+MiniSQLParser.cs (183) : {
+MiniSQLParser.cs (184) : Match match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (185) : string newDropSecurityProfile = match.Groups[1].Value;
+MiniSQLParser.cs (187) : return new DropSecurityProfile(newDropSecurityProfile);
+MiniSQLParser.cs (188) : }
+MiniSQLParser.cs (190) : else if (Regex.IsMatch(miniSQLQuery, grantPattern))
+MiniSQLParser.cs (191) : {
+Manager.cs (125) : {
+Manager.cs (126) : if (profile != null)
+Manager.cs (127) : {
+Manager.cs (128) : Profiles.Add(profile);
+Manager.cs (129) : }
+Manager.cs (130) : }
+Manager.cs (176) : {
+Manager.cs (178) : {
+Manager.cs (179) : return true;
+Manager.cs (180) : }
+Manager.cs (181) : }

@@ -1,0 +1,739 @@
+Total written by this student: 31% lines / 31% characters
+
+ColumnDefinition.cs (1) : ﻿using DbManager.Parser;
+ColumnDefinition.cs (3) : using System.Collections.Generic;
+ColumnDefinition.cs (4) : using System.Linq;
+ColumnDefinition.cs (73) : string result = Encode(Name) + Delimiter + Type.ToString();
+ColumnDefinition.cs (74) : return result;
+ColumnDefinition.cs (80) : List<string> parts = value.Split(Delimiter).ToList();
+ColumnDefinition.cs (81) : string decodedName = Decode(parts[0]);
+ColumnDefinition.cs (82) : if (!Enum.TryParse(parts[1], out DataType type))
+ColumnDefinition.cs (83) : {
+ColumnDefinition.cs (84) : throw new ArgumentException("Invalid data type.");
+ColumnDefinition.cs (85) : }
+ColumnDefinition.cs (86) : return new ColumnDefinition(type, decodedName);
+Database.cs (24) : Tables = new List<Table>();
+Database.cs (75) : // Verificar si ya existe una tabla con el mismo nombre
+Database.cs (77) : if (TableByName(tableName) != null)
+Database.cs (78) : {
+Database.cs (79) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (81) : }
+Database.cs (84) : if (ColumnDefinition == null || ColumnDefinition.Count == 0)
+Database.cs (85) : {
+Database.cs (86) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (88) : }
+Database.cs (90) : Table newTable = new Table(tableName, ColumnDefinition);
+Database.cs (91) : Tables.Add(newTable);
+Database.cs (93) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (94) : return true;
+Database.cs (129) : if (values == null || values.Count != table.NumColumns())
+Database.cs (130) : {
+Database.cs (131) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (132) : return false;
+Database.cs (133) : }
+Database.cs (135) : bool inserted = table.Insert(values);
+Database.cs (136) : if (inserted)
+Database.cs (137) : {
+Database.cs (140) : }
+Database.cs (141) : return false;
+Database.cs (155) : return null;
+Database.cs (216) : Table table = TableByName(tableName);
+Database.cs (217) : if (table == null)
+Database.cs (218) : {
+Database.cs (219) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (220) : return false;
+Database.cs (221) : }
+Database.cs (223) : if (table.ColumnByName(columnCondition.ColumnName) == null)
+Database.cs (224) : {
+Database.cs (225) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (227) : }
+Database.cs (229) : bool result = table.Update(columnNames, columnCondition);
+Database.cs (231) : if (result)
+Database.cs (232) : {
+Database.cs (233) : LastErrorMessage = Constants.UpdateSuccess;
+Database.cs (234) : return true;
+Database.cs (235) : }
+Database.cs (249) : try
+Database.cs (250) : {
+Database.cs (251) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (252) : {
+Database.cs (253) : string filePath = databaseName + "_" + Tables[i].Name + TableFileExtension;
+Database.cs (254) : StreamWriter writer = new StreamWriter(filePath);
+Database.cs (255) : try
+Database.cs (256) : {
+Database.cs (257) : writer.WriteLine(Tables[i].ToString());
+Database.cs (258) : }
+Database.cs (259) : finally
+Database.cs (260) : {
+Database.cs (261) : writer.Close();
+Database.cs (262) : }
+Database.cs (263) : }
+Database.cs (267) : return true;
+Database.cs (268) : }
+Database.cs (269) : catch (Exception ex)
+Database.cs (270) : {
+Database.cs (271) : Console.WriteLine("Error al guardar la base de datos: " + ex.Message);
+Database.cs (273) : }
+Database.cs (282) : try
+Database.cs (283) : {
+Database.cs (284) : string[] tableFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), databaseName + "_*" + TableFileExtension);
+Database.cs (285) : if (tableFiles.Length == 0)
+Database.cs (286) : {
+Database.cs (287) : Console.WriteLine(Constants.TableDoesNotExistError);
+Database.cs (288) : return null;
+Database.cs (289) : }
+Database.cs (291) : Database db = new Database();
+Database.cs (295) : for (int i = 0; i < tableFiles.Length; i++)
+Database.cs (296) : {
+Database.cs (297) : string filePath = tableFiles[i];
+Database.cs (298) : string tableName = Path.GetFileNameWithoutExtension(filePath).Replace(databaseName + "_", "");
+Database.cs (299) : StreamReader reader = new StreamReader(filePath);
+Database.cs (300) : try
+Database.cs (301) : {
+Database.cs (302) : string tableData = reader.ReadLine();
+Database.cs (303) : if (string.IsNullOrWhiteSpace(tableData))
+Database.cs (304) : {
+Database.cs (305) : continue;
+Database.cs (306) : }
+Database.cs (308) : int startColumns = tableData.IndexOf('[') + 1;
+Database.cs (309) : int endColumns = tableData.IndexOf(']');
+Database.cs (310) : if (startColumns == 0 || endColumns == -1)
+Database.cs (311) : {
+Database.cs (312) : continue;
+Database.cs (313) : }
+Database.cs (315) : string[] columnNamesArray = tableData.Substring(startColumns, endColumns - startColumns).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+Database.cs (316) : List<string> columnNames = new List<string>();
+Database.cs (317) : for (int j = 0; j < columnNamesArray.Length; j++)
+Database.cs (318) : {
+Database.cs (319) : columnNames.Add(columnNamesArray[j].Trim('\''));
+Database.cs (320) : }
+Database.cs (322) : List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
+Database.cs (323) : for (int j = 0; j < columnNames.Count; j++)
+Database.cs (324) : {
+Database.cs (325) : columnDefinitions.Add(new ColumnDefinition(ColumnDefinition.DataType.String, columnNames[j]));
+Database.cs (326) : }
+Database.cs (328) : Table table = new Table(tableName, columnDefinitions);
+Database.cs (330) : string rowsPart = tableData.Substring(endColumns + 1).Trim();
+Database.cs (331) : while (!string.IsNullOrEmpty(rowsPart))
+Database.cs (332) : {
+Database.cs (333) : int startRow = rowsPart.IndexOf('{');
+Database.cs (334) : int endRow = rowsPart.IndexOf('}');
+Database.cs (335) : if (startRow == -1 || endRow == -1 || startRow > endRow)
+Database.cs (336) : {
+Database.cs (337) : break;
+Database.cs (338) : }
+Database.cs (340) : string[] rowValuesArray = rowsPart.Substring(startRow + 1, endRow - startRow - 1).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+Database.cs (341) : List<string> values = new List<string>();
+Database.cs (342) : for (int j = 0; j < rowValuesArray.Length; j++)
+Database.cs (343) : {
+Database.cs (344) : values.Add(rowValuesArray[j].Trim('\''));
+Database.cs (345) : }
+Database.cs (347) : if (values.Count != columnDefinitions.Count)
+Database.cs (348) : {
+Database.cs (349) : throw new FormatException("Row values do not match column count");
+Database.cs (350) : }
+Database.cs (352) : table.AddRow(new Row(columnDefinitions, values));
+Database.cs (353) : rowsPart = rowsPart.Substring(endRow + 1).Trim();
+Database.cs (354) : }
+Database.cs (356) : db.Tables.Add(table);
+Database.cs (358) : }
+Database.cs (360) : finally
+Database.cs (361) : {
+Database.cs (362) : reader.Close();
+Database.cs (363) : }
+Database.cs (364) : }
+Database.cs (366) : return db;
+Database.cs (367) : }
+Database.cs (368) : catch (Exception ex)
+Database.cs (369) : {
+Database.cs (370) : Console.WriteLine("Error al cargar la base de datos: " + ex.Message);
+Database.cs (373) : }
+Database.cs (426) : public List<Table> GetTables()
+Row.cs (67) : return true;
+Row.cs (71) : if (pos == -1)
+Row.cs (72) : {
+Row.cs (73) : return false;
+Row.cs (76) : if (pos >= Values.Count || pos >= ColumnDefinitions.Count)
+Row.cs (77) : {
+Row.cs (79) : }
+Row.cs (81) : string value = Values[pos];
+Row.cs (82) : ColumnDefinition.DataType type = ColumnDefinitions[pos].Type;
+Row.cs (84) : return condition.IsTrue(value, type);
+Table.cs (6) : using System.Text;
+Table.cs (115) : if (ColumnDefinitions.Count == 0 && Rows.Count == 0)
+Table.cs (116) : {
+Table.cs (117) : return "";
+Table.cs (118) : }
+Table.cs (120) : string result = "[";
+Table.cs (122) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Table.cs (123) : {
+Table.cs (124) : if (i > 0) result += ",";
+Table.cs (125) : result += "'" + ColumnDefinitions[i].Name + "'";
+Table.cs (126) : }
+Table.cs (128) : result += "]";
+Table.cs (130) : // Si no hay filas, devolver solo las columnas
+Table.cs (131) : if (Rows.Count == 0)
+Table.cs (132) : {
+Table.cs (133) : return result;
+Table.cs (134) : }
+Table.cs (136) : for (int i = 0; i < Rows.Count; i++)
+Table.cs (137) : {
+Table.cs (138) : result += "{";
+Table.cs (140) : for (int j = 0; j < Rows[i].Values.Count; j++)
+Table.cs (141) : {
+Table.cs (142) : if (j > 0) result += ",";
+Table.cs (143) : result += "'" + Rows[i].Values[j] + "'";
+Table.cs (144) : }
+Table.cs (146) : result += "}";
+Table.cs (147) : }
+Table.cs (149) : return result;
+Table.cs (170) : for (int i = 0; i < Rows.Count; i++)
+Table.cs (171) : {
+Table.cs (190) : {
+Table.cs (200) : // Crear la nueva tabla con el nombre 'Result' y solo las columnas solicitadas
+Table.cs (202) : List<int> columnsIndices = new List<int>();
+Table.cs (204) : // Asegurar que todas las columnas solicitadas existen en la tabla original
+Table.cs (213) : int columnIndex = ColumnIndexByName(columnNames[i]);
+Table.cs (214) : if (columnIndex == -1)
+Table.cs (219) : columnsResult.Add(ColumnDefinitions[columnIndex]);
+Table.cs (220) : columnsIndices.Add(columnIndex);
+Table.cs (224) : Table resultTable = new Table("Result", columnsResult);
+Table.cs (226) : // Agregar filas que cumplen con la condici�n o todas si no hay condici�n
+Table.cs (227) : for (int i = 0; i < Rows.Count; i++)
+Table.cs (231) : List<string> selectedValues = new List<string>();
+Table.cs (233) : for (int j = 0; j < columnsIndices.Count; j++)
+Table.cs (235) : selectedValues.Add(Rows[i].GetValue(columnNames[j]));
+Table.cs (238) : resultTable.AddRow(new Row(columnsResult, selectedValues));
+Table.cs (242) : return resultTable;
+Table.cs (249) : if(values == null || values.Count != ColumnDefinitions.Count)
+ColumnDefinitionTests.cs (1) : ﻿using DbManager;
+ColumnDefinitionTests.cs (15) : [Fact]
+ColumnDefinitionTests.cs (16) : public void TestAsText()
+ColumnDefinitionTests.cs (17) : {
+ColumnDefinitionTests.cs (19) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.String, "Name");
+ColumnDefinitionTests.cs (20) : Assert.Equal("Name->String", column1.AsText());
+ColumnDefinitionTests.cs (22) : ColumnDefinition column2 = new ColumnDefinition(ColumnDefinition.DataType.Int, "User->ID");
+ColumnDefinitionTests.cs (23) : Assert.Equal("User[ARROW]ID->Int", column2.AsText());
+ColumnDefinitionTests.cs (25) : ColumnDefinition column3 = new ColumnDefinition(ColumnDefinition.DataType.Double, "");
+ColumnDefinitionTests.cs (26) : Assert.Equal("->Double", column3.AsText());
+ColumnDefinitionTests.cs (30) : }
+ColumnDefinitionTests.cs (32) : [Fact]
+ColumnDefinitionTests.cs (33) : public void TestParse()
+ColumnDefinitionTests.cs (34) : {
+ColumnDefinitionTests.cs (35) : ColumnDefinition column1 = ColumnDefinition.Parse("Name->String");
+ColumnDefinitionTests.cs (36) : Assert.Equal("Name", column1.Name);
+ColumnDefinitionTests.cs (37) : Assert.Equal(ColumnDefinition.DataType.String, column1.Type);
+ColumnDefinitionTests.cs (39) : ColumnDefinition column2 = ColumnDefinition.Parse("ID->Int");
+ColumnDefinitionTests.cs (40) : Assert.Equal("ID", column2.Name);
+ColumnDefinitionTests.cs (41) : Assert.Equal(ColumnDefinition.DataType.Int, column2.Type);
+ColumnDefinitionTests.cs (43) : //Parse con nombre codificado
+ColumnDefinitionTests.cs (45) : Assert.Equal("User->ID", column3.Name);
+ColumnDefinitionTests.cs (54) : [Fact]
+ColumnDefinitionTests.cs (55) : public void TestParse_ValidColumns()
+ColumnDefinitionTests.cs (56) : {
+ColumnDefinitionTests.cs (58) : ColumnDefinition column1 = ColumnDefinition.Parse("Name->String");
+ColumnDefinitionTests.cs (59) : Assert.Equal("Name", column1.Name);
+ColumnDefinitionTests.cs (60) : Assert.Equal(ColumnDefinition.DataType.String, column1.Type);
+ColumnDefinitionTests.cs (62) : ColumnDefinition column2 = ColumnDefinition.Parse("Age->Int");
+ColumnDefinitionTests.cs (63) : Assert.Equal("Age", column2.Name);
+ColumnDefinitionTests.cs (64) : Assert.Equal(ColumnDefinition.DataType.Int, column2.Type);
+ColumnDefinitionTests.cs (67) : ColumnDefinition column3 = ColumnDefinition.Parse("User[ARROW]ID->Int");
+ColumnDefinitionTests.cs (68) : Assert.Equal("User->ID", column3.Name);
+ColumnDefinitionTests.cs (69) : Assert.Equal(ColumnDefinition.DataType.Int, column3.Type);
+ColumnDefinitionTests.cs (74) : }
+ColumnDefinitionTests.cs (78) : }
+DatabaseTests.cs (169) : Table tabla2 = new Table("Information", columns2);
+DatabaseTests.cs (329) : Assert.Null(database.Select("fijsahdifhsdifj", returnColumns5, condition5));
+DatabaseTests.cs (333) : [Fact]
+DatabaseTests.cs (334) : public void TestCreateTable()
+DatabaseTests.cs (335) : {
+DatabaseTests.cs (337) : Database db = new Database("admin", "adminPassword");
+DatabaseTests.cs (338) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+DatabaseTests.cs (339) : {
+DatabaseTests.cs (340) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+DatabaseTests.cs (341) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age")
+DatabaseTests.cs (342) : };
+DatabaseTests.cs (344) : // Caso 1: Crear una tabla correctamente
+DatabaseTests.cs (345) : bool result1 = db.CreateTable("Users", columns);
+DatabaseTests.cs (346) : Assert.True(result1);
+DatabaseTests.cs (347) : Assert.NotNull(db.TableByName("Users"));
+DatabaseTests.cs (348) : Assert.Equal(Constants.CreateTableSuccess, db.LastErrorMessage);
+DatabaseTests.cs (350) : // Caso 2: Intentar crear una tabla con el mismo nombre
+DatabaseTests.cs (351) : bool result2 = db.CreateTable("Users", columns);
+DatabaseTests.cs (352) : Assert.False(result2);
+DatabaseTests.cs (353) : Assert.Equal(Constants.TableAlreadyExistsError, db.LastErrorMessage);
+DatabaseTests.cs (355) : // Caso 3: Intentar crear una tabla sin columnas
+DatabaseTests.cs (356) : bool result3 = db.CreateTable("EmptyTable", new List<ColumnDefinition>());
+DatabaseTests.cs (357) : Assert.False(result3);
+DatabaseTests.cs (358) : Assert.Equal(Constants.DatabaseCreatedWithoutColumnsError, db.LastErrorMessage);
+DatabaseTests.cs (359) : }
+DatabaseTests.cs (361) : [Fact]
+DatabaseTests.cs (362) : public void TestUpdate()
+DatabaseTests.cs (363) : {
+DatabaseTests.cs (365) : Database db = new Database("admin", "adminPassword");
+DatabaseTests.cs (366) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+DatabaseTests.cs (367) : {
+DatabaseTests.cs (368) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+DatabaseTests.cs (369) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age")
+DatabaseTests.cs (370) : };
+DatabaseTests.cs (372) : db.CreateTable("Users", columns);
+DatabaseTests.cs (373) : Table usersTable = db.TableByName("Users");
+DatabaseTests.cs (375) : usersTable.AddRow(new Row(columns, new List<string> { "Alice", "25" }));
+DatabaseTests.cs (376) : usersTable.AddRow(new Row(columns, new List<string> { "Bob", "30" }));
+DatabaseTests.cs (378) : // Caso 1: Actualizar una fila correctamente
+DatabaseTests.cs (380) : List<SetValue> updates1 = new List<SetValue> { new SetValue("Age", "26") };
+DatabaseTests.cs (382) : bool result1 = db.Update("Users", updates1, condition1);
+DatabaseTests.cs (383) : Assert.True(result1);
+DatabaseTests.cs (384) : Assert.Equal("26", db.TableByName("Users").GetRow(0).GetValue("Age"));
+DatabaseTests.cs (385) : Assert.Equal(Constants.UpdateSuccess, db.LastErrorMessage);
+DatabaseTests.cs (387) : // Caso 2: Intentar actualizar en una tabla inexistente
+DatabaseTests.cs (389) : List<SetValue> updates2 = new List<SetValue> { new SetValue("Age", "31") };
+DatabaseTests.cs (391) : bool result2 = db.Update("NonExistentTable", updates2, condition2);
+DatabaseTests.cs (392) : Assert.False(result2);
+DatabaseTests.cs (393) : Assert.Equal(Constants.TableDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (395) : // Caso 3: Intentar actualizar una columna inexistente
+DatabaseTests.cs (397) : List<SetValue> updates3 = new List<SetValue> { new SetValue("Salary", "6000") };
+DatabaseTests.cs (399) : bool result3 = db.Update("Users", updates3, condition3);
+DatabaseTests.cs (400) : Assert.False(result3);
+DatabaseTests.cs (401) : Assert.Equal(Constants.ColumnDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (402) : }
+DatabaseTests.cs (430) : [Fact]
+DatabaseTests.cs (431) : public void TestSaveAndLoadDatabase()
+DatabaseTests.cs (432) : {
+DatabaseTests.cs (433) : string dbName = "TestDB";
+DatabaseTests.cs (435) : Database db = new Database("admin", "password");
+DatabaseTests.cs (436) : db.CreateTable("Users", new List<ColumnDefinition>
+DatabaseTests.cs (437) : {
+DatabaseTests.cs (438) : new ColumnDefinition(ColumnDefinition.DataType.String, "ID"),
+DatabaseTests.cs (439) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name")
+DatabaseTests.cs (440) : });
+DatabaseTests.cs (442) : db.Insert("Users", new List<string> { "1", "Alice" });
+DatabaseTests.cs (443) : db.Insert("Users", new List<string> { "2", "Bob" });
+DatabaseTests.cs (453) : string tableFilePath = $"{dbName}_Users.tbl";
+DatabaseTests.cs (454) : Assert.True(File.Exists(tableFilePath));
+DatabaseTests.cs (458) : Assert.NotNull(loadedDb);
+DatabaseTests.cs (459) : Assert.NotNull(loadedDb.TableByName("Users"));
+DatabaseTests.cs (462) : Table loadedTable = loadedDb.TableByName("Users");
+DatabaseTests.cs (463) : Assert.Equal(2, loadedTable.NumRows());
+DatabaseTests.cs (464) : Assert.Equal("Alice", loadedTable.GetRow(0).GetValue("Name"));
+DatabaseTests.cs (465) : Assert.Equal("Bob", loadedTable.GetRow(1).GetValue("Name"));
+DatabaseTests.cs (466) : }
+ManagerTests.cs (43) : Assert.Equal(db.SecurityManager.Profiles[0].ToString(), manager.Profiles[0].ToString());
+ManagerTests.cs (44) : Assert.Equal(db.SecurityManager.Profiles[1].ToString(), manager.Profiles[1].ToString());
+ParseTests.cs (1) : ﻿using DbManager;
+ParseTests.cs (2) : using DbManager.Parser;
+ParseTests.cs (3) : using System;
+ParseTests.cs (4) : using System.Collections.Generic;
+ParseTests.cs (11) : [Fact]
+ParseTests.cs (12) : public void TestParse()
+ParseTests.cs (13) : {
+ParseTests.cs (14) : // Caso 1: SELECT
+ParseTests.cs (16) : Assert.NotNull(query1);
+ParseTests.cs (17) : Assert.IsType<Select>(query1);
+ParseTests.cs (18) : Select selectQuery = (Select)query1;
+ParseTests.cs (19) : Assert.Equal("Users", selectQuery.Table);
+ParseTests.cs (20) : Assert.Equal(new List<string> { "Name", "Age" }, selectQuery.Columns);
+ParseTests.cs (21) : Assert.NotNull(selectQuery.Where);
+ParseTests.cs (23) : // Caso 2: INSERT
+ParseTests.cs (24) : MiniSqlQuery query2 = MiniSQLParser.Parse("INSERT INTO Users VALUES ('Ibai','30','24.54')");
+ParseTests.cs (25) : Assert.NotNull(query2);
+ParseTests.cs (26) : Assert.IsType<Insert>(query2);
+ParseTests.cs (27) : Insert insertQuery = (Insert)query2;
+ParseTests.cs (28) : Assert.Equal("Users", insertQuery.Table);
+ParseTests.cs (29) : Assert.Equal(new List<string> { "Ibai", "30", "24.54" }, insertQuery.Values);
+ParseTests.cs (31) : // Caso 3: DROP TABLE
+ParseTests.cs (32) : MiniSqlQuery query3 = MiniSQLParser.Parse("DROP TABLE Employees");
+ParseTests.cs (33) : Assert.NotNull(query3);
+ParseTests.cs (34) : Assert.IsType<DropTable>(query3);
+ParseTests.cs (35) : DropTable dropQuery = (DropTable)query3;
+ParseTests.cs (36) : Assert.Equal("Employees", dropQuery.Table);
+ParseTests.cs (38) : // Caso 4: CREATE TABLE
+ParseTests.cs (40) : Assert.NotNull(query4);
+ParseTests.cs (41) : Assert.IsType<CreateTable>(query4);
+ParseTests.cs (42) : CreateTable createQuery = (CreateTable)query4;
+ParseTests.cs (43) : Assert.Equal("Customers", createQuery.Table);
+ParseTests.cs (52) : // Caso 5: UPDATE
+ParseTests.cs (54) : Assert.NotNull(query5);
+ParseTests.cs (55) : Assert.IsType<Update>(query5);
+ParseTests.cs (56) : Update updateQuery = (Update)query5;
+ParseTests.cs (57) : Assert.Equal("Users", updateQuery.Table);
+ParseTests.cs (58) : Assert.NotNull(updateQuery.Where);
+ParseTests.cs (60) : // Caso 6: DELETE
+ParseTests.cs (62) : Assert.NotNull(query6);
+ParseTests.cs (63) : Assert.IsType<Delete>(query6);
+ParseTests.cs (64) : Delete deleteQuery = (Delete)query6;
+ParseTests.cs (65) : Assert.Equal("Users", deleteQuery.Table);
+ParseTests.cs (66) : Assert.NotNull(deleteQuery.Where);
+ParseTests.cs (70) : [Fact]
+ParseTests.cs (71) : public void TestParse_InvalidQuery()
+ParseTests.cs (72) : {
+ParseTests.cs (73) : // Caso 7: Comando inválido
+ParseTests.cs (74) : MiniSqlQuery query7 = MiniSQLParser.Parse("INVALID COMMAND");
+ParseTests.cs (75) : Assert.Null(query7);
+ParseTests.cs (76) : }
+ParseTests.cs (248) : query = MiniSQLParser.Parse("CREATE TABLE Users (nombre TEXT,apellido TEXT)");
+ParseTests.cs (253) : Assert.Equal(0, db.TableByName("Users").NumRows());
+ParseTests.cs (257) : query = MiniSQLParser.Parse("INSERT INTO Users VALUES ('Ibai','Fernandez')");
+ParseTests.cs (259) : Assert.Equal(1, db.TableByName("Users").NumRows());
+ParseTests.cs (261) : query = MiniSQLParser.Parse("INSERT INTO Users VALUES ('Paco','Lopez')");
+ParseTests.cs (263) : Assert.Equal(2, db.TableByName("Users").NumRows());
+ParseTests.cs (266) : query = MiniSQLParser.Parse("INSERT INTO Users VALUES ('Paco')");
+ParseTests.cs (268) : Assert.Equal(2, db.TableByName("Users").NumRows());
+ParseTests.cs (359) : [Fact]
+ParseTests.cs (360) : public void TestDeleteUser()
+ParseTests.cs (361) : {
+ParseTests.cs (362) : // Caso válido
+ParseTests.cs (363) : string query = "DELETE USER Alice";
+ParseTests.cs (364) : MiniSqlQuery result = MiniSQLParser.Parse(query);
+ParseTests.cs (365) : Assert.NotNull(result);
+ParseTests.cs (366) : Assert.IsType<DeleteUser>(result);
+ParseTests.cs (367) : DeleteUser deleteUser = (DeleteUser)result;
+ParseTests.cs (368) : Assert.Equal("Alice", deleteUser.Username);
+ParseTests.cs (370) : // Caso inválido
+ParseTests.cs (371) : string invalidQuery = "DELETE USER Alice87";
+ParseTests.cs (372) : result = MiniSQLParser.Parse(invalidQuery);
+ParseTests.cs (373) : Assert.Null(result);
+ParseTests.cs (374) : }
+ParseTests.cs (376) : [Fact]
+ParseTests.cs (377) : public void TestAddUser()
+ParseTests.cs (378) : {
+ParseTests.cs (379) : // Caso válido
+ParseTests.cs (380) : string query = "ADD USER (Alice,SecurePass123,Admin)";
+ParseTests.cs (381) : MiniSqlQuery result = MiniSQLParser.Parse(query);
+ParseTests.cs (382) : Assert.NotNull(result);
+ParseTests.cs (383) : Assert.IsType<AddUser>(result);
+ParseTests.cs (384) : AddUser addUser = (AddUser)result;
+ParseTests.cs (385) : Assert.Equal("Alice", addUser.Username);
+ParseTests.cs (386) : Assert.Equal("SecurePass123", addUser.Password);
+ParseTests.cs (387) : Assert.Equal("Admin", addUser.ProfileName);
+ParseTests.cs (389) : // Caso inválido
+ParseTests.cs (390) : string invalidQuery = "ADD USER ('Bob','NoProfile')"; // Falta el perfil de seguridad
+ParseTests.cs (391) : result = MiniSQLParser.Parse(invalidQuery);
+ParseTests.cs (392) : Assert.Null(result);
+ParseTests.cs (393) : }
+ProfileTests.cs (1) : ﻿using System;
+ProfileTests.cs (2) : using System.Collections.Generic;
+ProfileTests.cs (3) : using System.Linq;
+ProfileTests.cs (4) : using System.Text;
+ProfileTests.cs (5) : using System.Threading.Tasks;
+ProfileTests.cs (6) : using DbManager;
+ProfileTests.cs (7) : using DbManager.Security;
+ProfileTests.cs (9) : namespace OurTests
+ProfileTests.cs (10) : {
+ProfileTests.cs (11) : public class ProfileTests
+ProfileTests.cs (12) : {
+ProfileTests.cs (13) : [Fact]
+ProfileTests.cs (14) : public void GrantPrivilege_AddsPrivilegeIfNotExists()
+ProfileTests.cs (15) : {
+ProfileTests.cs (16) : var profile = new Profile { Name = "TestProfile" };
+ProfileTests.cs (17) : bool granted = profile.GrantPrivilege("Users", Privilege.Select);
+ProfileTests.cs (18) : Assert.True(granted);
+ProfileTests.cs (19) : Assert.True(profile.IsGrantedPrivilege("Users", Privilege.Select));
+ProfileTests.cs (20) : }
+ProfileTests.cs (22) : [Fact]
+ProfileTests.cs (23) : public void GrantPrivilege_DoesNotDuplicatePrivilege()
+ProfileTests.cs (24) : {
+ProfileTests.cs (25) : var profile = new Profile { Name = "TestProfile" };
+ProfileTests.cs (26) : profile.GrantPrivilege("Users", Privilege.Delete);
+ProfileTests.cs (28) : bool grantedAgain = profile.GrantPrivilege("Users", Privilege.Delete);
+ProfileTests.cs (30) : Assert.False(grantedAgain);
+ProfileTests.cs (31) : Assert.True(profile.IsGrantedPrivilege("Users", Privilege.Delete));
+ProfileTests.cs (32) : }
+ProfileTests.cs (34) : [Fact]
+ProfileTests.cs (35) : public void RevokePrivilege_RemovesPrivilege()
+ProfileTests.cs (36) : {
+ProfileTests.cs (37) : var profile = new Profile { Name = "TestProfile" };
+ProfileTests.cs (38) : profile.GrantPrivilege("Users", Privilege.Insert);
+ProfileTests.cs (39) : bool revoked = profile.RevokePrivilege("Users", Privilege.Insert);
+ProfileTests.cs (40) : Assert.True(revoked);
+ProfileTests.cs (41) : Assert.False(profile.IsGrantedPrivilege("Users", Privilege.Insert));
+ProfileTests.cs (42) : }
+ProfileTests.cs (44) : [Fact]
+ProfileTests.cs (45) : public void RevokePrivilege_PrivilegeNotFound()
+ProfileTests.cs (46) : {
+ProfileTests.cs (47) : var profile = new Profile { Name = "TestProfile" };
+ProfileTests.cs (48) : bool revoked = profile.RevokePrivilege("Users", Privilege.Delete);
+ProfileTests.cs (49) : Assert.False(revoked);
+ProfileTests.cs (50) : }
+ProfileTests.cs (52) : [Fact]
+ProfileTests.cs (53) : public void IsGrantedPrivilege_UnknownTable()
+ProfileTests.cs (54) : {
+ProfileTests.cs (55) : var profile = new Profile { Name = "TestProfile" };
+ProfileTests.cs (56) : bool result = profile.IsGrantedPrivilege("Orders", Privilege.Delete);
+ProfileTests.cs (57) : Assert.False(result);
+ProfileTests.cs (58) : }
+ProfileTests.cs (60) : [Fact]
+ProfileTests.cs (61) : public void IsGrantedPrivilege_PrivilegeIsGranted()
+ProfileTests.cs (62) : {
+ProfileTests.cs (63) : var profile = new Profile { Name = "TestProfile" };
+ProfileTests.cs (64) : profile.GrantPrivilege("Employees", Privilege.Update);
+ProfileTests.cs (65) : bool result = profile.IsGrantedPrivilege("Employees", Privilege.Update);
+ProfileTests.cs (66) : Assert.True(result);
+ProfileTests.cs (67) : }
+ProfileTests.cs (70) : }
+ProfileTests.cs (71) : }
+TableTests.cs (1) : ﻿using DbManager;
+TableTests.cs (2) : using System.Text;
+TableTests.cs (3) : using DbManager.Parser;
+TableTests.cs (326) : [Fact]
+TableTests.cs (327) : public void TestUpdate()
+TableTests.cs (328) : {
+TableTests.cs (337) : Assert.Equal("26", table.GetRow(0).GetValue("Age"));
+TableTests.cs (345) : Assert.Equal("26", table.GetRow(0).GetValue("Age"));
+TableTests.cs (356) : }
+TableTests.cs (371) : [Fact]
+TableTests.cs (372) : public void TestToString()
+TableTests.cs (373) : {
+TableTests.cs (376) : Table emptyTable = new Table("EmptyTable", new List<ColumnDefinition>());
+TableTests.cs (377) : Assert.Equal("", emptyTable.ToString());
+TableTests.cs (380) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+TableTests.cs (381) : {
+TableTests.cs (382) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+TableTests.cs (383) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age")
+TableTests.cs (384) : };
+TableTests.cs (386) : Table tableWithoutRows = new Table("TestTable", columns);
+TableTests.cs (387) : Assert.Equal("['Name','Age']", tableWithoutRows.ToString());
+TableTests.cs (390) : Table tableWithRows = new Table("TestTable", columns);
+TableTests.cs (391) : tableWithRows.Insert(new List<string> { "Adolfo", "23" });
+TableTests.cs (392) : tableWithRows.Insert(new List<string> { "Jacinto", "24" });
+TableTests.cs (394) : string expectedOutput = "['Name','Age']{'Adolfo','23'}{'Jacinto','24'}";
+TableTests.cs (395) : Assert.Equal(expectedOutput, tableWithRows.ToString());
+TableTests.cs (396) : }
+AddUser.cs (3) : using System.Linq;
+AddUser.cs (6) : using DbManager.Security;
+AddUser.cs (21) : Username = username;
+AddUser.cs (22) : Password = password;
+AddUser.cs (23) : ProfileName = profileName;
+AddUser.cs (30) : // Verifica que el SecurityManager existe y que el admin est� presente.
+AddUser.cs (31) : if (database.SecurityManager == null || !database.SecurityManager.IsUserAdmin())
+AddUser.cs (32) : {
+AddUser.cs (33) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (34) : }
+AddUser.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (37) : if (profile == null)
+AddUser.cs (38) : {
+AddUser.cs (39) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (40) : }
+AddUser.cs (43) : if (profile.Users.Any(u => u.Username == Username))
+AddUser.cs (44) : {
+AddUser.cs (45) : return Constants.Error + "User already exists";
+AddUser.cs (46) : }
+AddUser.cs (49) : User newUser = new User(Username, Password);
+AddUser.cs (50) : profile.Users.Add(newUser);
+AddUser.cs (52) : return Constants.AddUserSuccess;
+CreateTable.cs (17) : Table = table;
+CreateTable.cs (18) : ColumnsParameters = columns;
+Delete.cs (15) : Table = table;
+Delete.cs (16) : Where = where;
+DeleteUser.cs (3) : using System.Linq;
+DeleteUser.cs (6) : using DbManager.Security;
+DeleteUser.cs (18) : Username=username;
+DeleteUser.cs (26) : if (database.SecurityManager == null || !database.SecurityManager.IsUserAdmin())
+DeleteUser.cs (27) : {
+DeleteUser.cs (28) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (29) : }
+DeleteUser.cs (31) : var profileWithUser = database.SecurityManager
+DeleteUser.cs (32) : .Profiles
+DeleteUser.cs (33) : .FirstOrDefault(p => p.Users.Any(u => u.Username == Username));
+DeleteUser.cs (35) : if (profileWithUser == null)
+DeleteUser.cs (36) : {
+DeleteUser.cs (37) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (38) : }
+DeleteUser.cs (40) : var userToRemove = profileWithUser.Users.First(u => u.Username == Username);
+DeleteUser.cs (41) : profileWithUser.Users.Remove(userToRemove);
+DeleteUser.cs (43) : return Constants.DeleteUserSuccess;
+Insert.cs (16) : Table = table;
+Insert.cs (17) : Values = values;
+MiniSQLParser.cs (1) : ﻿    using DbManager.Parser;
+MiniSQLParser.cs (3) : using System;
+MiniSQLParser.cs (14) : if (string.IsNullOrWhiteSpace(miniSQLQuery))
+MiniSQLParser.cs (15) : {
+MiniSQLParser.cs (16) : return null;
+MiniSQLParser.cs (17) : }
+MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(\s*([a-zA-Z]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*\)$";
+MiniSQLParser.cs (38) : const string deleteUserPattern = @"^DELETE\s+USER\s+([a-zA-Z]+)$";
+MiniSQLParser.cs (47) : Match match;
+MiniSQLParser.cs (48) : // SELECT
+MiniSQLParser.cs (50) : if (match.Success)
+MiniSQLParser.cs (51) : {
+MiniSQLParser.cs (52) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (53) : List<string> columns = CommaSeparatedNames(match.Groups[1].Value);
+MiniSQLParser.cs (54) : Condition condition = match.Groups[3].Success ? ParseCondition(match.Groups[3].Value) : null;
+MiniSQLParser.cs (55) : return new Select(table, columns, condition);
+MiniSQLParser.cs (56) : }
+MiniSQLParser.cs (58) : // INSERT
+MiniSQLParser.cs (60) : if (match.Success)
+MiniSQLParser.cs (61) : {
+MiniSQLParser.cs (62) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (63) : List<string> values = CommaSeparatedNames(match.Groups[2].Value);
+MiniSQLParser.cs (64) : if (values.Count == 0)
+MiniSQLParser.cs (65) : {
+MiniSQLParser.cs (66) : return null;
+MiniSQLParser.cs (67) : }
+MiniSQLParser.cs (68) : return new Insert(table, values);
+MiniSQLParser.cs (69) : }
+MiniSQLParser.cs (71) : // DROP TABLE
+MiniSQLParser.cs (73) : if (match.Success)
+MiniSQLParser.cs (74) : {
+MiniSQLParser.cs (75) : return new DropTable(match.Groups[1].Value);
+MiniSQLParser.cs (76) : }
+MiniSQLParser.cs (78) : // CREATE TABLE
+MiniSQLParser.cs (80) : if (match.Success)
+MiniSQLParser.cs (81) : {
+MiniSQLParser.cs (83) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (86) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+MiniSQLParser.cs (87) : List<string> columnDefinitions = CommaSeparatedNames(match.Groups[2].Value);
+MiniSQLParser.cs (89) : if(columnDefinitions.Count == 0)
+MiniSQLParser.cs (90) : {
+MiniSQLParser.cs (92) : }
+MiniSQLParser.cs (94) : foreach (string colDef in columnDefinitions)
+MiniSQLParser.cs (95) : {
+MiniSQLParser.cs (96) : string[] parts = colDef.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (97) : if (parts.Length != 2)
+MiniSQLParser.cs (98) : {
+MiniSQLParser.cs (100) : return null;
+MiniSQLParser.cs (101) : }
+MiniSQLParser.cs (102) : ColumnDefinition.DataType dataType;
+MiniSQLParser.cs (103) : switch (parts[1].ToUpper())
+MiniSQLParser.cs (104) : {
+MiniSQLParser.cs (105) : case "INT":
+MiniSQLParser.cs (106) : dataType = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (107) : break;
+MiniSQLParser.cs (108) : case "DOUBLE":
+MiniSQLParser.cs (109) : dataType = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (110) : break;
+MiniSQLParser.cs (111) : case "TEXT": // 🔹 En la clase ColumnDefinition, el tipo de texto es "String"
+MiniSQLParser.cs (112) : dataType = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (113) : break;
+MiniSQLParser.cs (114) : default:
+MiniSQLParser.cs (115) : Console.WriteLine(Constants.SyntaxError);
+MiniSQLParser.cs (116) : return null;
+MiniSQLParser.cs (117) : }
+MiniSQLParser.cs (120) : columns.Add(new ColumnDefinition(dataType, parts[0]));
+MiniSQLParser.cs (121) : }
+MiniSQLParser.cs (123) : return new CreateTable(table, columns);
+MiniSQLParser.cs (124) : }
+MiniSQLParser.cs (126) : //UPDATE
+MiniSQLParser.cs (128) : if (match.Success)
+MiniSQLParser.cs (129) : {
+MiniSQLParser.cs (135) : {
+MiniSQLParser.cs (138) : {
+MiniSQLParser.cs (141) : }
+MiniSQLParser.cs (155) : }
+MiniSQLParser.cs (158) : }
+MiniSQLParser.cs (160) : // DELETE
+MiniSQLParser.cs (162) : if (match.Success)
+MiniSQLParser.cs (163) : {
+MiniSQLParser.cs (164) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (165) : Condition condition = match.Groups[2].Success ? ParseCondition(match.Groups[2].Value) : null;
+MiniSQLParser.cs (166) : return new Delete(table, condition);
+MiniSQLParser.cs (167) : }
+MiniSQLParser.cs (191) : // ADD USER
+MiniSQLParser.cs (192) : match = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (193) : if (match.Success)
+MiniSQLParser.cs (194) : {
+MiniSQLParser.cs (195) : string username = match.Groups[1].Value;
+MiniSQLParser.cs (196) : string password = match.Groups[2].Value;
+MiniSQLParser.cs (197) : string profileName = match.Groups[3].Value;
+MiniSQLParser.cs (198) : return new AddUser(username, password, profileName);
+MiniSQLParser.cs (199) : }
+MiniSQLParser.cs (201) : // DELETE USER
+MiniSQLParser.cs (202) : match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (203) : if (match.Success)
+MiniSQLParser.cs (204) : {
+MiniSQLParser.cs (205) : string username = match.Groups[1].Value;
+MiniSQLParser.cs (206) : return new DeleteUser(username);
+MiniSQLParser.cs (207) : }
+MiniSQLParser.cs (247) : // Método para extraer condición correctamente
+MiniSQLParser.cs (248) : private static Condition ParseCondition(string conditionText)
+MiniSQLParser.cs (249) : {
+MiniSQLParser.cs (253) : Match match = Regex.Match(conditionText, pattern);
+MiniSQLParser.cs (255) : if (match.Success)
+MiniSQLParser.cs (256) : {
+MiniSQLParser.cs (257) : string columnName = match.Groups[1].Value.Trim();
+MiniSQLParser.cs (258) : string op = match.Groups[2].Value.Trim();
+MiniSQLParser.cs (259) : string literalValue = match.Groups[3].Value.Trim();
+MiniSQLParser.cs (263) : return new Condition(columnName, op, literalValue);
+MiniSQLParser.cs (264) : }
+MiniSQLParser.cs (267) : return null;
+MiniSQLParser.cs (268) : }
+Select.cs (18) : Table = table;
+Select.cs (19) : Columns = columns;
+Select.cs (20) : Where = condition;
+Update.cs (16) : Table = table;
+Update.cs (17) : Columns = columnNames;
+Update.cs (18) : Where = where;
+Manager.cs (236) : var user = new User("temp", "temp");
+Manager.cs (237) : user.Username = names[j];
+Manager.cs (238) : user.EncryptedPassword = passwords[j];
+Manager.cs (239) : profile.Users.Add(user);
+Profile.cs (21) : if (string.IsNullOrEmpty(table)) return false;
+Profile.cs (23) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (24) : {
+Profile.cs (25) : PrivilegesOn[table] = new List<Privilege>();
+Profile.cs (26) : }
+Profile.cs (28) : if (!PrivilegesOn[table].Contains(privilege))
+Profile.cs (29) : {
+Profile.cs (30) : PrivilegesOn[table].Add(privilege);
+Profile.cs (31) : return true;
+Profile.cs (32) : }
+Profile.cs (42) : if (string.IsNullOrEmpty(table) || !PrivilegesOn.ContainsKey(table)) return false;
+Profile.cs (44) : if (PrivilegesOn[table].Contains(privilege))
+Profile.cs (45) : {
+Profile.cs (46) : PrivilegesOn[table].Remove(privilege);
+Profile.cs (47) : if (PrivilegesOn[table].Count == 0)
+Profile.cs (48) : {
+Profile.cs (49) : PrivilegesOn.Remove(table);
+Profile.cs (50) : }
+Profile.cs (51) : return true;
+Profile.cs (52) : }
+Profile.cs (62) : return PrivilegesOn.ContainsKey(table) && PrivilegesOn[table].Contains(privilege);
+User.cs (17) : EncryptedPassword = Encryption.Encrypt(password);
+AddUserTests.cs (1) : ﻿using System;
+AddUserTests.cs (73) : [Fact]
+AddUserTests.cs (74) : public void Execute_AddUser_Successful()
+AddUserTests.cs (75) : {
+AddUserTests.cs (76) : Database db = new Database("admin", "adminPass");
+AddUserTests.cs (77) : Profile profile = new Profile { Name = "DevTeam" };
+AddUserTests.cs (78) : db.SecurityManager.AddProfile(profile);
+AddUserTests.cs (80) : var addUser = new AddUser("Alice", "12345", "DevTeam");
+AddUserTests.cs (82) : string result = addUser.Execute(db);
+AddUserTests.cs (84) : Assert.Equal(Constants.AddUserSuccess, result);
+AddUserTests.cs (85) : Assert.NotNull(profile.Users);
+AddUserTests.cs (86) : Assert.Single(profile.Users);
+AddUserTests.cs (87) : Assert.Equal("Alice", profile.Users[0].Username);
+AddUserTests.cs (88) : Assert.NotNull(profile.Users[0].EncryptedPassword);
+AddUserTests.cs (89) : Assert.NotEqual("12345", profile.Users[0].EncryptedPassword);
+AddUserTests.cs (90) : }
+AddUserTests.cs (92) : [Fact]
+AddUserTests.cs (93) : public void Execute_AddUser_WhenProfileDoesNotExist()
+AddUserTests.cs (94) : {
+AddUserTests.cs (95) : var db = new Database("admin", "adminPass");
+AddUserTests.cs (97) : var addUser = new AddUser("Bob", "67890", "NonExistentProfile");
+AddUserTests.cs (99) : string result = addUser.Execute(db);
+AddUserTests.cs (101) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, result);
+AddUserTests.cs (102) : }
+DeleteUserTests.cs (1) : ﻿using System;
+DeleteUserTests.cs (64) : [Fact]
+DeleteUserTests.cs (65) : public void Execute_DeleteUser()
+DeleteUserTests.cs (66) : {
+DeleteUserTests.cs (67) : Database db = new Database("admin", "Pass");
+DeleteUserTests.cs (68) : Profile profile = new Profile { Name = "UserProfile" };
+DeleteUserTests.cs (69) : User user = new User("Alice", "1234");
+DeleteUserTests.cs (70) : profile.Users.Add(user);
+DeleteUserTests.cs (71) : db.SecurityManager.AddProfile(profile);
+DeleteUserTests.cs (73) : DeleteUser deleteUser = new DeleteUser("Alice");
+DeleteUserTests.cs (74) : string result = deleteUser.Execute(db);
+DeleteUserTests.cs (76) : Assert.Equal(Constants.DeleteUserSuccess, result);
+DeleteUserTests.cs (77) : Assert.DoesNotContain(profile.Users, u => u.Username == "Alice");
+DeleteUserTests.cs (78) : }
+DeleteUserTests.cs (80) : [Fact]
+DeleteUserTests.cs (81) : public void Execute_DeleteUser_UserDoesNotExist()
+DeleteUserTests.cs (82) : {
+DeleteUserTests.cs (83) : Database db = new Database("admin", "Pass");
+DeleteUserTests.cs (84) : Profile profile = new Profile { Name = "UserProfile" };
+DeleteUserTests.cs (85) : db.SecurityManager.AddProfile(profile);
+DeleteUserTests.cs (87) : DeleteUser deleteUser = new DeleteUser("Bob");
+DeleteUserTests.cs (88) : string result = deleteUser.Execute(db);
+DeleteUserTests.cs (90) : Assert.Equal(Constants.UserDoesNotExistError, result);
+DeleteUserTests.cs (91) : }

@@ -1,0 +1,188 @@
+Total written by this student: 8% lines / 8% characters
+
+Condition.cs (34) : const String menos = "<";
+Condition.cs (35) : const String mayor = ">";
+Condition.cs (41) : int resultado = value.CompareTo(LiteralValue);
+Condition.cs (43) : if (Operator == igual)
+Condition.cs (45) : else if (Operator == mayor)
+Condition.cs (46) : return resultado > 0;
+Condition.cs (47) : else if (Operator == menos)
+Condition.cs (48) : return resultado < 0;
+Condition.cs (54) : if (Operator == igual)
+Condition.cs (56) : else if (Operator == menos)
+Condition.cs (58) : else if (Operator == mayor)
+Condition.cs (66) : if (Operator == igual)
+Condition.cs (68) : else if (Operator == menos)
+Condition.cs (70) : else if (Operator == mayor)
+Database.cs (30) : m_username = adminUsername;
+Database.cs (41) : Tables.Add(table);
+Database.cs (42) : return true;
+Database.cs (121) : Table table = TableByName(tableName);
+Database.cs (124) : {
+Database.cs (125) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (126) : return false;
+Database.cs (127) : }
+Database.cs (138) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (139) : return true;
+Row.cs (137) : String result = "";
+Row.cs (139) : for(int i=0; i<Values.Count; i++)
+Row.cs (141) : result += Values[i];
+Row.cs (143) : if(i<Values.Count - 1)
+Row.cs (144) : {
+Row.cs (145) : result += Delimiter;
+Row.cs (146) : }
+Row.cs (147) : }
+Row.cs (149) : return result;
+Row.cs (151) : }
+Row.cs (153) : public static Row Parse(List<ColumnDefinition> columns, string value)
+Row.cs (154) : {
+Row.cs (156) : //TODO DEADLINE 1.C: Parse a rowReturn the row as string with all values separated by the delimiter
+Row.cs (159) : List<String> values = value.Split(Delimiter).ToList();
+Row.cs (164) : Row row = new Row(columns, values);
+Row.cs (166) : return row;
+DatabaseTests.cs (404) : [Fact]
+DatabaseTests.cs (406) : public void TestInsert()
+DatabaseTests.cs (407) : {
+DatabaseTests.cs (408) : Database db = new Database("admin", "adminPassword");
+DatabaseTests.cs (411) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+DatabaseTests.cs (412) : {
+DatabaseTests.cs (413) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+DatabaseTests.cs (414) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age")
+DatabaseTests.cs (415) : };
+DatabaseTests.cs (417) : db.CreateTable("Users", columns);
+DatabaseTests.cs (419) : List<string> validRow = new List<string> { "Alice", "30" };
+DatabaseTests.cs (420) : bool insertSuccess = db.Insert("Users", validRow);
+DatabaseTests.cs (421) : Assert.True(insertSuccess);
+DatabaseTests.cs (422) : Assert.Equal(Constants.InsertSuccess, db.LastErrorMessage);
+DatabaseTests.cs (424) : List<string> rowForNonExistingTable = new List<string> { "Bob", "25" };
+DatabaseTests.cs (425) : bool insertFail = db.Insert("NonExistentTable", rowForNonExistingTable);
+DatabaseTests.cs (426) : Assert.False(insertFail);
+DatabaseTests.cs (427) : Assert.Equal(Constants.TableDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (428) : }
+ManagerTests.cs (141) : [Fact]
+ManagerTests.cs (143) : public void GrantPrivilege()
+ManagerTests.cs (144) : {
+ManagerTests.cs (146) : var manager = new Manager("admin");
+ManagerTests.cs (147) : var profile = new Profile { Name = "TestProfile" };
+ManagerTests.cs (148) : manager.AddProfile(profile);
+ManagerTests.cs (150) : string table = "Products";
+ManagerTests.cs (151) : Privilege privilege = Privilege.Select;
+ManagerTests.cs (154) : manager.GrantPrivilege("TestProfile", table, privilege);
+ManagerTests.cs (157) : var updatedProfile = manager.ProfileByName("TestProfile");
+ManagerTests.cs (158) : Assert.True(updatedProfile.IsGrantedPrivilege(table, privilege));
+ManagerTests.cs (159) : }
+ManagerTests.cs (162) : [Fact]
+ManagerTests.cs (164) : public void RevokePrivilege()
+ManagerTests.cs (165) : {
+ManagerTests.cs (166) : var manager = new Manager("admin");
+ManagerTests.cs (167) : var profile = new Profile { Name = "TestProfile" };
+ManagerTests.cs (168) : profile.GrantPrivilege("Orders", Privilege.Update); // Añadimos primero el privilegio
+ManagerTests.cs (169) : manager.AddProfile(profile);
+ManagerTests.cs (172) : manager.RevokePrivilege("TestProfile", "Orders", Privilege.Update);
+ManagerTests.cs (175) : var updatedProfile = manager.ProfileByName("TestProfile");
+ManagerTests.cs (176) : Assert.False(updatedProfile.IsGrantedPrivilege("Orders", Privilege.Update));
+ManagerTests.cs (178) : }
+ManagerTests.cs (181) : [Fact]
+ManagerTests.cs (183) : public void IsGrantedPrivilege()
+ManagerTests.cs (184) : {
+ManagerTests.cs (186) : var manager = new Manager("admin");
+ManagerTests.cs (188) : // Perfil con privilegio
+ManagerTests.cs (189) : var profileWithPrivilege = new Profile { Name = "ProfileWithPrivilege" };
+ManagerTests.cs (190) : var alice = new User("alice", Encryption.Encrypt("pass1"));
+ManagerTests.cs (191) : profileWithPrivilege.Users.Add(alice);
+ManagerTests.cs (192) : profileWithPrivilege.GrantPrivilege("Sales", Privilege.Select);
+ManagerTests.cs (193) : manager.AddProfile(profileWithPrivilege);
+ManagerTests.cs (195) : // Perfil sin privilegio
+ManagerTests.cs (196) : var profileWithoutPrivilege = new Profile { Name = "ProfileWithoutPrivilege" };
+ManagerTests.cs (197) : var bob = new User("bob", Encryption.Encrypt("pass2"));
+ManagerTests.cs (198) : profileWithoutPrivilege.Users.Add(bob);
+ManagerTests.cs (199) : manager.AddProfile(profileWithoutPrivilege);
+ManagerTests.cs (202) : Assert.True(manager.IsGrantedPrivilege("alice", "Sales", Privilege.Select)); //
+ManagerTests.cs (203) : Assert.False(manager.IsGrantedPrivilege("bob", "Sales", Privilege.Select)); //
+ManagerTests.cs (205) : Assert.False(manager.IsGrantedPrivilege("charlie", "Sales", Privilege.Select));
+ManagerTests.cs (206) : Assert.False(manager.IsGrantedPrivilege(null, "Sales", Privilege.Select));
+ManagerTests.cs (207) : Assert.False(manager.IsGrantedPrivilege("", "Sales", Privilege.Select));
+ManagerTests.cs (208) : Assert.False(manager.IsGrantedPrivilege("alice", null, Privilege.Select));
+ManagerTests.cs (209) : Assert.False(manager.IsGrantedPrivilege("alice", "", Privilege.Select));
+ManagerTests.cs (210) : Assert.False(manager.IsGrantedPrivilege("alice", "NonExistentTable", Privilege.Select));
+ManagerTests.cs (212) : }
+RowTests.cs (88) : [Fact]
+RowTests.cs (89) : public void TestAsText()
+RowTests.cs (90) : {
+RowTests.cs (91) : //Definir las columnas y una fila con valores
+RowTests.cs (92) : List<ColumnDefinition> columns = new List<ColumnDefinition>
+RowTests.cs (93) : {
+RowTests.cs (94) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+RowTests.cs (95) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age")
+RowTests.cs (96) : };
+RowTests.cs (98) : List<string> values = new List<string> { "Alice", "30" };
+RowTests.cs (99) : Row row = new Row(columns, values);
+RowTests.cs (101) : //Llamar al m�todo AsText
+RowTests.cs (102) : string result = row.AsText();
+RowTests.cs (104) : //Verificar que la salida es la esperada
+RowTests.cs (105) : Assert.Equal("Alice:30", result);
+RowTests.cs (130) : }
+RowTests.cs (132) : [Fact]
+RowTests.cs (134) : public void TestParse()
+RowTests.cs (135) : {
+RowTests.cs (136) : //Definir las columnas y la cadena de una fila v�lida
+RowTests.cs (137) : List<ColumnDefinition> columns = new List<ColumnDefinition>
+RowTests.cs (138) : {
+RowTests.cs (139) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+RowTests.cs (140) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age")
+RowTests.cs (141) : };
+RowTests.cs (143) : string encodedRow = "Alice:30"; // Cadena con formato correcto
+RowTests.cs (145) : //Llamar al m�todo Parse
+RowTests.cs (146) : Row result = Row.Parse(columns, encodedRow);
+RowTests.cs (148) : //Verificar que el objeto Row se cre� correctamente
+RowTests.cs (149) : Assert.NotNull(result);
+RowTests.cs (150) : Assert.Equal(2, result.Values.Count);
+RowTests.cs (151) : Assert.Equal("Alice", result.GetValue("Name"));
+RowTests.cs (152) : Assert.Equal("30", result.GetValue("Age"));
+RowTests.cs (159) : }
+Grant.cs (20) : PrivilegeName = privilegeName;
+Grant.cs (21) : TableName = tableName;
+Grant.cs (22) : ProfileName = profileName;
+MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+([A-Za-z0-9]+)\s+TO\s+([A-Za-z]+)$";
+MiniSQLParser.cs (34) : const string revokePattern = @"^REVOKE\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+([A-Za-z0-9]+)\s+TO\s+([A-Za-z]+)$";
+MiniSQLParser.cs (209) : //GRANT
+MiniSQLParser.cs (210) : match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (211) : if (match.Success)
+MiniSQLParser.cs (212) : {
+MiniSQLParser.cs (213) : String privilegeName = match.Groups[1].Value;
+MiniSQLParser.cs (214) : String tableName = match.Groups[2].Value;
+MiniSQLParser.cs (215) : String profileName = match.Groups[3].Value;
+MiniSQLParser.cs (216) : return new Grant(privilegeName, tableName, profileName);
+MiniSQLParser.cs (217) : }
+MiniSQLParser.cs (219) : //REVOKE
+MiniSQLParser.cs (220) : match = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (221) : if (match.Success)
+MiniSQLParser.cs (222) : {
+MiniSQLParser.cs (223) : String privilegeName = match.Groups[1].Value;
+MiniSQLParser.cs (224) : String tableName = match.Groups[2].Value;
+MiniSQLParser.cs (225) : String profileName = match.Groups[3].Value;
+MiniSQLParser.cs (226) : return new Revoke(privilegeName, tableName, profileName);
+MiniSQLParser.cs (227) : }
+Revoke.cs (18) : PrivilegeName = privilegeName;
+Revoke.cs (19) : TableName = tableName;
+Revoke.cs (20) : ProfileName = profileName;
+Manager.cs (59) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
+Manager.cs (60) : return;
+Manager.cs (62) : Profile profile = ProfileByName(profileName);
+Manager.cs (63) : if (profile != null)
+Manager.cs (64) : {
+Manager.cs (65) : profile.GrantPrivilege(table, privilege);
+Manager.cs (66) : }
+Manager.cs (75) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
+Manager.cs (76) : return;
+Manager.cs (78) : Profile profile = ProfileByName(profileName);
+Manager.cs (79) : if (profile != null)
+Manager.cs (80) : {
+Manager.cs (81) : profile.RevokePrivilege(table, privilege);
+Manager.cs (82) : }
+Manager.cs (90) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table))
+Manager.cs (93) : Profile profile = ProfileByUser(username);
+Manager.cs (94) : if (profile == null)
+Manager.cs (97) : return profile.IsGrantedPrivilege(table, privilege);
+GrantTests.cs (1) : ﻿using System;
+RevokeTests.cs (1) : ﻿using System;

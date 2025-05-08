@@ -1,0 +1,767 @@
+Total written by this student: 23% lines / 20% characters
+
+ColumnDefinition.cs (3) : using System.Windows.Markup;
+ColumnDefinition.cs (27) : //si se encuentra -> cambiar a [ARROW]
+ColumnDefinition.cs (29) : if (value.Contains(Delimiter))
+ColumnDefinition.cs (30) : {
+ColumnDefinition.cs (31) : return value.Replace(Delimiter,DelimiterEncoded);
+ColumnDefinition.cs (32) : }
+ColumnDefinition.cs (33) : return value;
+ColumnDefinition.cs (39) : if (value.Contains(DelimiterEncoded))
+ColumnDefinition.cs (40) : {
+ColumnDefinition.cs (41) : return value.Replace(DelimiterEncoded,Delimiter);
+ColumnDefinition.cs (42) : }
+ColumnDefinition.cs (43) : return value;
+ColumnDefinition.cs (49) : return  Type + Delimiter + Encode(Name);
+ColumnDefinition.cs (55) : //value es un string:Int -> Fecha [ARROW] dd/mm/aaa
+ColumnDefinition.cs (57) : if (string.IsNullOrEmpty(value))
+ColumnDefinition.cs (58) : {
+ColumnDefinition.cs (60) : }
+ColumnDefinition.cs (62) : string[] splitedValues = value.Split("->");
+ColumnDefinition.cs (64) : for (int i=0; i<splitedValues.Length; i++)
+ColumnDefinition.cs (65) : {
+ColumnDefinition.cs (66) : string tipoString = splitedValues[i];
+ColumnDefinition.cs (67) : string name = splitedValues[i+1];
+ColumnDefinition.cs (68) : string decode = Decode(name); //si tiene [ARROW] pasar� a -> : Fecha -> dd/mm/aaa
+ColumnDefinition.cs (70) : //tengo que pasar de String a DataType
+ColumnDefinition.cs (71) : DataType tipoDato = DataType.String;
+ColumnDefinition.cs (72) : Enum.TryParse(tipoString, out tipoDato);
+ColumnDefinition.cs (73) : ColumnDefinition columna = new ColumnDefinition(tipoDato, decode);
+ColumnDefinition.cs (75) : return columna;
+ColumnDefinition.cs (77) : return null;
+ColumnDefinition.cs (78) : }
+Condition.cs (42) : {
+Database.cs (45) : Table existe = TableByName(table.Name);
+Database.cs (46) : if (existe == null) //si no existe a�adir la tabla
+Database.cs (47) : {
+Database.cs (48) : Tables.Add(table);
+Database.cs (49) : return true;
+Database.cs (50) : }
+Database.cs (51) : return false; //ya existe la tabla dada
+Database.cs (57) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (58) : {
+Database.cs (59) : if (tableName == Tables[i].Name) //el mismo nombre
+Database.cs (60) : {
+Database.cs (61) : return Tables[i];
+Database.cs (62) : }
+Database.cs (63) : }
+Database.cs (213) : Table tabla = TableByName(tableName);
+Database.cs (217) : if (tabla == null) // no existe la tabla
+Database.cs (218) : {
+Database.cs (219) : LastErrorMessage = Constants.TableDoesNotExistError; //no hay ninguna tabla con el nombre dado
+Database.cs (220) : return false;
+Database.cs (221) : }
+Database.cs (239) : {
+Database.cs (241) : {
+Database.cs (242) : //el nombre de la columna de la tabla es igual al nombre de la columna que se va a actualizar
+Database.cs (250) : {
+Database.cs (251) : tabla.Update(columnNames, columnCondition);
+Database.cs (253) : return true;
+Database.cs (254) : }
+Database.cs (256) : {
+Database.cs (257) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (258) : return false;
+Database.cs (259) : }
+Database.cs (260) : }
+Table.cs (5) : using System.ComponentModel.Design;
+Table.cs (140) : else
+Table.cs (141) : {
+Table.cs (142) : return;
+Table.cs (143) : }
+Table.cs (148) : //TODO DEADLINE 1.A: Returns the indices of all the rows where the condition is true. Check Row.IsTrueIsTrue()
+Table.cs (151) : if (condition == null)
+Table.cs (152) : {
+Table.cs (153) : return indicesOfRows; //no habr� ninguno que cumpla la condici�n
+Table.cs (154) : }
+Table.cs (182) : List<int> filasTablaNueva = new List<int>();//las filas que va a tener la tabla Resultado
+Table.cs (183) : List<ColumnDefinition> columnas = new List<ColumnDefinition>();
+Table.cs (184) : Table Resultado = new Table("Result", columnas);
+Table.cs (186) : for (int i=0; i<columnNames.Count; i++)
+Table.cs (187) : {
+Table.cs (188) : ColumnDefinition posicionColumna = ColumnByName(columnNames[i]); //obtener la columna por el nombre
+Table.cs (190) : if (posicionColumna == null) //esto quiere decir que la columna no existe
+Table.cs (191) : {
+Table.cs (192) : return Resultado;
+Table.cs (193) : }
+Table.cs (194) : columnas.Add(posicionColumna); //a�adir a la lista
+Table.cs (195) : }
+Table.cs (198) : if (condition ==null)//devolver todos los valores de las columnas
+Table.cs (199) : {
+Table.cs (200) : for(int i=0; i< Rows.Count; i++)
+Table.cs (201) : {
+Table.cs (202) : filasTablaNueva.Add(i);
+Table.cs (203) : }
+Table.cs (204) : }
+Table.cs (205) : else
+Table.cs (206) : {
+Table.cs (207) : filasTablaNueva = RowIndicesWhereConditionIsTrue(condition); //las filas que cumplen la condici�n
+Table.cs (208) : }
+Table.cs (210) : for (int i = 0; i < filasTablaNueva.Count; i++)
+Table.cs (211) : {
+Table.cs (212) : Row row = Rows[filasTablaNueva[i]];//la fila que cumple la condici�n, si es null todas
+Table.cs (213) : List<string> valores = new List<string>();//valores que voy a mostrar en la tabla resultado
+Table.cs (215) : for (int k = 0; k < columnas.Count; k++)
+Table.cs (216) : {
+Table.cs (217) : string valor = row.GetValue(columnas[k].Name);//obtener el valor
+Table.cs (218) : valores.Add(valor);// a�adir a la lista
+Table.cs (220) : }
+Table.cs (221) : Row fila = new Row(columnas, valores);
+Table.cs (222) : Resultado.AddRow(fila);
+Table.cs (223) : }
+Table.cs (224) : return Resultado;
+Table.cs (249) : List<int> indicesCumplidos;
+Table.cs (250) : indicesCumplidos = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (253) : for (int i = 0; i < indicesCumplidos.Count; i++)
+Table.cs (256) : Rows[indicesCumplidos[i]].SetValue(setValues[j].ColumnName, setValues[j].Value);
+ColumnDefinitionTests.cs (1) : using DbManager;
+ColumnDefinitionTests.cs (2) : using System.ComponentModel.DataAnnotations;
+ColumnDefinitionTests.cs (16) : [Fact]
+ColumnDefinitionTests.cs (17) : public void TestAsText()
+ColumnDefinitionTests.cs (18) : {
+ColumnDefinitionTests.cs (19) : //si el string contiene -> cambiarlo por [ARROW]
+ColumnDefinitionTests.cs (20) : string valorConDelimiter = "Fecha -> dd/mm/aaaa";
+ColumnDefinitionTests.cs (21) : string cambio = "Fecha [ARROW] dd/mm/aaaa";
+ColumnDefinitionTests.cs (22) : ColumnDefinition columna = new ColumnDefinition(ColumnDefinition.DataType.String, valorConDelimiter);
+ColumnDefinitionTests.cs (23) : string resultado = columna.AsText(); //cambia la -> por [ARROW] y tiene -> entre el Name y Type
+ColumnDefinitionTests.cs (24) : Assert.Equal("String->"+ cambio, resultado);
+ColumnDefinitionTests.cs (26) : //si no tiene -> no tiene que hacer el cambio por [ARROW]
+ColumnDefinitionTests.cs (27) : ColumnDefinition columna2 = new ColumnDefinition(ColumnDefinition.DataType.Int, "Edad");
+ColumnDefinitionTests.cs (28) : Assert.Equal("Int->Edad", columna2.AsText());
+ColumnDefinitionTests.cs (30) : ColumnDefinition columna3 = new ColumnDefinition(ColumnDefinition.DataType.String, "Apellido");
+ColumnDefinitionTests.cs (31) : Assert.Equal("String->Apellido", columna3.AsText());
+ColumnDefinitionTests.cs (32) : }
+ColumnDefinitionTests.cs (34) : [Fact]
+ColumnDefinitionTests.cs (35) : public void TestParse()
+ColumnDefinitionTests.cs (36) : {
+ColumnDefinitionTests.cs (37) : //value est� vac�o
+ColumnDefinitionTests.cs (38) : string valueVacio = "";
+ColumnDefinitionTests.cs (39) : ColumnDefinition columnaVacia = ColumnDefinition.Parse(valueVacio);
+ColumnDefinitionTests.cs (40) : Assert.Null(columnaVacia);
+ColumnDefinitionTests.cs (42) : //value es nulo
+ColumnDefinitionTests.cs (43) : string valueNulo = null;
+ColumnDefinitionTests.cs (44) : ColumnDefinition columnaNula = ColumnDefinition.Parse(valueNulo);
+ColumnDefinitionTests.cs (45) : Assert.Null(columnaNula);
+ColumnDefinitionTests.cs (47) : //value con [ARROW]
+ColumnDefinitionTests.cs (48) : string value = "Double->Precio [ARROW] Final";
+ColumnDefinitionTests.cs (49) : ColumnDefinition columna = ColumnDefinition.Parse(value);
+ColumnDefinitionTests.cs (50) : Assert.Equal(ColumnDefinition.DataType.Double, columna.Type);
+ColumnDefinitionTests.cs (51) : Assert.Equal("Precio -> Final", columna.Name);
+ColumnDefinitionTests.cs (53) : //con dos [ARROW]
+ColumnDefinitionTests.cs (54) : string value2 = "Double->Precio [ARROW] Final [ARROW] Impuestos";
+ColumnDefinitionTests.cs (55) : ColumnDefinition columna2 = ColumnDefinition.Parse(value2);
+ColumnDefinitionTests.cs (56) : Assert.Equal(ColumnDefinition.DataType.Double, columna2.Type);
+ColumnDefinitionTests.cs (57) : Assert.Equal("Precio -> Final -> Impuestos", columna2.Name);
+ColumnDefinitionTests.cs (59) : //value sin [ARROW]
+ColumnDefinitionTests.cs (60) : string value3 = "String->Nombre";
+ColumnDefinitionTests.cs (61) : ColumnDefinition columna3 = ColumnDefinition.Parse(value3);
+ColumnDefinitionTests.cs (62) : Assert.Equal(ColumnDefinition.DataType.String, columna3.Type);
+ColumnDefinitionTests.cs (63) : Assert.Equal("Nombre", columna3.Name);
+ColumnDefinitionTests.cs (64) : }
+DatabaseTests.cs (1) : using DbManager;
+DatabaseTests.cs (2) : using DbManager.Parser;
+DatabaseTests.cs (3) : using System.Collections.Generic;
+DatabaseTests.cs (18) : [Fact]
+DatabaseTests.cs (19) : public void TestAddTable()
+DatabaseTests.cs (20) : {
+DatabaseTests.cs (21) : //COMPROBAR QUE NO SE A�ADE UNA TABLA CON EL MISMO NOMBRE
+DatabaseTests.cs (22) : Database database = Database.CreateTestDatabase(); //en DataBase tenemos las tablas propuestas
+DatabaseTests.cs (23) : bool a�adir;
+DatabaseTests.cs (25) : //crear una tabla para insertar en el DataBase
+DatabaseTests.cs (26) : Table tableInsert = new Table("Tabla1", new List<ColumnDefinition>()
+DatabaseTests.cs (27) : {
+DatabaseTests.cs (28) : new ColumnDefinition(ColumnDefinition.DataType.String, "Material"),
+DatabaseTests.cs (29) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Precio"),
+DatabaseTests.cs (31) : });
+DatabaseTests.cs (32) : a�adir = database.AddTable(tableInsert);
+DatabaseTests.cs (33) : Assert.True(a�adir);
+DatabaseTests.cs (35) : //hacer que a�ada la misma tabla otra vez(con el mismo nombre), para que no deje (return false)
+DatabaseTests.cs (36) : a�adir = database.AddTable(tableInsert);
+DatabaseTests.cs (37) : Assert.False(a�adir);
+DatabaseTests.cs (39) : //insertar otra tabla diferente al database
+DatabaseTests.cs (40) : Table tableInsert2 = new Table("Tabla2", new List<ColumnDefinition>()
+DatabaseTests.cs (41) : {
+DatabaseTests.cs (42) : new ColumnDefinition(ColumnDefinition.DataType.String, "ID"),
+DatabaseTests.cs (43) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Nota"),
+DatabaseTests.cs (45) : });
+DatabaseTests.cs (46) : a�adir = database.AddTable(tableInsert2);
+DatabaseTests.cs (47) : Assert.True(a�adir);
+DatabaseTests.cs (48) : }
+DatabaseTests.cs (50) : [Fact]
+DatabaseTests.cs (51) : public void TestTableByName()
+DatabaseTests.cs (52) : {
+DatabaseTests.cs (53) : Database database = Database.CreateTestDatabase(); //crea la tabla TestTable
+DatabaseTests.cs (54) : Table resultado1 = database.TableByName("TestTable"); //el nombre de la tabla creada al crear el dataBase
+DatabaseTests.cs (55) : Assert.Equal("TestTable", resultado1.Name);
+DatabaseTests.cs (56) : database.CheckForTesting("TestTable", new List<List<string>>()
+DatabaseTests.cs (57) : {
+DatabaseTests.cs (58) : new List<string> { "Rodolfo", "1.62" },
+DatabaseTests.cs (59) : new List<string> { "Maider", "1.67" },
+DatabaseTests.cs (60) : new List<string> { "Pepe", "1.55" }
+DatabaseTests.cs (61) : });
+DatabaseTests.cs (63) : //crear una tabla para insertar en el DataBase
+DatabaseTests.cs (64) : Table tableInsert = new Table("Tabla1", new List<ColumnDefinition>()
+DatabaseTests.cs (65) : {
+DatabaseTests.cs (66) : new ColumnDefinition(ColumnDefinition.DataType.String, "Material"),
+DatabaseTests.cs (67) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Precio"),
+DatabaseTests.cs (69) : });
+DatabaseTests.cs (70) : database.AddTable(tableInsert); //a�adir al dataBase
+DatabaseTests.cs (71) : Table resultado2 = database.TableByName("Tabla1");
+DatabaseTests.cs (72) : Assert.Equal("Tabla1", resultado2.Name);
+DatabaseTests.cs (75) : //crear otra tabla diferente
+DatabaseTests.cs (76) : Table tableInsert2 = new Table("Tabla2", new List<ColumnDefinition>()
+DatabaseTests.cs (77) : {
+DatabaseTests.cs (78) : new ColumnDefinition(ColumnDefinition.DataType.String, "ID"),
+DatabaseTests.cs (79) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Nota"),
+DatabaseTests.cs (81) : });
+DatabaseTests.cs (82) : database.AddTable(tableInsert2);
+DatabaseTests.cs (83) : Table resultado3 = database.TableByName("Tabla2");
+DatabaseTests.cs (84) : Assert.Equal("Tabla2", resultado3.Name);
+DatabaseTests.cs (86) : //si buscamos una tabla que no est� en la base de datos, return null
+DatabaseTests.cs (87) : Table resultado4 = database.TableByName("NoExiste");
+DatabaseTests.cs (88) : Assert.Null(resultado4);
+DatabaseTests.cs (89) : }
+DatabaseTests.cs (90) : [Fact]
+DatabaseTests.cs (91) : public void TestUpdate()
+DatabaseTests.cs (92) : {
+DatabaseTests.cs (93) : Database database = Database.CreateTestDatabase();
+DatabaseTests.cs (95) : //update de un table que no existe
+DatabaseTests.cs (96) : Condition condition = new Condition("Height", "<", "1.60");
+DatabaseTests.cs (98) : Assert.Equal(Constants.TableDoesNotExistError, database.LastErrorMessage);
+DatabaseTests.cs (100) : //la columna no existe
+DatabaseTests.cs (101) : List <SetValue> columnaValor = new List<SetValue> { new SetValue("ColumnaNoexiste", "NewValue") };
+DatabaseTests.cs (103) : Assert.Equal(Constants.ColumnDoesNotExistError, database.LastErrorMessage);
+DatabaseTests.cs (105) : //update v�lido
+DatabaseTests.cs (106) : List<SetValue> columnaValorExiste = new List<SetValue> { new SetValue("Name", "Naroa") };
+DatabaseTests.cs (109) : database.CheckForTesting("TestTable", new List<List<string>>()
+DatabaseTests.cs (110) : {
+DatabaseTests.cs (111) : new List<string> { "Rodolfo", "1.62", "25" },
+DatabaseTests.cs (112) : new List<string> { "Maider", "1.67", "67" },
+DatabaseTests.cs (113) : new List<string> { "Naroa", "1.55", "51" }
+DatabaseTests.cs (114) : });
+DatabaseTests.cs (117) : //con otra condici�n
+DatabaseTests.cs (121) : database.CheckForTesting("TestTable", new List<List<string>>()
+DatabaseTests.cs (122) : {
+DatabaseTests.cs (123) : new List<string> { "Rodolfo", "1.62", "25" },
+DatabaseTests.cs (124) : new List<string> { "Naroa", "1.67", "67" },
+DatabaseTests.cs (125) : new List<string> { "Naroa", "1.55", "51" }
+DatabaseTests.cs (126) : });
+DatabaseTests.cs (337) : }
+DeleteTest.cs (1) : ﻿using DbManager;
+DeleteTest.cs (2) : using DbManager.Parser;
+DeleteTest.cs (3) : using System;
+DeleteTest.cs (4) : using System.Collections.Generic;
+DeleteTest.cs (5) : using System.Linq;
+DeleteTest.cs (6) : using System.Text;
+DeleteTest.cs (7) : using System.Threading.Tasks;
+DeleteTest.cs (8) : using System.Xml.Linq;
+DeleteTest.cs (10) : namespace OurTests
+DeleteTest.cs (11) : {
+DeleteTest.cs (12) : public class DeleteTest
+DeleteTest.cs (13) : {
+DeleteTest.cs (14) : [Fact]
+DeleteTest.cs (15) : public void DeleteUserPatternTest()
+DeleteTest.cs (16) : {
+DeleteTest.cs (17) : DeleteUser query = MiniSQLParser.Parse("DELETE USER Jacinto") as DeleteUser;
+DeleteTest.cs (18) : Assert.NotNull(query);
+DeleteTest.cs (20) : query = MiniSQLParser.Parse("DELETE USER JACINTO") as DeleteUser;
+DeleteTest.cs (21) : Assert.NotNull(query);
+DeleteTest.cs (23) : query = MiniSQLParser.Parse("DELETE USER  Jacinto") as DeleteUser;
+DeleteTest.cs (24) : Assert.NotNull(query);
+DeleteTest.cs (26) : query = MiniSQLParser.Parse("DELETE  USER Jacinto") as DeleteUser;
+DeleteTest.cs (27) : Assert.NotNull(query);
+DeleteTest.cs (29) : query = MiniSQLParser.Parse("DELETE USER Jacinto_García") as DeleteUser;
+DeleteTest.cs (30) : Assert.NotNull(query);
+DeleteTest.cs (32) : //incorrectos
+DeleteTest.cs (33) : query = MiniSQLParser.Parse("delete user Jacinto") as DeleteUser;
+DeleteTest.cs (34) : Assert.Null(query);
+DeleteTest.cs (36) : query = MiniSQLParser.Parse("Delete User Jacinto") as DeleteUser;
+DeleteTest.cs (37) : Assert.Null(query);
+DeleteTest.cs (39) : query = MiniSQLParser.Parse("DELETE USER") as DeleteUser;
+DeleteTest.cs (40) : Assert.Null(query);
+DeleteTest.cs (42) : query = MiniSQLParser.Parse("DELETE") as DeleteUser;
+DeleteTest.cs (43) : Assert.Null(query);
+DeleteTest.cs (44) : }
+DeleteTest.cs (46) : [Fact]
+DeleteTest.cs (47) : public void DeletePatternTest()
+DeleteTest.cs (48) : {
+DeleteTest.cs (49) : Delete query = MiniSQLParser.Parse("DELETE FROM Table1") as Delete;
+DeleteTest.cs (50) : Assert.Null(query);
+DeleteTest.cs (52) : Delete queryS = MiniSQLParser.Parse("DELETE FROM Table1 WHERE Inicial='A'") as Delete;
+DeleteTest.cs (53) : Assert.NotNull(queryS);
+DeleteTest.cs (54) : Assert.Equal("Table1", queryS.Table);
+DeleteTest.cs (55) : Assert.Equal("Inicial", queryS.Where.ColumnName);
+DeleteTest.cs (56) : Assert.Equal("=", queryS.Where.Operator);
+DeleteTest.cs (57) : Assert.Equal("A", queryS.Where.LiteralValue);
+DeleteTest.cs (59) : Delete query1 = MiniSQLParser.Parse("DELETE FROM Table6 WHERE Name='María'") as Delete;
+DeleteTest.cs (60) : Assert.NotNull(query1);
+DeleteTest.cs (62) : Assert.Equal("Table6", query1.Table);
+DeleteTest.cs (63) : Assert.Equal("Name", query1.Where.ColumnName);
+DeleteTest.cs (64) : Assert.Equal("=", query1.Where.Operator);
+DeleteTest.cs (65) : Assert.Equal("María", query1.Where.LiteralValue);
+DeleteTest.cs (67) : Delete query2 = MiniSQLParser.Parse("DELETE FROM Table6 WHERE Edad<'18'") as Delete;
+DeleteTest.cs (68) : Assert.NotNull(query2);
+DeleteTest.cs (69) : Assert.Equal("Table6", query2.Table);
+DeleteTest.cs (70) : Assert.Equal("Edad", query2.Where.ColumnName);
+DeleteTest.cs (71) : Assert.Equal("<", query2.Where.Operator);
+DeleteTest.cs (72) : Assert.Equal("18", query2.Where.LiteralValue);
+DeleteTest.cs (74) : Delete query3 = MiniSQLParser.Parse("DELETE FROM Table6 WHERE Precio>'-10.88'") as Delete;
+DeleteTest.cs (75) : Assert.NotNull(query3);
+DeleteTest.cs (76) : Assert.NotNull(query3);
+DeleteTest.cs (77) : Assert.Equal("Table6", query3.Table);
+DeleteTest.cs (78) : Assert.Equal("Precio", query3.Where.ColumnName);
+DeleteTest.cs (79) : Assert.Equal(">", query3.Where.Operator);
+DeleteTest.cs (80) : Assert.Equal("-10.88", query3.Where.LiteralValue);
+DeleteTest.cs (82) : Delete query4 = MiniSQLParser.Parse("DELETE  FROM  Table6  WHERE  Precio>'10.88'") as Delete;
+DeleteTest.cs (83) : Assert.NotNull(query4);
+DeleteTest.cs (84) : Assert.NotNull(query4);
+DeleteTest.cs (85) : Assert.Equal("Table6", query4.Table);
+DeleteTest.cs (86) : Assert.Equal("Precio", query4.Where.ColumnName);
+DeleteTest.cs (87) : Assert.Equal(">", query4.Where.Operator);
+DeleteTest.cs (88) : Assert.Equal("10.88", query4.Where.LiteralValue);
+DeleteTest.cs (90) : Delete query11 = MiniSQLParser.Parse("DELETE FROM Table6 WHERE Alumno='Adolfo Sánchez'") as Delete; //nombre compuesto
+DeleteTest.cs (91) : Assert.NotNull(query11);
+DeleteTest.cs (92) : Assert.Equal("Table6", query11.Table);
+DeleteTest.cs (93) : Assert.Equal("Alumno", query11.Where.ColumnName);
+DeleteTest.cs (94) : Assert.Equal("=", query11.Where.Operator);
+DeleteTest.cs (95) : Assert.Equal("Adolfo Sánchez", query11.Where.LiteralValue);
+DeleteTest.cs (97) : //incorrectos
+DeleteTest.cs (98) : Delete query5 = MiniSQLParser.Parse("DELETE Tabla1") as Delete;
+DeleteTest.cs (99) : Assert.Null(query5);
+DeleteTest.cs (101) : Delete query6 = MiniSQLParser.Parse("DELETE FROM") as Delete;
+DeleteTest.cs (102) : Assert.Null(query6);
+DeleteTest.cs (104) : Delete query7 = MiniSQLParser.Parse("Delete From Tabla WHERE Apellido='Fernandez'") as Delete;
+DeleteTest.cs (105) : Assert.Null(query7);
+DeleteTest.cs (107) : Delete queryNull = MiniSQLParser.Parse("DELETE FROM Tabla WHERE Apellido=''") as Delete;
+DeleteTest.cs (108) : Assert.Null(queryNull);
+DeleteTest.cs (110) : Delete query8 = MiniSQLParser.Parse("Delete From Tabla WHERE") as Delete;
+DeleteTest.cs (111) : Assert.Null(query8);
+DeleteTest.cs (113) : Delete query9 = MiniSQLParser.Parse("DELETE FROM Table6 WHERE Name = Jacinto") as Delete; //sin comillas no pasa el test
+DeleteTest.cs (114) : Assert.Null(query9);
+DeleteTest.cs (116) : Delete query10 = MiniSQLParser.Parse("DELETE FROM Table6 WHERE Precio > '10.88'") as Delete; //espacios en la condición
+DeleteTest.cs (117) : Assert.Null(query10);
+DeleteTest.cs (119) : }
+DeleteTest.cs (120) : [Fact]
+DeleteTest.cs (121) : public void DeleteExecuteTest()
+DeleteTest.cs (122) : {
+DeleteTest.cs (123) : Database testingdatabase = new Database("user", "password");
+DeleteTest.cs (125) : Table table = new Table("Table1", new List<ColumnDefinition>()
+DeleteTest.cs (126) : {
+DeleteTest.cs (127) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+DeleteTest.cs (128) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Edad"),
+DeleteTest.cs (130) : });
+DeleteTest.cs (131) : table.Insert(new List<string>() { "Jon", "30"});
+DeleteTest.cs (132) : table.Insert(new List<string>() { "Mikel", "12" });
+DeleteTest.cs (133) : table.Insert(new List<string>() { "Ane", "20" });
+DeleteTest.cs (134) : testingdatabase.AddTable(table);
+DeleteTest.cs (135) : Assert.Equal(2, testingdatabase.TableByName("Table1").NumColumns());
+DeleteTest.cs (136) : Assert.Equal(3, testingdatabase.TableByName("Table1").NumRows());
+DeleteTest.cs (138) : Delete query = MiniSQLParser.Parse("DELETE FROM Table1 WHERE Edad<'25'") as Delete;
+DeleteTest.cs (139) : query.Execute(testingdatabase);
+DeleteTest.cs (140) : Assert.NotNull(testingdatabase.TableByName("Table1"));
+DeleteTest.cs (141) : Assert.Equal(2, testingdatabase.TableByName("Table1").NumColumns());
+DeleteTest.cs (142) : Assert.Equal(1, testingdatabase.TableByName("Table1").NumRows());
+DeleteTest.cs (144) : //la tabla no existe
+DeleteTest.cs (145) : Delete query2 = MiniSQLParser.Parse("DELETE FROM Table2 WHERE Name='Antonio'") as Delete;
+DeleteTest.cs (146) : query2.Execute(testingdatabase);
+DeleteTest.cs (147) : Assert.Null(testingdatabase.TableByName("Table2"));
+DeleteTest.cs (149) : }
+DeleteTest.cs (150) : }
+DeleteTest.cs (151) : }
+DropTest.cs (1) : ﻿using DbManager.Parser;
+DropTest.cs (2) : using DbManager;
+DropTest.cs (3) : using System;
+DropTest.cs (4) : using System.Collections.Generic;
+DropTest.cs (5) : using System.Linq;
+DropTest.cs (6) : using System.Text;
+DropTest.cs (7) : using System.Threading.Tasks;
+DropTest.cs (9) : namespace OurTests
+DropTest.cs (10) : {
+DropTest.cs (11) : public class DropTest
+DropTest.cs (12) : {
+DropTest.cs (13) : [Fact]
+DropTest.cs (14) : public void DropTablePatternTest()
+DropTest.cs (15) : {
+DropTest.cs (16) : /*correct
+DropTest.cs (17) : * DROP TABLE Table1
+DropTest.cs (18) : DROP TABLE MyTable
+DropTest.cs (19) : DROP  TABLE  Table1
+DropTest.cs (20) : DROP TABLE    Table1
+DropTest.cs (21) : */
+DropTest.cs (22) : DropTable query = MiniSQLParser.Parse("DROP TABLE Table1") as DropTable;
+DropTest.cs (23) : Assert.NotNull(query);
+DropTest.cs (24) : Assert.Equal("Table1", query.Table);
+DropTest.cs (26) : query = MiniSQLParser.Parse("DROP  TABLE  Table1") as DropTable;
+DropTest.cs (27) : Assert.NotNull(query);
+DropTest.cs (29) : query = MiniSQLParser.Parse("DROP TABLE    MyTable") as DropTable;
+DropTest.cs (30) : Assert.NotNull(query);
+DropTest.cs (31) : Assert.Equal("MyTable", query.Table);
+DropTest.cs (33) : query = MiniSQLParser.Parse("DROP TABLE") as DropTable;
+DropTest.cs (34) : Assert.Null(query);
+DropTest.cs (36) : query = MiniSQLParser.Parse("DROP  MyTable") as DropTable;
+DropTest.cs (37) : Assert.Null(query);
+DropTest.cs (39) : query = MiniSQLParser.Parse("Drop  TABLE  Table1") as DropTable;
+DropTest.cs (40) : Assert.Null(query);
+DropTest.cs (42) : query = MiniSQLParser.Parse("DROP  TABLE  Table1  ") as DropTable;
+DropTest.cs (43) : Assert.Null(query);
+DropTest.cs (45) : query = MiniSQLParser.Parse("DROP  TABLE  Ta ble1") as DropTable;
+DropTest.cs (46) : Assert.Null(query);
+DropTest.cs (47) : }
+DropTest.cs (48) : [Fact]
+DropTest.cs (49) : public void DropTableExecuteTest()
+DropTest.cs (50) : {
+DropTest.cs (51) : Database testingdataBase = new Database("user", "password");
+DropTest.cs (53) : Table table = new Table("Table1", new List<ColumnDefinition>());
+DropTest.cs (54) : Table table2 = new Table("Table2", new List<ColumnDefinition>());
+DropTest.cs (56) : testingdataBase.AddTable(table);
+DropTest.cs (57) : testingdataBase.AddTable(table2);
+DropTest.cs (59) : DropTable query = MiniSQLParser.Parse("DROP TABLE Table1") as DropTable;
+DropTest.cs (60) : query.Execute(testingdataBase);
+DropTest.cs (61) : Assert.Equal("Table1", query.Table);
+DropTest.cs (64) : //no existe la tabla
+DropTest.cs (65) : DropTable query2 = MiniSQLParser.Parse("DROP TABLE Table5") as DropTable;
+DropTest.cs (66) : query2.Execute(testingdataBase);
+DropTest.cs (67) : Assert.Null(testingdataBase.TableByName("Table5"));
+DropTest.cs (69) : }
+DropTest.cs (70) : }
+DropTest.cs (71) : }
+ProfileTests.cs (4) : using System.Security.Cryptography.X509Certificates;
+ProfileTests.cs (8) : using DbManager.Security;
+ProfileTests.cs (14) : [Fact]
+ProfileTests.cs (15) : public void GrantPrivilegeTest()
+ProfileTests.cs (16) : {
+ProfileTests.cs (17) : Manager managerCorrect = new Manager("Usuario1");
+ProfileTests.cs (18) : Profile profile = new Profile();
+ProfileTests.cs (19) : profile.PrivilegesOn["Table1"] = new List<Privilege> { Privilege.Select };
+ProfileTests.cs (20) : managerCorrect.Profiles.Add(profile);
+ProfileTests.cs (22) : //CORRECTOS
+ProfileTests.cs (23) : //tabla que ya existe y no tiene privilegio
+ProfileTests.cs (24) : bool resultado = profile.GrantPrivilege("Table1", Privilege.Delete);
+ProfileTests.cs (25) : Assert.True(resultado);
+ProfileTests.cs (27) : //la tabla no existe  --> NuevaTabla
+ProfileTests.cs (28) : //tiene que crear la tabla y darle privilegio
+ProfileTests.cs (29) : bool resultadoSinTabla= profile.GrantPrivilege("NuevaTabla", Privilege.Insert);
+ProfileTests.cs (30) : Assert.True(resultadoSinTabla);
+ProfileTests.cs (32) : //INCORRECTO
+ProfileTests.cs (33) : //tabla ya existente y ya tenía privilegio
+ProfileTests.cs (34) : bool resultadoExistente= profile.GrantPrivilege("NuevaTabla", Privilege.Insert);
+ProfileTests.cs (35) : Assert.False(resultadoExistente);
+ProfileTests.cs (37) : }
+ProfileTests.cs (38) : [Fact]
+ProfileTests.cs (39) : public void RevokePrivilegeTest()
+ProfileTests.cs (40) : {
+ProfileTests.cs (41) : //la tabla no existe
+ProfileTests.cs (42) : Manager managerCorrect = new Manager("Usuario2");
+ProfileTests.cs (44) : Profile profile = new Profile();
+ProfileTests.cs (45) : profile.PrivilegesOn["Table1"] = new List<Privilege> { Privilege.Select };
+ProfileTests.cs (47) : managerCorrect.Profiles.Add(profile);
+ProfileTests.cs (48) : bool resultadoSinTabla = profile.RevokePrivilege("NuevaTabla", Privilege.Select);
+ProfileTests.cs (49) : Assert.False(resultadoSinTabla);
+ProfileTests.cs (51) : //no tiene privilegio
+ProfileTests.cs (52) : Profile profile2 = new Profile();
+ProfileTests.cs (53) : profile2.PrivilegesOn["Table2"] = new List<Privilege> { Privilege.Insert, Privilege.Delete };
+ProfileTests.cs (55) : managerCorrect.Profiles.Add(profile2);
+ProfileTests.cs (56) : bool resultado = profile2.RevokePrivilege("Table2", Privilege.Update);
+ProfileTests.cs (57) : Assert.False(resultado);
+ProfileTests.cs (59) : //caso correcto
+ProfileTests.cs (60) : Profile profile3 = new Profile();
+ProfileTests.cs (61) : profile3.PrivilegesOn["Table3"] = new List<Privilege> { Privilege.Insert, Privilege.Delete };
+ProfileTests.cs (62) : managerCorrect.Profiles.Add(profile3);
+ProfileTests.cs (63) : bool resultadoTrue = profile3.RevokePrivilege("Table3", Privilege.Delete);
+ProfileTests.cs (64) : Assert.True(resultadoTrue);
+ProfileTests.cs (66) : }
+ProfileTests.cs (67) : [Fact]
+ProfileTests.cs (68) : public void IsGrantedPrivilegeTest()
+ProfileTests.cs (69) : {
+ProfileTests.cs (70) : Profile profile = new Profile();
+ProfileTests.cs (71) : profile.PrivilegesOn["Table1"] = new List<Privilege> { Privilege.Delete, Privilege.Insert, Privilege.Select };
+ProfileTests.cs (72) : profile.PrivilegesOn["Table2"] = new List<Privilege> { Privilege.Delete, Privilege.Select };
+ProfileTests.cs (74) : //la tabla existe y tiene privilegio CORRECTO
+ProfileTests.cs (75) : bool result = profile.IsGrantedPrivilege("Table1", Privilege.Select);
+ProfileTests.cs (76) : Assert.True(result);
+ProfileTests.cs (77) : //no existe la tabla INCORRECTO
+ProfileTests.cs (78) : result = profile.IsGrantedPrivilege("Table3", Privilege.Select);
+ProfileTests.cs (79) : Assert.False(result);
+ProfileTests.cs (80) : //la tabla existente no tiene privilegio INCORRECTO
+ProfileTests.cs (81) : result = profile.IsGrantedPrivilege("Table2", Privilege.Update);
+ProfileTests.cs (82) : Assert.False(result);
+ProfileTests.cs (83) : }
+TableTests.cs (86) : table.DeleteIthRow(3); //�ndice m�s grande que la tabla
+TableTests.cs (119) : public void TestDeleteWhere()
+TableTests.cs (124) : //condition null
+TableTests.cs (125) : Condition conditionNull = null;
+TableTests.cs (126) : table.DeleteWhere(conditionNull);
+TableTests.cs (127) : Assert.Equal(3, table.NumRows());
+TableTests.cs (128) : table.CheckForTesting(new List<List<string>>()
+TableTests.cs (129) : {
+TableTests.cs (130) : new List<string> { "Maider", "1.67", "67" },
+TableTests.cs (131) : new List<string> { "Rodolfo", "1.62", "25" },
+TableTests.cs (132) : new List<string> { "Pepe", "1.55", "51" }
+TableTests.cs (133) : });
+TableTests.cs (135) : Condition condition1 = new Condition("Age", ">", "60");
+TableTests.cs (136) : table.DeleteWhere(condition1); //tiene que borrar Maider ya que tiene m�s de 60 a�os
+TableTests.cs (138) : Assert.Equal(2, table.NumRows());
+TableTests.cs (140) : table.CheckForTesting(new List<List<string>>()
+TableTests.cs (141) : {
+TableTests.cs (142) : new List<string> { "Rodolfo", "1.62", "25" },
+TableTests.cs (143) : new List<string> { "Pepe", "1.55", "51" }
+TableTests.cs (144) : });
+TableTests.cs (146) : Condition condition2 = new Condition("Height", ">", "1.60");
+TableTests.cs (147) : table.DeleteWhere(condition2); //tiene que borrar a Rodolfo
+TableTests.cs (149) : Assert.Equal(1, table.NumRows());
+TableTests.cs (150) : table.CheckForTesting(new List<List<string>>()
+TableTests.cs (151) : {
+TableTests.cs (152) : new List<string> { "Pepe", "1.55", "51" }
+TableTests.cs (153) : });
+TableTests.cs (155) : Condition condition3 = new Condition("Height", "=", "1.90");
+TableTests.cs (156) : table.DeleteWhere(condition3); //no debe de borrar
+TableTests.cs (158) : Assert.Equal(1, table.NumRows());
+TableTests.cs (159) : table.CheckForTesting(new List<List<string>>()
+TableTests.cs (160) : {
+TableTests.cs (161) : new List<string> { "Pepe", "1.55", "51" }
+TableTests.cs (162) : });
+TableTests.cs (164) : Condition condition4 = new Condition("Age", "=", "51");
+TableTests.cs (165) : table.DeleteWhere(condition4);//borra Pepe y la tabla se queda vac�a
+TableTests.cs (167) : Assert.Equal(0, table.NumRows());
+TableTests.cs (168) : table.CheckForTesting(new List<List<string>>());
+TableTests.cs (170) : [Fact]
+TableTests.cs (171) : public void TestSelect()
+TableTests.cs (172) : {
+TableTests.cs (173) : Table table = Table.CreateTestTable();
+TableTests.cs (174) : Assert.Equal(3, table.NumRows());
+TableTests.cs (176) : List<string> columnNames = new List<string> { "Name", "Height"};
+TableTests.cs (177) : Table resultado = table.Select(columnNames, null); //sin condici�n, debe de devolver todo lo que haya
+TableTests.cs (178) : Assert.Equal(2, resultado.NumColumns());
+TableTests.cs (179) : Assert.Equal(3, resultado.NumRows());
+TableTests.cs (181) : resultado.CheckForTesting(new List<List<string>>()
+TableTests.cs (182) : {
+TableTests.cs (183) : new List<string> { "Rodolfo", "1.62"},
+TableTests.cs (184) : new List<string> { "Maider", "1.67"},
+TableTests.cs (185) : new List<string> { "Pepe", "1.55"}
+TableTests.cs (186) : });
+TableTests.cs (188) : //las columnas en otro orden
+TableTests.cs (189) : List<string> columnNamesDisordered = new List<string> { "Age", "Name", "Height" };
+TableTests.cs (190) : Table resultadoDisordered = table.Select(columnNamesDisordered, null); //sin condici�n, debe de devolver todo lo que haya
+TableTests.cs (191) : Assert.Equal(3, resultadoDisordered.NumColumns());
+TableTests.cs (192) : Assert.Equal(3, resultadoDisordered.NumRows());
+TableTests.cs (194) : resultadoDisordered.CheckForTesting(new List<List<string>>()
+TableTests.cs (195) : {
+TableTests.cs (196) : new List<string> { "25", "Rodolfo", "1.62" },
+TableTests.cs (197) : new List<string> { "67", "Maider", "1.67"},
+TableTests.cs (198) : new List<string> { "51", "Pepe", "1.55" }
+TableTests.cs (199) : });
+TableTests.cs (207) : //si no existe la columna sin condici�n, devolver tabla vac�a
+TableTests.cs (208) : List<string> columnNamesNotExist = new List<string> { "Direction", "Price" };
+TableTests.cs (209) : Table resultadoNull = table.Select(columnNamesNotExist, null);
+TableTests.cs (210) : Assert.Equal(0, resultadoNull.NumColumns());
+TableTests.cs (211) : Assert.Equal(0, resultadoNull.NumRows());
+TableTests.cs (213) : Condition condition = new Condition("Height", "<", "1.60"); //Pepe es el �nico que cumple
+TableTests.cs (214) : Table resultado2=table.Select(columnNames, condition);
+TableTests.cs (215) : Assert.Equal(2, resultado2.NumColumns());
+TableTests.cs (216) : Assert.Equal(1, resultado2.NumRows());
+TableTests.cs (217) : resultado2.CheckForTesting(new List<List<string>>()
+TableTests.cs (218) : {
+TableTests.cs (219) : new List<string> { "Pepe", "1.55" }
+TableTests.cs (220) : });
+TableTests.cs (221) : //si no existe la columna con condici�n, null
+TableTests.cs (222) : Table resultadoNullCondition= table.Select(columnNamesNotExist, condition);
+TableTests.cs (223) : Assert.Equal(0, resultadoNull.NumColumns());
+TableTests.cs (224) : Assert.Equal(0, resultadoNull.NumRows());
+TableTests.cs (226) : //otro ejemplo con 3 columnas
+TableTests.cs (227) : List<string> columnNamesNew = new List<string> { "Name", "Height", "Age" };
+TableTests.cs (228) : Condition conditionNew = new Condition("Age", ">", "50"); //tiene que seleccionar a Maider y Pepe
+TableTests.cs (229) : Table resultado3=table.Select(columnNamesNew, conditionNew);
+TableTests.cs (230) : Assert.Equal(3, resultado3.NumColumns());
+TableTests.cs (231) : Assert.Equal(2, resultado3.NumRows());
+TableTests.cs (232) : resultado3.CheckForTesting(new List<List<string>>()
+TableTests.cs (233) : {
+TableTests.cs (234) : new List<string> { "Maider", "1.67", "67" },
+TableTests.cs (235) : new List<string> { "Pepe", "1.55", "51" }
+TableTests.cs (236) : });
+Delete.cs (3) : using System.Reflection.Metadata;
+Delete.cs (16) : Table = table;
+Delete.cs (17) : Where = where;
+Delete.cs (24) : bool boolean = database.DeleteWhere(Table, Where);
+Delete.cs (25) : if (boolean == false)
+Delete.cs (26) : {
+Delete.cs (27) : return database.LastErrorMessage;
+Delete.cs (28) : }
+Delete.cs (29) : else
+Delete.cs (30) : {
+Delete.cs (31) : return Constants.DeleteSuccess;
+Delete.cs (32) : }
+DeleteUser.cs (3) : using System.Runtime.Intrinsics.X86;
+DeleteUser.cs (6) : using DbManager.Security;
+DeleteUser.cs (18) : Username = username;
+DeleteUser.cs (25) : if (database.SecurityManager.IsUserAdmin() ==false)
+DeleteUser.cs (26) : {
+DeleteUser.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (29) : }
+DeleteUser.cs (32) : if (database.SecurityManager.UserByName(Username) == null)
+DeleteUser.cs (33) : {
+DeleteUser.cs (34) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (35) : }
+DeleteUser.cs (36) : else
+DeleteUser.cs (37) : {
+DeleteUser.cs (38) : Profile profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (39) : database.SecurityManager.RemoveProfile(profile.Name);
+DeleteUser.cs (40) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (41) : }
+DropTable.cs (15) : Table = table;
+DropTable.cs (23) : database.DropTable(Table);
+DropTable.cs (24) : return database.LastErrorMessage;
+Grant.cs (5) : using DbManager.Security;
+Grant.cs (19) : PrivilegeName=privilegeName;
+Grant.cs (20) : TableName = tableName;
+Grant.cs (21) : ProfileName = profileName;
+Grant.cs (29) : Privilege privilege = new Privilege();
+Grant.cs (30) : switch (PrivilegeName)
+Grant.cs (31) : {
+Grant.cs (32) : case "DELETE":
+Grant.cs (33) : privilege = Privilege.Delete;
+Grant.cs (34) : break;
+Grant.cs (35) : case "INSERT":
+Grant.cs (36) : privilege = Privilege.Insert;
+Grant.cs (37) : break;
+Grant.cs (38) : case "SELECT":
+Grant.cs (39) : privilege = Privilege.Select;
+Grant.cs (40) : break;
+Grant.cs (41) : case "UPDATE":
+Grant.cs (42) : privilege = Privilege.Update;
+Grant.cs (43) : break;
+Grant.cs (44) : default:
+Grant.cs (45) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (46) : }
+Grant.cs (49) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (50) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
+Grant.cs (51) : {
+Grant.cs (52) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (53) : }
+Grant.cs (54) : else if (profile.IsGrantedPrivilege(TableName, privilege))
+Grant.cs (55) : {
+Grant.cs (56) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (57) : }
+Grant.cs (58) : else if (database.SecurityManager.IsUserAdmin() == false)
+Grant.cs (59) : {
+Grant.cs (60) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (62) : }
+Grant.cs (63) : else
+Grant.cs (64) : {
+Grant.cs (65) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
+Grant.cs (66) : return Constants.GrantPrivilegeSuccess;
+Grant.cs (67) : }
+MiniSQLParser.cs (3) : using DbManager.Security;
+MiniSQLParser.cs (22) : const string dropTablePattern = @"DROP\s+TABLE\s+([a-zA-Z_������������]+\w)";
+MiniSQLParser.cs (31) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)\s+(WHERE\s+([a-zA-Z0-9]+)(=|<|>)(\'(?:-?\d+\.\d+|-?\d+|[a-zA-Z�-�][a-zA-Z�-�0-9 ]*)'))";
+MiniSQLParser.cs (39) : const string grantPattern = @"GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+([a-zA-Z������������]+)";
+MiniSQLParser.cs (45) : const string deleteUserPattern = @"DELETE\s+USER\s+([a-zA-Z_������������]+)";
+MiniSQLParser.cs (55) : Match matchDrop = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (56) : if (matchDrop.Success && miniSQLQuery.Length == matchDrop.Length)
+MiniSQLParser.cs (57) : {
+MiniSQLParser.cs (58) : return new DropTable(matchDrop.Groups[1].Value); //nombre de la tabla
+MiniSQLParser.cs (59) : }
+MiniSQLParser.cs (80) : Match matchDelete = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (81) : if (matchDelete.Success && miniSQLQuery.Length == matchDelete.Length) //el match y el string pasado de la misma longitud
+MiniSQLParser.cs (82) : {
+MiniSQLParser.cs (84) : Condition condition = null;
+MiniSQLParser.cs (86) : {
+MiniSQLParser.cs (90) : string[] valorSinComSimple = valor.Split("'", System.StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (91) : condition = new Condition(columnaNombre, operador, valorSinComSimple[0]);
+MiniSQLParser.cs (124) : if (columnMatchPattern.Success) //hay columnas bien escrita
+MiniSQLParser.cs (125) : {
+MiniSQLParser.cs (146) : }
+MiniSQLParser.cs (203) : Match match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (204) : if (match.Success && miniSQLQuery.Length == match.Length)
+MiniSQLParser.cs (205) : {
+MiniSQLParser.cs (206) : return new DeleteUser(match.Groups[1].Value);
+MiniSQLParser.cs (207) : }
+MiniSQLParser.cs (209) : Match matchGrant = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (210) : if (matchGrant.Success && miniSQLQuery.Length == matchGrant.Length) //el match y el string pasado de la misma longitud
+MiniSQLParser.cs (211) : {
+MiniSQLParser.cs (212) : string privilegeType = matchGrant.Groups[1].Value;
+MiniSQLParser.cs (213) : string tableName = matchGrant.Groups[2].Value;
+MiniSQLParser.cs (214) : string securityProfil = matchGrant.Groups[3].Value;
+MiniSQLParser.cs (215) : return new Grant(privilegeType, tableName, securityProfil);
+MiniSQLParser.cs (216) : }
+Manager.cs (34) : {
+Manager.cs (35) : return true;
+Manager.cs (36) : }
+Profile.cs (20) : //key --> tabla
+Profile.cs (21) : //valores --> lista de privilegios
+Profile.cs (24) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (25) : {
+Profile.cs (26) : //crear lista vacia de privilegios
+Profile.cs (27) : List<Privilege> privileges = new List<Privilege>();
+Profile.cs (28) : PrivilegesOn[table]=privileges;
+Profile.cs (29) : }
+Profile.cs (31) : if (PrivilegesOn[table].Contains(privilege))//si ya tiene ese privilegio, false
+Profile.cs (32) : {
+Profile.cs (33) : return false;
+Profile.cs (34) : }
+Profile.cs (35) : //agregar privilegio ya que no est� en la lista
+Profile.cs (36) : PrivilegesOn[table].Add(privilege);
+Profile.cs (37) : return true;
+Profile.cs (44) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (45) : {
+Profile.cs (46) : return false;
+Profile.cs (47) : }
+Profile.cs (48) : if (!PrivilegesOn[table].Contains(privilege))//si no existe ese privilegio, false
+Profile.cs (49) : {
+Profile.cs (50) : return false;
+Profile.cs (51) : }
+Profile.cs (54) : PrivilegesOn[table].Remove(privilege);
+Profile.cs (55) : return true;
+Profile.cs (61) : if(PrivilegesOn.ContainsKey(table))
+Profile.cs (62) : {
+Profile.cs (63) : return PrivilegesOn[table].Contains(privilege);
+Profile.cs (64) : }
+DeleteUserTests.cs (14) : [Fact]
+DeleteUserTests.cs (15) : public void ExecuteDeleteTest()
+DeleteUserTests.cs (16) : {
+DeleteUserTests.cs (17) : Database database = new Database("Admin", "passwordAdmin");
+DeleteUserTests.cs (18) : Profile profile = new Profile() { Name = "B" };
+DeleteUserTests.cs (19) : User user = new User("user", "vgjh");
+DeleteUserTests.cs (20) : profile.Users.Add(user);
+DeleteUserTests.cs (21) : database.SecurityManager.AddProfile(profile);
+DeleteUserTests.cs (23) : DeleteUser query = MiniSQLParser.Parse("DELETE USER user") as DeleteUser;
+DeleteUserTests.cs (24) : string r = query.Execute(database);
+DeleteUserTests.cs (25) : Assert.Equal(Constants.DeleteUserSuccess, r);
+DeleteUserTests.cs (27) : DeleteUser query1 = MiniSQLParser.Parse("DELETE USER naroa") as DeleteUser;
+DeleteUserTests.cs (28) : string r2 = query1.Execute(database);
+DeleteUserTests.cs (29) : Assert.Equal(Constants.UserDoesNotExistError, r2);
+DeleteUserTests.cs (31) : }
+GrantTests.cs (9) : using System.Xml.Linq;
+GrantTests.cs (10) : using System.Collections;
+GrantTests.cs (16) : Database data = new Database("admin", "contrAdmin");
+GrantTests.cs (88) : Assert.Null(query);
+GrantTests.cs (91) : Assert.Null(query);
+GrantTests.cs (94) : Assert.Null(query);
+GrantTests.cs (97) : Assert.Null(query);
+GrantTests.cs (115) : Grant query4 = MiniSQLParser.Parse("GRANT SET ON Table TO User") as Grant;
+GrantTests.cs (136) : [Fact]
+GrantTests.cs (137) : public void ExecuteTest()
+GrantTests.cs (138) : {
+GrantTests.cs (140) : User user1P1 = new User("admin", "u1");
+GrantTests.cs (141) : User user2P1 = new User("u2p1", "u2");
+GrantTests.cs (143) : List<Privilege> priviP1 = new List<Privilege> { Privilege.Select };
+GrantTests.cs (144) : List<Privilege> priviP2 = new List<Privilege> { Privilege.Update, Privilege.Delete };
+GrantTests.cs (147) : Profile p1 = new Profile() { Name = "AdminProfile" };
+GrantTests.cs (148) : p1.Users.Add(user1P1);
+GrantTests.cs (150) : Profile p2 = new Profile() { Name = "B" };
+GrantTests.cs (151) : p2.Users.Add(user2P1);
+GrantTests.cs (154) : p1.PrivilegesOn.Add("Tabla1", priviP1);
+GrantTests.cs (155) : data.SecurityManager.Profiles.Add(p1);
+GrantTests.cs (157) : p2.PrivilegesOn.Add("Tabla2", priviP2);
+GrantTests.cs (158) : data.SecurityManager.Profiles.Add(p2);
+GrantTests.cs (160) : Grant query = MiniSQLParser.Parse("GRANT INSERT ON Tabla1 TO Z") as Grant;
+GrantTests.cs (161) : string r = query.Execute(data);
+GrantTests.cs (162) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, r);
+GrantTests.cs (165) : Grant query1 = MiniSQLParser.Parse("GRANT SELECT ON Tabla1 TO AdminProfile") as Grant;
+GrantTests.cs (166) : string r1 = query1.Execute(data);
+GrantTests.cs (167) : Assert.Equal(Constants.ProfileAlreadyHasPrivilege, r1);
+GrantTests.cs (169) : Grant query2 = MiniSQLParser.Parse("GRANT SELECT ON Tabla2 TO B") as Grant;
+GrantTests.cs (170) : string r2 = query2.Execute(data);
+GrantTests.cs (171) : Assert.Equal(Constants.GrantPrivilegeSuccess, r2);
+GrantTests.cs (173) : Grant query3 = MiniSQLParser.Parse("GRANT SELECT ON Tabla3 TO B") as Grant;
+GrantTests.cs (174) : string r3 = query3.Execute(data);
+GrantTests.cs (175) : Assert.Equal(Constants.GrantPrivilegeSuccess, r3);
+GrantTests.cs (179) : }

@@ -1,0 +1,970 @@
+Total written by this student: 29% lines / 26% characters
+
+Database.cs (6) : using System.Data.Common;
+Database.cs (7) : using System.Globalization;
+Database.cs (125) : Table TablaIndicada = TableByName(tableName);
+Database.cs (127) : if (TablaIndicada == null)
+Database.cs (128) : {
+Database.cs (130) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (133) : }
+Database.cs (135) : if (TablaIndicada.NumColumns() != values.Count)
+Database.cs (136) : {
+Database.cs (137) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (138) : return false;
+Database.cs (139) : }
+Database.cs (142) : TablaIndicada.Insert(values);
+Database.cs (143) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (145) : return true;
+Database.cs (157) : Table TablaIndicada = TableByName(tableName);
+Database.cs (159) : if (TablaIndicada == null)
+Database.cs (160) : {
+Database.cs (161) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (164) : }
+Database.cs (168) : //Verificar que existes las columnas
+Database.cs (169) : for (int i = 0; i < columns.Count; i++)
+Database.cs (170) : {
+Database.cs (171) : if (TablaIndicada.ColumnByName(columns[i]) == null)
+Database.cs (172) : {
+Database.cs (173) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (179) : }
+Database.cs (181) : return TablaIndicada.Select(columns, condition);
+Database.cs (311) : try
+Database.cs (312) : {
+Database.cs (314) : //Username y password por ahora no lo vamos a utilizar, m�s adelante cuando empezemos con la parte de seguiridad.
+Database.cs (319) : Database dataBase1 = new Database();
+Database.cs (358) : {
+Database.cs (360) : TextReader reader = File.OpenText(archivoTablas[i]);
+Database.cs (362) : string line1NombreTabla = reader.ReadLine();
+Database.cs (363) : string line2Columnas = reader.ReadLine();
+Database.cs (366) : string[] arrayColumnas = line2Columnas.Split(new char[] { ';' });
+Database.cs (368) : List<ColumnDefinition> columnas = new List<ColumnDefinition>();
+Database.cs (369) : for( int j = 0; j<arrayColumnas.Length; j++)
+Database.cs (370) : {
+Database.cs (371) : columnas.Add(ColumnDefinition.Parse(arrayColumnas[j]));
+Database.cs (373) : }
+Database.cs (374) : List<Row> filas = new List<Row>();
+Database.cs (375) : string line= reader.ReadLine();
+Database.cs (376) : while (line !=null)
+Database.cs (377) : {
+Database.cs (378) : filas.Add(Row.Parse(columnas, line));
+Database.cs (379) : line = reader.ReadLine();
+Database.cs (380) : }
+Database.cs (381) : reader.Close();
+Database.cs (385) : Table nuevaTabla = new Table(line1NombreTabla, columnas);
+Database.cs (386) : dataBase1.Tables.Add(nuevaTabla);
+Database.cs (388) : }
+Database.cs (393) : return dataBase1;
+Database.cs (402) : }
+Database.cs (403) : catch
+Database.cs (404) : {
+Database.cs (409) : }
+Row.cs (29) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Row.cs (31) : if (ColumnDefinitions[i].Name.Equals(columnName))
+Row.cs (74) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Row.cs (76) : if (ColumnDefinitions[i].Name.Equals(columnName))
+Row.cs (90) : return Values[numeroColumnna];
+Row.cs (105) : string value = GetValue(condition.ColumnName);
+Row.cs (109) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Row.cs (110) : {
+Row.cs (111) : if (ColumnDefinitions[i].Name.Equals(condition.ColumnName))
+Row.cs (112) : {
+Row.cs (113) : numeroColumnna = i;
+Row.cs (115) : }
+Row.cs (123) : ColumnDefinition.DataType type = ColumnDefinitions[numeroColumnna].Type;
+Row.cs (125) : return condition.IsTrue(value, type);
+Row.cs (126) : }
+DatabaseTests.cs (195) : [Fact]
+DatabaseTests.cs (196) : public void DataBaseInsert()
+DatabaseTests.cs (197) : {
+DatabaseTests.cs (198) : Database database = new Database("adminU", "adminP");
+DatabaseTests.cs (199) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+DatabaseTests.cs (200) : {
+DatabaseTests.cs (201) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+DatabaseTests.cs (202) : new ColumnDefinition(ColumnDefinition.DataType.String, "Age")
+DatabaseTests.cs (203) : };
+DatabaseTests.cs (204) : //Crear tabla1
+DatabaseTests.cs (205) : database.CreateTable("Tabla1", columns);
+DatabaseTests.cs (207) : //Prueba normal
+DatabaseTests.cs (208) : List<string> row1= new List<string>() { "Ramiro", "27" };
+DatabaseTests.cs (209) : bool prueba1 = database.Insert("Tabla1", row1);
+DatabaseTests.cs (210) : Assert.True(prueba1);
+DatabaseTests.cs (211) : Assert.Equal(Constants.InsertSuccess, database.LastErrorMessage);
+DatabaseTests.cs (213) : //Para probar si  no existe la tabla
+DatabaseTests.cs (214) : List<string> row2 = new List<string>() { "Paco", "67" }; ;
+DatabaseTests.cs (215) : bool prueba2 = database.Insert("TablaNoExiste", row2);//"TablaNoExiste" no existe por tanto tiene que dar false y lanzar el mensaje de error
+DatabaseTests.cs (216) : Assert.False(prueba2);
+DatabaseTests.cs (217) : //Para comprobar el mensae
+DatabaseTests.cs (218) : Assert.Equal(Constants.TableDoesNotExistError, database.LastErrorMessage);
+DatabaseTests.cs (220) : //Para probar que el numero de valores y numero de columna no existe
+DatabaseTests.cs (221) : List<string> row3 = new List<string>() { "Paco", "67", "Calle Manuel Iradier"};
+DatabaseTests.cs (222) : bool prueba3 = database.Insert("Tabla1", row3);
+DatabaseTests.cs (223) : Assert.False(prueba3);
+DatabaseTests.cs (224) : Assert.Equal(Constants.ColumnCountsDontMatch, database.LastErrorMessage);
+DatabaseTests.cs (228) : }
+DatabaseTests.cs (229) : [Fact]
+DatabaseTests.cs (230) : public void DataBaseSelect()
+DatabaseTests.cs (231) : {
+DatabaseTests.cs (232) : Database database = new Database("adminU", "adminP");
+DatabaseTests.cs (233) : List<ColumnDefinition> columns1 = new List<ColumnDefinition>()
+DatabaseTests.cs (234) : {
+DatabaseTests.cs (235) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+DatabaseTests.cs (236) : new ColumnDefinition(ColumnDefinition.DataType.String, "Age")
+DatabaseTests.cs (237) : };
+DatabaseTests.cs (238) : //Falta que creen el metodo de crar: tabla
+DatabaseTests.cs (239) : database.CreateTable("Tabla1", columns1);
+DatabaseTests.cs (240) : List<string> row1 = new List<string>() { "Ramiro", "27" };
+DatabaseTests.cs (241) : database.Insert("Tabla1", row1);
+DatabaseTests.cs (242) : List<string> row2 = new List<string>() { "Paco", "22" };
+DatabaseTests.cs (243) : database.Insert("Tabla1", row2);
+DatabaseTests.cs (244) : List<string> row3 = new List<string>() { "Paca", "52" };
+DatabaseTests.cs (245) : database.Insert("Tabla1", row3);
+DatabaseTests.cs (249) : //Si todo el correcto
+DatabaseTests.cs (250) : List<string> select1= new List<string>() { "Name", "Age"};
+DatabaseTests.cs (251) : Table prueba1 = database.Select("Tabla1", select1, null);
+DatabaseTests.cs (252) : Assert.NotNull(prueba1);
+DatabaseTests.cs (254) : //Tabla que no tiene columns requeridas
+DatabaseTests.cs (255) : List<ColumnDefinition> columns2 = new List<ColumnDefinition>()
+DatabaseTests.cs (256) : {
+DatabaseTests.cs (257) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name")
+DatabaseTests.cs (259) : };
+DatabaseTests.cs (260) : database.CreateTable("TablaSinTodasLasColumnas", columns2);
+DatabaseTests.cs (261) : Table prueba2 = database.Select("TablaSinTodasLasColumnas", select1, null);
+DatabaseTests.cs (262) : Assert.Null(prueba2);
+DatabaseTests.cs (266) : //Para probar si  no existe la tabla
+DatabaseTests.cs (267) : Table prueba3 = database.Select("TablaNoExiste", select1, null);//"TablaNoExiste" no existe por tanto tiene que dar false y lanzar el mensaje de error
+DatabaseTests.cs (268) : Assert.Null(prueba3);
+DatabaseTests.cs (270) : //Para comprobar el mensae
+DatabaseTests.cs (271) : Assert.Equal(Constants.TableDoesNotExistError, database.LastErrorMessage);
+DatabaseTests.cs (273) : }
+InsertTests.cs (1) : ﻿using DbManager;
+InsertTests.cs (2) : using DbManager.Parser;
+InsertTests.cs (4) : namespace OurTests
+InsertTests.cs (5) : {
+InsertTests.cs (6) : public class InsertTests
+InsertTests.cs (7) : {
+InsertTests.cs (8) : [Fact]
+InsertTests.cs (9) : public void InsertPatternTest()
+InsertTests.cs (10) : {
+InsertTests.cs (11) : /*
+InsertTests.cs (12) : * INSERT INTO Persona VALUES ('Jon')
+InsertTests.cs (13) : * INSERT INTO Persona VALUES ('Jon','30')
+InsertTests.cs (14) : * INSERT INTO Persona VALUES ('Jon','30','1990')
+InsertTests.cs (15) : * INSERT INTO Persona VALUES ('30')
+InsertTests.cs (16) : * INSERT INTO Persona VALUES ('-30.5')
+InsertTests.cs (17) : * Incorrectos
+InsertTests.cs (18) : * INSERT Persona VALUES ('Jon')
+InsertTests.cs (19) : * INSERT INTOPersona VALUES ('Jon')
+InsertTests.cs (20) : * INSERT INTO Persona VALUES ()
+InsertTests.cs (21) : * INSERT INTO Persona VALUES ('Jon''30')
+InsertTests.cs (22) : * INSERT INTO Persona1 Persona 2 VALUES ('Jon','June')
+InsertTests.cs (23) : *
+InsertTests.cs (24) : */
+InsertTests.cs (25) : Insert query1 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('Jon')") as Insert;
+InsertTests.cs (26) : Assert.NotNull(query1);
+InsertTests.cs (27) : Assert.Equal("Persona", query1.Table);
+InsertTests.cs (28) : List<string> insertarValor= new List<string>()
+InsertTests.cs (29) : {
+InsertTests.cs (30) : "Jon"
+InsertTests.cs (32) : };
+InsertTests.cs (33) : for (int i = 0; i < insertarValor.Count; i++)
+InsertTests.cs (34) : {
+InsertTests.cs (35) : Assert.Equal(insertarValor[i], query1.Values[i]);
+InsertTests.cs (37) : };
+InsertTests.cs (41) : Insert query2 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('Jon Mikel Aramburu','30')") as Insert;
+InsertTests.cs (42) : Assert.NotNull(query2);
+InsertTests.cs (43) : Assert.Equal("Persona", query2.Table);
+InsertTests.cs (44) : List<string> insertarValor2 = new List<string>()
+InsertTests.cs (45) : {
+InsertTests.cs (46) : "Jon Mikel Aramburu","30"
+InsertTests.cs (49) : };
+InsertTests.cs (51) : Assert.Equal(insertarValor2.Count, query2.Values.Count);
+InsertTests.cs (52) : for (int i = 0; i < insertarValor2.Count; i++)
+InsertTests.cs (53) : {
+InsertTests.cs (54) : Assert.Equal(insertarValor2[i], query2.Values[i]);
+InsertTests.cs (57) : };
+InsertTests.cs (61) : Insert query3 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('Jon','30','1990')") as Insert;
+InsertTests.cs (62) : Assert.NotNull(query3);
+InsertTests.cs (63) : Assert.Equal("Persona", query3.Table);
+InsertTests.cs (64) : List<string> insertarValor3 = new List<string>()
+InsertTests.cs (65) : {
+InsertTests.cs (66) : "Jon",  "30","1990"
+InsertTests.cs (68) : };
+InsertTests.cs (69) : Assert.Equal(insertarValor3.Count, query3.Values.Count);
+InsertTests.cs (70) : for (int i = 0; i < insertarValor3.Count; i++)
+InsertTests.cs (71) : {
+InsertTests.cs (72) : Assert.Equal(insertarValor3[i], query3.Values[i]);
+InsertTests.cs (74) : };
+InsertTests.cs (78) : Insert query4 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('30')") as Insert;
+InsertTests.cs (79) : Assert.NotNull(query4);
+InsertTests.cs (80) : Assert.Equal("Persona", query4.Table);
+InsertTests.cs (81) : List<string> insertarValor4 = new List<string>()
+InsertTests.cs (82) : {
+InsertTests.cs (83) : "30"
+InsertTests.cs (85) : };
+InsertTests.cs (86) : Assert.Equal(insertarValor4.Count, query4.Values.Count);
+InsertTests.cs (87) : for (int i = 0; i < insertarValor4.Count; i++)
+InsertTests.cs (88) : {
+InsertTests.cs (89) : Assert.Equal(insertarValor4[i], query4.Values[i]);
+InsertTests.cs (91) : };
+InsertTests.cs (93) : Insert query5 = MiniSQLParser.Parse("INSERT    INTO    Persona    VALUES    ('-30.5')") as Insert;
+InsertTests.cs (94) : Assert.NotNull(query5);
+InsertTests.cs (95) : Assert.Equal("Persona", query5.Table);
+InsertTests.cs (96) : List<string> insertarValor5 = new List<string>()
+InsertTests.cs (97) : {
+InsertTests.cs (98) : "-30.5"
+InsertTests.cs (100) : };
+InsertTests.cs (101) : Assert.Equal(insertarValor5.Count, query5.Values.Count);
+InsertTests.cs (102) : for (int i = 0; i < insertarValor5.Count; i++)
+InsertTests.cs (103) : {
+InsertTests.cs (104) : Assert.Equal(insertarValor5[i], query5.Values[i]);
+InsertTests.cs (106) : };
+InsertTests.cs (107) : //incorrectos
+InsertTests.cs (108) : Insert query6 = MiniSQLParser.Parse("INSERT Persona VALUES ('Jon')") as Insert;
+InsertTests.cs (109) : Assert.Null(query6);
+InsertTests.cs (110) : Insert query7 = MiniSQLParser.Parse("INSERT INTOPersona VALUES ('Jon') ") as Insert;
+InsertTests.cs (111) : Assert.Null(query7);
+InsertTests.cs (112) : Insert query8 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ()") as Insert;
+InsertTests.cs (113) : Assert.Null(query8);
+InsertTests.cs (114) : Insert query9 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('Jon''30')") as Insert;
+InsertTests.cs (115) : Assert.Null(query9);
+InsertTests.cs (116) : Insert query10 = MiniSQLParser.Parse("INSERT INTO Persona1 Persona 2 VALUES ('Jon','June')") as Insert;
+InsertTests.cs (117) : Assert.Null(query10);
+InsertTests.cs (118) : //Sin coma o espacio
+InsertTests.cs (119) : Insert query11 = MiniSQLParser.Parse("INSERT INTO Persona1 VALUES ('Jon''June')") as Insert;
+InsertTests.cs (120) : Assert.Null(query11);
+InsertTests.cs (121) : Insert query12 = MiniSQLParser.Parse("INSERT INTO Persona1 VALUES ( 'Jon','June')") as Insert;
+InsertTests.cs (122) : Assert.Null(query12);
+InsertTests.cs (123) : Insert query13 = MiniSQLParser.Parse("INSERT INTO Persona1 VALUES('Jon','June')") as Insert;
+InsertTests.cs (124) : Assert.Null(query13);
+InsertTests.cs (125) : Insert query14 = MiniSQLParser.Parse("INSERT INTO Persona1 VALUES ('Jon','June' )") as Insert;
+InsertTests.cs (126) : Assert.Null(query14);
+InsertTests.cs (127) : Insert query15 = MiniSQLParser.Parse("INSERT INTO Persona1 VALUES ('Jon', 'June' )") as Insert;
+InsertTests.cs (128) : Assert.Null(query15);
+InsertTests.cs (131) : }
+InsertTests.cs (132) : [Fact]
+InsertTests.cs (133) : public void InsertExecuteTest()
+InsertTests.cs (134) : {
+InsertTests.cs (136) : Database testingdatabase = new Database("user", "password");
+InsertTests.cs (137) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+InsertTests.cs (138) : {
+InsertTests.cs (139) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+InsertTests.cs (140) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+InsertTests.cs (141) : new ColumnDefinition(ColumnDefinition.DataType.String, "Año Nacimiento")
+InsertTests.cs (142) : };
+InsertTests.cs (143) : //Crear tabla
+InsertTests.cs (144) : testingdatabase.CreateTable("Persona", columns);
+InsertTests.cs (147) : Insert query = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('Jon','30','1990')") as Insert;
+InsertTests.cs (148) : query.Execute(testingdatabase);
+InsertTests.cs (149) : Assert.NotNull(testingdatabase.TableByName("Persona"));
+InsertTests.cs (150) : Assert.Equal(3, testingdatabase.TableByName("Persona").NumColumns());
+InsertTests.cs (151) : Assert.NotNull(query);
+InsertTests.cs (152) : Assert.Equal(Constants.InsertSuccess, testingdatabase.LastErrorMessage);
+InsertTests.cs (155) : //Hay más  MENOS valores  insertados que columnas, se envia el error en la clase DataBase en el metodo de Insert
+InsertTests.cs (156) : Insert query2 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('30')") as Insert;
+InsertTests.cs (157) : query2.Execute(testingdatabase);
+InsertTests.cs (158) : Assert.NotNull(testingdatabase.TableByName("Persona"));
+InsertTests.cs (159) : Assert.NotEqual(1, testingdatabase.TableByName("Persona").NumColumns());
+InsertTests.cs (160) : Assert.NotNull(query2);
+InsertTests.cs (161) : Assert.Equal(Constants.ColumnCountsDontMatch, testingdatabase.LastErrorMessage);
+InsertTests.cs (163) : Insert query3 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('Jon Mikel Aramburu','30')") as  Insert;
+InsertTests.cs (164) : query3.Execute(testingdatabase);
+InsertTests.cs (165) : Assert.NotNull(testingdatabase.TableByName("Persona"));
+InsertTests.cs (166) : Assert.NotEqual(2, testingdatabase.TableByName("Persona").NumColumns());
+InsertTests.cs (167) : Assert.NotNull(query3);
+InsertTests.cs (168) : Assert.Equal(Constants.ColumnCountsDontMatch, testingdatabase.LastErrorMessage);
+InsertTests.cs (170) : //Hay más  MÁS valores  insertados que columnas, se envia el error en la clase DataBase en el metodo de Insert
+InsertTests.cs (171) : Insert query4 = MiniSQLParser.Parse("INSERT INTO Persona VALUES ('Jon','30','Manuel Iradier 23','40')") as Insert;
+InsertTests.cs (172) : Assert.NotNull(query4);
+InsertTests.cs (173) : query4.Execute(testingdatabase);
+InsertTests.cs (174) : Assert.NotNull(testingdatabase.TableByName("Persona"));
+InsertTests.cs (175) : Assert.NotEqual(4, testingdatabase.TableByName("Persona").NumColumns());
+InsertTests.cs (176) : Assert.Equal(Constants.ColumnCountsDontMatch, testingdatabase.LastErrorMessage);
+InsertTests.cs (178) : //La taba no existe error
+InsertTests.cs (179) : Insert query5 = MiniSQLParser.Parse("INSERT INTO Alumno VALUES ('Jon','30','1990')") as Insert;
+InsertTests.cs (180) : Assert.NotNull(query4);
+InsertTests.cs (181) : query5.Execute(testingdatabase);
+InsertTests.cs (182) : Assert.Null(testingdatabase.TableByName("Alumno"));
+InsertTests.cs (183) : Assert.Equal(Constants.TableDoesNotExistError, testingdatabase.LastErrorMessage);
+InsertTests.cs (185) : }
+InsertTests.cs (189) : }
+InsertTests.cs (190) : }
+ManagerTest.cs (7) : using DbManager.Security;
+ManagerTest.cs (15) : [Fact]
+ManagerTest.cs (16) : public void TestIsUserAdmin()
+ManagerTest.cs (17) : {
+ManagerTest.cs (18) : //es el Admin
+ManagerTest.cs (19) : Database db1 = new Database("Juan", "abd");
+ManagerTest.cs (20) : bool resultado = db1.SecurityManager.IsUserAdmin();
+ManagerTest.cs (21) : Assert.True(resultado);
+ManagerTest.cs (23) : //no admin
+ManagerTest.cs (24) : Profile p1= new  Profile() { Name = "B" };
+ManagerTest.cs (25) : User user1 = new User("u1", "u1");
+ManagerTest.cs (26) : List<Privilege> privi = new List<Privilege>();
+ManagerTest.cs (27) : privi.Add(Privilege.Delete);
+ManagerTest.cs (28) : p1.Users.Add(user1);
+ManagerTest.cs (29) : p1.PrivilegesOn.Add("Tabla1", privi);
+ManagerTest.cs (30) : db1.SecurityManager.Profiles.Add(p1);
+ManagerTest.cs (31) : db1.Save("dbprobIsAdmin");
+ManagerTest.cs (33) : Database test = Database.Load("dbprobIsAdmin", "u1", "u1");
+ManagerTest.cs (34) : Assert.False(test.SecurityManager.IsUserAdmin());
+ManagerTest.cs (37) : }
+ManagerTest.cs (38) : [Fact]
+ManagerTest.cs (39) : public void TestAddProfile()
+ManagerTest.cs (40) : {
+ManagerTest.cs (41) : Database db1 = new Database("Juan", "abd");
+ManagerTest.cs (43) : Profile p1 = new Profile() { Name = "B" };
+ManagerTest.cs (44) : User user1 = new User("u1", "u1");
+ManagerTest.cs (45) : p1.Users.Add(user1);
+ManagerTest.cs (46) : db1.SecurityManager.AddProfile(p1);
+ManagerTest.cs (48) : //otro perfil mas
+ManagerTest.cs (49) : Profile p2 = new Profile() { Name = "C" };
+ManagerTest.cs (50) : p2.Users.Add(user1);
+ManagerTest.cs (51) : db1.SecurityManager.AddProfile(p2);
+ManagerTest.cs (53) : //al ser admin habra 3 perfiles
+ManagerTest.cs (54) : Assert.Equal(3, db1.SecurityManager.Profiles.Count);
+ManagerTest.cs (56) : //No admin
+ManagerTest.cs (57) : Profile p4 = new Profile() { Name = "D" };
+ManagerTest.cs (58) : User user2 = new User("u2", "u2");
+ManagerTest.cs (59) : p4.Users.Add(user2);
+ManagerTest.cs (61) : db1.Save("dbprobAddProfile");
+ManagerTest.cs (62) : Manager test = Manager.Load("dbprobAddProfile", "u2");
+ManagerTest.cs (64) : //guardamos la cuents inicial pra luego compara y ver que yo a añadido el 4 perfil
+ManagerTest.cs (65) : int perfilesIniciales = test.Profiles.Count;
+ManagerTest.cs (66) : //inetntamos añadir
+ManagerTest.cs (67) : Profile profileNoAdmin = new Profile { Name = "UsuarioBasico3Profile" };
+ManagerTest.cs (68) : profileNoAdmin.Users.Add(user1);
+ManagerTest.cs (69) : test.AddProfile(profileNoAdmin);
+ManagerTest.cs (70) : Assert.Equal(perfilesIniciales, test.Profiles.Count);
+ManagerTest.cs (74) : /*
+ManagerTest.cs (75) : Manager managerNoAdmin = new Manager("Basico");
+ManagerTest.cs (76) : User user2 = new User("Usuario2", "1234");
+ManagerTest.cs (77) : Profile profile3 = new Profile { Name = "UsuarioBasico3Profile" };
+ManagerTest.cs (79) : profile3.Users.Add(user2);
+ManagerTest.cs (80) : managerNoAdmin.AddProfile(profile3);
+ManagerTest.cs (82) : //añadimos en segundo profile
+ManagerTest.cs (83) : Profile profile4 = new Profile { Name = "UsuarioBasico4Profile" };
+ManagerTest.cs (85) : profile4.Users.Add(user2);
+ManagerTest.cs (86) : managerNoAdmin.AddProfile(profile2);
+ManagerTest.cs (87) : //vemos que no ha aññadido nada
+ManagerTest.cs (88) : Assert.Equal(0, managerNoAdmin.Profiles.Count);
+ManagerTest.cs (89) : */
+ManagerTest.cs (93) : }
+ManagerTest.cs (95) : [Fact]
+ManagerTest.cs (96) : public void TestIsPasswordCorrect()
+ManagerTest.cs (97) : {
+ManagerTest.cs (98) : Database db1 = new Database("Juan", "abd");
+ManagerTest.cs (99) : //creamos un perfil y añadimos un usuario
+ManagerTest.cs (100) : Profile p1 = new Profile() { Name = "B" };
+ManagerTest.cs (101) : User user1 = new User("u1", "1234");
+ManagerTest.cs (102) : p1.Users.Add(user1);
+ManagerTest.cs (104) : //añadimos el perfil a la lista
+ManagerTest.cs (105) : db1.SecurityManager.Profiles.Add(p1);
+ManagerTest.cs (107) : //contraseña correcta
+ManagerTest.cs (108) : bool resulatdo = db1.SecurityManager.IsPasswordCorrect("u1", "1234");
+ManagerTest.cs (109) : Assert.True(resulatdo);
+ManagerTest.cs (110) : //incorrecta
+ManagerTest.cs (111) : bool resulatdo2 = db1.SecurityManager.IsPasswordCorrect("u1", "123");
+ManagerTest.cs (112) : Assert.False(resulatdo2);
+ManagerTest.cs (116) : /*Manager manager = new Manager("Admin");
+ManagerTest.cs (117) : User user = new User("Usuario", "1234");
+ManagerTest.cs (118) : Profile profile1 = new Profile { Name = "UsuarioBasicoProfile" };
+ManagerTest.cs (120) : profile1.Users.Add(user);
+ManagerTest.cs (121) : manager.AddProfile(profile1);
+ManagerTest.cs (122) : //contaseña correcta
+ManagerTest.cs (123) : bool resulatdo = manager.IsPasswordCorrect("Usuario", "1234");
+ManagerTest.cs (124) : Assert.True(resulatdo);
+ManagerTest.cs (126) : //contraseña no correcta
+ManagerTest.cs (127) : bool resulatdo2 = manager.IsPasswordCorrect("Usuario", "123");
+ManagerTest.cs (128) : Assert.False(resulatdo2);
+ManagerTest.cs (129) : */
+ManagerTest.cs (132) : }
+ManagerTest.cs (133) : [Fact]
+ManagerTest.cs (134) : public void TestGrantPrivilege()
+ManagerTest.cs (135) : {
+ManagerTest.cs (136) : Database db1 = new Database("Juan", "abd");
+ManagerTest.cs (138) : Profile p1 = new Profile() { Name = "B" };
+ManagerTest.cs (139) : User user1 = new User("u1", "u1");
+ManagerTest.cs (140) : p1.Users.Add(user1);
+ManagerTest.cs (141) : db1.SecurityManager.AddProfile(p1);
+ManagerTest.cs (143) : //otro perfil mas
+ManagerTest.cs (144) : Profile p2 = new Profile() { Name = "C" };
+ManagerTest.cs (145) : p2.Users.Add(user1);
+ManagerTest.cs (146) : db1.SecurityManager.AddProfile(p2);
+ManagerTest.cs (148) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+ManagerTest.cs (149) : {
+ManagerTest.cs (150) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+ManagerTest.cs (151) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+ManagerTest.cs (152) : new ColumnDefinition(ColumnDefinition.DataType.String, "Año Nacimiento")
+ManagerTest.cs (153) : };
+ManagerTest.cs (154) : db1.CreateTable("Persona", columns);
+ManagerTest.cs (156) : //verificamos que no tiene
+ManagerTest.cs (157) : bool antes = p1.IsGrantedPrivilege("Persona", Privilege.Delete);
+ManagerTest.cs (158) : Assert.False(antes);
+ManagerTest.cs (159) : //damos el provilegi
+ManagerTest.cs (160) : db1.SecurityManager.GrantPrivilege("B", "Persona", Privilege.Delete);
+ManagerTest.cs (161) : //verificamos que tiene
+ManagerTest.cs (162) : bool despues = p1.IsGrantedPrivilege("Persona", Privilege.Delete);
+ManagerTest.cs (163) : Assert.True(despues);
+ManagerTest.cs (165) : //NO ADMIN
+ManagerTest.cs (166) : db1.Save("dbprobGrant");
+ManagerTest.cs (167) : Manager test = Manager.Load("dbprobGrant", "u2");
+ManagerTest.cs (169) : Profile prefilNoAdmin = null;
+ManagerTest.cs (170) : for(int i=0; i<test.Profiles.Count;i++)
+ManagerTest.cs (171) : {
+ManagerTest.cs (172) : if (test.Profiles[i].Name == "C")
+ManagerTest.cs (173) : {
+ManagerTest.cs (174) : prefilNoAdmin = test.Profiles[i];
+ManagerTest.cs (175) : break;
+ManagerTest.cs (176) : }
+ManagerTest.cs (177) : }
+ManagerTest.cs (178) : //verificamos que no tiene
+ManagerTest.cs (179) : bool antesNoAdmin = prefilNoAdmin.IsGrantedPrivilege("Persona", Privilege.Insert);
+ManagerTest.cs (180) : Assert.False(antesNoAdmin);
+ManagerTest.cs (181) : //intendamos sar el provilegi
+ManagerTest.cs (182) : test.GrantPrivilege("C", "Persona", Privilege.Insert);
+ManagerTest.cs (183) : //verificamos que tiene
+ManagerTest.cs (184) : bool despuesNoAdmin = prefilNoAdmin.IsGrantedPrivilege("Persona", Privilege.Insert);
+ManagerTest.cs (185) : Assert.False(despuesNoAdmin);
+ManagerTest.cs (189) : /*Manager manager = new Manager("Admin");
+ManagerTest.cs (190) : User user = new User("Usuario", "1234");
+ManagerTest.cs (191) : Profile profile1 = new Profile { Name = "UsuarioBasicoProfile" };
+ManagerTest.cs (192) : Privilege privilegio1 = Privilege.Delete;
+ManagerTest.cs (195) : profile1.Users.Add(user);
+ManagerTest.cs (196) : manager.AddProfile(profile1);
+ManagerTest.cs (199) : //tabla
+ManagerTest.cs (200) : Database testingdatabase = new Database("user", "password");
+ManagerTest.cs (201) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+ManagerTest.cs (202) : {
+ManagerTest.cs (203) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+ManagerTest.cs (204) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+ManagerTest.cs (205) : new ColumnDefinition(ColumnDefinition.DataType.String, "Año Nacimiento")
+ManagerTest.cs (206) : };
+ManagerTest.cs (207) : //Crear tabla
+ManagerTest.cs (208) : testingdatabase.CreateTable("Persona", columns);
+ManagerTest.cs (209) : //damos el privilegio
+ManagerTest.cs (210) : manager.GrantPrivilege("UsuarioBasicoProfile", "Persona", privilegio1);
+ManagerTest.cs (211) : //comprombamos que tiene el privilegio que le dimos con el metodo de profile IsGrantedPrivilege
+ManagerTest.cs (212) : bool resulatdo = profile1.IsGrantedPrivilege("Persona", privilegio1);
+ManagerTest.cs (213) : Assert.True(resulatdo);
+ManagerTest.cs (215) : //No admin
+ManagerTest.cs (216) : Manager managerNoAdmin = new Manager("Basico");
+ManagerTest.cs (217) : User user2 = new User("Usuario2", "1234");
+ManagerTest.cs (218) : Profile profile2 = new Profile { Name = "UsuarioBasico3Profile" };
+ManagerTest.cs (219) : Privilege privilegio2 = Privilege.Insert;
+ManagerTest.cs (221) : profile2.Users.Add(user2);
+ManagerTest.cs (223) : managerNoAdmin.AddProfile(profile2);
+ManagerTest.cs (224) : managerNoAdmin.GrantPrivilege("UsuarioBasico3Profile", "Persona", privilegio2);
+ManagerTest.cs (226) : bool resultado2 = profile2.IsGrantedPrivilege("Persona", privilegio2);
+ManagerTest.cs (227) : Assert.False(resultado2);
+ManagerTest.cs (229) : */
+ManagerTest.cs (231) : /*
+ManagerTest.cs (232) : manager.AddProfile(profile2);
+ManagerTest.cs (233) : //damos el privilegio con el manager no admin
+ManagerTest.cs (234) : managerNoAdmin.GrantPrivilege("UsuarioBasico3Profile", "Persona", privilegio2);
+ManagerTest.cs (235) : //comprombamos que tiene el privilegio que le dimos con el metodo de profile IsGrantedPrivilege
+ManagerTest.cs (236) : bool resulatdo2 = profile2.IsGrantedPrivilege("Persona", privilegio2);
+ManagerTest.cs (237) : Assert.False(resulatdo2);
+ManagerTest.cs (238) : */
+ManagerTest.cs (242) : }
+ManagerTest.cs (243) : [Fact]
+ManagerTest.cs (244) : public void TestRevokePrivilege()
+ManagerTest.cs (245) : {
+ManagerTest.cs (246) : Manager manager = new Manager("Admin");
+ManagerTest.cs (247) : User user = new User("Usuario", "1234");
+ManagerTest.cs (248) : Profile profile1 = new Profile { Name = "UsuarioBasicoProfile" };
+ManagerTest.cs (249) : Privilege privilegio1 = Privilege.Delete;
+ManagerTest.cs (252) : profile1.Users.Add(user);
+ManagerTest.cs (253) : manager.AddProfile(profile1);
+ManagerTest.cs (256) : //tabla
+ManagerTest.cs (257) : Database testingdatabase = new Database("user", "password");
+ManagerTest.cs (258) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+ManagerTest.cs (259) : {
+ManagerTest.cs (260) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+ManagerTest.cs (261) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+ManagerTest.cs (262) : new ColumnDefinition(ColumnDefinition.DataType.String, "Año Nacimiento")
+ManagerTest.cs (263) : };
+ManagerTest.cs (264) : //Crear tabla
+ManagerTest.cs (265) : testingdatabase.CreateTable("Persona", columns);
+ManagerTest.cs (266) : //damos el privilegio
+ManagerTest.cs (267) : manager.GrantPrivilege("UsuarioBasicoProfile", "Persona", privilegio1);
+ManagerTest.cs (268) : //quitamos el privilegio que hemos dado anteriormente, como el test anterior pasa sabemos que se añade biwn
+ManagerTest.cs (269) : manager.RevokePrivilege("UsuarioBasicoProfile", "Persona", privilegio1);
+ManagerTest.cs (270) : //comprombamos que no tiene el privilegio que le quitamos
+ManagerTest.cs (271) : bool resulatdo = profile1.IsGrantedPrivilege("Persona", privilegio1);
+ManagerTest.cs (272) : Assert.False(resulatdo);
+ManagerTest.cs (275) : }
+ManagerTest.cs (276) : [Fact]
+ManagerTest.cs (277) : public void TestIsGrantedPrivilege()
+ManagerTest.cs (278) : {
+ManagerTest.cs (279) : Database db1 = new Database("Juan", "abd");
+ManagerTest.cs (281) : Profile p1 = new Profile() { Name = "B" };
+ManagerTest.cs (282) : User user1 = new User("u1", "u1");
+ManagerTest.cs (283) : p1.Users.Add(user1);
+ManagerTest.cs (284) : db1.SecurityManager.AddProfile(p1);
+ManagerTest.cs (288) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+ManagerTest.cs (289) : {
+ManagerTest.cs (290) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+ManagerTest.cs (291) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+ManagerTest.cs (292) : new ColumnDefinition(ColumnDefinition.DataType.String, "Año Nacimiento")
+ManagerTest.cs (293) : };
+ManagerTest.cs (294) : db1.CreateTable("Persona", columns);
+ManagerTest.cs (296) : //verificamos que no tiene
+ManagerTest.cs (297) : bool antes = db1.SecurityManager.IsGrantedPrivilege("u1","Persona", Privilege.Delete);
+ManagerTest.cs (298) : Assert.False(antes);
+ManagerTest.cs (299) : //damos el provilegi
+ManagerTest.cs (300) : db1.SecurityManager.GrantPrivilege("B", "Persona", Privilege.Delete);
+ManagerTest.cs (301) : //verificamos que tiene
+ManagerTest.cs (302) : bool despues = db1.SecurityManager.IsGrantedPrivilege("u1", "Persona", Privilege.Delete);
+ManagerTest.cs (303) : Assert.True(despues);
+ManagerTest.cs (307) : /*
+ManagerTest.cs (308) : *Manager manager = new Manager("Admin");
+ManagerTest.cs (309) : User user = new User("Usuario", "1234");
+ManagerTest.cs (310) : Profile profile1 = new Profile { Name = "UsuarioBasicoProfile" };
+ManagerTest.cs (311) : Privilege privilegio1 = Privilege.Delete;
+ManagerTest.cs (314) : profile1.Users.Add(user);
+ManagerTest.cs (315) : manager.AddProfile(profile1);
+ManagerTest.cs (318) : //tabla
+ManagerTest.cs (319) : Database testingdatabase = new Database("user", "password");
+ManagerTest.cs (320) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+ManagerTest.cs (321) : {
+ManagerTest.cs (322) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+ManagerTest.cs (323) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+ManagerTest.cs (324) : new ColumnDefinition(ColumnDefinition.DataType.String, "Año Nacimiento")
+ManagerTest.cs (325) : };
+ManagerTest.cs (326) : //Crear tabla
+ManagerTest.cs (327) : testingdatabase.CreateTable("Persona", columns);
+ManagerTest.cs (328) : //damos el privilegio
+ManagerTest.cs (329) : manager.GrantPrivilege("UsuarioBasicoProfile", "Persona", privilegio1);
+ManagerTest.cs (330) : //comprombamos que tiene el privilegio que le dimos con el metodo de MANAGER IsGrantedPrivilege
+ManagerTest.cs (331) : bool resulatdo = manager.IsGrantedPrivilege("Usuario", "Persona", privilegio1);
+ManagerTest.cs (332) : Assert.True(resulatdo);
+ManagerTest.cs (333) : */
+ManagerTest.cs (338) : }
+RowTests.cs (4) : using System.Linq.Expressions;
+RowTests.cs (14) : public void Test1SetGet()
+RowTests.cs (16) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+RowTests.cs (18) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+RowTests.cs (19) : new ColumnDefinition(ColumnDefinition.DataType.String, "Age"),
+RowTests.cs (24) : Assert.Equal("Ramiro", row.GetValue("Name"));
+RowTests.cs (25) : Assert.Equal("27", row.GetValue("Age"));
+RowTests.cs (28) : row.SetValue("Age", "50");
+RowTests.cs (32) : Assert.Equal("50", row.GetValue("Age"));
+RowTests.cs (58) : [Fact]
+RowTests.cs (59) : public void Test2IsTrue()
+RowTests.cs (60) : {
+RowTests.cs (61) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+RowTests.cs (62) : {
+RowTests.cs (63) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+RowTests.cs (64) : new ColumnDefinition(ColumnDefinition.DataType.String, "Age"),
+RowTests.cs (65) : };
+RowTests.cs (66) : List<string> values = new List<string>() { "Ramiro", "27" };
+RowTests.cs (67) : Row row = new Row(columns, values);
+RowTests.cs (70) : Assert.True(row.IsTrue(condition1));
+RowTests.cs (74) : Assert.False(row.IsTrue(condition2));
+RowTests.cs (76) : Condition condition3 = new Condition("Age", "=", "27");
+RowTests.cs (77) : Assert.True(row.IsTrue(condition3));
+RowTests.cs (88) : }
+CreateSecurityProfile.cs (5) : using DbManager.Security;
+CreateSecurityProfile.cs (17) : ProfileName = profileName;
+CreateSecurityProfile.cs (25) : if (database.SecurityManager.IsUserAdmin() == false)
+CreateSecurityProfile.cs (26) : {
+CreateSecurityProfile.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateSecurityProfile.cs (28) : }
+CreateSecurityProfile.cs (29) : Profile nuevoProfile = new Profile { Name = ProfileName };
+CreateSecurityProfile.cs (30) : database.SecurityManager.AddProfile(nuevoProfile);
+CreateSecurityProfile.cs (31) : return Constants.CreateSecurityProfileSuccess;
+DropSecurityProfile.cs (5) : using DbManager.Security;
+DropSecurityProfile.cs (17) : ProfileName = profileName;
+DropSecurityProfile.cs (24) : if (database.SecurityManager.IsUserAdmin() == false)
+DropSecurityProfile.cs (25) : {
+DropSecurityProfile.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (27) : }
+DropSecurityProfile.cs (28) : Profile profileEliminar = null;
+DropSecurityProfile.cs (29) : for (int i = 0; i < database.SecurityManager.Profiles.Count; i++)
+DropSecurityProfile.cs (30) : {
+DropSecurityProfile.cs (31) : if (database.SecurityManager.Profiles[i].Name == ProfileName)
+DropSecurityProfile.cs (32) : {
+DropSecurityProfile.cs (33) : profileEliminar = database.SecurityManager.Profiles[i];
+DropSecurityProfile.cs (34) : }
+DropSecurityProfile.cs (35) : }
+DropSecurityProfile.cs (36) : if (profileEliminar == null)
+DropSecurityProfile.cs (37) : {
+DropSecurityProfile.cs (39) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (40) : }
+DropSecurityProfile.cs (41) : database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (42) : return Constants.DropSecurityProfileSuccess;
+Insert.cs (16) : Table = table;
+Insert.cs (17) : Values = values;
+Insert.cs (24) : database.Insert(Table, Values);
+Insert.cs (25) : return database.LastErrorMessage;
+MiniSQLParser.cs (5) : using System.Linq;
+MiniSQLParser.cs (6) : using System.Reflection.Metadata.Ecma335;
+MiniSQLParser.cs (9) : using System.Drawing;
+MiniSQLParser.cs (11) : using System.IO;
+MiniSQLParser.cs (24) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s+\(((?:'[^']*')(?:,(?:'[^']*'))*)\)";
+MiniSQLParser.cs (29) : const string updateTablePattern = @"\s*UPDATE\s+(\w+)\s+SET\s+((?:[a-zA-Z0-9]+='(?:-?\d+\.\d+|-?\d+|[a-zA-Z�-�][a-zA-Z�-�0-9 ]*)'(?:,[a-zA-Z0-9]+='(?:-?\d+\.\d+|-?\d+|[a-zA-Z�-�][a-zA-Z�-�0-9 ]*)')*))\s+(WHERE\s+([a-zA-Z0-9]+)(=|<|>)(\'(?:-?\d+\.\d+|-?\d+|[a-zA-Z�-�][a-zA-Z�-�0-9 ]*)'))\s*";
+MiniSQLParser.cs (35) : const string createSecurityProfilePattern = @"CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z_������������]+)$";
+MiniSQLParser.cs (37) : const string dropSecurityProfilePattern = @"DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z_������������]+)$";
+MiniSQLParser.cs (63) : Match matchInsert = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (64) : if (matchInsert.Success && miniSQLQuery.Length == matchInsert.Length)
+MiniSQLParser.cs (65) : {
+MiniSQLParser.cs (66) : string nombreTablaInsert = matchInsert.Groups[1].Value;
+MiniSQLParser.cs (67) : string valoresCapturados = matchInsert.Groups[2].Value;
+MiniSQLParser.cs (68) : List <string> valores = CommaSeparatedNames(valoresCapturados);
+MiniSQLParser.cs (69) : //eliminar las comillas con x.Trim('\'') y tambien eliminamos espacios por si acaso
+MiniSQLParser.cs (70) : for(int i=0; i<valores.Count;i++)
+MiniSQLParser.cs (71) : {
+MiniSQLParser.cs (72) : valores[i] = valores[i].Trim(' ').Trim('\'');
+MiniSQLParser.cs (74) : }
+MiniSQLParser.cs (75) : return new Insert(nombreTablaInsert, valores);
+MiniSQLParser.cs (77) : }
+MiniSQLParser.cs (150) : Match matchUpdate = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (151) : if (matchUpdate.Success && miniSQLQuery.Length == matchUpdate.Length) //el match y el string pasado de la misma longitud
+MiniSQLParser.cs (152) : {
+MiniSQLParser.cs (153) : string nombreTabla = matchUpdate.Groups[1].Value;
+MiniSQLParser.cs (155) : string valorCapturados = matchUpdate.Groups[2].Value;
+MiniSQLParser.cs (156) : List<string> valores = CommaSeparatedNames(valorCapturados);
+MiniSQLParser.cs (157) : List<SetValue> columnYvalor = new List<SetValue>();
+MiniSQLParser.cs (159) : for(int i = 0; i < valores.Count;i++)
+MiniSQLParser.cs (160) : {
+MiniSQLParser.cs (161) : //Dividor columna y valor mediante el =
+MiniSQLParser.cs (162) : string[] division= valores[i].Split('=');
+MiniSQLParser.cs (163) : string columna = division[0];
+MiniSQLParser.cs (164) : string valor = division[1];
+MiniSQLParser.cs (165) : string[] valorSinComSimple = valor.Split("'", System.StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (168) : columnYvalor.Add(new SetValue(columna, valorSinComSimple[0]));
+MiniSQLParser.cs (169) : }
+MiniSQLParser.cs (171) : Condition condition = null;
+MiniSQLParser.cs (173) : if (matchUpdate.Groups[3].Success)
+MiniSQLParser.cs (174) : {
+MiniSQLParser.cs (175) : string columnaNombre = matchUpdate.Groups[4].Value; //nombre de la columna
+MiniSQLParser.cs (176) : string operador = matchUpdate.Groups[5].Value; // Operador(=, <, >)
+MiniSQLParser.cs (177) : string valor = matchUpdate.Groups[6].Value; //despu�s del operador, el valor
+MiniSQLParser.cs (178) : string[] valorSinComSimpleCondition = valor.Split("'", System.StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (179) : condition = new Condition(columnaNombre, operador, valorSinComSimpleCondition[0]);
+MiniSQLParser.cs (180) : }
+MiniSQLParser.cs (181) : return new Update(nombreTabla, columnYvalor, condition);
+MiniSQLParser.cs (183) : }
+MiniSQLParser.cs (187) : Match matchCreateSecuityProfile = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (188) : if(matchCreateSecuityProfile.Success && miniSQLQuery.Length == matchCreateSecuityProfile.Length)
+MiniSQLParser.cs (189) : {
+MiniSQLParser.cs (190) : return new CreateSecurityProfile(matchCreateSecuityProfile.Groups[1].Value);
+MiniSQLParser.cs (192) : }
+MiniSQLParser.cs (194) : Match matchDropSecuityProfile = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (195) : if (matchDropSecuityProfile.Success && miniSQLQuery.Length == matchDropSecuityProfile.Length)
+MiniSQLParser.cs (196) : {
+MiniSQLParser.cs (197) : return new DropSecurityProfile(matchDropSecuityProfile.Groups[1].Value);
+MiniSQLParser.cs (199) : }
+MiniSQLParser.cs (249) : }
+Update.cs (15) : Table = table;
+Update.cs (16) : Columns = columnNames;
+Update.cs (17) : Where = where;
+Manager.cs (25) : //Profile.AdminProfileName nos indica el nombre del admin
+Manager.cs (26) : for(int i=0; i < Profiles.Count; i++)
+Manager.cs (27) : {
+Manager.cs (28) : if (Profiles[i].Name == Profile.AdminProfileName)
+Manager.cs (29) : {
+Manager.cs (30) : for (int j = 0; j < Profiles[i].Users.Count; j++)
+Manager.cs (31) : {
+Manager.cs (32) : //en la clase user tenemos los parametros de Username EncryptedPassword
+Manager.cs (33) : if (Profiles[i].Users[j].Username == m_username)
+Manager.cs (38) : }
+Manager.cs (39) : }
+Manager.cs (40) : return false;
+Manager.cs (48) : for (int i = 0; i < Profiles.Count; i++)
+Manager.cs (49) : {
+Manager.cs (50) : for (int j = 0; j < Profiles[i].Users.Count; j++)
+Manager.cs (51) : {
+Manager.cs (52) : //en la clase user tenemos los parametros de Username EncryptedPassword
+Manager.cs (53) : if (Profiles[i].Users[j].Username == username && Profiles[i].Users[j].EncryptedPassword == Encryption.Encrypt(password))
+Manager.cs (54) : {
+Manager.cs (55) : return true;
+Manager.cs (56) : }
+Manager.cs (57) : }
+Manager.cs (58) : }
+Manager.cs (68) : for (int i = 0; i < Profiles.Count; i++)
+Manager.cs (69) : {
+Manager.cs (70) : if (Profiles[i].Name ==profileName && IsUserAdmin())
+Manager.cs (71) : {
+Manager.cs (72) : //el metodo GrantPrivilege(string table, Privilege privilege) de profile a�ade el privilegio directamente
+Manager.cs (73) : Profiles[i].GrantPrivilege(table, privilege);
+Manager.cs (79) : }
+Manager.cs (84) : //el metodo RevokePrivilege(string table, Privilege privilege) de profile lo hace
+Manager.cs (85) : for (int i = 0; i < Profiles.Count; i++)
+Manager.cs (86) : {
+Manager.cs (87) : if (Profiles[i].Name == profileName)
+Manager.cs (88) : {
+Manager.cs (89) : Profiles[i].RevokePrivilege(table,privilege);
+Manager.cs (93) : }
+Manager.cs (94) : }
+Manager.cs (99) : //el metodo IsGrantedPrivilege(string table, Privilege privilege) de profile lo hace
+Manager.cs (100) : for (int i = 0; i < Profiles.Count; i++)
+Manager.cs (101) : {
+Manager.cs (102) : for (int j = 0; j < Profiles[i].Users.Count; j++)
+Manager.cs (103) : {
+Manager.cs (104) : //en la clase user tenemos los parametros de Username EncryptedPassword
+Manager.cs (105) : if (Profiles[i].Users[j].Username==username)
+Manager.cs (106) : {
+Manager.cs (107) : if (Profiles[i].IsGrantedPrivilege(table, privilege))
+Manager.cs (108) : {
+Manager.cs (109) : return true;
+Manager.cs (110) : }
+Manager.cs (112) : }
+Manager.cs (113) : }
+Manager.cs (114) : }
+Manager.cs (123) : if (IsUserAdmin())
+Manager.cs (124) : {
+Manager.cs (126) : }
+RevokeTests.cs (1) : ﻿using System;
+RevokeTests.cs (2) : using System.Collections.Generic;
+RevokeTests.cs (3) : using System.Linq;
+RevokeTests.cs (4) : using System.Text;
+RevokeTests.cs (5) : using System.Threading.Tasks;
+RevokeTests.cs (8) : namespace SecurityParsingTests
+RevokeTests.cs (9) : {
+RevokeTests.cs (10) : public class RevokeTests
+RevokeTests.cs (11) : {
+RevokeTests.cs (12) : /*
+RevokeTests.cs (13) : [Fact]
+RevokeTests.cs (14) : public void Correct()
+RevokeTests.cs (15) : {
+RevokeTests.cs (16) : Revoke query = MiniSQLParser.Parse("REVOKE DELETE ON Table TO User") as Revoke;
+RevokeTests.cs (17) : Assert.Equal("DELETE", query.PrivilegeName);
+RevokeTests.cs (18) : Assert.Equal("Table", query.TableName);
+RevokeTests.cs (19) : Assert.Equal("User", query.ProfileName);
+RevokeTests.cs (21) : query = MiniSQLParser.Parse("REVOKE INSERT ON Table TO User") as Revoke;
+RevokeTests.cs (22) : Assert.Equal("INSERT", query.PrivilegeName);
+RevokeTests.cs (23) : Assert.Equal("Table", query.TableName);
+RevokeTests.cs (24) : Assert.Equal("User", query.ProfileName);
+RevokeTests.cs (26) : query = MiniSQLParser.Parse("REVOKE SELECT ON Table TO User") as Revoke;
+RevokeTests.cs (27) : Assert.Equal("SELECT", query.PrivilegeName);
+RevokeTests.cs (28) : Assert.Equal("Table", query.TableName);
+RevokeTests.cs (29) : Assert.Equal("User", query.ProfileName);
+RevokeTests.cs (31) : query = MiniSQLParser.Parse("REVOKE UPDATE ON Table TO User") as Revoke;
+RevokeTests.cs (32) : Assert.Equal("UPDATE", query.PrivilegeName);
+RevokeTests.cs (33) : Assert.Equal("Table", query.TableName);
+RevokeTests.cs (34) : Assert.Equal("User", query.ProfileName);
+RevokeTests.cs (35) : }
+RevokeTests.cs (37) : [Fact]
+RevokeTests.cs (38) : public void CorrectWithSpaces()
+RevokeTests.cs (39) : {
+RevokeTests.cs (40) : Revoke query = MiniSQLParser.Parse("REVOKE DELETE    ON Table TO User") as Revoke;
+RevokeTests.cs (41) : Assert.Equal("DELETE", query.PrivilegeName);
+RevokeTests.cs (42) : Assert.Equal("Table", query.TableName);
+RevokeTests.cs (43) : Assert.Equal("User", query.ProfileName);
+RevokeTests.cs (45) : query = MiniSQLParser.Parse("REVOKE INSERT ON Table    TO User") as Revoke;
+RevokeTests.cs (46) : Assert.Equal("INSERT", query.PrivilegeName);
+RevokeTests.cs (47) : Assert.Equal("Table", query.TableName);
+RevokeTests.cs (48) : Assert.Equal("User", query.ProfileName);
+RevokeTests.cs (50) : query = MiniSQLParser.Parse("REVOKE SELECT ON Table TO     User") as Revoke;
+RevokeTests.cs (51) : Assert.Equal("SELECT", query.PrivilegeName);
+RevokeTests.cs (52) : Assert.Equal("Table", query.TableName);
+RevokeTests.cs (53) : Assert.Equal("User", query.ProfileName);
+RevokeTests.cs (55) : query = MiniSQLParser.Parse("REVOKE    UPDATE     ON    Table    TO     User") as Revoke;
+RevokeTests.cs (56) : Assert.Equal("UPDATE", query.PrivilegeName);
+RevokeTests.cs (57) : Assert.Equal("Table", query.TableName);
+RevokeTests.cs (58) : Assert.Equal("User", query.ProfileName);
+RevokeTests.cs (59) : }
+RevokeTests.cs (61) : [Fact]
+RevokeTests.cs (62) : public void IncorrectProfileWithForbiddenChars()
+RevokeTests.cs (63) : {
+RevokeTests.cs (64) : Revoke query = MiniSQLParser.Parse("REVOKE DELETE ON Table TO User 1") as Revoke;
+RevokeTests.cs (65) : Assert.Null(query);
+RevokeTests.cs (67) : query = MiniSQLParser.Parse("REVOKE INSERT ON Table TO Us er") as Revoke;
+RevokeTests.cs (68) : Assert.Null(query);
+RevokeTests.cs (70) : query = MiniSQLParser.Parse("REVOKE SELECT ON Table TO User-1") as Revoke;
+RevokeTests.cs (71) : Assert.Null(query);
+RevokeTests.cs (73) : query = MiniSQLParser.Parse("REVOKE UPDATE ON Table To User_2") as Revoke;
+RevokeTests.cs (74) : Assert.Null(query);
+RevokeTests.cs (75) : }
+RevokeTests.cs (77) : [Fact]
+RevokeTests.cs (78) : public void IncorrectCapitalization()
+RevokeTests.cs (79) : {
+RevokeTests.cs (80) : Revoke query = MiniSQLParser.Parse("Revoke DELETE ON Table TO User") as Revoke;
+RevokeTests.cs (81) : Assert.Null(query);
+RevokeTests.cs (83) : query = MiniSQLParser.Parse("REVOKE Insert ON Table TO User") as Revoke;
+RevokeTests.cs (84) : Assert.Null(query);
+RevokeTests.cs (86) : query = MiniSQLParser.Parse("REVOKE SELECT on Table TO User") as Revoke;
+RevokeTests.cs (87) : Assert.Null(query);
+RevokeTests.cs (89) : query = MiniSQLParser.Parse("REVOKE UPDATE ON Table To User") as Revoke;
+RevokeTests.cs (90) : Assert.Null(query);
+RevokeTests.cs (91) : }
+RevokeTests.cs (93) : [Fact]
+RevokeTests.cs (94) : public void IncorrectPrivileges()
+RevokeTests.cs (95) : {
+RevokeTests.cs (96) : Revoke query = MiniSQLParser.Parse("REVOKE Remove ON Table TO User") as Revoke;
+RevokeTests.cs (97) : Assert.Null(query);
+RevokeTests.cs (99) : query = MiniSQLParser.Parse("REVOKE REMOVE ON Table TO User") as Revoke;
+RevokeTests.cs (100) : Assert.Null(query);
+RevokeTests.cs (102) : query = MiniSQLParser.Parse("REVOKE UPGRADE ON Table TO User") as Revoke;
+RevokeTests.cs (103) : Assert.Null(query);
+RevokeTests.cs (105) : query = MiniSQLParser.Parse("REVOKE SET ON Table TO User") as Revoke;
+RevokeTests.cs (106) : Assert.Null(query);
+RevokeTests.cs (107) : }
+RevokeTests.cs (109) : [Fact]
+RevokeTests.cs (110) : public void IncorrectWithoutOnePart()
+RevokeTests.cs (111) : {
+RevokeTests.cs (112) : Revoke query = MiniSQLParser.Parse("REVOKE ON Table TO User") as Revoke;
+RevokeTests.cs (113) : Assert.Null(query);
+RevokeTests.cs (115) : query = MiniSQLParser.Parse("REVOKE SELECT ON TO User") as Revoke;
+RevokeTests.cs (116) : Assert.Null(query);
+RevokeTests.cs (118) : query = MiniSQLParser.Parse("REVOKE SELECT TO User") as Revoke;
+RevokeTests.cs (119) : Assert.Null(query);
+RevokeTests.cs (121) : query = MiniSQLParser.Parse("REVOKE SELECT ON Table TO") as Revoke;
+RevokeTests.cs (122) : Assert.Null(query);
+RevokeTests.cs (123) : }
+RevokeTests.cs (124) : */
+RevokeTests.cs (125) : }
+RevokeTests.cs (126) : }
+CreateSecurityProfileTests.cs (15) : * correctos
+CreateSecurityProfileTests.cs (16) : * CREATE SECURITY PROFILE User
+CreateSecurityProfileTests.cs (17) : * CREATE SECURITY PROFILE Admin
+CreateSecurityProfileTests.cs (18) : * CREATE SECURITY PROFILE User
+CreateSecurityProfileTests.cs (19) : * CREATE SECURITY PROFILE UserOne
+CreateSecurityProfileTests.cs (20) : * CREATE SECURITY PROFILE UserTwo
+CreateSecurityProfileTests.cs (21) : * incorrecto
+CreateSecurityProfileTests.cs (22) : * CREATE SECURITY PROFILE 1
+CreateSecurityProfileTests.cs (23) : * CREATE SECURITY PROFILE User2
+CreateSecurityProfileTests.cs (24) : * CREATE SECURITY PROFILE User-One
+CreateSecurityProfileTests.cs (25) : */
+CreateSecurityProfileTests.cs (76) : //execute test
+CreateSecurityProfileTests.cs (77) : [Fact]
+CreateSecurityProfileTests.cs (78) : public void CreateSecurityProfileExecuteTest()
+CreateSecurityProfileTests.cs (79) : {
+CreateSecurityProfileTests.cs (80) : Database testingdatabase = new Database("Admin", "password");
+CreateSecurityProfileTests.cs (81) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE profile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (83) : //comprobar mensaje CORRECTO
+CreateSecurityProfileTests.cs (84) : string resultado = query.Execute(testingdatabase);
+CreateSecurityProfileTests.cs (85) : Assert.Equal(Constants.CreateSecurityProfileSuccess, resultado);
+CreateSecurityProfileTests.cs (87) : //comprobamos que se añadio, buscamos que se añadio "profile"
+CreateSecurityProfileTests.cs (88) : bool creado = false;
+CreateSecurityProfileTests.cs (89) : for(int i=0; i<testingdatabase.SecurityManager.Profiles.Count; i++)
+CreateSecurityProfileTests.cs (90) : {
+CreateSecurityProfileTests.cs (91) : Profile profileActual = testingdatabase.SecurityManager.Profiles[i];
+CreateSecurityProfileTests.cs (92) : if (profileActual.Name == "profile")
+CreateSecurityProfileTests.cs (93) : {
+CreateSecurityProfileTests.cs (94) : creado = true;
+CreateSecurityProfileTests.cs (95) : break;
+CreateSecurityProfileTests.cs (96) : }
+CreateSecurityProfileTests.cs (97) : }
+CreateSecurityProfileTests.cs (98) : Assert.True(creado);
+CreateSecurityProfileTests.cs (101) : }
+CreateSecurityProfileTests.cs (102) : [Fact]
+CreateSecurityProfileTests.cs (103) : public void CreateSecurityProfileExecuteTestNoPrivilegios()
+CreateSecurityProfileTests.cs (104) : {
+CreateSecurityProfileTests.cs (105) : Database db1 = new Database("Juan", "abd");
+CreateSecurityProfileTests.cs (107) : //añadimos primero un perfil
+CreateSecurityProfileTests.cs (108) : Profile p1 = new Profile() { Name = "B" };
+CreateSecurityProfileTests.cs (109) : User user1 = new User("u1", "u1");
+CreateSecurityProfileTests.cs (110) : p1.Users.Add(user1);
+CreateSecurityProfileTests.cs (111) : db1.SecurityManager.AddProfile(p1);
+CreateSecurityProfileTests.cs (114) : //guardamo y cargamos usuario no admin
+CreateSecurityProfileTests.cs (115) : db1.Save("dbprobCreateNo");
+CreateSecurityProfileTests.cs (116) : Database test = Database.Load("dbprobCreateNo", "u1", "u1");
+CreateSecurityProfileTests.cs (118) : //el query para crear
+CreateSecurityProfileTests.cs (119) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE profile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (121) : //comprobar mensaje INCORRECTO
+CreateSecurityProfileTests.cs (122) : string resultado = query.Execute(test);
+CreateSecurityProfileTests.cs (123) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, resultado);
+CreateSecurityProfileTests.cs (125) : //verificamos que no se creo
+CreateSecurityProfileTests.cs (126) : bool profileQuery = false;
+CreateSecurityProfileTests.cs (127) : for(int i=0;i<test.SecurityManager.Profiles.Count;i++)
+CreateSecurityProfileTests.cs (128) : {
+CreateSecurityProfileTests.cs (129) : if (test.SecurityManager.Profiles[i].Name=="profile")
+CreateSecurityProfileTests.cs (130) : {
+CreateSecurityProfileTests.cs (131) : profileQuery = true;
+CreateSecurityProfileTests.cs (132) : break;
+CreateSecurityProfileTests.cs (133) : }
+CreateSecurityProfileTests.cs (134) : }
+CreateSecurityProfileTests.cs (135) : Assert.False(profileQuery);
+CreateSecurityProfileTests.cs (138) : /*Database testingdatabase = new Database("AdminNo", "password");
+CreateSecurityProfileTests.cs (139) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE profile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (141) : //comprobar mensaje INCORRECTO
+CreateSecurityProfileTests.cs (142) : string resultado = query.Execute(testingdatabase);
+CreateSecurityProfileTests.cs (143) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, resultado);
+CreateSecurityProfileTests.cs (145) : //comprobamos que se añadio, buscamos que se añadio "profile"
+CreateSecurityProfileTests.cs (146) : bool creado = false;
+CreateSecurityProfileTests.cs (147) : for (int i = 0; i < testingdatabase.SecurityManager.Profiles.Count; i++)
+CreateSecurityProfileTests.cs (148) : {
+CreateSecurityProfileTests.cs (149) : Profile profileActual = testingdatabase.SecurityManager.Profiles[i];
+CreateSecurityProfileTests.cs (150) : if (profileActual.Name == "profile")
+CreateSecurityProfileTests.cs (151) : {
+CreateSecurityProfileTests.cs (152) : creado = true;
+CreateSecurityProfileTests.cs (153) : break;
+CreateSecurityProfileTests.cs (154) : }
+CreateSecurityProfileTests.cs (155) : }
+CreateSecurityProfileTests.cs (156) : Assert.False(creado);
+CreateSecurityProfileTests.cs (157) : */
+CreateSecurityProfileTests.cs (158) : }
+DropSecurityProfileTests.cs (15) : * correctos
+DropSecurityProfileTests.cs (16) : * DROP SECURITY PROFILE User
+DropSecurityProfileTests.cs (17) : * DROP SECURITY PROFILE Admin
+DropSecurityProfileTests.cs (18) : * DROP SECURITY PROFILE User
+DropSecurityProfileTests.cs (19) : * DROP SECURITY PROFILE UserOne
+DropSecurityProfileTests.cs (20) : * DROP SECURITY PROFILE UserTwo
+DropSecurityProfileTests.cs (21) : * incorrecto
+DropSecurityProfileTests.cs (22) : * DROP SECURITY PROFILE 1
+DropSecurityProfileTests.cs (23) : * DROP SECURITY PROFILE User2
+DropSecurityProfileTests.cs (24) : * DROP SECURITY PROFILE User-One
+DropSecurityProfileTests.cs (25) : *
+DropSecurityProfileTests.cs (26) : */
+DropSecurityProfileTests.cs (76) : [Fact]
+DropSecurityProfileTests.cs (77) : public void DropSecurityProfileExecuteTestProfileNoExiste()
+DropSecurityProfileTests.cs (78) : {
+DropSecurityProfileTests.cs (79) : Database testingdatabase = new Database("Admin", "password");
+DropSecurityProfileTests.cs (80) : DropSecurityProfile query = MiniSQLParser.Parse("DROP SECURITY PROFILE profile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (82) : //comprobar mensaje CORRECTO
+DropSecurityProfileTests.cs (83) : string resultado = query.Execute(testingdatabase);
+DropSecurityProfileTests.cs (84) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, resultado);
+DropSecurityProfileTests.cs (86) : }
+DropSecurityProfileTests.cs (88) : [Fact]
+DropSecurityProfileTests.cs (89) : public void DropSecurityProfileExecuteTestProfile()
+DropSecurityProfileTests.cs (90) : {
+DropSecurityProfileTests.cs (91) : Database testingdatabase = new Database("Admin", "password");
+DropSecurityProfileTests.cs (92) : //añadimos primero el perfil "profile"
+DropSecurityProfileTests.cs (93) : Profile pf1 = new Profile() { Name = "profile" };
+DropSecurityProfileTests.cs (94) : testingdatabase.SecurityManager.AddProfile(pf1);
+DropSecurityProfileTests.cs (95) : Assert.NotNull(testingdatabase.SecurityManager.ProfileByName("profile"));
+DropSecurityProfileTests.cs (97) : //el query para borrar
+DropSecurityProfileTests.cs (98) : DropSecurityProfile query = MiniSQLParser.Parse("DROP SECURITY PROFILE profile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (99) : //comprobar que borre y mensaje CORRECTO
+DropSecurityProfileTests.cs (100) : string resultado = query.Execute(testingdatabase);
+DropSecurityProfileTests.cs (101) : Assert.Equal(Constants.DropSecurityProfileSuccess, resultado);
+DropSecurityProfileTests.cs (102) : Assert.Null(testingdatabase.SecurityManager.ProfileByName("profile"));
+DropSecurityProfileTests.cs (103) : }
+DropSecurityProfileTests.cs (105) : [Fact]
+DropSecurityProfileTests.cs (106) : public void DropSecurityProfileExecuteTestNoPrivilegios()
+DropSecurityProfileTests.cs (107) : {
+DropSecurityProfileTests.cs (108) : Database db1 = new Database("Juan", "abd");
+DropSecurityProfileTests.cs (110) : //añadimos primero un perfil
+DropSecurityProfileTests.cs (111) : Profile p1 = new Profile() { Name = "B" };
+DropSecurityProfileTests.cs (112) : User user1 = new User("u1", "u1");
+DropSecurityProfileTests.cs (113) : p1.Users.Add(user1);
+DropSecurityProfileTests.cs (114) : db1.SecurityManager.AddProfile(p1);
+DropSecurityProfileTests.cs (116) : //otro perfil mas
+DropSecurityProfileTests.cs (117) : Profile p2 = new Profile() { Name = "C" };
+DropSecurityProfileTests.cs (118) : User user2 = new User("u2", "u2");
+DropSecurityProfileTests.cs (119) : p2.Users.Add(user2);
+DropSecurityProfileTests.cs (120) : db1.SecurityManager.AddProfile(p2);
+DropSecurityProfileTests.cs (122) : //guardamo y cargamos usuario no admin
+DropSecurityProfileTests.cs (123) : db1.Save("dbprobDropNo");
+DropSecurityProfileTests.cs (124) : Database test = Database.Load("dbprobDropNo", "u2","u2");
+DropSecurityProfileTests.cs (126) : //el query para borrar
+DropSecurityProfileTests.cs (127) : DropSecurityProfile query = MiniSQLParser.Parse("DROP SECURITY PROFILE B") as DropSecurityProfile;
+DropSecurityProfileTests.cs (128) : //comprobar que borre y mensaje CORRECTO
+DropSecurityProfileTests.cs (129) : string resultado = query.Execute(test);
+DropSecurityProfileTests.cs (131) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, resultado);
+DropSecurityProfileTests.cs (132) : Assert.NotNull(test.SecurityManager.ProfileByName("B"));
+DropSecurityProfileTests.cs (138) : /*Database testingdatabase = new Database("AdminNo", "password");
+DropSecurityProfileTests.cs (139) : //añadimos primero el perfil "profile"
+DropSecurityProfileTests.cs (140) : Profile pf1 = new Profile() { Name = "profile" };
+DropSecurityProfileTests.cs (141) : testingdatabase.SecurityManager.Profiles.Add(pf1);
+DropSecurityProfileTests.cs (142) : Assert.NotNull(testingdatabase.SecurityManager.ProfileByName("profile"));
+DropSecurityProfileTests.cs (144) : //el query para borrar
+DropSecurityProfileTests.cs (145) : DropSecurityProfile query = MiniSQLParser.Parse("DROP SECURITY PROFILE profile") as DropSecurityProfile;
+DropSecurityProfileTests.cs (146) : //comprobar que no borre y mensaje CORRECTO
+DropSecurityProfileTests.cs (147) : string resultado = query.Execute(testingdatabase);
+DropSecurityProfileTests.cs (148) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, resultado);
+DropSecurityProfileTests.cs (149) : Assert.NotNull(testingdatabase.SecurityManager.ProfileByName("profile"));
+DropSecurityProfileTests.cs (150) : */
+DropSecurityProfileTests.cs (151) : }

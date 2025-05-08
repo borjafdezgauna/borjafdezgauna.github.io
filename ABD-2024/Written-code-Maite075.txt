@@ -1,0 +1,482 @@
+Total written by this student: 25% lines / 21% characters
+
+Database.cs (5) : using System.Data.Common;
+Database.cs (30) : m_username = adminUsername;
+Database.cs (36) : if (table == null) { return false; }
+Database.cs (37) : int i = Tables.Count;
+Database.cs (38) : Tables.Add(table);
+Database.cs (39) : if ((i + 1) == Tables.Count) { return true; }
+Database.cs (40) : else { return false; }
+Database.cs (46) : for (int i = 0; i < Tables.Count(); i++)
+Database.cs (47) : {
+Database.cs (48) : if (Tables[i].Name == tableName)
+Database.cs (49) : {
+Database.cs (50) : return Tables[i];
+Database.cs (51) : }
+Database.cs (52) : }
+Database.cs (62) : if (TableByName(tableName) != null)
+Database.cs (63) : {
+Database.cs (64) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (66) : }
+Database.cs (67) : else if (ColumnDefinition==null||ColumnDefinition.Count==0)
+Database.cs (68) : {
+Database.cs (69) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (70) : return false;
+Database.cs (71) : }
+Database.cs (72) : else
+Database.cs (73) : {
+Database.cs (74) : Table table = new Table(tableName, ColumnDefinition);
+Database.cs (75) : AddTable(table);
+Database.cs (76) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (77) : return true;
+Database.cs (78) : }
+Database.cs (85) : if (TableByName(tableName) == null)
+Database.cs (86) : {
+Database.cs (87) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (90) : else
+Database.cs (91) : {
+Database.cs (92) : for (int i=0; i < Tables.Count; i++)
+Database.cs (93) : {
+Database.cs (94) : if (Tables[i].Name == tableName)
+Database.cs (95) : {
+Database.cs (96) : Tables.RemoveAt(i);
+Database.cs (97) : }
+Database.cs (98) : }
+Database.cs (99) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (100) : return true;
+Database.cs (101) : }
+Database.cs (102) : }
+Database.cs (114) : else if (values.Count != pTable.NumColumns())
+Database.cs (115) : {
+Database.cs (116) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (117) : return false;
+Database.cs (118) : }
+Database.cs (122) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (141) : for (int i=0; i<columns.Count();i++)
+Database.cs (142) : {
+Database.cs (143) : if (pTable.ColumnByName(columns[i])==null)
+Database.cs (144) : {
+Database.cs (145) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (146) : return null;
+Database.cs (147) : }
+Database.cs (148) : }
+Database.cs (173) : LastErrorMessage = Constants.DeleteSuccess;
+Database.cs (190) : else if(pTable.ColumnByName(columnCondition.ColumnName) == null)
+Database.cs (191) : {
+Database.cs (198) : LastErrorMessage = Constants.UpdateSuccess;
+Table.cs (4) : using System.Data.Common;
+Table.cs (22) : Rows = new List<Row>();
+Table.cs (28) : if (i < NumRows())
+Table.cs (29) : {
+Table.cs (30) : return Rows[i];
+Table.cs (32) : return null;
+Table.cs (33) : }
+Table.cs (38) : if (row != null&&ColumnDefinitions.Count == row.Values.Count)
+Table.cs (39) : {
+Table.cs (40) : Rows.Add(row);
+Table.cs (42) : }
+Table.cs (47) : return Rows.Count;
+Table.cs (54) : if (i>=0 && i < NumColumns())
+Table.cs (55) : {
+Table.cs (56) : return ColumnDefinitions[i];
+Table.cs (58) : return null;
+Table.cs (59) : }
+Table.cs (64) : return ColumnDefinitions.Count;
+Table.cs (70) : for(int i=0; i < NumColumns(); i++)
+Table.cs (71) : {
+Table.cs (72) : if (ColumnDefinitions[i].Name == column)
+Table.cs (73) : {
+Table.cs (74) : return ColumnDefinitions[i];
+Table.cs (75) : }
+Table.cs (76) : }
+Table.cs (84) : for (int i = 0; i < NumColumns(); i++)
+Table.cs (85) : {
+Table.cs (86) : if (ColumnDefinitions[i].Name == columnName)
+Table.cs (87) : {
+Table.cs (88) : return i;
+Table.cs (89) : }
+Table.cs (90) : }
+Table.cs (159) : if (row>=0 && row < Rows.Count)
+Table.cs (160) : {
+Table.cs (161) : Rows.RemoveAt(row);
+Table.cs (162) : }
+Table.cs (182) : List<int> indices = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (183) : for (int i = indices.Count - 1; i >= 0; i--)
+Table.cs (184) : {
+Table.cs (185) : DeleteIthRow(indices[i]);
+Table.cs (186) : }
+Table.cs (193) : bool esVacio = false;
+Table.cs (194) : if (columnNames == null || columnNames.Count == 0 || columnNames[0] == null) { esVacio = true; }
+Table.cs (195) : else
+Table.cs (196) : {
+Table.cs (197) : for (int n = 0; n < columnNames.Count; n++)
+Table.cs (198) : {
+Table.cs (199) : if (ColumnByName(columnNames[n]) == null) { esVacio = true; }
+Table.cs (200) : }
+Table.cs (201) : }
+Table.cs (202) : if (esVacio)
+Table.cs (203) : {
+Table.cs (204) : Table table = new Table("Result", new List<ColumnDefinition>());
+Table.cs (205) : return table;
+Table.cs (206) : }
+Table.cs (207) : else
+Table.cs (208) : {
+Table.cs (209) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Table.cs (210) : List<int> indices = new List<int>();
+Table.cs (212) : for (int i = 0; i < columnNames.Count; i++)
+Table.cs (213) : {
+Table.cs (214) : if (ColumnByName(columnNames[i]) != null)
+Table.cs (215) : {
+Table.cs (216) : columns.Add(ColumnByName(columnNames[i]));
+Table.cs (217) : indices.Add(ColumnIndexByName(columnNames[i]));
+Table.cs (218) : }
+Table.cs (219) : }
+Table.cs (220) : Table table = new Table("Result", columns);
+Table.cs (222) : for (int k = 0; k < NumRows(); k++)
+Table.cs (223) : {
+Table.cs (224) : List<string> values = new List<string>();
+Table.cs (225) : Row row = Rows[k];
+Table.cs (226) : if (condition == null || condition.ColumnName == "" || condition.ColumnName == null || Rows[k].IsTrue(condition))
+Table.cs (227) : {
+Table.cs (228) : for (int j = 0; j < indices.Count; j++)
+Table.cs (229) : {
+Table.cs (230) : values.Add(row.Values[indices[j]]);
+Table.cs (231) : }
+Table.cs (232) : table.AddRow(new Row(columns, values));
+Table.cs (233) : }
+Table.cs (234) : }
+Table.cs (235) : return table;
+Table.cs (243) : if (values != null && values.Count == ColumnDefinitions.Count)
+Table.cs (244) : {
+Table.cs (245) : Row row = new Row(ColumnDefinitions, values);
+Table.cs (246) : AddRow(row);
+Table.cs (247) : return true;
+Table.cs (248) : }
+Table.cs (258) : if (condition == null||setValues.Count==0) { return false; }
+DatabaseTests.cs (1) : using DbManager;
+DatabaseTests.cs (12) : public void TestAddTableByName()
+DatabaseTests.cs (14) : Database database = Database.CreateTestDatabase();
+DatabaseTests.cs (15) : Assert.Equal("TestTable",database.TableByName("TestTable").Name);
+DatabaseTests.cs (16) : Assert.False(database.AddTable(null));
+DatabaseTests.cs (17) : Assert.Null(database.TableByName("tabla123"));
+DatabaseTests.cs (20) : [Fact]
+DatabaseTests.cs (21) : public void TestCreateTable()
+DatabaseTests.cs (22) : {
+DatabaseTests.cs (23) : Database database = Database.CreateTestDatabase();
+DatabaseTests.cs (24) : List<ColumnDefinition> columns0 = new List<ColumnDefinition>() { };
+DatabaseTests.cs (25) : List<ColumnDefinition> columnDefinition = new List<ColumnDefinition>()
+DatabaseTests.cs (26) : {
+DatabaseTests.cs (27) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+DatabaseTests.cs (28) : new ColumnDefinition(ColumnDefinition.DataType.String, "Height"),
+DatabaseTests.cs (29) : new ColumnDefinition(ColumnDefinition.DataType.String, "Age"),
+DatabaseTests.cs (30) : };
+DatabaseTests.cs (31) : Assert.False(database.CreateTable("TestTable", columnDefinition));
+DatabaseTests.cs (33) : Assert.True(database.CreateTable("TestTable123", columnDefinition));
+DatabaseTests.cs (34) : }
+DatabaseTests.cs (36) : [Fact]
+DatabaseTests.cs (37) : public void TestDropTable()
+DatabaseTests.cs (38) : {
+DatabaseTests.cs (39) : Database database = Database.CreateTestDatabase();
+DatabaseTests.cs (40) : Assert.True(database.DropTable("TestTable"));
+DatabaseTests.cs (41) : Assert.False(database.DropTable("TestTable123"));
+DatabaseTests.cs (42) : }
+DatabaseTests.cs (49) : List<string> values2 = new List<string> { "Pepe", "1,8", "25", "2000" };
+DatabaseTests.cs (52) : Assert.False(database.Insert("TestTable", values2));
+DatabaseTests.cs (60) : Condition con = new Condition("Age", ">", "18");
+DatabaseTests.cs (64) : Assert.Equal(3, database.Select("TestTable", columns, con).NumRows());
+DeleteTest.cs (1) : using DbManager;
+DeleteTest.cs (2) : using DbManager.Parser;
+DeleteTest.cs (3) : using System.Windows.Markup;
+DeleteTest.cs (4) : namespace OurTests
+DeleteTest.cs (5) : {
+DeleteTest.cs (6) : public class DeleteTest
+DeleteTest.cs (7) : {
+DeleteTest.cs (8) : [Fact]
+DeleteTest.cs (9) : public void delete()
+DeleteTest.cs (10) : {
+DeleteTest.cs (11) : Delete query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>'30'") as Delete;
+DeleteTest.cs (12) : Assert.NotNull(query);
+DeleteTest.cs (13) : query = MiniSQLParser.Parse("DELETE FROM employees Where age>'30'") as Delete;
+DeleteTest.cs (14) : Assert.Null(query);
+DeleteTest.cs (15) : }
+DeleteTest.cs (17) : [Fact]
+DeleteTest.cs (18) : public void Correct()
+DeleteTest.cs (19) : {
+DeleteTest.cs (20) : Delete query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>'30'") as Delete;
+DeleteTest.cs (21) : Assert.NotNull(query);
+DeleteTest.cs (23) : query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>'30'") as Delete;
+DeleteTest.cs (24) : Assert.NotNull(query);
+DeleteTest.cs (26) : query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>'30'") as Delete;
+DeleteTest.cs (27) : Assert.NotNull(query);
+DeleteTest.cs (29) : query = MiniSQLParser.Parse("DELETE FROM employees WHERE age<='30'") as Delete;
+DeleteTest.cs (30) : Assert.NotNull(query);
+DeleteTest.cs (32) : }
+DeleteTest.cs (34) : [Fact]
+DeleteTest.cs (35) : public void CorrectWithSpaces()
+DeleteTest.cs (36) : {
+DeleteTest.cs (37) : Delete query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>'30'") as Delete;
+DeleteTest.cs (38) : Assert.Equal("employees", query.Table);
+DeleteTest.cs (39) : Assert.Equal("age", query.Where.ColumnName);
+DeleteTest.cs (40) : Assert.Equal(">", query.Where.Operator);
+DeleteTest.cs (41) : Assert.Equal("30", query.Where.LiteralValue);
+DeleteTest.cs (43) : }
+DeleteTest.cs (45) : [Fact]
+DeleteTest.cs (46) : public void IncorrectCapitalization()
+DeleteTest.cs (47) : {
+DeleteTest.cs (48) : Delete query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>'30'") as Delete;
+DeleteTest.cs (49) : Assert.NotNull(query);
+DeleteTest.cs (51) : query = MiniSQLParser.Parse("Delete From employees WHERE age>'30'") as Delete;
+DeleteTest.cs (52) : Assert.Null(query);
+DeleteTest.cs (54) : query = MiniSQLParser.Parse("delete from employees WHERE age>'30'") as Delete;
+DeleteTest.cs (55) : Assert.Null(query);
+DeleteTest.cs (56) : }
+DeleteTest.cs (58) : [Fact]
+DeleteTest.cs (59) : public void IncorrectUserWithForbiddenChars()
+DeleteTest.cs (60) : {
+DeleteTest.cs (61) : Delete query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>'30'") as Delete;
+DeleteTest.cs (62) : Assert.NotNull(query);
+DeleteTest.cs (64) : query = MiniSQLParser.Parse("DELETE FROM employees WHERE ag-e>30") as Delete;
+DeleteTest.cs (65) : Assert.Null(query);
+DeleteTest.cs (67) : query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>3 0") as Delete;
+DeleteTest.cs (68) : Assert.Null(query);
+DeleteTest.cs (69) : }
+DeleteTest.cs (71) : [Fact]
+DeleteTest.cs (72) : public void IncorrectWithoutTableName()
+DeleteTest.cs (73) : {
+DeleteTest.cs (74) : Delete query = MiniSQLParser.Parse("DELETE FROM employees WHERE age>'30'") as Delete;
+DeleteTest.cs (75) : Assert.NotNull(query);
+DeleteTest.cs (77) : query = MiniSQLParser.Parse("DELETE FROM  WHERE age>'30'") as Delete;
+DeleteTest.cs (78) : Assert.Null(query);
+DeleteTest.cs (80) : }
+DeleteTest.cs (81) : }
+DeleteTest.cs (82) : }
+TableTests.cs (2) : using System.Data.Common;
+TableTests.cs (18) : new ColumnDefinition(ColumnDefinition.DataType.String, "Height"),
+TableTests.cs (19) : new ColumnDefinition(ColumnDefinition.DataType.String, "Age"),
+TableTests.cs (21) : List<ColumnDefinition> columns2 = new List<ColumnDefinition>()
+TableTests.cs (22) : {
+TableTests.cs (23) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+TableTests.cs (24) : new ColumnDefinition(ColumnDefinition.DataType.String, "Height"),
+TableTests.cs (25) : new ColumnDefinition(ColumnDefinition.DataType.String, "Age"),
+TableTests.cs (26) : new ColumnDefinition(ColumnDefinition.DataType.String, "Salary"),
+TableTests.cs (31) : List<string> values4 = new List<string>();
+TableTests.cs (37) : row2.SetValue("Name", "Juan");
+TableTests.cs (38) : row2.SetValue("Height", "1.6");
+TableTests.cs (39) : row2.SetValue("Age", "22");
+TableTests.cs (41) : row3.SetValue("Name", "Juan");
+TableTests.cs (42) : row3.SetValue("Height", "1.3");
+TableTests.cs (43) : row3.SetValue("Age", "23");
+TableTests.cs (44) : row3.SetValue("Salary", "2000");
+TableTests.cs (45) : Row row4 = new Row(columns, values4);
+TableTests.cs (46) : row.SetValue("Name", "Pepe");
+TableTests.cs (47) : row.SetValue("Height", "1.8");
+TableTests.cs (48) : Table table1 = new Table("tabla",columns);
+TableTests.cs (49) : table1.AddRow(row);
+TableTests.cs (50) : table1.AddRow(row2);
+TableTests.cs (51) : table1.AddRow(row3);
+TableTests.cs (52) : Assert.Equal(row, table1.GetRow(0));
+TableTests.cs (53) : Assert.Equal(row2, table1.GetRow(1));
+TableTests.cs (54) : Assert.Null(table1.GetRow(17));
+TableTests.cs (55) : Assert.Equal(2, table1.NumRows());
+TableTests.cs (56) : table1.AddRow(row4);
+TableTests.cs (57) : Assert.Equal(2, table1.NumRows());
+TableTests.cs (58) : Table table = Table.CreateTestTable();
+TableTests.cs (59) : Assert.Null(table.GetRow(table.NumRows()));
+TableTests.cs (60) : table.AddRow(null);
+TableTests.cs (61) : Assert.Equal(3, table.NumRows());
+TableTests.cs (64) : [Fact]
+TableTests.cs (69) : table.DeleteIthRow(0);
+TableTests.cs (70) : Assert.Equal(2, table.NumRows());
+TableTests.cs (73) : [Fact]
+TableTests.cs (78) : Assert.Equal(column.Name, table.GetColumn(0).Name);
+TableTests.cs (79) : Assert.Null(table.GetColumn(-1));
+TableTests.cs (80) : Assert.Null(table.GetColumn(7));
+TableTests.cs (81) : Assert.Null(table.GetColumn(table.NumColumns()));
+TableTests.cs (84) : [Fact]
+TableTests.cs (91) : [Fact]
+TableTests.cs (92) : public void TestColumnByName()
+TableTests.cs (93) : {
+TableTests.cs (94) : Table table = Table.CreateTestTable();
+TableTests.cs (95) : ColumnDefinition column = new ColumnDefinition(ColumnDefinition.DataType.String, "Age");
+TableTests.cs (96) : Assert.Equal(column.Name, table.ColumnByName("Age").Name);
+TableTests.cs (97) : Assert.Null(table.ColumnByName("Dni"));
+TableTests.cs (98) : Assert.Null(table.ColumnByName(""));
+TableTests.cs (99) : }
+TableTests.cs (101) : [Fact]
+TableTests.cs (103) : public void TestColumnIndexByName()
+TableTests.cs (104) : {
+TableTests.cs (105) : Table table = Table.CreateTestTable();
+TableTests.cs (106) : Assert.Equal(0, table.ColumnIndexByName("Name"));
+TableTests.cs (107) : Assert.Equal(2, table.ColumnIndexByName("Age"));
+TableTests.cs (108) : Assert.Equal(-1, table.ColumnIndexByName("Dni"));
+TableTests.cs (109) : Assert.Equal(-1, table.ColumnIndexByName(""));
+TableTests.cs (110) : }
+TableTests.cs (148) : table.DeleteIthRow(7);
+TableTests.cs (149) : Assert.Equal(2, table.NumRows());
+TableTests.cs (150) : table.DeleteIthRow(-3);
+TableTests.cs (151) : Assert.Equal(2, table.NumRows());
+TableTests.cs (152) : table.DeleteIthRow(table.NumRows()-1);
+TableTests.cs (153) : Assert.Equal(1, table.NumRows());
+TableTests.cs (154) : table.DeleteIthRow(0);
+TableTests.cs (155) : Assert.Equal(0, table.NumRows());
+TableTests.cs (156) : }
+TableTests.cs (158) : [Fact]
+TableTests.cs (159) : public void TestInsert()
+TableTests.cs (160) : {
+TableTests.cs (161) : Table table = Table.CreateTestTable();
+TableTests.cs (162) : List<string> values = new List<string> { "Maite", "1.8", "21" };
+TableTests.cs (163) : Assert.True(table.Insert(values));
+TableTests.cs (164) : Assert.Equal(4, table.NumRows());
+TableTests.cs (165) : List<string> values2 = new List<string> { "Maite", "1.8", "21", "1500" };
+TableTests.cs (166) : Assert.False(table.Insert(values2));
+TableTests.cs (167) : Assert.Equal(4, table.NumRows());
+TableTests.cs (168) : Assert.False(table.Insert(null));
+TableTests.cs (169) : Assert.False(table.Insert(new List<string>()));
+TableTests.cs (173) : public void TestDeleteWhere()
+TableTests.cs (174) : {
+TableTests.cs (175) : Table table = Table.CreateTestTable();
+TableTests.cs (176) : Condition condition = new Condition("Height", ">", "1.65");
+TableTests.cs (177) : table.DeleteWhere(condition);
+TableTests.cs (178) : Assert.Equal(2, table.NumRows());
+TableTests.cs (179) : Condition condition2 = new Condition("Name", "=", "Rodolfo");
+TableTests.cs (180) : table.DeleteWhere(condition2);
+TableTests.cs (181) : Assert.Equal(1, table.NumRows());
+TableTests.cs (182) : Condition condition3 = new Condition("Age", "=", "18");
+TableTests.cs (183) : table.DeleteWhere(condition3);
+TableTests.cs (184) : Assert.Equal(1, table.NumRows());
+TableTests.cs (185) : }
+TableTests.cs (187) : [Fact]
+TableTests.cs (189) : public void TestSelect()
+TableTests.cs (190) : {
+TableTests.cs (191) : Table table = Table.CreateTestTable();
+TableTests.cs (192) : Condition condition = new Condition("Age", "<", "60");
+TableTests.cs (193) : Condition condition2 = new Condition("Age", "<", "0");
+TableTests.cs (194) : Condition condition3 = new Condition("", "", "");
+TableTests.cs (195) : Condition condition4 = new Condition(null, null, null);
+TableTests.cs (196) : List<string> columns = new List<string> { "Age", "Name" };
+TableTests.cs (197) : List<string> columns2 = new List<string> { "Age", "Name", "Height" };
+TableTests.cs (198) : List<string> columns3 = new List<string> { "Name", "Height", "Age" };;
+TableTests.cs (199) : List<string> columns5 =new List<string> { null };
+TableTests.cs (201) : Assert.Equal(2, table.Select(columns, condition).NumRows());
+TableTests.cs (202) : Assert.Equal("Pepe", table.Select(columns, condition).GetRow(1).GetValue("Name"));
+TableTests.cs (203) : Assert.Equal("51", table.Select(columns, condition).GetRow(1).Values[0]);
+TableTests.cs (204) : Assert.Equal(0, table.Select(null, null).NumRows());
+TableTests.cs (205) : Assert.Equal(3, table.Select(columns2, null).NumRows());
+TableTests.cs (206) : Assert.Equal("Pepe", table.Select(columns2, null).GetRow(2).Values[1]);
+TableTests.cs (207) : Assert.Equal(3, table.Select(columns3, null).NumRows());
+TableTests.cs (208) : Assert.Equal(3, table.Select(columns3, condition4).NumRows());
+TableTests.cs (209) : Assert.Equal(0, table.Select(null, condition2).NumRows());
+TableTests.cs (210) : Assert.Equal(0, table.Select(null, condition3).NumRows());
+TableTests.cs (211) : Assert.Equal(0, table.Select(null, condition4).NumRows());
+TableTests.cs (212) : Assert.Equal(0, table.Select(columns5, null).NumRows());
+TableTests.cs (213) : }
+TableTests.cs (231) : SetValue SV3 = new SetValue("Name", "Jorge");
+TableTests.cs (233) : List<SetValue> Lsv2 = new List<SetValue> { SV3 };
+TableTests.cs (234) : List<SetValue> Lsv3 = new List<SetValue> ();
+TableTests.cs (237) : Condition c2 = new Condition("Age", "=", "0");
+TableTests.cs (238) : Condition c3 = new Condition("Name", "=", "Maider");
+TableTests.cs (240) : table.Update(Lsv, c);
+TableTests.cs (243) : Assert.False(table.Update(Lsv2, c2));
+TableTests.cs (244) : Assert.False(table.Update(Lsv3,c3));
+UpdateTest.cs (1) : using DbManager;
+UpdateTest.cs (2) : using System.Windows.Markup;
+UpdateTest.cs (3) : namespace OurTests
+UpdateTest.cs (4) : {
+UpdateTest.cs (5) : public class UpdateTest
+UpdateTest.cs (6) : {
+UpdateTest.cs (7) : [Fact]
+UpdateTest.cs (8) : public void Update()
+UpdateTest.cs (9) : {
+UpdateTest.cs (10) : Update query = MiniSQLParser.Parse("UPDATE employees SET name='Maria',age='18' WHERE age>'30'") as Update;
+UpdateTest.cs (11) : Assert.NotNull(query);
+UpdateTest.cs (12) : query = MiniSQLParser.Parse("UPDATE employees Set name='Maria' Where age>'30'") as Update;
+UpdateTest.cs (13) : Assert.Null(query);
+UpdateTest.cs (14) : }
+UpdateTest.cs (16) : [Fact]
+UpdateTest.cs (17) : public void Correct()
+UpdateTest.cs (18) : {
+UpdateTest.cs (19) : Update query = MiniSQLParser.Parse("UPDATE employees SET name='Maria' WHERE age>'30'") as Update;
+UpdateTest.cs (20) : Assert.NotNull(query);
+UpdateTest.cs (22) : query = MiniSQLParser.Parse("UPDATE employees SET name='Maria' WHERE age>'30'") as Update;
+UpdateTest.cs (23) : Assert.NotNull(query);
+UpdateTest.cs (25) : query = MiniSQLParser.Parse("UPDATE employees SET name='Maria' WHERE age<'30'") as Update;
+UpdateTest.cs (26) : Assert.NotNull(query);
+UpdateTest.cs (28) : query = MiniSQLParser.Parse("UPDATE employees SET name='Maria' WHERE age<='30'") as Update;
+UpdateTest.cs (29) : Assert.NotNull(query);
+UpdateTest.cs (31) : }
+UpdateTest.cs (33) : [Fact]
+UpdateTest.cs (34) : public void CorrectWithSpaces()
+UpdateTest.cs (35) : {
+UpdateTest.cs (36) : Update query = MiniSQLParser.Parse("UPDATE    employees  SET  name='Maria'   WHERE age>'30'") as Update;
+UpdateTest.cs (37) : Assert.Equal("employees", query.Table);
+UpdateTest.cs (38) : Assert.Equal("name", query.Columns[0].ColumnName);
+UpdateTest.cs (39) : Assert.Equal("Maria", query.Columns[0].Value);
+UpdateTest.cs (40) : Assert.Equal("age", query.Where.ColumnName);
+UpdateTest.cs (41) : Assert.Equal(">", query.Where.Operator);
+UpdateTest.cs (42) : Assert.Equal("30", query.Where.LiteralValue);
+UpdateTest.cs (44) : }
+UpdateTest.cs (46) : [Fact]
+UpdateTest.cs (47) : public void IncorrectCapitalization()
+UpdateTest.cs (48) : {
+UpdateTest.cs (49) : Update query = MiniSQLParser.Parse("UPDATE employees SET name='Maria' WHERE age>'30'") as Update;
+UpdateTest.cs (50) : Assert.NotNull(query);
+UpdateTest.cs (52) : query = MiniSQLParser.Parse("Update employees SET name='Maria' WHERE age>'30'") as Update;
+UpdateTest.cs (53) : Assert.Null(query);
+UpdateTest.cs (55) : query = MiniSQLParser.Parse("update employees set name='Maria' WHERE age>'30'") as Update;
+UpdateTest.cs (56) : Assert.Null(query);
+UpdateTest.cs (57) : }
+UpdateTest.cs (59) : [Fact]
+UpdateTest.cs (60) : public void IncorrectUserWithForbiddenChars()
+UpdateTest.cs (61) : {
+UpdateTest.cs (62) : Update query = MiniSQLParser.Parse("UPDATE employees SET name='Maria' WHERE age>'30'") as Update;
+UpdateTest.cs (63) : Assert.NotNull(query);
+UpdateTest.cs (65) : query = MiniSQLParser.Parse("UPDATE employees SET name='Maria' WHERE ag-e>'30'") as Update;
+UpdateTest.cs (66) : Assert.Null(query);
+UpdateTest.cs (67) : }
+UpdateTest.cs (69) : [Fact]
+UpdateTest.cs (70) : public void IncorrectWithoutTableName()
+UpdateTest.cs (71) : {
+UpdateTest.cs (72) : Update query = MiniSQLParser.Parse("UPDATE employees SET name='Maria' WHERE age>'30'") as Update;
+UpdateTest.cs (73) : Assert.NotNull(query);
+UpdateTest.cs (75) : query = MiniSQLParser.Parse("UPDATE  SET name='Maria' WHERE age>'30'") as Update;
+UpdateTest.cs (76) : Assert.Null(query);
+UpdateTest.cs (78) : }
+UpdateTest.cs (79) : }
+UpdateTest.cs (80) : }
+Delete.cs (15) : Table = table;
+Delete.cs (16) : Where = where;
+Delete.cs (23) : database.DeleteWhere(Table, Where);
+Delete.cs (25) : return database.LastErrorMessage;
+DropTable.cs (15) : Table = table;
+MiniSQLParser.cs (25) : const string updateTablePattern = @"UPDATE\s+([a-zA-Z_][\w]*)\s+SET\s+(\w+='[^']+'(?:,\w+='[^']+')*)\s+WHERE\s+(\w+)\s*(=|<>|!=|>|<|>=|<=)\s*'([^']+)'\s*";
+MiniSQLParser.cs (27) : const string deletePattern = @"DELETE\s+FROM\s+([a-zA-Z0-9_, -]+)\s+WHERE\s+(\w+)(=|<>|!=|>|<|>=|<=)'([^']+)'";
+MiniSQLParser.cs (70) : {
+MiniSQLParser.cs (72) : }
+MiniSQLParser.cs (75) : {
+MiniSQLParser.cs (79) : }
+MiniSQLParser.cs (169) : Match match5 = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (170) : if (match5.Success)
+MiniSQLParser.cs (172) : string tableName = match5.Groups[1].Value;
+MiniSQLParser.cs (173) : string set = match5.Groups[2].Value;
+MiniSQLParser.cs (174) : string where = match5.Groups[3].Value;
+MiniSQLParser.cs (184) : string newValue = assignmentParts[1].Trim().Trim('\'');
+MiniSQLParser.cs (188) : string whereColumn = match5.Groups[3].Value;
+MiniSQLParser.cs (189) : string whereOperator = match5.Groups[4].Value;
+MiniSQLParser.cs (190) : string whereValue = match5.Groups[5].Value.Trim('\'');
+MiniSQLParser.cs (192) : Condition whereCondition = new Condition(whereColumn, whereOperator, whereValue);
+MiniSQLParser.cs (194) : if (tableName.Contains("-") || tableName.Contains(" "))
+MiniSQLParser.cs (196) : return null;
+MiniSQLParser.cs (201) : Match match6 = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (202) : if (match6.Success)
+MiniSQLParser.cs (203) : {
+MiniSQLParser.cs (204) : string tableDeleteName = match6.Groups[1].Value;
+MiniSQLParser.cs (206) : string whereColumn = match6.Groups[2].Value;
+MiniSQLParser.cs (207) : string whereOperator = match6.Groups[3].Value;
+MiniSQLParser.cs (208) : string whereValue = match6.Groups[4].Value.Trim('\'');
+MiniSQLParser.cs (210) : Condition whereCondition = new Condition(whereColumn, whereOperator, whereValue);
+MiniSQLParser.cs (211) : return new Delete(tableDeleteName, whereCondition);
+Select.cs (18) : Table = table;
+Select.cs (19) : Columns = columns;
+Select.cs (20) : Where = condition;
+Update.cs (25) : database.Update(Table, Columns, Where);
+Update.cs (26) : return database.LastErrorMessage;

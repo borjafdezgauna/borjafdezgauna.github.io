@@ -1,0 +1,304 @@
+Total written by this student: 10% lines / 10% characters
+
+ColumnDefinition.cs (30) : return value.Replace(Delimiter,DelimiterEncoded);
+ColumnDefinition.cs (38) : return value.Replace(DelimiterEncoded,Delimiter);
+ColumnDefinition.cs (46) : return Type.ToString()+Delimiter+Name;
+ColumnDefinition.cs (53) : int index=value.IndexOf(Delimiter);
+ColumnDefinition.cs (54) : //elimina todo despues del indice dejando solo el tipo
+ColumnDefinition.cs (55) : string typeString = value.Remove(index);
+ColumnDefinition.cs (56) : //cambia el tipo y el delimitador dejando solo el nombre
+ColumnDefinition.cs (57) : string name = value.Replace(typeString + Delimiter,"");
+ColumnDefinition.cs (58) : DataType type=(DataType)Enum.Parse(typeof(DataType),typeString);
+ColumnDefinition.cs (59) : return new ColumnDefinition(type,name);
+ColumnDefinitionTests.cs (1) : using DbManager;
+ColumnDefinitionTests.cs (2) : using System;
+ColumnDefinitionTests.cs (15) : [Fact]
+ColumnDefinitionTests.cs (16) : public void TestAsText()
+ColumnDefinitionTests.cs (17) : {
+ColumnDefinitionTests.cs (18) : // Arrange: Crear una instancia de ColumnDefinition
+ColumnDefinitionTests.cs (19) : ColumnDefinition column = new ColumnDefinition(ColumnDefinition.DataType.String, "TestColumn");
+ColumnDefinitionTests.cs (21) : // Act: Convertir a texto
+ColumnDefinitionTests.cs (22) : string textRepresentation = column.AsText();
+ColumnDefinitionTests.cs (24) : // Assert: Verificar que el formato es correcto
+ColumnDefinitionTests.cs (25) : Assert.Equal("String->TestColumn", textRepresentation);
+ColumnDefinitionTests.cs (28) : [Fact]
+ColumnDefinitionTests.cs (29) : public void TestParseValid()
+ColumnDefinitionTests.cs (30) : {
+ColumnDefinitionTests.cs (31) : // Arrange: String generado por AsText()
+ColumnDefinitionTests.cs (32) : string text = "Int->Age";
+ColumnDefinitionTests.cs (34) : // Act: Convertir de texto a objeto
+ColumnDefinitionTests.cs (35) : ColumnDefinition column = ColumnDefinition.Parse(text);
+ColumnDefinitionTests.cs (37) : // Assert: Verificar que los valores coinciden
+ColumnDefinitionTests.cs (38) : Assert.Equal(ColumnDefinition.DataType.Int, column.Type);
+ColumnDefinitionTests.cs (39) : Assert.Equal("Age", column.Name);
+ColumnDefinitionTests.cs (42) : [Fact]
+ColumnDefinitionTests.cs (43) : public void TestParseWithEncodedDelimiter()
+ColumnDefinitionTests.cs (44) : {
+ColumnDefinitionTests.cs (45) : // Arrange: Nombre con el delimitador codificado
+ColumnDefinitionTests.cs (46) : ColumnDefinition column = new ColumnDefinition(ColumnDefinition.DataType.String, "Test[ARROW]Column");
+ColumnDefinitionTests.cs (47) : string text = column.AsText();
+ColumnDefinitionTests.cs (49) : // Act: Parsear el texto de nuevo a objeto
+ColumnDefinitionTests.cs (50) : ColumnDefinition parsedColumn = ColumnDefinition.Parse(text);
+ColumnDefinitionTests.cs (52) : // Assert: Verificar que los valores coinciden despu�s del decode
+ColumnDefinitionTests.cs (53) : Assert.Equal(column.Type, parsedColumn.Type);
+ColumnDefinitionTests.cs (54) : Assert.Equal(column.Name, parsedColumn.Name);
+ColumnDefinitionTests.cs (55) : }
+ColumnDefinitionTests.cs (58) : [Fact]
+ColumnDefinitionTests.cs (59) : public void TestParseInvalidType()
+ColumnDefinitionTests.cs (60) : {
+ColumnDefinitionTests.cs (61) : // Arrange: Tipo inexistente en el enum
+ColumnDefinitionTests.cs (62) : string text = "InvalidType->ColumnName";
+ColumnDefinitionTests.cs (64) : // Act & Assert: Verificar que lanza una excepci�n
+ColumnDefinitionTests.cs (65) : Assert.Throws<ArgumentException>(() => ColumnDefinition.Parse(text));
+ColumnDefinitionTests.cs (66) : }
+ColumnDefinitionTests.cs (67) : }
+ColumnDefinitionTests.cs (68) : }
+InsertTest.cs (1) : ﻿using DbManager;
+InsertTest.cs (2) : using DbManager.Parser;
+InsertTest.cs (4) : using System.Collections.Generic;
+InsertTest.cs (6) : namespace OurTests
+InsertTest.cs (7) : {
+InsertTest.cs (8) : public class InsertTest
+InsertTest.cs (9) : {
+InsertTest.cs (10) : [Fact]
+InsertTest.cs (11) : public void TestInsert()
+InsertTest.cs (12) : {
+InsertTest.cs (13) : // Casos válidos
+InsertTest.cs (15) : Assert.NotNull(consulta);
+InsertTest.cs (16) : Assert.Equal("usuarios", consulta.Table);
+InsertTest.cs (26) : Assert.NotNull(consulta);
+InsertTest.cs (29) : // Casos inválidos
+InsertTest.cs (30) : consulta = MiniSQLParser.Parse("INSERT INTO usuarios") as Insert;
+InsertTest.cs (31) : Assert.Null(consulta);
+InsertTest.cs (33) : consulta = MiniSQLParser.Parse("INSERT INTO usuarios VALORES (1, 'Juan', 25)") as Insert;
+InsertTest.cs (34) : Assert.Null(consulta);
+InsertTest.cs (36) : consulta = MiniSQLParser.Parse("INSERT usuarios VALUES (1, 'Juan', 25)") as Insert;
+InsertTest.cs (37) : Assert.Null(consulta);
+InsertTest.cs (39) : consulta = MiniSQLParser.Parse("INSERT INTO VALUES (1, 'Juan', 25)") as Insert;
+InsertTest.cs (40) : Assert.Null(consulta);
+InsertTest.cs (89) : }
+InsertTest.cs (90) : }
+InsertTest.cs (91) : }
+ManagerTests.cs (1) : ﻿using DbManager;
+ManagerTests.cs (190) : [Fact]
+ManagerTests.cs (191) : public void RemoveProfile()
+ManagerTests.cs (192) : {
+ManagerTests.cs (193) : // 1) Solo el admin puede eliminar perfiles
+ManagerTests.cs (194) : var nonAdmin = new Manager("notAdmin");
+ManagerTests.cs (195) : // añadimos un perfil cualquiera
+ManagerTests.cs (196) : var perfil1 = new Profile { Name = "P1" };
+ManagerTests.cs (197) : nonAdmin.Profiles.Add(perfil1);
+ManagerTests.cs (198) : // intento de borrado con usuario no-admin → debe devolver false y no quitar nada
+ManagerTests.cs (199) : Assert.False(nonAdmin.RemoveProfile("P1"));
+ManagerTests.cs (200) : Assert.Contains(perfil1, nonAdmin.Profiles);
+ManagerTests.cs (202) : // 2) Con admin sí se puede borrar un perfil existente
+ManagerTests.cs (203) : var admin = new Manager("Admin");
+ManagerTests.cs (204) : var perfil2 = new Profile { Name = "P2" };
+ManagerTests.cs (205) : admin.Profiles.Add(perfil2);
+ManagerTests.cs (206) : Assert.True(admin.RemoveProfile("P2"));
+ManagerTests.cs (207) : Assert.DoesNotContain(perfil2, admin.Profiles);
+ManagerTests.cs (209) : // 3) No se puede borrar un perfil que no existe
+ManagerTests.cs (210) : Assert.False(admin.RemoveProfile("Dont exist"));
+ManagerTests.cs (212) : // 4) No se debe permitir eliminar el perfil "Admin" incluso cuando el usuario sea Admin
+ManagerTests.cs (213) : var perfilAdmin = new Profile { Name = Profile.AdminProfileName };
+ManagerTests.cs (214) : admin.Profiles.Add(perfilAdmin);
+ManagerTests.cs (215) : Assert.False(admin.RemoveProfile(Profile.AdminProfileName));
+ManagerTests.cs (216) : Assert.Contains(perfilAdmin, admin.Profiles);
+ManagerTests.cs (217) : }
+SelectTest.cs (1) : ﻿using DbManager;
+SelectTest.cs (2) : using DbManager.Parser;
+SelectTest.cs (3) : using Xunit;
+SelectTest.cs (5) : namespace OurTests
+SelectTest.cs (6) : {
+SelectTest.cs (7) : public class SelectTests
+SelectTest.cs (8) : {
+SelectTest.cs (9) : [Fact]
+SelectTest.cs (10) : public void ProbarSelect()
+SelectTest.cs (11) : {
+SelectTest.cs (94) : }
+SelectTest.cs (189) : }
+SelectTest.cs (190) : }
+TableTests.cs (3) : using System.Collections.Generic;
+TableTests.cs (207) : public void TestNumColumns()
+TableTests.cs (209) : // Arrange: Crear una tabla con tres columnas
+TableTests.cs (210) : List<ColumnDefinition> columns = new List<ColumnDefinition>
+TableTests.cs (213) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+TableTests.cs (214) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Height")
+TableTests.cs (218) : // Act: Obtener el n�mero de columnas
+TableTests.cs (219) : int numColumns = table.NumColumns();
+TableTests.cs (221) : // Assert: Verificar que el n�mero de columnas es correcto
+TableTests.cs (222) : Assert.Equal(3, numColumns);
+TableTests.cs (223) : }
+TableTests.cs (251) : [Fact]
+TableTests.cs (252) : public void TestAddRow()
+TableTests.cs (253) : {
+TableTests.cs (254) : // Arrange: Crear una tabla vac�a y una fila
+TableTests.cs (255) : List<ColumnDefinition> columns = new List<ColumnDefinition>
+TableTests.cs (256) : {
+TableTests.cs (257) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+TableTests.cs (258) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age")
+TableTests.cs (259) : };
+TableTests.cs (260) : Table table = new Table("TestTable", columns);
+TableTests.cs (261) : Row newRow = new Row(columns, new List<string> { "Alice", "30" });
+TableTests.cs (263) : // Act: Agregar la fila a la tabla
+TableTests.cs (264) : table.AddRow(newRow);
+TableTests.cs (266) : // Assert: Verificar que la fila fue a�adida
+TableTests.cs (267) : Assert.Equal(1, table.NumRows());
+TableTests.cs (274) : [Fact]
+TableTests.cs (275) : public void TestGetRow()
+TableTests.cs (276) : {
+TableTests.cs (304) : [Fact]
+TableTests.cs (305) : public void TestInsertValidRow()
+TableTests.cs (306) : {
+TableTests.cs (307) : // Arrange: Crear una tabla y una lista de valores v�lidos
+TableTests.cs (308) : Table table = Table.CreateTestTable();
+TableTests.cs (309) : List<string> values = new List<string> { "Maria", "1.75", "28" };
+TableTests.cs (311) : // Act: Insertar la fila en la tabla
+TableTests.cs (312) : bool result = table.Insert(values);
+TableTests.cs (314) : // Assert: Verificar que la fila fue insertada y el conteo es correcto
+TableTests.cs (315) : Assert.True(result);
+TableTests.cs (316) : Assert.Equal(4, table.NumRows());
+TableTests.cs (319) : [Fact]
+TableTests.cs (320) : public void TestInsertInvalidRow()
+TableTests.cs (321) : {
+TableTests.cs (322) : // Arrange: Crear una tabla y una lista de valores incompleta
+TableTests.cs (323) : Table table = Table.CreateTestTable();
+TableTests.cs (324) : List<string> values = new List<string> { "Maria", "1.75" }; // Faltan valores
+TableTests.cs (326) : // Act: Intentar insertar la fila
+TableTests.cs (327) : bool result = table.Insert(values);
+TableTests.cs (329) : // Assert: Verificar que la inserci�n fall� y el conteo no cambi�
+TableTests.cs (330) : Assert.False(result);
+TableTests.cs (331) : Assert.Equal(3, table.NumRows());
+TableTests.cs (332) : }
+TableTests.cs (411) : }
+TableTests.cs (412) : }
+UpdateTableTests.cs (65) : //This part is new
+UpdateTableTests.cs (66) : [Fact]
+UpdateTableTests.cs (67) : public void updateTest2() {
+UpdateTableTests.cs (69) : Update query = MiniSQLParser.Parse("UPDATE alumnos SET Name = Javier WHERE Age = 30") as Update;
+UpdateTableTests.cs (70) : Assert.Null(query);
+UpdateTableTests.cs (72) : // Espacios extra
+UpdateTableTests.cs (74) : Assert.NotNull(query);
+UpdateTableTests.cs (76) : // Falta espacio en SET
+UpdateTableTests.cs (77) : query = MiniSQLParser.Parse("UPDATE alumnos SETName='Javier' WHERE Age>20") as Update;
+UpdateTableTests.cs (78) : Assert.Null(query);
+UpdateTableTests.cs (80) : // Falta espacio en WHERE
+UpdateTableTests.cs (84) : }
+CreateSecurityProfile.cs (5) : using DbManager.Security;
+CreateSecurityProfile.cs (17) : // Se asigna el nombre del perfil recibido al miembro ProfileName.
+CreateSecurityProfile.cs (18) : // que no sea nulo o vac�o.
+CreateSecurityProfile.cs (19) : if (string.IsNullOrWhiteSpace(profileName))
+CreateSecurityProfile.cs (20) : {
+CreateSecurityProfile.cs (21) : throw new ArgumentException("El nombre del perfil no puede ser nulo o vac�o.", nameof(profileName));
+CreateSecurityProfile.cs (22) : }
+CreateSecurityProfile.cs (23) : ProfileName = profileName.Trim();
+CreateSecurityProfile.cs (30) : // 1) Si no es admin, cortamos aqu�
+CreateSecurityProfile.cs (31) : if (!database.IsUserAdmin())
+CreateSecurityProfile.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateSecurityProfile.cs (34) : // 2) Creamos el perfil y asignamos el nombre
+CreateSecurityProfile.cs (35) : var profile = new Profile();
+CreateSecurityProfile.cs (36) : profile.Name = ProfileName;
+CreateSecurityProfile.cs (38) : // 3) Lo registramos en el SecurityManager
+CreateSecurityProfile.cs (39) : database.SecurityManager.AddProfile(profile);
+CreateSecurityProfile.cs (41) : // 4) Devolvemos mensaje de �xito
+CreateSecurityProfile.cs (42) : return Constants.CreateSecurityProfileSuccess;
+Insert.cs (16) : this.Table = table;
+Insert.cs (17) : this.Values = values;
+MiniSQLParser.cs (28) : const string createSecurityProfilePattern = @"CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z][a-zA-Z0-9]+)\s*$";
+MiniSQLParser.cs (62) : Match matchSelect = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (63) : if (matchSelect.Success)
+MiniSQLParser.cs (64) : {
+MiniSQLParser.cs (65) : List<string> columns = CommaSeparatedNames(matchSelect.Groups[1].Value.Trim());
+MiniSQLParser.cs (70) : {
+MiniSQLParser.cs (71) : return null;
+MiniSQLParser.cs (72) : }
+MiniSQLParser.cs (74) : if(columns.Count == 1 && columns[0].Contains(" ") && columns[0] != "*")
+MiniSQLParser.cs (75) : {
+MiniSQLParser.cs (76) : return null;
+MiniSQLParser.cs (77) : }
+MiniSQLParser.cs (79) : Condition condition = null;
+MiniSQLParser.cs (80) : if (matchSelect.Groups[3].Success)
+MiniSQLParser.cs (81) : {
+MiniSQLParser.cs (89) : }
+MiniSQLParser.cs (94) : }
+MiniSQLParser.cs (97) : // Comprobar INSERT (sin redeclarar match)
+MiniSQLParser.cs (98) : // 2) Comprobar INSERT
+MiniSQLParser.cs (99) : Match matchInsert = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (100) : if (matchInsert.Success)
+MiniSQLParser.cs (101) : {
+MiniSQLParser.cs (121) : }
+MiniSQLParser.cs (128) : Match match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (279) : //Aqui capturaremos el createSecurityPattern
+MiniSQLParser.cs (280) : Match matchCreateProfile = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (281) : if (matchCreateProfile.Success)
+MiniSQLParser.cs (282) : {
+MiniSQLParser.cs (283) : string profile = matchCreateProfile.Groups[1].Value;
+MiniSQLParser.cs (284) : return new CreateSecurityProfile(profile);
+MiniSQLParser.cs (285) : }
+MiniSQLParser.cs (298) : commaSeparator.Add(textParts[i].Trim());
+Select.cs (18) : this.Columns = columns;
+Select.cs (19) : this.Table = table;
+Select.cs (20) : this.Where = condition;
+Manager.cs (24) : return m_username=="Admin";
+Manager.cs (105) : if (string.IsNullOrWhiteSpace(username))
+Manager.cs (106) : return null;
+Manager.cs (108) : // Recorre cada perfil
+Manager.cs (109) : foreach (var profile in Profiles)
+Manager.cs (110) : {
+Manager.cs (111) : if (profile?.Users == null)
+Manager.cs (112) : continue;
+Manager.cs (114) : // Busca el usuario dentro de ese perfil
+Manager.cs (115) : foreach (var user in profile.Users)
+Manager.cs (116) : {
+Manager.cs (117) : if (string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase))
+Manager.cs (118) : return user;
+Manager.cs (119) : }
+Manager.cs (120) : }
+Manager.cs (122) : // Si no lo hemos encontrado, devolvemos null
+Manager.cs (169) : //No se puede eliminar perfiles so no se es admin
+Manager.cs (170) : if (IsUserAdmin()==false)
+Manager.cs (171) : {
+Manager.cs (172) : return false;
+Manager.cs (173) : }
+Manager.cs (174) : //el admin no puede eliminar al admin
+Manager.cs (175) : if (profileName==Profile.AdminProfileName)
+Manager.cs (176) : {
+Manager.cs (177) : return false;
+Manager.cs (178) : }
+Manager.cs (180) : if (string.IsNullOrWhiteSpace(profileName))
+Manager.cs (181) : return false;
+Manager.cs (184) : // Buscar el perfil
+Manager.cs (185) : var profile = ProfileByName(profileName);
+Manager.cs (186) : if (profile == null)
+Manager.cs (187) : return false;
+Manager.cs (189) : // Eliminarlo de la lista de perfiles
+Manager.cs (190) : return Profiles.Remove(profile);
+Manager.cs (303) : string filePath = $"data/security_{databaseName}.txt";
+Manager.cs (304) : Directory.CreateDirectory("data");
+Manager.cs (306) : List<string> lines = new List<string>();
+Manager.cs (308) : foreach (var profile in Profiles)
+Manager.cs (309) : {
+Manager.cs (310) : lines.Add("Profile=" + profile.Name);
+Manager.cs (312) : foreach (var user in profile.Users)
+Manager.cs (313) : {
+Manager.cs (314) : lines.Add("User=" + user.Username);
+Manager.cs (315) : lines.Add("Password=" + user.EncryptedPassword);
+Manager.cs (316) : }
+Manager.cs (318) : foreach (var entry in profile.PrivilegesOn)
+Manager.cs (319) : {
+Manager.cs (320) : string table = entry.Key;
+Manager.cs (335) : }
+Manager.cs (336) : }
+Manager.cs (338) : File.WriteAllLines(filePath, lines);
+User.cs (16) : //We can she if the user don't put the username or the password
+User.cs (17) : if (string.IsNullOrWhiteSpace(username)) {
+User.cs (18) : throw new ArgumentException("The username can't be empty", nameof(username));
+User.cs (19) : }
+User.cs (20) : if (string.IsNullOrEmpty(password))
+User.cs (21) : {
+User.cs (22) : throw new ArgumentException("Password", nameof(password));
+User.cs (23) : }
+User.cs (24) : //
+User.cs (25) : Username = username.Trim();
+User.cs (26) : //In this part we encrypt the password with the class Encrypt
+User.cs (27) : EncryptedPassword = Encryption.Encrypt(password);

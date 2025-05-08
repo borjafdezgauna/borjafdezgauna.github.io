@@ -1,0 +1,558 @@
+Total written by this student: 16% lines / 15% characters
+
+Database.cs (8) : using System.Security.Cryptography;
+Database.cs (161) : int index = Tables.FindIndex(t => t.Name.Equals(tableName));
+Database.cs (162) : if(index == -1)
+Database.cs (163) : {
+Database.cs (164) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (166) : }
+Database.cs (170) : {
+Database.cs (171) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (173) : }
+Table.cs (5) : using System.Security.Cryptography.X509Certificates;
+Table.cs (6) : // Change something on this line to keep commit regularity: ABCDEFGH.
+Table.cs (24) : public Row GetRow(int i)
+DatabaseTests.cs (136) : Database db = PrepareDatabaseForTesting();
+DatabaseTests.cs (137) : List<string> columnNames = new List<string>();
+DatabaseTests.cs (138) : columnNames.Add("Name");
+DatabaseTests.cs (139) : columnNames.Add("Age");
+DatabaseTests.cs (145) : Table t = Table.CreateTestTable("dog");
+DatabaseTests.cs (146) : db.AddTable(t);
+MiniSQLParserTests.cs (1) : ﻿using System;
+MiniSQLParserTests.cs (2) : using System.Collections;
+MiniSQLParserTests.cs (3) : using System.Collections.Generic;
+MiniSQLParserTests.cs (4) : using System.Linq;
+MiniSQLParserTests.cs (5) : using System.Text;
+MiniSQLParserTests.cs (6) : using System.Threading.Tasks;
+MiniSQLParserTests.cs (7) : using DbManager;
+MiniSQLParserTests.cs (8) : using DbManager.Parser;
+MiniSQLParserTests.cs (9) : using Xunit;
+MiniSQLParserTests.cs (11) : namespace OurTests
+MiniSQLParserTests.cs (12) : {
+MiniSQLParserTests.cs (13) : public class MiniSQLParserTests
+MiniSQLParserTests.cs (14) : {
+MiniSQLParserTests.cs (15) : [Fact]
+MiniSQLParserTests.cs (16) : public void SelectTest()
+MiniSQLParserTests.cs (17) : {
+MiniSQLParserTests.cs (18) : Select query1 = MiniSQLParser.Parse("SELECT Name FROM Table") as Select;
+MiniSQLParserTests.cs (19) : Assert.Equal("Name", query1.Columns[0]);
+MiniSQLParserTests.cs (20) : Assert.Equal("Table", query1.Table);
+MiniSQLParserTests.cs (21) : Assert.Equal(null, query1.Where);
+MiniSQLParserTests.cs (23) : query1 = MiniSQLParser.Parse("select Name FROM Table") as Select;
+MiniSQLParserTests.cs (24) : Assert.Null(query1);
+MiniSQLParserTests.cs (26) : query1 = MiniSQLParser.Parse("sas Select Name FROM Table") as Select;
+MiniSQLParserTests.cs (27) : Assert.Null(query1);
+MiniSQLParserTests.cs (29) : query1 = MiniSQLParser.Parse("ID, Name, Age SELECT FROM Users") as Select;
+MiniSQLParserTests.cs (30) : Assert.Null(query1);
+MiniSQLParserTests.cs (32) : query1 = MiniSQLParser.Parse("SELECT Name Users") as Select;
+MiniSQLParserTests.cs (33) : Assert.Null(query1);
+MiniSQLParserTests.cs (34) : }
+MiniSQLParserTests.cs (36) : [Fact]
+MiniSQLParserTests.cs (37) : public void InsertTest()
+MiniSQLParserTests.cs (38) : {
+MiniSQLParserTests.cs (39) : Insert query2 = MiniSQLParser.Parse("INSERT INTO TableName VALUES ('Value')") as Insert;
+MiniSQLParserTests.cs (40) : Assert.Equal("TableName", query2.Table);
+MiniSQLParserTests.cs (41) : Assert.Equal(new List<string> { "Value" }, query2.Values);
+MiniSQLParserTests.cs (43) : query2 = MiniSQLParser.Parse("INSERT INTO Users VALUES ('A')") as Insert;
+MiniSQLParserTests.cs (44) : Assert.Equal("Users", query2.Table);
+MiniSQLParserTests.cs (45) : Assert.Equal(new List<string> { "A" }, query2.Values);
+MiniSQLParserTests.cs (47) : query2 = MiniSQLParser.Parse("INSERT INTO Users VALUES (A)") as Insert;
+MiniSQLParserTests.cs (48) : Assert.Null(query2);
+MiniSQLParserTests.cs (50) : query2 = MiniSQLParser.Parse("INSERT INTO Users VALUES ('20')") as Insert;
+MiniSQLParserTests.cs (51) : Assert.Equal("Users", query2.Table);
+MiniSQLParserTests.cs (52) : Assert.Equal(new List<string> { "20" }, query2.Values);
+MiniSQLParserTests.cs (54) : query2 = MiniSQLParser.Parse("INSERT INTO Users (Age) VALUES (20)") as Insert;
+MiniSQLParserTests.cs (55) : Assert.Null(query2);
+MiniSQLParserTests.cs (57) : query2 = MiniSQLParser.Parse("INSERT INTO Users VALUES ('A')") as Insert;
+MiniSQLParserTests.cs (58) : Assert.Equal("Users", query2.Table);
+MiniSQLParserTests.cs (59) : Assert.Equal(new List<string> { "A" }, query2.Values);
+MiniSQLParserTests.cs (61) : query2 = MiniSQLParser.Parse("INSERT INTO Users (Name) VALUES (A)") as Insert;
+MiniSQLParserTests.cs (62) : Assert.Null(query2);
+MiniSQLParserTests.cs (64) : query2 = MiniSQLParser.Parse("INSERT INTO Users VALUES ('A','320')") as Insert;
+MiniSQLParserTests.cs (65) : Assert.Equal("Users", query2.Table);
+MiniSQLParserTests.cs (66) : Assert.Equal(new List<string> { "A", "320" }, query2.Values);
+MiniSQLParserTests.cs (68) : query2 = MiniSQLParser.Parse("INSERT INTO Users (Name Age) VALUES ('A' 20)") as Insert;
+MiniSQLParserTests.cs (69) : Assert.Null(query2);
+MiniSQLParserTests.cs (71) : query2 = MiniSQLParser.Parse("INSERTINTO Users (Name, Age) VALUES ('A', 20)") as Insert;
+MiniSQLParserTests.cs (72) : Assert.Null(query2);
+MiniSQLParserTests.cs (74) : query2 = MiniSQLParser.Parse("INSERT INTO Users VALUES ('50.5')") as Insert;
+MiniSQLParserTests.cs (75) : Assert.Equal("Users", query2.Table);
+MiniSQLParserTests.cs (76) : Assert.Equal(new List<string> { "50.5" }, query2.Values);
+MiniSQLParserTests.cs (78) : query2 = MiniSQLParser.Parse("INSERT INTO Users (Weight) VALUES (50.5)") as Insert;
+MiniSQLParserTests.cs (79) : Assert.Null(query2);
+MiniSQLParserTests.cs (81) : query2 = MiniSQLParser.Parse("INSERT INTO Users VALUES ('A','20')") as Insert;
+MiniSQLParserTests.cs (82) : Assert.Equal("Users", query2.Table);
+MiniSQLParserTests.cs (83) : Assert.Equal(new List<string> { "A", "20" }, query2.Values);
+MiniSQLParserTests.cs (85) : query2 = MiniSQLParser.Parse("INSERT INTO Users(Name, Age)VALUES('A',20)") as Insert;
+MiniSQLParserTests.cs (86) : Assert.Null(query2);
+MiniSQLParserTests.cs (87) : }
+MiniSQLParserTests.cs (89) : [Fact]
+MiniSQLParserTests.cs (90) : public void DropTableTest()
+MiniSQLParserTests.cs (91) : {
+MiniSQLParserTests.cs (92) : DropTable query3 = MiniSQLParser.Parse("DROP TABLE TableName") as DropTable;
+MiniSQLParserTests.cs (93) : Assert.Equal("TableName", query3.Table);
+MiniSQLParserTests.cs (95) : query3 = MiniSQLParser.Parse("DROP TABLE") as DropTable;
+MiniSQLParserTests.cs (96) : Assert.Equal(null, query3);
+MiniSQLParserTests.cs (97) : Assert.Equal(null, query3?.Table);
+MiniSQLParserTests.cs (99) : DropTable query5 = MiniSQLParser.Parse("DROP Users TABLE") as DropTable;
+MiniSQLParserTests.cs (100) : Assert.Equal(null, query3);
+MiniSQLParserTests.cs (101) : Assert.Equal(null, query3?.Table);
+MiniSQLParserTests.cs (103) : query3 = MiniSQLParser.Parse("dRoP table person") as DropTable;
+MiniSQLParserTests.cs (104) : Assert.Equal(null, query3);
+MiniSQLParserTests.cs (105) : Assert.Equal(null, query3?.Table);
+MiniSQLParserTests.cs (106) : }
+MiniSQLParserTests.cs (108) : [Fact]
+MiniSQLParserTests.cs (109) : public void CreateTableTest()
+MiniSQLParserTests.cs (110) : {
+MiniSQLParserTests.cs (112) : Assert.Equal("Person", query4.Table);
+MiniSQLParserTests.cs (113) : Assert.Equal("Names", query4.ColumnsParameters[0].Name);
+MiniSQLParserTests.cs (114) : Assert.Equal(ColumnDefinition.DataType.String, query4.ColumnsParameters[0].Type);
+MiniSQLParserTests.cs (115) : Assert.Equal("Age", query4.ColumnsParameters[1].Name);
+MiniSQLParserTests.cs (116) : Assert.Equal(ColumnDefinition.DataType.Int, query4.ColumnsParameters[1].Type);
+MiniSQLParserTests.cs (147) : Assert.Null(query4);
+MiniSQLParserTests.cs (149) : query4 = MiniSQLParser.Parse("CREATE TABLE person ( id   INT , name  string ,  age  INT )") as CreateTable;
+MiniSQLParserTests.cs (150) : Assert.Null(query4);
+MiniSQLParserTests.cs (153) : Assert.Null(query4);
+MiniSQLParserTests.cs (155) : query4 = MiniSQLParser.Parse("create table person (ID int)") as CreateTable;
+MiniSQLParserTests.cs (156) : Assert.Null(query4);
+MiniSQLParserTests.cs (158) : query4 = MiniSQLParser.Parse("CREATE person (ID int)") as CreateTable;
+MiniSQLParserTests.cs (159) : Assert.Null(query4);
+MiniSQLParserTests.cs (161) : query4 = MiniSQLParser.Parse("CREATE TABLE person ID int") as CreateTable;
+MiniSQLParserTests.cs (162) : Assert.Null(query4);
+MiniSQLParserTests.cs (164) : query4 = MiniSQLParser.Parse("CREATE TABLE person (id INT, name A)") as CreateTable;
+MiniSQLParserTests.cs (165) : Assert.Null(query4);
+MiniSQLParserTests.cs (167) : query4 = MiniSQLParser.Parse("CREATE TABLE person ( id INT )") as CreateTable;
+MiniSQLParserTests.cs (168) : Assert.Null(query4);
+MiniSQLParserTests.cs (170) : query4 = MiniSQLParser.Parse("CREATE TABLE person ( id INT)") as CreateTable;
+MiniSQLParserTests.cs (171) : Assert.Null(query4);
+MiniSQLParserTests.cs (173) : query4 = MiniSQLParser.Parse("CREATE TABLE person ( idINT, nameASD   ageINT )") as CreateTable;
+MiniSQLParserTests.cs (174) : Assert.Null(query4);
+MiniSQLParserTests.cs (176) : query4 = MiniSQLParser.Parse("CREATE TABLE person (id INT, name TEXT, age INT)") as CreateTable;
+MiniSQLParserTests.cs (177) : Assert.Null(query4);
+MiniSQLParserTests.cs (178) : }
+MiniSQLParserTests.cs (180) : [Fact]
+MiniSQLParserTests.cs (181) : public void UpdateTableTest()
+MiniSQLParserTests.cs (182) : {
+MiniSQLParserTests.cs (183) : Update query5 = MiniSQLParser.Parse("UPDATE Names SET Age='20' WHERE ID='1'") as Update;
+MiniSQLParserTests.cs (184) : Assert.Equal("Names", query5.Table);
+MiniSQLParserTests.cs (185) : Assert.Equal("Age", query5.Columns[0].ColumnName);
+MiniSQLParserTests.cs (186) : Assert.Equal("20", query5.Columns[0].Value);
+MiniSQLParserTests.cs (187) : Assert.Equal("ID", query5.Where.ColumnName);
+MiniSQLParserTests.cs (188) : Assert.Equal("=", query5.Where.Operator);
+MiniSQLParserTests.cs (189) : Assert.Equal("1", query5.Where.LiteralValue);
+MiniSQLParserTests.cs (191) : query5 = MiniSQLParser.Parse("UPDATE Users SET Name='A' WHERE ID='1'") as Update;
+MiniSQLParserTests.cs (192) : Assert.Equal("Users", query5.Table);
+MiniSQLParserTests.cs (193) : Assert.Equal("Name", query5.Columns[0].ColumnName);
+MiniSQLParserTests.cs (194) : Assert.Equal("A", query5.Columns[0].Value);
+MiniSQLParserTests.cs (195) : Assert.Equal("ID", query5.Where.ColumnName);
+MiniSQLParserTests.cs (196) : Assert.Equal("=", query5.Where.Operator);
+MiniSQLParserTests.cs (197) : Assert.Equal("1", query5.Where.LiteralValue);
+MiniSQLParserTests.cs (199) : query5 = MiniSQLParser.Parse("UPDATE Users SET Age='20' WHERE ID='1'") as Update;
+MiniSQLParserTests.cs (200) : Assert.Equal("Users", query5.Table);
+MiniSQLParserTests.cs (201) : Assert.Equal("Age", query5.Columns[0].ColumnName);
+MiniSQLParserTests.cs (202) : Assert.Equal("ID", query5.Where.ColumnName);
+MiniSQLParserTests.cs (203) : Assert.Equal("=", query5.Where.Operator);
+MiniSQLParserTests.cs (204) : Assert.Equal("1", query5.Where.LiteralValue);
+MiniSQLParserTests.cs (206) : query5 = MiniSQLParser.Parse("UPDATE Users SET Age='20' WHERE ID='2'") as Update;
+MiniSQLParserTests.cs (207) : Assert.Equal("Users", query5.Table);
+MiniSQLParserTests.cs (208) : Assert.Equal("Age", query5.Columns[0].ColumnName);
+MiniSQLParserTests.cs (209) : Assert.Equal("ID", query5.Where.ColumnName);
+MiniSQLParserTests.cs (210) : Assert.Equal("=", query5.Where.Operator);
+MiniSQLParserTests.cs (211) : Assert.Equal("2", query5.Where.LiteralValue);
+MiniSQLParserTests.cs (213) : query5 = MiniSQLParser.Parse("UPDATE Users, Products SET Name = 'A' WHERE ID = 1") as Update;
+MiniSQLParserTests.cs (214) : Assert.Null(query5);
+MiniSQLParserTests.cs (216) : query5 = MiniSQLParser.Parse("UPDATE Users SET Name = A WHERE ID = 1") as Update;
+MiniSQLParserTests.cs (217) : Assert.Null(query5);
+MiniSQLParserTests.cs (219) : query5 = MiniSQLParser.Parse("UPDATE Users SET Name='B' WHERE ID='1'") as Update;
+MiniSQLParserTests.cs (220) : Assert.Equal("Users", query5.Table);
+MiniSQLParserTests.cs (221) : Assert.Equal("Name", query5.Columns[0].ColumnName);
+MiniSQLParserTests.cs (222) : Assert.Equal("B", query5.Columns[0].Value);
+MiniSQLParserTests.cs (223) : Assert.Equal("ID", query5.Where.ColumnName);
+MiniSQLParserTests.cs (224) : Assert.Equal("=", query5.Where.Operator);
+MiniSQLParserTests.cs (225) : Assert.Equal("1", query5.Where.LiteralValue);
+MiniSQLParserTests.cs (227) : query5 = MiniSQLParser.Parse("UPDATE Users SET Weight='5.5' WHERE ID='1'") as Update;
+MiniSQLParserTests.cs (228) : Assert.Equal("Users", query5.Table);
+MiniSQLParserTests.cs (229) : Assert.Equal("Weight", query5.Columns[0].ColumnName);
+MiniSQLParserTests.cs (230) : Assert.Equal("5.5", query5.Columns[0].Value);
+MiniSQLParserTests.cs (231) : Assert.Equal("ID", query5.Where.ColumnName);
+MiniSQLParserTests.cs (232) : Assert.Equal("=", query5.Where.Operator);
+MiniSQLParserTests.cs (233) : Assert.Equal("1", query5.Where.LiteralValue);
+MiniSQLParserTests.cs (235) : query5 = MiniSQLParser.Parse("UPDATE Users SET Height='1.75',Weight='70.5' WHERE ID='1'") as Update;
+MiniSQLParserTests.cs (236) : Assert.Equal("Users", query5.Table);
+MiniSQLParserTests.cs (237) : Assert.Equal("Height", query5.Columns[0].ColumnName);
+MiniSQLParserTests.cs (238) : Assert.Equal("1.75", query5.Columns[0].Value);
+MiniSQLParserTests.cs (239) : Assert.Equal("Weight", query5.Columns[1].ColumnName);
+MiniSQLParserTests.cs (240) : Assert.Equal("70.5", query5.Columns[1].Value);
+MiniSQLParserTests.cs (242) : query5 = MiniSQLParser.Parse("UPDATEUsersSETName=AWHEREID=1") as Update;
+MiniSQLParserTests.cs (243) : Assert.Null(query5);
+MiniSQLParserTests.cs (245) : query5 = MiniSQLParser.Parse("UPDATEUsers SETName='A' WHEREID='1'") as Update;
+MiniSQLParserTests.cs (246) : Assert.Null(query5);
+MiniSQLParserTests.cs (247) : }
+MiniSQLParserTests.cs (249) : [Fact]
+MiniSQLParserTests.cs (250) : public void DeleteTest()
+MiniSQLParserTests.cs (251) : {
+MiniSQLParserTests.cs (252) : Delete query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE ID='1'") as Delete;
+MiniSQLParserTests.cs (253) : Assert.Equal("Users", query6.Table);
+MiniSQLParserTests.cs (254) : Assert.Equal("ID", query6.Where.ColumnName);
+MiniSQLParserTests.cs (255) : Assert.Equal("=", query6.Where.Operator);
+MiniSQLParserTests.cs (256) : Assert.Equal("1", query6.Where.LiteralValue);
+MiniSQLParserTests.cs (258) : query6 = MiniSQLParser.Parse("DELETE    FROM   Users   WHERE Age =    30 ") as Delete;
+MiniSQLParserTests.cs (259) : Assert.Null(query6);
+MiniSQLParserTests.cs (261) : query6 = MiniSQLParser.Parse("DELETE    FROM    Users    WHERE    ID = '1'") as Delete;
+MiniSQLParserTests.cs (262) : Assert.Null(query6);
+MiniSQLParserTests.cs (264) : query6 = MiniSQLParser.Parse("DELETE    FROM    Users    WHERE    ID='1'") as Delete;
+MiniSQLParserTests.cs (265) : Assert.Equal("Users", query6.Table);
+MiniSQLParserTests.cs (266) : Assert.Equal("ID", query6.Where.ColumnName);
+MiniSQLParserTests.cs (267) : Assert.Equal("=", query6.Where.Operator);
+MiniSQLParserTests.cs (268) : Assert.Equal("1", query6.Where.LiteralValue);
+MiniSQLParserTests.cs (270) : query6 = MiniSQLParser.Parse("DELETEFROM Users WHERE Age='30'") as Delete;
+MiniSQLParserTests.cs (271) : Assert.Null(query6);
+MiniSQLParserTests.cs (273) : query6 = MiniSQLParser.Parse(" DELETE FROM Users WHERE Age='30' ") as Delete;
+MiniSQLParserTests.cs (274) : Assert.Null(query6);
+MiniSQLParserTests.cs (276) : query6 = MiniSQLParser.Parse(" DELETE FROM Users WHERE Age='30'") as Delete;
+MiniSQLParserTests.cs (277) : Assert.Null(query6);
+MiniSQLParserTests.cs (279) : query6 = MiniSQLParser.Parse("DELETE FROM UsersWHERE Age='30'") as Delete;
+MiniSQLParserTests.cs (280) : Assert.Null(query6);
+MiniSQLParserTests.cs (282) : query6 = MiniSQLParser.Parse("DELETE FROMUsers WHERE Age='30'") as Delete;
+MiniSQLParserTests.cs (283) : Assert.Null(query6);
+MiniSQLParserTests.cs (285) : query6 = MiniSQLParser.Parse("delete from Users where Age='20'") as Delete;
+MiniSQLParserTests.cs (286) : Assert.Null(query6);
+MiniSQLParserTests.cs (288) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Age = 10 AND Weight = 20") as Delete;
+MiniSQLParserTests.cs (289) : Assert.Null(query6);
+MiniSQLParserTests.cs (291) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Age = 10, Weight = 20") as Delete;
+MiniSQLParserTests.cs (292) : Assert.Null(query6);
+MiniSQLParserTests.cs (294) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Age='20'") as Delete;
+MiniSQLParserTests.cs (295) : Assert.Equal("Users", query6.Table);
+MiniSQLParserTests.cs (296) : Assert.Equal("Age", query6.Where.ColumnName);
+MiniSQLParserTests.cs (297) : Assert.Equal("=", query6.Where.Operator);
+MiniSQLParserTests.cs (298) : Assert.Equal("20", query6.Where.LiteralValue);
+MiniSQLParserTests.cs (300) : query6 = MiniSQLParser.Parse("DELETE FROM People WHERE Name='Adolfo'") as Delete;
+MiniSQLParserTests.cs (301) : Assert.Equal("People", query6.Table);
+MiniSQLParserTests.cs (302) : Assert.Equal("Name", query6.Where.ColumnName);
+MiniSQLParserTests.cs (303) : Assert.Equal("=", query6.Where.Operator);
+MiniSQLParserTests.cs (304) : Assert.Equal("Adolfo", query6.Where.LiteralValue);
+MiniSQLParserTests.cs (306) : query6 = MiniSQLParser.Parse("DELETE FROM Individuals WHERE Status='Student'") as Delete;
+MiniSQLParserTests.cs (307) : Assert.Equal("Individuals", query6.Table);
+MiniSQLParserTests.cs (308) : Assert.Equal("Status", query6.Where.ColumnName);
+MiniSQLParserTests.cs (309) : Assert.Equal("=", query6.Where.Operator);
+MiniSQLParserTests.cs (310) : Assert.Equal("Student", query6.Where.LiteralValue);
+MiniSQLParserTests.cs (312) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Age = 20") as Delete;
+MiniSQLParserTests.cs (313) : Assert.Null(query6);
+MiniSQLParserTests.cs (315) : query6 = MiniSQLParser.Parse("delete from Users where Age = 20") as Delete;
+MiniSQLParserTests.cs (316) : Assert.Null(query6);
+MiniSQLParserTests.cs (318) : query6 = MiniSQLParser.Parse("Delete From Users Where Age='20'") as Delete;
+MiniSQLParserTests.cs (319) : Assert.Null(query6);
+MiniSQLParserTests.cs (321) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Name='A'") as Delete;
+MiniSQLParserTests.cs (322) : Assert.Equal("Users", query6.Table);
+MiniSQLParserTests.cs (323) : Assert.Equal("Name", query6.Where.ColumnName);
+MiniSQLParserTests.cs (324) : Assert.Equal("=", query6.Where.Operator);
+MiniSQLParserTests.cs (325) : Assert.Equal("A", query6.Where.LiteralValue);
+MiniSQLParserTests.cs (327) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Name = 'A' Age = 20") as Delete;
+MiniSQLParserTests.cs (328) : Assert.Null(query6);
+MiniSQLParserTests.cs (330) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Name='A' Age='20'") as Delete;
+MiniSQLParserTests.cs (331) : Assert.Null(query6);
+MiniSQLParserTests.cs (333) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Name='A'") as Delete;
+MiniSQLParserTests.cs (334) : Assert.Equal("Users", query6.Table);
+MiniSQLParserTests.cs (335) : Assert.Equal("Name", query6.Where.ColumnName);
+MiniSQLParserTests.cs (336) : Assert.Equal("=", query6.Where.Operator);
+MiniSQLParserTests.cs (337) : Assert.Equal("A", query6.Where.LiteralValue);
+MiniSQLParserTests.cs (339) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Name = A") as Delete;
+MiniSQLParserTests.cs (340) : Assert.Null(query6);
+MiniSQLParserTests.cs (342) : query6 = MiniSQLParser.Parse("DELETE FROM Users, Orders WHERE Age = 20") as Delete;
+MiniSQLParserTests.cs (343) : Assert.Null(query6);
+MiniSQLParserTests.cs (345) : query6 = MiniSQLParser.Parse("DELETE FROM Users WHERE Age='20'") as Delete;
+MiniSQLParserTests.cs (346) : Assert.Equal("Users", query6.Table);
+MiniSQLParserTests.cs (347) : Assert.Equal("Age", query6.Where.ColumnName);
+MiniSQLParserTests.cs (348) : Assert.Equal("=", query6.Where.Operator);
+MiniSQLParserTests.cs (349) : Assert.Equal("20", query6.Where.LiteralValue);
+MiniSQLParserTests.cs (351) : query6 = MiniSQLParser.Parse("DELETEFROMUsersWHEREAge=20") as Delete;
+MiniSQLParserTests.cs (352) : Assert.Null(query6);
+MiniSQLParserTests.cs (354) : query6 = MiniSQLParser.Parse("DELETEFROMUsersWHEREAge='20'") as Delete;
+MiniSQLParserTests.cs (355) : Assert.Null(query6);
+MiniSQLParserTests.cs (357) : query6 = MiniSQLParser.Parse("DELETE FROM Users") as Delete;
+MiniSQLParserTests.cs (358) : Assert.Null(query6);
+MiniSQLParserTests.cs (360) : }
+MiniSQLParserTests.cs (362) : [Fact]
+MiniSQLParserTests.cs (363) : public void CreateSecurityProfileTest()
+MiniSQLParserTests.cs (364) : {
+MiniSQLParserTests.cs (365) : CreateSecurityProfile query7 = MiniSQLParser.Parse("CREATE SECURITY PROFILE Name") as CreateSecurityProfile;
+MiniSQLParserTests.cs (366) : Assert.Equal("Name", query7.ProfileName);
+MiniSQLParserTests.cs (368) : query7 = MiniSQLParser.Parse("CREATE SECURITY PROFILE") as CreateSecurityProfile;
+MiniSQLParserTests.cs (369) : Assert.Null(query7);
+MiniSQLParserTests.cs (371) : query7 = MiniSQLParser.Parse("PROFILE SECURITY CREATE Name") as CreateSecurityProfile;
+MiniSQLParserTests.cs (372) : Assert.Null(query7);
+MiniSQLParserTests.cs (374) : query7 = MiniSQLParser.Parse("CREATE SECURITY PROFILE Name A") as CreateSecurityProfile;
+MiniSQLParserTests.cs (375) : Assert.Null(query7);
+MiniSQLParserTests.cs (377) : query7 = MiniSQLParser.Parse("  CREATE SECURITY PROFILE   Name  ") as CreateSecurityProfile;
+MiniSQLParserTests.cs (378) : Assert.Null(query7);
+MiniSQLParserTests.cs (380) : query7 = MiniSQLParser.Parse("create security profile Name") as CreateSecurityProfile;
+MiniSQLParserTests.cs (381) : Assert.Null(query7);
+MiniSQLParserTests.cs (383) : query7 = MiniSQLParser.Parse("CREATE SECURITY PROFILE '12345'") as CreateSecurityProfile;
+MiniSQLParserTests.cs (384) : Assert.Null(query7);
+MiniSQLParserTests.cs (386) : query7 = MiniSQLParser.Parse("CREATE SECURITY PROFILE 'Name'") as CreateSecurityProfile;
+MiniSQLParserTests.cs (387) : Assert.Null(query7);
+MiniSQLParserTests.cs (388) : }
+MiniSQLParserTests.cs (390) : [Fact]
+MiniSQLParserTests.cs (391) : public void DropSecurityProfileTest()
+MiniSQLParserTests.cs (392) : {
+MiniSQLParserTests.cs (393) : DropSecurityProfile query8 = MiniSQLParser.Parse("DROP SECURITY PROFILE Name") as DropSecurityProfile;
+MiniSQLParserTests.cs (394) : Assert.Equal("Name", query8.ProfileName);
+MiniSQLParserTests.cs (396) : DropSecurityProfile query9 = MiniSQLParser.Parse("DROP PROFILE SECURITY Name") as DropSecurityProfile;
+MiniSQLParserTests.cs (397) : Assert.Null(query9);
+MiniSQLParserTests.cs (399) : DropSecurityProfile query10 = MiniSQLParser.Parse("DROP SECURITY PROFILE") as DropSecurityProfile;
+MiniSQLParserTests.cs (400) : Assert.Null(query10);
+MiniSQLParserTests.cs (402) : DropSecurityProfile query11 = MiniSQLParser.Parse("PROFILE SECURITY DROP Name") as DropSecurityProfile;
+MiniSQLParserTests.cs (403) : Assert.Null(query11);
+MiniSQLParserTests.cs (405) : query11 = MiniSQLParser.Parse("DROP SECURITY PROFILE 'Name'") as DropSecurityProfile;
+MiniSQLParserTests.cs (406) : Assert.Null(query11);
+MiniSQLParserTests.cs (408) : query11 = MiniSQLParser.Parse("DROPSECURITYPROFILENAME") as DropSecurityProfile;
+MiniSQLParserTests.cs (409) : Assert.Null(query11);
+MiniSQLParserTests.cs (411) : query11 = MiniSQLParser.Parse("DROP   SECURITY   PROFILE") as DropSecurityProfile;
+MiniSQLParserTests.cs (412) : Assert.Null(query11);
+MiniSQLParserTests.cs (414) : query11 = MiniSQLParser.Parse("DROP SECURITYPROFILE Name") as DropSecurityProfile;
+MiniSQLParserTests.cs (415) : Assert.Null(query11);
+MiniSQLParserTests.cs (416) : }
+MiniSQLParserTests.cs (418) : [Fact]
+MiniSQLParserTests.cs (419) : public void GrantTest()
+MiniSQLParserTests.cs (420) : {
+MiniSQLParserTests.cs (421) : Grant query9 = MiniSQLParser.Parse("GRANT SELECT ON Names TO Surnames") as Grant;
+MiniSQLParserTests.cs (422) : Assert.Equal("SELECT", query9.PrivilegeName);
+MiniSQLParserTests.cs (423) : Assert.Equal("Names", query9.TableName);
+MiniSQLParserTests.cs (424) : Assert.Equal("Surnames", query9.ProfileName);
+MiniSQLParserTests.cs (426) : Grant query3 = MiniSQLParser.Parse("GRANT SELECT Users TO Names") as Grant;
+MiniSQLParserTests.cs (427) : Assert.Null(query3);
+MiniSQLParserTests.cs (429) : Grant query4 = MiniSQLParser.Parse("SELECT GRANT ON Names TO Surnames") as Grant;
+MiniSQLParserTests.cs (430) : Assert.Null(query4);
+MiniSQLParserTests.cs (432) : Grant query5 = MiniSQLParser.Parse("GRANT SELECT ON Names TO Surnames A") as Grant;
+MiniSQLParserTests.cs (433) : Assert.Null(query5);
+MiniSQLParserTests.cs (435) : query9 = MiniSQLParser.Parse("GRANT INSERT ON Names TO Surnames") as Grant;
+MiniSQLParserTests.cs (436) : Assert.Equal("INSERT", query9.PrivilegeName);
+MiniSQLParserTests.cs (437) : Assert.Equal("Names", query9.TableName);
+MiniSQLParserTests.cs (438) : Assert.Equal("Surnames", query9.ProfileName);
+MiniSQLParserTests.cs (440) : query9 = MiniSQLParser.Parse("GRANT   UPDATE   ON   Names   TO   Surnames") as Grant;
+MiniSQLParserTests.cs (441) : Assert.Equal("UPDATE", query9.PrivilegeName);
+MiniSQLParserTests.cs (442) : Assert.Equal("Names", query9.TableName);
+MiniSQLParserTests.cs (443) : Assert.Equal("Surnames", query9.ProfileName);
+MiniSQLParserTests.cs (445) : query9 = MiniSQLParser.Parse("GRANTSELECTONNamesTOSurnames") as Grant;
+MiniSQLParserTests.cs (446) : Assert.Null(query9);
+MiniSQLParserTests.cs (448) : query9 = MiniSQLParser.Parse("GRANT SELECT ONNames TO Surnames") as Grant;
+MiniSQLParserTests.cs (449) : Assert.Null(query9);
+MiniSQLParserTests.cs (451) : query9 = MiniSQLParser.Parse("GRANT SELECT ON NamesTOSurnames") as Grant;
+MiniSQLParserTests.cs (452) : Assert.Null(query9);
+MiniSQLParserTests.cs (453) : }
+MiniSQLParserTests.cs (455) : [Fact]
+MiniSQLParserTests.cs (456) : public void RevokeTest()
+MiniSQLParserTests.cs (457) : {
+MiniSQLParserTests.cs (458) : Revoke query10 = MiniSQLParser.Parse("REVOKE SELECT ON Names TO Surnames") as Revoke;
+MiniSQLParserTests.cs (459) : Assert.Equal("SELECT", query10.PrivilegeName);
+MiniSQLParserTests.cs (460) : Assert.Equal("Names", query10.TableName);
+MiniSQLParserTests.cs (461) : Assert.Equal("Surnames", query10.ProfileName);
+MiniSQLParserTests.cs (463) : Revoke query11 = MiniSQLParser.Parse("REVOKE SELECT, DELETE ON Users TO Admin") as Revoke;
+MiniSQLParserTests.cs (464) : Assert.Null(query11);
+MiniSQLParserTests.cs (466) : Revoke query12 = MiniSQLParser.Parse("REVOKE SELECT ON Names Surnames") as Revoke;
+MiniSQLParserTests.cs (467) : Assert.Null(query12);
+MiniSQLParserTests.cs (469) : Revoke query13 = MiniSQLParser.Parse("SELECT REVOKE ON Names TO Surnames") as Revoke;
+MiniSQLParserTests.cs (470) : Assert.Null(query13);
+MiniSQLParserTests.cs (472) : query10 = MiniSQLParser.Parse("REVOKE INSERT ON People TO Names") as Revoke;
+MiniSQLParserTests.cs (473) : Assert.Equal("INSERT", query10.PrivilegeName);
+MiniSQLParserTests.cs (474) : Assert.Equal("People", query10.TableName);
+MiniSQLParserTests.cs (475) : Assert.Equal("Names", query10.ProfileName);
+MiniSQLParserTests.cs (477) : query10 = MiniSQLParser.Parse("REVOKE   UPDATE   ON   Orders   TO   Customers") as Revoke;
+MiniSQLParserTests.cs (478) : Assert.Equal("UPDATE", query10.PrivilegeName);
+MiniSQLParserTests.cs (479) : Assert.Equal("Orders", query10.TableName);
+MiniSQLParserTests.cs (480) : Assert.Equal("Customers", query10.ProfileName);
+MiniSQLParserTests.cs (482) : }
+MiniSQLParserTests.cs (484) : [Fact]
+MiniSQLParserTests.cs (485) : public void AddUserTest()
+MiniSQLParserTests.cs (486) : {
+MiniSQLParserTests.cs (487) : AddUser query11 = MiniSQLParser.Parse("ADD USER (Name,123,Surname)") as AddUser;
+MiniSQLParserTests.cs (488) : Assert.Equal("Name", query11.Username);
+MiniSQLParserTests.cs (489) : Assert.Equal("123", query11.Password);
+MiniSQLParserTests.cs (490) : Assert.Equal("Surname", query11.ProfileName);
+MiniSQLParserTests.cs (492) : AddUser query12 = MiniSQLParser.Parse("ADD USER Alice,123,Admin") as AddUser;
+MiniSQLParserTests.cs (493) : Assert.Null(query12);
+MiniSQLParserTests.cs (495) : AddUser query3 = MiniSQLParser.Parse("USER ADD (Name,123,Surname)") as AddUser;
+MiniSQLParserTests.cs (496) : Assert.Null(query3);
+MiniSQLParserTests.cs (498) : query11 = MiniSQLParser.Parse("ADD USER (asdfd,pass123,customers)") as AddUser;
+MiniSQLParserTests.cs (499) : Assert.Equal("asdfd", query11.Username);
+MiniSQLParserTests.cs (500) : Assert.Equal("pass123", query11.Password);
+MiniSQLParserTests.cs (501) : Assert.Equal("customers", query11.ProfileName);
+MiniSQLParserTests.cs (503) : query11 = MiniSQLParser.Parse("ADD USER (asdfd,12345,Student)") as AddUser;
+MiniSQLParserTests.cs (504) : Assert.Equal("asdfd", query11.Username);
+MiniSQLParserTests.cs (505) : Assert.Equal("12345", query11.Password);
+MiniSQLParserTests.cs (506) : Assert.Equal("Student", query11.ProfileName);
+MiniSQLParserTests.cs (507) : }
+MiniSQLParserTests.cs (509) : [Fact]
+MiniSQLParserTests.cs (510) : public void DeleteUserTest()
+MiniSQLParserTests.cs (511) : {
+MiniSQLParserTests.cs (512) : DeleteUser query12 = MiniSQLParser.Parse("DELETE USER User") as DeleteUser;
+MiniSQLParserTests.cs (513) : Assert.Equal("User", query12.Username);
+MiniSQLParserTests.cs (515) : DeleteUser query13 = MiniSQLParser.Parse("DELETE USER") as DeleteUser;
+MiniSQLParserTests.cs (516) : Assert.Null(query13);
+MiniSQLParserTests.cs (518) : DeleteUser query14 = MiniSQLParser.Parse("USER DELETE User") as DeleteUser;
+MiniSQLParserTests.cs (519) : Assert.Null(query14);
+MiniSQLParserTests.cs (521) : DeleteUser query15 = MiniSQLParser.Parse("DELETE uSER User ") as DeleteUser;
+MiniSQLParserTests.cs (522) : Assert.Null(query15);
+MiniSQLParserTests.cs (524) : query12 = MiniSQLParser.Parse("DELETE     USER    User  ") as DeleteUser;
+MiniSQLParserTests.cs (525) : Assert.Null(query15);
+MiniSQLParserTests.cs (527) : query12 = MiniSQLParser.Parse("DELETE USER 12345") as DeleteUser;
+MiniSQLParserTests.cs (528) : Assert.Null(query15);
+MiniSQLParserTests.cs (529) : }
+MiniSQLParserTests.cs (530) : }
+MiniSQLParserTests.cs (531) : }
+TableTests.cs (30) : [Fact]
+TableTests.cs (31) : public void GetRowTest()
+TableTests.cs (32) : {
+TableTests.cs (33) : Table table = Table.CreateTestTable();
+TableTests.cs (34) : Assert.Equal("Rodolfo", table.GetRow(0).GetValue("Name"));
+TableTests.cs (35) : Assert.Equal("Maider", table.GetRow(1).GetValue("Name"));
+TableTests.cs (36) : Assert.Equal("25", table.GetRow(0).GetValue("Age"));
+TableTests.cs (37) : Assert.Equal("67", table.GetRow(1).GetValue("Age"));
+TableTests.cs (38) : Assert.Equal("1.55", table.GetRow(2).GetValue("Height"));
+TableTests.cs (39) : }
+TableTests.cs (210) : [Fact]
+TableTests.cs (211) : public void SelectTest()
+TableTests.cs (212) : {
+TableTests.cs (213) : Table table = Table.CreateTestTable();
+TableTests.cs (214) : List<string> columnNames = new List<string>();
+TableTests.cs (216) : columnNames.Add("Name");
+TableTests.cs (217) : columnNames.Add("Age");
+TableTests.cs (220) : Assert.Equal(3, table.Select(columnNames, null).NumRows());
+TableTests.cs (221) : Assert.Equal(2, table.Select(columnNames, null).NumColumns());
+TableTests.cs (226) : Condition c = new Condition("Name", "=", "Maider");
+TableTests.cs (227) : Assert.Equal(1, table.Select(columnNames, c).NumRows());
+TableTests.cs (228) : Assert.Equal(2, table.Select(columnNames, c).NumColumns());
+TableTests.cs (267) : }
+MiniSQLParser.cs (2) : using System;
+MiniSQLParser.cs (4) : using System.Linq;
+MiniSQLParser.cs (5) : using System.Net.Http.Headers;
+MiniSQLParser.cs (6) : using System.Runtime.Serialization.Formatters;
+MiniSQLParser.cs (16) : const string selectPattern = "^SELECT\\s+([\\w,]+)\\s+FROM\\s+(\\w+)(\\s+WHERE\\s+([\\w]+)([<=>])'([\\w]+)')?$";
+MiniSQLParser.cs (17) : Match match = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (18) : if (match.Success)
+MiniSQLParser.cs (19) : {
+MiniSQLParser.cs (20) : List<string> columns = match.Groups[1].Value.Split(',').ToList<string>();
+MiniSQLParser.cs (21) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (22) : Condition condition = null;
+MiniSQLParser.cs (23) : if (match.Groups[3].Success)
+MiniSQLParser.cs (24) : {
+MiniSQLParser.cs (25) : condition = new Condition(match.Groups[4].Value, match.Groups[5].Value, match.Groups[6].Value);
+MiniSQLParser.cs (26) : }
+MiniSQLParser.cs (27) : return new Select(table, columns, condition);
+MiniSQLParser.cs (28) : }
+MiniSQLParser.cs (31) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (32) : if (match.Success)
+MiniSQLParser.cs (33) : {
+MiniSQLParser.cs (34) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (35) : List<string> values = match.Groups[2].Value.Split(',').ToList();
+MiniSQLParser.cs (36) : List<string> trimmedList = new List<string>();
+MiniSQLParser.cs (37) : foreach (string value in values)
+MiniSQLParser.cs (38) : {
+MiniSQLParser.cs (39) : if (!value.StartsWith('\'') || !value.EndsWith('\''))
+MiniSQLParser.cs (40) : {
+MiniSQLParser.cs (41) : return null;
+MiniSQLParser.cs (42) : }
+MiniSQLParser.cs (43) : trimmedList.Add(value.Trim('\''));
+MiniSQLParser.cs (44) : }
+MiniSQLParser.cs (45) : return new Insert(table, trimmedList);
+MiniSQLParser.cs (46) : }
+MiniSQLParser.cs (48) : const string dropTablePattern = "^DROP\\s+TABLE\\s+(\\w+)$";
+MiniSQLParser.cs (49) : match = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (50) : if (match.Success)
+MiniSQLParser.cs (51) : {
+MiniSQLParser.cs (52) : return new DropTable(match.Groups[1].Value);
+MiniSQLParser.cs (53) : }
+MiniSQLParser.cs (56) : match = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (57) : if (match.Success)
+MiniSQLParser.cs (58) : {
+MiniSQLParser.cs (59) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (60) : List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
+MiniSQLParser.cs (65) : {
+MiniSQLParser.cs (66) : string[] c = col.Split(' ');
+MiniSQLParser.cs (67) : ColumnDefinition colDef = null;
+MiniSQLParser.cs (69) : {
+MiniSQLParser.cs (71) : colDef = new ColumnDefinition(ColumnDefinition.DataType.String, c[0]);
+MiniSQLParser.cs (72) : break;
+MiniSQLParser.cs (73) : case "INT":
+MiniSQLParser.cs (74) : colDef = new ColumnDefinition(ColumnDefinition.DataType.Int, c[0]);
+MiniSQLParser.cs (75) : break;
+MiniSQLParser.cs (76) : case "DOUBLE":
+MiniSQLParser.cs (77) : colDef = new ColumnDefinition(ColumnDefinition.DataType.Double, c[0]);
+MiniSQLParser.cs (78) : break;
+MiniSQLParser.cs (79) : default:
+MiniSQLParser.cs (80) : return null;
+MiniSQLParser.cs (81) : }
+MiniSQLParser.cs (82) : columnDefinitions.Add(colDef);
+MiniSQLParser.cs (83) : }
+MiniSQLParser.cs (85) : return new CreateTable(table, columnDefinitions);
+MiniSQLParser.cs (86) : }
+MiniSQLParser.cs (90) : match = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (91) : if (match.Success)
+MiniSQLParser.cs (92) : {
+MiniSQLParser.cs (93) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (94) : string[] columns = match.Groups[2].Value.Split(',');
+MiniSQLParser.cs (95) : List<SetValue> setValues = new List<SetValue>();
+MiniSQLParser.cs (96) : foreach (string col in columns)
+MiniSQLParser.cs (97) : {
+MiniSQLParser.cs (98) : string[] split = col.Split('=');
+MiniSQLParser.cs (99) : SetValue setValue = new SetValue(split[0], split[1].Trim('\''));
+MiniSQLParser.cs (100) : setValues.Add(setValue);
+MiniSQLParser.cs (101) : }
+MiniSQLParser.cs (103) : return new Update(table, setValues, condition);
+MiniSQLParser.cs (104) : }
+MiniSQLParser.cs (108) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (109) : if (match.Success)
+MiniSQLParser.cs (110) : {
+MiniSQLParser.cs (111) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (112) : Condition where = new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value.Trim('\''));
+MiniSQLParser.cs (113) : return new Delete(table, where);
+MiniSQLParser.cs (114) : }
+MiniSQLParser.cs (119) : const string createSecurityProfilePattern = "^CREATE\\s+SECURITY\\s+PROFILE\\s+([A-Za-z]+)$";
+MiniSQLParser.cs (120) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (121) : if (match.Success)
+MiniSQLParser.cs (122) : {
+MiniSQLParser.cs (123) : string profile = match.Groups[1].Value;
+MiniSQLParser.cs (124) : return new CreateSecurityProfile(profile);
+MiniSQLParser.cs (125) : }
+MiniSQLParser.cs (127) : const string dropSecurityProfilePattern = "^DROP\\s+SECURITY\\s+PROFILE\\s+([A-Za-z]+)$";
+MiniSQLParser.cs (128) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (129) : if (match.Success)
+MiniSQLParser.cs (130) : {
+MiniSQLParser.cs (131) : string profile = match.Groups[1].Value;
+MiniSQLParser.cs (132) : return new DropSecurityProfile(profile);
+MiniSQLParser.cs (133) : }
+MiniSQLParser.cs (135) : const string grantPattern = "^GRANT\\s+(\\w+)\\s+ON\\s+([\\w,]+)\\s+TO\\s+([A-Za-z]+)$";
+MiniSQLParser.cs (136) : match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (137) : if (match.Success)
+MiniSQLParser.cs (138) : {
+MiniSQLParser.cs (139) : string privilegeName= match.Groups[1].Value;
+MiniSQLParser.cs (140) : string tableName= match.Groups[2].Value;
+MiniSQLParser.cs (141) : string profileName= match.Groups[3].Value;
+MiniSQLParser.cs (142) : return new Grant(privilegeName,tableName,profileName);
+MiniSQLParser.cs (143) : }
+MiniSQLParser.cs (145) : const string revokePattern = "^REVOKE\\s+(\\w+)\\s+ON\\s+([\\w,]+)\\s+TO\\s+([A-Za-z]+)$";
+MiniSQLParser.cs (146) : match = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (147) : if (match.Success)
+MiniSQLParser.cs (148) : {
+MiniSQLParser.cs (149) : string privilegeName = match.Groups[1].Value;
+MiniSQLParser.cs (150) : string tableName = match.Groups[2].Value;
+MiniSQLParser.cs (151) : string profileName = match.Groups[3].Value;
+MiniSQLParser.cs (152) : return new Revoke(privilegeName,tableName,profileName);
+MiniSQLParser.cs (153) : }
+MiniSQLParser.cs (154) : const string addUserPattern = "^ADD\\s+USER\\s+\\(([\\w,]+)\\)$";
+MiniSQLParser.cs (155) : match = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (156) : if (match.Success)
+MiniSQLParser.cs (157) : {
+MiniSQLParser.cs (158) : string[] split = match.Groups[1].Value.Split(',');
+MiniSQLParser.cs (159) : string username = split[0];
+MiniSQLParser.cs (160) : string password = split[1];
+MiniSQLParser.cs (161) : string profilename = split[2];
+MiniSQLParser.cs (162) : return new AddUser(username,password,profilename);
+MiniSQLParser.cs (163) : }
+MiniSQLParser.cs (164) : const string deleteUserPattern = "^DELETE\\s+USER\\s+([A-Za-z]+)$";
+MiniSQLParser.cs (165) : match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (166) : if (match.Success)
+MiniSQLParser.cs (167) : {
+MiniSQLParser.cs (168) : string username= match.Groups[1].Value;
+MiniSQLParser.cs (169) : return new DeleteUser(username);
+MiniSQLParser.cs (170) : }

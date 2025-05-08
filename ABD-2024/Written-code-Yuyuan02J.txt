@@ -1,0 +1,594 @@
+Total written by this student: 17% lines / 17% characters
+
+Database.cs (38) : SecurityManager.Profiles.Add(adminProfile);
+Database.cs (66) : public bool CreateTable(string tableName, List<ColumnDefinition> ColumnDefinitions)
+Database.cs (78) : if (TableByName(tableName) != null)
+Database.cs (79) : {
+Database.cs (80) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (81) : return false;
+Database.cs (82) : }
+Database.cs (83) : if (ColumnDefinitions == null || ColumnDefinitions.Count == 0)
+Database.cs (84) : {
+Database.cs (85) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (87) : }
+Database.cs (89) : Table newTable = new Table(tableName, ColumnDefinitions);
+Database.cs (90) : Tables.Add(newTable);
+Database.cs (91) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (92) : return true;
+Database.cs (106) : Table table = TableByName(tableName);
+Database.cs (107) : if (table == null)
+Database.cs (108) : {
+Database.cs (109) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (113) : Tables.Remove(table);
+Database.cs (114) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (115) : return true;
+Database.cs (116) : }
+Database.cs (128) : Table table = TableByName(tableName);
+Database.cs (129) : if (table == null)
+Database.cs (130) : {
+Database.cs (131) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (132) : return false;
+Database.cs (133) : }
+Database.cs (135) : if (values.Count != table.NumColumns())
+Database.cs (136) : {
+Database.cs (137) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (139) : }
+Database.cs (141) : bool result = table.Insert(values);
+Database.cs (142) : if (result)
+Database.cs (143) : {
+Database.cs (144) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (145) : return true;
+Database.cs (146) : }
+Database.cs (147) : return false;
+Database.cs (188) : //If the table or the column in the condition don't exist, return false and set LastErrorMessage (Check Constants.cs)
+Database.cs (196) : Table table = TableByName(tableName);
+Database.cs (197) : if (table == null)
+Database.cs (198) : {
+Database.cs (199) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (200) : return false;
+Database.cs (201) : }
+Database.cs (203) : if (columnCondition == null || columnCondition.ColumnName == null)
+Database.cs (204) : {
+Database.cs (205) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (206) : return false;
+Database.cs (207) : }
+Database.cs (209) : int i = 0;
+Database.cs (210) : while (i < table.NumColumns())
+Database.cs (211) : {
+Database.cs (213) : {
+Database.cs (214) : table.DeleteWhere(columnCondition);
+Database.cs (215) : return true;
+Database.cs (216) : }
+Database.cs (217) : else
+Database.cs (218) : {
+Database.cs (219) : if (i == table.NumColumns() - 1)
+Database.cs (220) : {
+Database.cs (221) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (222) : return false;
+Database.cs (223) : }
+Database.cs (224) : }
+Database.cs (225) : i++;
+Database.cs (226) : }
+Database.cs (234) : //If the table or the column in the condition don't exist, return false and set LastErrorMessage (Check Constants.cs)
+Database.cs (242) : Table table = TableByName(tableName);
+Database.cs (243) : if (table == null)
+Database.cs (244) : {
+Database.cs (245) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (246) : return false;
+Database.cs (247) : }
+Database.cs (249) : if (columnCondition != null && table.ColumnByName(columnCondition.ColumnName) == null)
+Database.cs (250) : {
+Database.cs (251) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (252) : return false;
+Database.cs (253) : }
+Database.cs (255) : foreach (SetValue setValue in columnNames)
+Database.cs (256) : {
+Database.cs (257) : if(table.ColumnByName(setValue.ColumnName) == null)
+Database.cs (258) : {
+Database.cs (259) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (260) : return false;
+Database.cs (261) : }
+Database.cs (262) : }
+Database.cs (264) : bool result = table.Update(columnNames, columnCondition);
+Database.cs (265) : if (result)
+Database.cs (266) : {
+Database.cs (267) : LastErrorMessage = Constants.UpdateSuccess;
+Database.cs (268) : return true;
+Database.cs (269) : }
+Database.cs (270) : LastErrorMessage = Constants.Error;
+DatabaseTests.cs (2) : using DbManager.Parser;
+DatabaseTests.cs (4) : using System.ComponentModel;
+DatabaseTests.cs (72) : Database db = PrepareDatabaseForTesting();
+DatabaseTests.cs (73) : List<ColumnDefinition> columns = new List<ColumnDefinition>
+DatabaseTests.cs (74) : {
+DatabaseTests.cs (75) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+DatabaseTests.cs (76) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age")
+DatabaseTests.cs (77) : };
+DatabaseTests.cs (79) : bool result1 = db.CreateTable("TestTableX", columns);
+DatabaseTests.cs (80) : Assert.True(result1);
+DatabaseTests.cs (81) : Assert.Equal(Constants.CreateTableSuccess, db.LastErrorMessage);
+DatabaseTests.cs (83) : //TestTable1 already exists
+DatabaseTests.cs (84) : bool result2 = db.CreateTable("TestTable1", columns);
+DatabaseTests.cs (85) : Assert.False(result2);
+DatabaseTests.cs (86) : Assert.Equal(Constants.TableAlreadyExistsError, db.LastErrorMessage);
+DatabaseTests.cs (88) : List<ColumnDefinition> columnsEmpty = new List<ColumnDefinition>();
+DatabaseTests.cs (89) : bool result3 = db.CreateTable("TestTableEmpty", columnsEmpty);
+DatabaseTests.cs (90) : Assert.False(result3);
+DatabaseTests.cs (91) : Assert.Equal(Constants.DatabaseCreatedWithoutColumnsError, db.LastErrorMessage);
+DatabaseTests.cs (93) : bool result4 = db.CreateTable("TestTableNull", null);
+DatabaseTests.cs (94) : Assert.False(result3);
+DatabaseTests.cs (95) : Assert.Equal(Constants.DatabaseCreatedWithoutColumnsError, db.LastErrorMessage);
+DatabaseTests.cs (102) : Database db = PrepareDatabaseForTesting();
+DatabaseTests.cs (104) : bool result1 = db.DropTable("TestTable1");
+DatabaseTests.cs (105) : Assert.True(result1);
+DatabaseTests.cs (106) : Assert.Equal(Constants.DropTableSuccess, db.LastErrorMessage);
+DatabaseTests.cs (108) : bool result2 = db.DropTable("TestTableNotExist");
+DatabaseTests.cs (109) : Assert.False(result2);
+DatabaseTests.cs (110) : Assert.Equal(Constants.TableDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (116) : Database db = PrepareDatabaseForTesting();
+DatabaseTests.cs (117) : List<string> values = new List<string>() { "Andres", "1.84", "26" };
+DatabaseTests.cs (118) : List<string> valuesIncorrect = new List<string>() { "Alverto", "1.62", "16", "Hombre" };
+DatabaseTests.cs (120) : bool result1 = db.Insert("TestTable1", values);
+DatabaseTests.cs (121) : Assert.True(result1);
+DatabaseTests.cs (122) : Assert.Equal(Constants.InsertSuccess, db.LastErrorMessage);
+DatabaseTests.cs (124) : bool result2 = db.Insert("TestTableNotExist", values);
+DatabaseTests.cs (125) : Assert.False(result2);
+DatabaseTests.cs (126) : Assert.Equal(Constants.TableDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (128) : bool result3 = db.Insert("TestTable1", valuesIncorrect);
+DatabaseTests.cs (129) : Assert.False(result3);
+DatabaseTests.cs (130) : Assert.Equal(Constants.ColumnCountsDontMatch, db.LastErrorMessage);
+DatabaseTests.cs (190) : Database db = PrepareDatabaseForTesting();
+DatabaseTests.cs (191) : //['Name','Height','Age']{'Rodolfo','1.62','25'}{'Maider','1.67','67'}{'Pepe','1.55','51'}
+DatabaseTests.cs (192) : Condition condition = new Condition("Age", "<", "30");
+DatabaseTests.cs (193) : Condition conditionWithColumnNull = new Condition(null, null, null);
+DatabaseTests.cs (194) : Condition conditionWithColumnNotExist = new Condition("Nombre", "=", "Pepe");//"Nombre" not exist in table
+DatabaseTests.cs (195) : Condition conditionAllFalse = new Condition("Age", ">", "99");
+DatabaseTests.cs (197) : bool result1 = db.DeleteWhere(null, condition);
+DatabaseTests.cs (198) : Assert.False(result1);
+DatabaseTests.cs (199) : Assert.Equal(Constants.TableDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (201) : bool result2 = db.DeleteWhere("TestTable3", conditionWithColumnNull);
+DatabaseTests.cs (202) : Assert.False(result2);
+DatabaseTests.cs (203) : Assert.Equal(Constants.ColumnDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (205) : bool result3 = db.DeleteWhere("TestTable3", null);
+DatabaseTests.cs (206) : Assert.False(result3);
+DatabaseTests.cs (207) : Assert.Equal(Constants.ColumnDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (209) : bool result4 = db.DeleteWhere("TestTable3", conditionWithColumnNotExist);
+DatabaseTests.cs (210) : Assert.False(result4);
+DatabaseTests.cs (211) : Assert.Equal(Constants.ColumnDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (213) : bool result5 = db.DeleteWhere("TestTable3", condition);
+DatabaseTests.cs (214) : Assert.True(result5);
+DatabaseTests.cs (216) : bool result6 = db.DeleteWhere("TestTable3", conditionAllFalse);
+DatabaseTests.cs (217) : Assert.True(result6);
+DatabaseTests.cs (223) : Database db = PrepareDatabaseForTesting();
+DatabaseTests.cs (224) : //['Name','Height','Age']{'Rodolfo','1.62','25'}{'Maider','1.67','67'}{'Pepe','1.55','51'}
+DatabaseTests.cs (225) : Condition condition = new Condition("Age", "<", "30");
+DatabaseTests.cs (226) : Condition conditionWithColumnNotExist = new Condition("Nombre", "=", "Pepe");//"Nombre" not exist in table
+DatabaseTests.cs (227) : List<SetValue> setValues = new List<SetValue>();
+DatabaseTests.cs (228) : setValues.Add(new SetValue("Name", "Marta"));
+DatabaseTests.cs (229) : setValues.Add(new SetValue("Age", "27"));
+DatabaseTests.cs (230) : setValues.Add(new SetValue("Height", "1.74"));
+DatabaseTests.cs (232) : List<SetValue> setValuesFalses = new List<SetValue>();
+DatabaseTests.cs (233) : setValuesFalses.Add(new SetValue("Name", "Marta"));
+DatabaseTests.cs (234) : setValuesFalses.Add(new SetValue("Age", "27"));
+DatabaseTests.cs (235) : setValuesFalses.Add(new SetValue("Altura", "1.74"));//"Altura" not exist in table
+DatabaseTests.cs (237) : bool result1 = db.Update(null, setValues, condition);
+DatabaseTests.cs (238) : Assert.False(result1);
+DatabaseTests.cs (239) : Assert.Equal(Constants.TableDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (241) : bool result2 = db.Update("TestTable2", setValues, conditionWithColumnNotExist);
+DatabaseTests.cs (242) : Assert.False(result2);
+DatabaseTests.cs (243) : Assert.Equal(Constants.ColumnDoesNotExistError, db.LastErrorMessage);
+DatabaseTests.cs (245) : bool result3 = db.Update("TestTable2", setValues, condition);
+DatabaseTests.cs (246) : Assert.True(result3);
+DatabaseTests.cs (247) : Assert.Equal(Constants.UpdateSuccess, db.LastErrorMessage);
+DatabaseTests.cs (249) : bool result4 = db.Update("TestTable2", setValuesFalses, condition);
+DatabaseTests.cs (250) : Assert.False(result4);
+DatabaseTests.cs (251) : Assert.Equal(Constants.ColumnDoesNotExistError, db.LastErrorMessage);
+DeleteUserTests.cs (1) : ﻿using DbManager;
+DeleteUserTests.cs (2) : using DbManager.Security;
+DeleteUserTests.cs (3) : using System;
+DeleteUserTests.cs (4) : using System.Collections.Generic;
+DeleteUserTests.cs (5) : using System.Linq;
+DeleteUserTests.cs (6) : using System.Text;
+DeleteUserTests.cs (7) : using System.Threading.Tasks;
+DeleteUserTests.cs (9) : namespace OurTests
+DeleteUserTests.cs (10) : {
+DeleteUserTests.cs (11) : public class DeleteUserTests
+DeleteUserTests.cs (12) : {
+DeleteUserTests.cs (13) : [Fact]
+DeleteUserTests.cs (14) : public void DeleteUserTest()
+DeleteUserTests.cs (15) : {
+DeleteUserTests.cs (16) : string username = "Mikel";
+DeleteUserTests.cs (17) : DeleteUser deleteUser = new DeleteUser(username);
+DeleteUserTests.cs (19) : Assert.Equal(username, deleteUser.Username);
+DeleteUserTests.cs (20) : }
+DeleteUserTests.cs (22) : [Fact]
+DeleteUserTests.cs (23) : public void ExecuteTest()
+DeleteUserTests.cs (24) : {
+DeleteUserTests.cs (25) : //Not Admin
+DeleteUserTests.cs (26) : Database db1 = Database.CreateTestDatabase();
+DeleteUserTests.cs (27) : Profile profile = new Profile();
+DeleteUserTests.cs (28) : profile.Name = "Manager";
+DeleteUserTests.cs (29) : User user = new User("user", "1234");
+DeleteUserTests.cs (30) : profile.Users.Add(user);
+DeleteUserTests.cs (31) : db1.SecurityManager.AddProfile(profile);
+DeleteUserTests.cs (33) : if  (db1.Save("database1"))
+DeleteUserTests.cs (34) : {
+DeleteUserTests.cs (35) : Database dbNotAdmin = Database.Load("database1", "user", "1234");
+DeleteUserTests.cs (37) : DeleteUser deleteUserNotAdmin = new DeleteUser("user");
+DeleteUserTests.cs (38) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, deleteUserNotAdmin.Execute(dbNotAdmin));
+DeleteUserTests.cs (39) : }
+DeleteUserTests.cs (41) : //Admin
+DeleteUserTests.cs (42) : Database db2 = Database.CreateTestDatabase();
+DeleteUserTests.cs (43) : User u = new User("OtherUser", "4567");
+DeleteUserTests.cs (44) : profile.Users.Add(u);
+DeleteUserTests.cs (45) : db2.SecurityManager.AddProfile(profile);
+DeleteUserTests.cs (47) : DeleteUser deleteUser = new DeleteUser(u.Username);
+DeleteUserTests.cs (48) : Assert.Equal(Constants.DeleteUserSuccess, deleteUser.Execute(db2));
+DeleteUserTests.cs (50) : DeleteUser du = new DeleteUser("UserNotExist");
+DeleteUserTests.cs (51) : Assert.Equal(Constants.UserDoesNotExistError, du.Execute(db2));
+DeleteUserTests.cs (53) : }
+DeleteUserTests.cs (54) : }
+DeleteUserTests.cs (55) : }
+DropSecurityProfileTests.cs (1) : ﻿using DbManager;
+DropSecurityProfileTests.cs (2) : using DbManager.Security;
+DropSecurityProfileTests.cs (3) : using System;
+DropSecurityProfileTests.cs (4) : using System.Collections.Generic;
+DropSecurityProfileTests.cs (5) : using System.Linq;
+DropSecurityProfileTests.cs (6) : using System.Text;
+DropSecurityProfileTests.cs (7) : using System.Threading.Tasks;
+DropSecurityProfileTests.cs (9) : namespace OurTests
+DropSecurityProfileTests.cs (10) : {
+DropSecurityProfileTests.cs (11) : public class DropSecurityProfileTests
+DropSecurityProfileTests.cs (12) : {
+DropSecurityProfileTests.cs (13) : [Fact]
+DropSecurityProfileTests.cs (14) : public void DropSecurityProfileTest()
+DropSecurityProfileTests.cs (15) : {
+DropSecurityProfileTests.cs (16) : string profileName = "Programmer";
+DropSecurityProfileTests.cs (17) : DropSecurityProfile dropSecurityProfile = new DropSecurityProfile(profileName);
+DropSecurityProfileTests.cs (19) : Assert.Equal(profileName, dropSecurityProfile.ProfileName);
+DropSecurityProfileTests.cs (20) : }
+DropSecurityProfileTests.cs (22) : [Fact]
+DropSecurityProfileTests.cs (23) : public void ExecuteTest()
+DropSecurityProfileTests.cs (24) : {
+DropSecurityProfileTests.cs (25) : Database db = Database.CreateTestDatabase();
+DropSecurityProfileTests.cs (26) : Profile profile = new Profile();
+DropSecurityProfileTests.cs (27) : profile.Name = "Programmer";
+DropSecurityProfileTests.cs (28) : db.SecurityManager.AddProfile(profile);
+DropSecurityProfileTests.cs (30) : //It's Admin
+DropSecurityProfileTests.cs (31) : DropSecurityProfile dsp = new DropSecurityProfile("Programmer");
+DropSecurityProfileTests.cs (32) : Assert.Equal(Constants.DropSecurityProfileSuccess, dsp.Execute(db));
+DropSecurityProfileTests.cs (34) : //profile "Manager" not exist in db
+DropSecurityProfileTests.cs (35) : DropSecurityProfile dspn = new DropSecurityProfile("Manager");
+DropSecurityProfileTests.cs (36) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, dspn.Execute(db));
+DropSecurityProfileTests.cs (38) : //It isn't Admin
+DropSecurityProfileTests.cs (39) : Profile p = new Profile();
+DropSecurityProfileTests.cs (40) : p.Name = "Customer";
+DropSecurityProfileTests.cs (41) : db.SecurityManager.AddProfile(p);
+DropSecurityProfileTests.cs (43) : AddUser au = new AddUser("user", "1234", "Customer");
+DropSecurityProfileTests.cs (44) : au.Execute(db);
+DropSecurityProfileTests.cs (47) : {
+DropSecurityProfileTests.cs (50) : DropSecurityProfile dropSecurityProfile = new DropSecurityProfile("Customer");
+DropSecurityProfileTests.cs (51) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, dropSecurityProfile.Execute(db));
+DropSecurityProfileTests.cs (52) : }
+DropSecurityProfileTests.cs (54) : }
+DropSecurityProfileTests.cs (55) : }
+DropSecurityProfileTests.cs (56) : }
+ManagerTests.cs (114) : //When user is Admin
+ManagerTests.cs (115) : User adminUser = new User { Username = "adminUser" };
+ManagerTests.cs (116) : Profile adminProfile = new Profile
+ManagerTests.cs (117) : {
+ManagerTests.cs (118) : Name = Profile.AdminProfileName,
+ManagerTests.cs (119) : Users = new List<User> { adminUser }
+ManagerTests.cs (120) : };
+ManagerTests.cs (121) : Manager manager1 = new Manager("adminUser");
+ManagerTests.cs (122) : manager1.Profiles.Add(adminProfile);
+ManagerTests.cs (124) : Assert.True(manager1.IsUserAdmin());
+ManagerTests.cs (126) : //When user is not Admin
+ManagerTests.cs (127) : User normalUser = new User { Username = "normalUser" };
+ManagerTests.cs (128) : Profile userProfile = new Profile
+ManagerTests.cs (129) : {
+ManagerTests.cs (130) : Name = "User",
+ManagerTests.cs (131) : Users = new List<User> { normalUser }
+ManagerTests.cs (132) : };
+ManagerTests.cs (133) : Manager manager2 = new Manager("normalUser");
+ManagerTests.cs (134) : manager2.Profiles.Add(userProfile);
+ManagerTests.cs (136) : Assert.False(manager2.IsUserAdmin());
+ManagerTests.cs (142) : Manager manager = CreateManagerForTesting();
+ManagerTests.cs (143) : //Case valid
+ManagerTests.cs (144) : bool result1 = manager.IsPasswordCorrect("John", "1234");
+ManagerTests.cs (145) : Assert.True(result1);
+ManagerTests.cs (146) : bool result2 = manager.IsPasswordCorrect("Joe", "1111");//wrong password
+ManagerTests.cs (147) : Assert.False(result2);
+ManagerTests.cs (148) : bool result3 = manager.IsPasswordCorrect("nonExistentUser", "1234");//A user don't exist
+ManagerTests.cs (149) : Assert.False(result3);
+ManagerTests.cs (156) : Manager manager = CreateManagerForTesting();
+ManagerTests.cs (157) : string profileName = "Customer";
+ManagerTests.cs (158) : string table = "product"; // this table is added in PrivilegesOn for "Profile1"
+ManagerTests.cs (159) : Privilege privilege = Privilege.Select;
+ManagerTests.cs (161) : Profile profile1 = manager.Profiles.FirstOrDefault(p => p.Name == profileName);
+ManagerTests.cs (162) : Assert.NotNull(profile1);
+ManagerTests.cs (164) : int initialPrivilegeCount = profile1.PrivilegesOn.ContainsKey(table)
+ManagerTests.cs (165) : ? profile1.PrivilegesOn[table].Count
+ManagerTests.cs (166) : : 0;
+ManagerTests.cs (167) : manager.GrantPrivilege(profileName, table, privilege);
+ManagerTests.cs (169) : Assert.True(profile1.PrivilegesOn.ContainsKey(table));
+ManagerTests.cs (170) : Assert.Contains(privilege, profile1.PrivilegesOn[table]);
+ManagerTests.cs (171) : Assert.Equal(initialPrivilegeCount + 1, profile1.PrivilegesOn[table].Count);
+ManagerTests.cs (173) : // test profile not found
+ManagerTests.cs (174) : string profileNotFound = "ProfileNotExist";
+ManagerTests.cs (175) : manager.GrantPrivilege(profileNotFound, table, privilege);
+ManagerTests.cs (176) : Profile profileNull = manager.Profiles.FirstOrDefault(p => p.Name == profileNotFound);
+ManagerTests.cs (177) : Assert.Null(profileNull);
+ManagerTests.cs (193) : Manager manager = CreateManagerForTesting();
+ManagerTests.cs (194) : string profileName = "Programmer";
+ManagerTests.cs (195) : string table = "car";// This profile has Select and Update privileges on "car"
+ManagerTests.cs (196) : Privilege privilege = Privilege.Update;
+ManagerTests.cs (198) : Profile profile2 = manager.Profiles.FirstOrDefault(p => p.Name == profileName);
+ManagerTests.cs (199) : Assert.NotNull(profile2);
+ManagerTests.cs (200) : Assert.True(profile2.PrivilegesOn.ContainsKey(table));
+ManagerTests.cs (201) : Assert.Contains(privilege, profile2.PrivilegesOn[table]);
+ManagerTests.cs (203) : int initialPrivilegeCount = profile2.PrivilegesOn[table].Count;
+ManagerTests.cs (204) : manager.RevokePrivilege(profileName, table, privilege);
+ManagerTests.cs (206) : Assert.DoesNotContain(privilege, profile2.PrivilegesOn[table]);
+ManagerTests.cs (207) : Assert.Equal(initialPrivilegeCount - 1, profile2.PrivilegesOn[table].Count);
+ManagerTests.cs (209) : //test profile not found
+ManagerTests.cs (210) : string profileNotFound = "ProfileNotExist";
+ManagerTests.cs (211) : manager.RevokePrivilege(profileNotFound, table, privilege);
+ManagerTests.cs (212) : Profile profileNull = manager.Profiles.FirstOrDefault(p => p.Name == profileNotFound);
+ManagerTests.cs (213) : Assert.Null(profileNull);
+ManagerTests.cs (215) : // Testing what the manager does without admin privileges
+ManagerTests.cs (216) : manager.Save("RevokePrivilegeTest");
+ManagerTests.cs (217) : manager = Manager.Load("RevokePrivilegeTest", "Joe");
+ManagerTests.cs (219) : Profile profileAfterLoad = manager.Profiles.FirstOrDefault(p => p.Name == profileName);
+ManagerTests.cs (220) : Assert.NotNull(profileAfterLoad);
+ManagerTests.cs (221) : Privilege OtherPrivilege = Privilege.Select;
+ManagerTests.cs (222) : Assert.Contains(OtherPrivilege, profileAfterLoad.PrivilegesOn[table]);
+ManagerTests.cs (224) : manager.RevokePrivilege(profileName, table, privilege);
+ManagerTests.cs (225) : Assert.Contains(OtherPrivilege, profileAfterLoad.PrivilegesOn[table]);
+ManagerTests.cs (226) : int countPrivilegeAfterLoad = initialPrivilegeCount - 1;
+ManagerTests.cs (227) : Assert.Equal(countPrivilegeAfterLoad, profileAfterLoad.PrivilegesOn[table].Count);
+ManagerTests.cs (235) : //A user of profile admin always return true
+ManagerTests.cs (236) : Assert.True(manager.IsGrantedPrivilege("admin", "pet", Privilege.Select));
+ManagerTests.cs (237) : Assert.True(manager.IsGrantedPrivilege("admin", "pet", Privilege.Update));
+ManagerTests.cs (238) : Assert.True(manager.IsGrantedPrivilege("admin", "pet", Privilege.Delete));
+ManagerTests.cs (239) : Assert.True(manager.IsGrantedPrivilege("admin", "product", Privilege.Select));
+ManagerTests.cs (240) : Assert.True(manager.IsGrantedPrivilege("admin", "product", Privilege.Update));
+ManagerTests.cs (241) : Assert.True(manager.IsGrantedPrivilege("admin", "product", Privilege.Delete));
+ManagerTests.cs (242) : // admin2 not exist
+ManagerTests.cs (243) : Assert.False(manager.IsGrantedPrivilege("admin2", "pet", Privilege.Select));
+ManagerTests.cs (244) : Assert.False(manager.IsGrantedPrivilege("admin2", "pet", Privilege.Update));
+ManagerTests.cs (245) : Assert.False(manager.IsGrantedPrivilege("admin2", "pet", Privilege.Delete));
+ManagerTests.cs (246) : //Other cases
+ManagerTests.cs (248) : Assert.True(manager.IsGrantedPrivilege("Joe", "pet", Privilege.Insert));
+ManagerTests.cs (269) : Profile p2 = new Profile();
+ManagerTests.cs (311) : //Can't remove profile if isn't Admin
+ManagerTests.cs (312) : manager.Save("AddProfileTest");
+ManagerTests.cs (313) : manager = Manager.Load("AddProfileTest", "Joe");
+ManagerTests.cs (314) : Assert.False(manager.RemoveProfile("Management"));
+SelectTests.cs (1) : ﻿using DbManager;
+SelectTests.cs (3) : using System;
+SelectTests.cs (4) : using System.Collections.Generic;
+SelectTests.cs (5) : using System.Linq;
+SelectTests.cs (6) : using System.Reflection;
+SelectTests.cs (7) : using System.Text;
+SelectTests.cs (8) : using System.Threading.Tasks;
+SelectTests.cs (10) : namespace OurTests
+SelectTests.cs (11) : {
+SelectTests.cs (12) : public class SelectTests
+SelectTests.cs (13) : {
+SelectTests.cs (14) : [Fact]
+SelectTests.cs (15) : public void SelectConstructorTest()
+SelectTests.cs (16) : {
+SelectTests.cs (17) : List<string> columnNames = new List<string>();
+SelectTests.cs (18) : columnNames.Add("Name");
+SelectTests.cs (19) : columnNames.Add("Age");
+SelectTests.cs (20) : Condition conditionHeight = new Condition("Height", ">", "1.80");
+SelectTests.cs (22) : Select select1 = new Select("Cats", columnNames);
+SelectTests.cs (23) : Assert.Null(select1.Where);
+SelectTests.cs (24) : Assert.NotNull(select1.Columns);
+SelectTests.cs (25) : Assert.Equal("Cats", select1.Table);
+SelectTests.cs (27) : Select select2 = new Select("Cats", columnNames, conditionHeight);
+SelectTests.cs (28) : Assert.Equal(conditionHeight, select2.Where);
+SelectTests.cs (29) : }
+SelectTests.cs (31) : [Fact]
+SelectTests.cs (32) : public void ExecuteTest()
+SelectTests.cs (33) : {
+SelectTests.cs (34) : Database db = Database.CreateTestDatabase();//['Name','Height','Age']{'Rodolfo','1.62','25'}{'Maider','1.67','67'}{'Pepe','1.55','51'}
+SelectTests.cs (35) : List<string> columnNames = new List<string>();
+SelectTests.cs (37) : columnNames.Add("Age");
+SelectTests.cs (38) : Condition conditionHeight = new Condition("Height", ">", "1.60");
+SelectTests.cs (40) : Select selectTest = new Select("TestTable", columnNames, conditionHeight);
+SelectTests.cs (42) : string result = selectTest.Execute(db);
+SelectTests.cs (43) : Assert.NotNull(result);
+SelectTests.cs (46) : Select selectTestXXX = new Select("TestTableXXX", columnNames, conditionHeight);//"TestTableXXX" not exist in db
+SelectTests.cs (47) : string resultXXX = selectTestXXX.Execute(db);
+SelectTests.cs (48) : Assert.Equal(Constants.TableDoesNotExistError, resultXXX);
+SelectTests.cs (63) : }
+SelectTests.cs (64) : }
+SelectTests.cs (65) : }
+UpdateTests.cs (1) : ﻿using DbManager;
+UpdateTests.cs (2) : using DbManager.Parser;
+UpdateTests.cs (4) : using System;
+UpdateTests.cs (5) : using System.Collections.Generic;
+UpdateTests.cs (6) : using System.Linq;
+UpdateTests.cs (7) : using System.Text;
+UpdateTests.cs (8) : using System.Threading.Tasks;
+UpdateTests.cs (10) : namespace OurTests
+UpdateTests.cs (11) : {
+UpdateTests.cs (12) : public class UpdateTests
+UpdateTests.cs (13) : {
+UpdateTests.cs (14) : [Fact]
+UpdateTests.cs (15) : public void UpdateConstructorTest()
+UpdateTests.cs (16) : {
+UpdateTests.cs (17) : List<string> columnNames = new List<string>();
+UpdateTests.cs (18) : columnNames.Add("Name");
+UpdateTests.cs (19) : columnNames.Add("Age");
+UpdateTests.cs (20) : Condition conditionHeight = new Condition("Height", ">", "1.60");
+UpdateTests.cs (22) : Select update1 = new Select("Pigs", columnNames);
+UpdateTests.cs (23) : Assert.Null(update1.Where);
+UpdateTests.cs (24) : Assert.NotNull(update1.Columns);
+UpdateTests.cs (25) : Assert.Equal("Pigs", update1.Table);
+UpdateTests.cs (27) : Select update2 = new Select("Pigs", columnNames, conditionHeight);
+UpdateTests.cs (28) : Assert.Equal(conditionHeight, update2.Where);
+UpdateTests.cs (30) : }
+UpdateTests.cs (32) : [Fact]
+UpdateTests.cs (33) : public void ExecuteTest()
+UpdateTests.cs (34) : {
+UpdateTests.cs (35) : Database db = Database.CreateTestDatabase();//['Name','Height','Age']{'Rodolfo','1.62','25'}{'Maider','1.67','67'}{'Pepe','1.55','51'}
+UpdateTests.cs (36) : List<SetValue> setValues = new List<SetValue>();
+UpdateTests.cs (37) : setValues.Add(new SetValue("Name", "Marta"));
+UpdateTests.cs (38) : setValues.Add(new SetValue("Age", "27"));
+UpdateTests.cs (39) : setValues.Add(new SetValue("Height", "1.74"));
+UpdateTests.cs (40) : Condition conditionHeight = new Condition("Height", "<", "1.60");
+UpdateTests.cs (42) : Update updateTest = new Update("TestTable", setValues, conditionHeight);
+UpdateTests.cs (43) : string result = updateTest.Execute(db);
+UpdateTests.cs (44) : Assert.Equal(Constants.UpdateSuccess, result);
+UpdateTests.cs (46) : Update updateTestXXX = new Update("TestTableXXX", setValues, conditionHeight);//"TestTableXXX" not exist in db
+UpdateTests.cs (47) : string resultXXX = updateTestXXX.Execute(db);
+UpdateTests.cs (48) : Assert.Equal(Constants.TableDoesNotExistError, resultXXX);
+UpdateTests.cs (61) : }
+UpdateTests.cs (62) : }
+UpdateTests.cs (63) : }
+UserTests.cs (1) : ﻿using System;
+UserTests.cs (2) : using System.Collections.Generic;
+UserTests.cs (3) : using System.Linq;
+UserTests.cs (4) : using System.Text;
+UserTests.cs (5) : using System.Threading.Tasks;
+UserTests.cs (7) : using DbManager.Security;
+UserTests.cs (8) : using static DbManager.Security.Encryption;
+UserTests.cs (10) : namespace OurTests
+UserTests.cs (11) : {
+UserTests.cs (12) : public class UserTests
+UserTests.cs (13) : {
+UserTests.cs (14) : [Fact]
+UserTests.cs (15) : public void UserTest()
+UserTests.cs (16) : {
+UserTests.cs (17) : User userTest1 = new User("111222333", "abcpp829");
+UserTests.cs (18) : User userTest2 = new User("111222444", "ooopp345");
+UserTests.cs (20) : Assert.Equal("111222333", userTest1.Username);
+UserTests.cs (21) : Assert.Equal(Encrypt("abcpp829"), userTest1.EncryptedPassword);
+UserTests.cs (23) : Assert.Equal("111222444", userTest2.Username);
+UserTests.cs (24) : Assert.Equal(Encrypt("ooopp345"), userTest2.EncryptedPassword);
+UserTests.cs (25) : }
+UserTests.cs (65) : }
+UserTests.cs (66) : }
+XmlDeserializerTests.cs (1) : ﻿using DbManager;
+XmlDeserializerTests.cs (2) : using DbManager.Network;
+XmlDeserializerTests.cs (3) : using System;
+XmlDeserializerTests.cs (50) : string answer = "<Success/>";
+XmlDeserializerTests.cs (51) : string error;
+XmlDeserializerTests.cs (52) : Assert.True(XmlDeserializer.ParseOpenCreateAnswer(answer, out error));
+XmlDeserializerTests.cs (53) : Assert.Null(error);
+XmlDeserializerTests.cs (55) : answer = "<Error>" + Constants.CouldNotCreateDatabase + "</Error>";
+XmlDeserializerTests.cs (56) : Assert.False(XmlDeserializer.ParseOpenCreateAnswer(answer, out error));
+XmlDeserializerTests.cs (57) : Assert.Equal(error, Constants.CouldNotCreateDatabase);
+Client.cs (98) : string xmlQuery = XmlSerializer.Query(query);
+Client.cs (99) : string xmlResponse = SendString(xmlQuery);
+Client.cs (100) : if (XmlDeserializer.ParseQueryAnswer(xmlResponse, out string result))
+Client.cs (101) : {
+Client.cs (102) : return result;
+Client.cs (103) : }
+Client.cs (104) : return $"Error: {result}";
+Client.cs (111) : string closeMessage = XmlSerializer.CloseConnection;
+Client.cs (112) : SendString(closeMessage);
+Client.cs (113) : m_tcpClient.Close();
+XmlDeserializer.cs (4) : using System.IO;
+XmlDeserializer.cs (41) : if (answer == XmlSerializer.OpenCreateSuccess)
+XmlDeserializer.cs (42) : {
+XmlDeserializer.cs (43) : error = null;
+XmlDeserializer.cs (44) : return true;
+XmlDeserializer.cs (45) : }
+XmlDeserializer.cs (46) : const string errorPattern = "^<Error>(.*?)<\\/Error>$";
+XmlDeserializer.cs (47) : Match match = Regex.Match(answer, errorPattern);
+XmlDeserializer.cs (48) : if (match.Success)
+XmlDeserializer.cs (49) : {
+XmlDeserializer.cs (50) : error = match.Groups[1].Value;
+XmlDeserializer.cs (51) : return false;
+XmlDeserializer.cs (52) : }
+DeleteUser.cs (5) : using DbManager.Security;
+DeleteUser.cs (23) : if (database.SecurityManager.IsUserAdmin())
+DeleteUser.cs (24) : {
+DeleteUser.cs (25) : Profile profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (26) : if (profile == null)
+DeleteUser.cs (27) : {
+DeleteUser.cs (28) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (29) : }
+DeleteUser.cs (30) : else
+DeleteUser.cs (31) : {
+DeleteUser.cs (32) : profile.Users.Remove(database.SecurityManager.UserByName(Username));
+DeleteUser.cs (33) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (34) : }
+DeleteUser.cs (35) : }
+DeleteUser.cs (36) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (5) : using DbManager.Security;
+DropSecurityProfile.cs (23) : if (database.SecurityManager.IsUserAdmin())
+DropSecurityProfile.cs (24) : {
+DropSecurityProfile.cs (25) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+DropSecurityProfile.cs (26) : if (profile == null)
+DropSecurityProfile.cs (27) : {
+DropSecurityProfile.cs (28) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (29) : }
+DropSecurityProfile.cs (30) : else
+DropSecurityProfile.cs (31) : {
+DropSecurityProfile.cs (32) : database.SecurityManager.Profiles.Remove(profile);
+DropSecurityProfile.cs (33) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (34) : }
+DropSecurityProfile.cs (35) : }
+DropSecurityProfile.cs (36) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+MiniSQLParser.cs (107) : const string deletePattern = "^DELETE\\s+FROM\\s+(\\w+)\\s+WHERE\\s+([\\w]+)([<=>])'([\\w.\\sÁ-ú-]+)'$";
+Select.cs (18) : Table = table;
+Select.cs (19) : Columns = columns;
+Select.cs (20) : Where = condition;
+Select.cs (26) : Table table = database.Select(Table, Columns, Where);
+Select.cs (30) : {
+Select.cs (31) : return table.ToString();
+Select.cs (32) : }
+Select.cs (34) : return database.LastErrorMessage;
+Update.cs (15) : Table = table;
+Update.cs (16) : Columns = columnNames;
+Update.cs (17) : Where = where;
+Update.cs (24) : bool success = database.Update(Table, Columns, Where);
+Update.cs (25) : if (success)
+Update.cs (26) : {
+Update.cs (27) : return Constants.UpdateSuccess;
+Update.cs (28) : }
+Update.cs (29) : return database.LastErrorMessage;
+Manager.cs (8) : using static DbManager.Security.Encryption;
+Manager.cs (25) : foreach (Profile profile in Profiles)
+Manager.cs (26) : {
+Manager.cs (27) : if (profile.Name == Profile.AdminProfileName)
+Manager.cs (28) : {
+Manager.cs (29) : foreach (User user in profile.Users)
+Manager.cs (30) : {
+Manager.cs (31) : if (user.Username == m_username) return true;
+Manager.cs (32) : }
+Manager.cs (33) : }
+Manager.cs (34) : }
+Manager.cs (42) : string encryptedPassword = Encrypt(password);
+Manager.cs (43) : foreach (Profile profile in Profiles)
+Manager.cs (44) : {
+Manager.cs (45) : foreach (User user in profile.Users)
+Manager.cs (46) : {
+Manager.cs (48) : }
+Manager.cs (49) : }
+Manager.cs (60) : Profile profile = Profiles.FirstOrDefault(p => p.Name == profileName);
+Manager.cs (61) : if (profile == null) return;
+Manager.cs (62) : profile.GrantPrivilege(table, privilege);
+Manager.cs (70) : if (IsUserAdmin())
+Manager.cs (71) : {
+Manager.cs (72) : Profile profile = Profiles.FirstOrDefault(p => p.Name == profileName);
+Manager.cs (73) : if (profile == null) return;
+Manager.cs (74) : profile.RevokePrivilege(table, privilege);
+Manager.cs (75) : }
+Manager.cs (85) : Profile profile = ProfileByUser(username);
+Manager.cs (90) : //if this profile is admin, returns true
+Manager.cs (104) : if(IsUserAdmin())
+Manager.cs (105) : {
+Manager.cs (109) : }
+Manager.cs (144) : if (IsUserAdmin())
+Manager.cs (145) : {
+Manager.cs (148) : return false;
+Manager.cs (149) : }
+User.cs (5) : using static DbManager.Security.Encryption;
+User.cs (18) : Username = username;
+User.cs (19) : EncryptedPassword = Encrypt(password);

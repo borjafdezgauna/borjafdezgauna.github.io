@@ -1,0 +1,537 @@
+Total written by this student: 13% lines / 24% characters
+
+Database.cs (84) : if (TableByName(tableName) != null)
+Database.cs (85) : {
+Database.cs (86) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (87) : return false;
+Database.cs (88) : }
+Database.cs (90) : else if(ColumnDefinition == null || ColumnDefinition.Count == 0)
+Database.cs (91) : {
+Database.cs (94) : }
+Database.cs (96) : else
+Database.cs (97) : {
+Database.cs (98) : bool last = AddTable(new Table(tableName, ColumnDefinition));
+Database.cs (99) : if (last == true)
+Database.cs (100) : {
+Database.cs (101) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (102) : return true;
+Database.cs (104) : }
+Database.cs (105) : else
+Database.cs (106) : {
+Database.cs (107) : LastErrorMessage = Constants.Error;
+Database.cs (109) : }
+Database.cs (110) : }
+Database.cs (118) : if(TableByName(tableName) == null)
+Database.cs (119) : {
+Database.cs (120) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (124) : else
+Database.cs (125) : {
+Database.cs (126) : Tables.Remove(TableByName(tableName));
+Database.cs (127) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (128) : return true;
+Database.cs (129) : }
+Database.cs (130) : }
+Database.cs (139) : {
+Database.cs (140) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (141) : return false;
+Database.cs (148) : }
+Database.cs (150) : bool erantzuna = TableByName(tableName).Insert(values);
+Database.cs (152) : if (!erantzuna)
+Database.cs (153) : {
+Database.cs (156) : }
+Database.cs (160) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (161) : return true;
+Row.cs (106) : return value.Replace(Delimiter, DelimiterEncoded);
+Row.cs (114) : return value.Replace(DelimiterEncoded, Delimiter);
+Row.cs (139) : List<string> baloreak = value.Split(new string[] { Delimiter }, StringSplitOptions.None)
+Row.cs (140) : .Select(v => Decode(v)).ToList();
+Row.cs (141) : return new Row(columns, baloreak);
+ClientTests.cs (1) : ﻿using DbManager.Network;
+ClientTests.cs (3) : namespace OurTests
+ClientTests.cs (4) : {
+ClientTests.cs (5) : public class ClientTests
+ClientTests.cs (6) : {
+ClientTests.cs (7) : [Fact]
+ClientTests.cs (8) : public void Connect_PuertoInvalido_DevuelveFalse()
+ClientTests.cs (9) : {
+ClientTests.cs (10) : // Arrange
+ClientTests.cs (11) : var client = new Client();
+ClientTests.cs (12) : string ip = "128.0.0.1";
+ClientTests.cs (13) : int closedPort = 65000; // Supongamos que este puerto está cerrado
+ClientTests.cs (15) : // Act
+ClientTests.cs (16) : bool result = client.Connect(ip, closedPort);
+ClientTests.cs (18) : // Assert
+ClientTests.cs (19) : Assert.False(result);
+ClientTests.cs (20) : }
+ClientTests.cs (21) : }
+ClientTests.cs (22) : }
+CreateTableTests.cs (1) : ﻿using System;
+CreateTableTests.cs (2) : using System.Collections.Generic;
+CreateTableTests.cs (3) : using System.Linq;
+CreateTableTests.cs (4) : using System.Text;
+CreateTableTests.cs (5) : using System.Threading.Tasks;
+CreateTableTests.cs (6) : using DbManager;
+CreateTableTests.cs (7) : using Xunit;
+CreateTableTests.cs (9) : namespace OurTests
+CreateTableTests.cs (10) : {
+CreateTableTests.cs (11) : public class CreateTableTests
+CreateTableTests.cs (12) : {
+CreateTableTests.cs (13) : [Fact]
+CreateTableTests.cs (14) : public void Correct()
+CreateTableTests.cs (15) : {
+CreateTableTests.cs (16) : CreateTable query = MiniSQLParser.Parse("CREATE TABLE empleados (id INT,nombre TEXT)") as CreateTable;
+CreateTableTests.cs (17) : Assert.NotNull(query);
+CreateTableTests.cs (18) : Assert.Equal("empleados", query.Table);
+CreateTableTests.cs (19) : Assert.Equal(2, query.ColumnsParameters.Count());
+CreateTableTests.cs (20) : Assert.Equal("id", query.ColumnsParameters[0].Name);
+CreateTableTests.cs (21) : Assert.Equal(ColumnDefinition.DataType.Int, query.ColumnsParameters[0].Type);
+CreateTableTests.cs (22) : Assert.Equal("nombre", query.ColumnsParameters[1].Name);
+CreateTableTests.cs (23) : Assert.Equal(ColumnDefinition.DataType.String, query.ColumnsParameters[1].Type);
+CreateTableTests.cs (25) : query = MiniSQLParser.Parse("CREATE TABLE ElverGa (edad DOUBLE,ciudad TEXT)") as CreateTable;
+CreateTableTests.cs (26) : Assert.NotNull(query);
+CreateTableTests.cs (27) : Assert.Equal("ElverGa", query.Table);
+CreateTableTests.cs (28) : Assert.Equal(2, query.ColumnsParameters.Count());
+CreateTableTests.cs (29) : Assert.Equal("edad", query.ColumnsParameters[0].Name);
+CreateTableTests.cs (30) : Assert.Equal(ColumnDefinition.DataType.Double, query.ColumnsParameters[0].Type);
+CreateTableTests.cs (31) : Assert.Equal("ciudad", query.ColumnsParameters[1].Name);
+CreateTableTests.cs (32) : Assert.Equal(ColumnDefinition.DataType.String, query.ColumnsParameters[1].Type);
+CreateTableTests.cs (33) : }
+CreateTableTests.cs (34) : [Fact]
+CreateTableTests.cs (35) : public void Incorrect()
+CreateTableTests.cs (36) : {
+CreateTableTests.cs (37) : CreateTable query = MiniSQLParser.Parse("CREATE TABLE correcto (id INT,nombre TEXT)") as CreateTable;
+CreateTableTests.cs (38) : Assert.NotNull(query);
+CreateTableTests.cs (40) : query = MiniSQLParser.Parse("Create Table malEscrito (dato INT)") as CreateTable;
+CreateTableTests.cs (41) : Assert.Null(query);
+CreateTableTests.cs (43) : query = MiniSQLParser.Parse("create table malEscrito (dato INT)") as CreateTable;
+CreateTableTests.cs (44) : Assert.Null(query);
+CreateTableTests.cs (45) : }
+CreateTableTests.cs (46) : [Fact]
+CreateTableTests.cs (47) : public void IncorrectSyntax()
+CreateTableTests.cs (48) : {
+CreateTableTests.cs (49) : CreateTable query;
+CreateTableTests.cs (51) : // Falta nombre de la tabla
+CreateTableTests.cs (52) : query = MiniSQLParser.Parse("CREATE TABLE (id INT, nombre TEXT)") as CreateTable;
+CreateTableTests.cs (53) : Assert.Null(query);
+CreateTableTests.cs (55) : // No tiene columnas
+CreateTableTests.cs (56) : query = MiniSQLParser.Parse("CREATE TABLE tablaSinColumnas ()") as CreateTable;
+CreateTableTests.cs (57) : Assert.NotNull(query);
+CreateTableTests.cs (59) : // Tipo de dato inválido: STRING en vez de TEXT
+CreateTableTests.cs (60) : query = MiniSQLParser.Parse("CREATE TABLE tablaMal (id INT, nombre STRING)") as CreateTable;
+CreateTableTests.cs (61) : Assert.Null(query);
+CreateTableTests.cs (63) : // Error  en CREATE
+CreateTableTests.cs (64) : query = MiniSQLParser.Parse("CREAT TABLE prueba (id INT, nombre TEXT)") as CreateTable;
+CreateTableTests.cs (65) : Assert.Null(query);
+CreateTableTests.cs (66) : }
+CreateTableTests.cs (67) : }
+CreateTableTests.cs (68) : }
+DatabaseTests.cs (1) : using System.Data;
+DatabaseTests.cs (3) : using System.Xml;
+DatabaseTests.cs (4) : using DbManager;
+DatabaseTests.cs (157) : }
+DatabaseTests.cs (159) : [Fact]
+DatabaseTests.cs (161) : {
+DatabaseTests.cs (166) : {
+DatabaseTests.cs (167) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Aa")
+DatabaseTests.cs (168) : };
+DatabaseTests.cs (197) : Assert.Equal(Constants.DatabaseCreatedWithoutColumnsError, database.LastErrorMessage);
+DatabaseTests.cs (200) : [Fact]
+DatabaseTests.cs (202) : {
+DatabaseTests.cs (208) : List<ColumnDefinition> columns = new List<ColumnDefinition>
+DatabaseTests.cs (209) : {
+DatabaseTests.cs (210) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Aa")
+DatabaseTests.cs (211) : };
+DatabaseTests.cs (230) : }
+DatabaseTests.cs (232) : [Fact]
+DatabaseTests.cs (234) : {
+DatabaseTests.cs (237) : List<ColumnDefinition> columns = new List<ColumnDefinition>
+DatabaseTests.cs (238) : {
+DatabaseTests.cs (239) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Codigo"),
+DatabaseTests.cs (240) : new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre")
+DatabaseTests.cs (241) : };
+DeleteTests.cs (1) : ﻿using System;
+DeleteTests.cs (2) : using System.Collections.Generic;
+DeleteTests.cs (3) : using System.Linq;
+DeleteTests.cs (4) : using System.Text;
+DeleteTests.cs (5) : using System.Threading.Tasks;
+DeleteTests.cs (6) : using DbManager.Parser;
+DeleteTests.cs (7) : using DbManager;
+DeleteTests.cs (8) : using Xunit;
+DeleteTests.cs (10) : namespace OurTests
+DeleteTests.cs (11) : {
+DeleteTests.cs (12) : public class DeleteTests
+DeleteTests.cs (13) : {
+DeleteTests.cs (14) : [Fact]
+DeleteTests.cs (15) : public void Correct()
+DeleteTests.cs (16) : {
+DeleteTests.cs (17) : Delete query = MiniSQLParser.Parse("DELETE FROM joseba WHERE columna1='valor1'") as Delete;
+DeleteTests.cs (19) : Assert.NotNull(query);
+DeleteTests.cs (20) : Assert.Equal("joseba", query.Table);
+DeleteTests.cs (22) : Assert.NotNull(query.Where);
+DeleteTests.cs (23) : Assert.Equal("columna1", query.Where.ColumnName);
+DeleteTests.cs (24) : Assert.Equal("=", query.Where.Operator);
+DeleteTests.cs (25) : Assert.Equal("valor1", query.Where.LiteralValue);
+DeleteTests.cs (26) : }
+DeleteTests.cs (27) : [Fact]
+DeleteTests.cs (28) : public void CorrectWithSpaces()
+DeleteTests.cs (29) : {
+DeleteTests.cs (30) : Delete query = MiniSQLParser.Parse("DELETE   FROM   joseba   WHERE   columna1='valor1'") as Delete;
+DeleteTests.cs (32) : Assert.NotNull(query);
+DeleteTests.cs (33) : Assert.Equal("joseba", query.Table);
+DeleteTests.cs (35) : Assert.NotNull(query.Where);
+DeleteTests.cs (36) : Assert.Equal("columna1", query.Where.ColumnName);
+DeleteTests.cs (37) : Assert.Equal("=", query.Where.Operator);
+DeleteTests.cs (38) : Assert.Equal("valor1", query.Where.LiteralValue);
+DeleteTests.cs (39) : }
+DeleteTests.cs (40) : [Fact]
+DeleteTests.cs (41) : public void InCorrectLiteralValue()
+DeleteTests.cs (42) : {
+DeleteTests.cs (43) : Delete query = MiniSQLParser.Parse("DELETE FROM joseba WHERE columna2> 50") as Delete;
+DeleteTests.cs (45) : Assert.Null(query);
+DeleteTests.cs (46) : }
+DeleteTests.cs (47) : }
+DeleteTests.cs (48) : }
+DropTableTests7.cs (1) : ﻿using System;
+DropTableTests7.cs (2) : using System.Collections.Generic;
+DropTableTests7.cs (3) : using System.Linq;
+DropTableTests7.cs (4) : using System.Text;
+DropTableTests7.cs (5) : using System.Threading.Tasks;
+DropTableTests7.cs (6) : using DbManager;
+DropTableTests7.cs (7) : using Xunit;
+DropTableTests7.cs (9) : namespace OurTests
+DropTableTests7.cs (10) : {
+DropTableTests7.cs (11) : public class DropTableTests7
+DropTableTests7.cs (12) : {
+DropTableTests7.cs (13) : [Fact]
+DropTableTests7.cs (14) : public void Correct()
+DropTableTests7.cs (15) : {
+DropTableTests7.cs (16) : DropTable query = MiniSQLParser.Parse("DROP TABLE PeioGuay") as DropTable;
+DropTableTests7.cs (17) : Assert.NotNull(query);
+DropTableTests7.cs (18) : Assert.Equal("PeioGuay", query.Table);
+DropTableTests7.cs (20) : query = MiniSQLParser.Parse("DROP TABLE ElverGa") as DropTable;
+DropTableTests7.cs (21) : Assert.NotNull(query);
+DropTableTests7.cs (22) : Assert.Equal("ElverGa", query.Table);
+DropTableTests7.cs (23) : }
+DropTableTests7.cs (24) : [Fact]
+DropTableTests7.cs (25) : public void CorrectWithSpaces()
+DropTableTests7.cs (26) : {
+DropTableTests7.cs (27) : DropTable query = MiniSQLParser.Parse("DROP     TABLE      muchosespaciosWey") as DropTable;
+DropTableTests7.cs (28) : Assert.NotNull(query);
+DropTableTests7.cs (29) : Assert.Equal("muchosespaciosWey", query.Table);
+DropTableTests7.cs (31) : query = MiniSQLParser.Parse("DROP TABLE   tresEspacios") as DropTable;
+DropTableTests7.cs (32) : Assert.NotNull(query);
+DropTableTests7.cs (33) : Assert.Equal("tresEspacios", query.Table);
+DropTableTests7.cs (34) : }
+DropTableTests7.cs (35) : [Fact]
+DropTableTests7.cs (36) : public void IncorrectCapitalization()
+DropTableTests7.cs (37) : {
+DropTableTests7.cs (38) : DropTable query = MiniSQLParser.Parse("DROP TABLE correcto") as DropTable;
+DropTableTests7.cs (39) : Assert.NotNull(query);
+DropTableTests7.cs (41) : query = MiniSQLParser.Parse("Drop Table malEscrito") as DropTable;
+DropTableTests7.cs (42) : Assert.Null(query);
+DropTableTests7.cs (44) : query = MiniSQLParser.Parse("drop table malEscrito") as DropTable;
+DropTableTests7.cs (45) : Assert.Null(query);
+DropTableTests7.cs (46) : }
+DropTableTests7.cs (48) : }
+DropTableTests7.cs (49) : }
+InsertUserTest.cs (7) : namespace OurTests
+InsertUserTest.cs (15) : Insert query = MiniSQLParser.Parse("INSERT INTO users VALUES ('Peio')") as Insert;
+InsertUserTest.cs (18) : Assert.Equal(new List<string> {"Peio" }, query.Values);
+InsertUserTest.cs (34) : Insert query = MiniSQLParser.Parse("INSERT INTO sales VALUES ('1001','2025-03-03','150.50')") as Insert;
+InsertUserTest.cs (38) : Assert.Equal(new List<string> { "1001","2025-03-03","150.50" }, query.Values);
+ManagerTests.cs (14) : namespace OurTests
+ProfileTests.cs (12) : namespace OurTests
+RowTests.cs (112) : [Fact]
+RowTests.cs (113) : public void TestAsTextMethod()
+RowTests.cs (114) : {
+RowTests.cs (115) : //make columns
+RowTests.cs (116) : List<ColumnDefinition> columns = new List<ColumnDefinition>()
+RowTests.cs (117) : {
+RowTests.cs (119) : new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre"),
+RowTests.cs (120) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Adina")
+RowTests.cs (121) : };
+RowTests.cs (122) : //make values to create a row
+RowTests.cs (123) : List<string> valus = new List<string>() { "Joseba:Aperribay", "21" };
+RowTests.cs (124) : Row row = new Row(columns, valus);
+RowTests.cs (125) : string espero = "Joseba[SEPARATOR]Aperribay:21";
+RowTests.cs (127) : Assert.Equal(espero, row.AsText());
+RowTests.cs (128) : }
+RowTests.cs (129) : [Fact]
+RowTests.cs (130) : public void TestParseMethod()
+RowTests.cs (131) : {
+RowTests.cs (132) : string valorParametro = "Joseba[SEPARATOR]Cilarte:21:Zumarraga";
+RowTests.cs (133) : List<ColumnDefinition> columns = new List<ColumnDefinition>
+RowTests.cs (134) : {
+RowTests.cs (135) : new ColumnDefinition(ColumnDefinition.DataType.String, "Izena"),
+RowTests.cs (136) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Adina"),
+RowTests.cs (137) : new ColumnDefinition(ColumnDefinition.DataType.String, "Hiria")
+RowTests.cs (138) : };
+RowTests.cs (139) : Row rowTest = Row.Parse(columns, valorParametro);
+RowTests.cs (141) : Assert.Equal("Joseba:Cilarte", rowTest.GetValue("Izena"));
+RowTests.cs (142) : Assert.Equal("21", rowTest.GetValue("Adina"));
+RowTests.cs (143) : Assert.Equal("Zumarraga", rowTest.GetValue("Hiria"));
+RowTests.cs (145) : }
+SelectUserTests.cs (1) : ﻿
+SelectUserTests.cs (3) : using System;
+SelectUserTests.cs (4) : using System.Collections.Generic;
+SelectUserTests.cs (5) : using System.Linq;
+SelectUserTests.cs (6) : using System.Text;
+SelectUserTests.cs (7) : using System.Threading.Tasks;
+SelectUserTests.cs (8) : using Xunit;
+SelectUserTests.cs (9) : using DbManager.Security;
+SelectUserTests.cs (10) : using DbManager;
+SelectUserTests.cs (12) : namespace OurTests
+SelectUserTests.cs (13) : {
+SelectUserTests.cs (14) : public class SelectUserTests
+SelectUserTests.cs (15) : {
+SelectUserTests.cs (16) : [Fact]
+SelectUserTests.cs (17) : public void Correct()
+SelectUserTests.cs (18) : {
+SelectUserTests.cs (19) : Select query = MiniSQLParser.Parse("SELECT columna1,columna2 FROM table") as Select;
+SelectUserTests.cs (20) : Assert.Equal("table", query.Table);
+SelectUserTests.cs (21) : Assert.Equal("columna1", query.Columns[0]);
+SelectUserTests.cs (22) : Assert.Equal("columna2", query.Columns[1]);
+SelectUserTests.cs (23) : }
+SelectUserTests.cs (25) : [Fact]
+SelectUserTests.cs (26) : public void CorrectWithSpaces()
+SelectUserTests.cs (27) : {
+SelectUserTests.cs (28) : Select query = MiniSQLParser.Parse("SELECT    columna1,columna2   FROM   table") as Select;
+SelectUserTests.cs (30) : Assert.NotNull(query);
+SelectUserTests.cs (31) : Assert.Equal("table", query.Table);
+SelectUserTests.cs (32) : Assert.Equal("columna1", query.Columns[0]);
+SelectUserTests.cs (33) : Assert.Equal("columna2", query.Columns[1]);
+SelectUserTests.cs (35) : }
+SelectUserTests.cs (36) : [Fact]
+SelectUserTests.cs (37) : public void CorrectWithWhereClause()
+SelectUserTests.cs (38) : {
+SelectUserTests.cs (39) : Select query = MiniSQLParser.Parse("SELECT columna1 FROM table WHERE columna1>'100'") as Select;
+SelectUserTests.cs (40) : Assert.NotNull(query);
+SelectUserTests.cs (41) : Assert.Equal("table", query.Table);
+SelectUserTests.cs (42) : Assert.Equal("columna1", query.Columns[0]);
+SelectUserTests.cs (43) : Assert.NotNull(query.Where);
+SelectUserTests.cs (44) : Assert.Equal("columna1", query.Where.ColumnName);
+SelectUserTests.cs (45) : Assert.Equal(">", query.Where.Operator);
+SelectUserTests.cs (46) : Assert.Equal("100", query.Where.LiteralValue);
+SelectUserTests.cs (47) : }
+SelectUserTests.cs (49) : /*
+SelectUserTests.cs (50) : [Fact]
+SelectUserTests.cs (51) : //no two condition required for the proyect
+SelectUserTests.cs (52) : public void CorrectWithWhereMultipleConditions()
+SelectUserTests.cs (53) : {
+SelectUserTests.cs (54) : Select query = MiniSQLParser.Parse("SELECT columna1    FROM     table WHERE columna1>100 AND columna2<50") as Select;
+SelectUserTests.cs (55) : Assert.NotNull(query);
+SelectUserTests.cs (56) : Assert.Equal("table", query.Table);
+SelectUserTests.cs (57) : Assert.Equal("columna1", query.Columns[0]);
+SelectUserTests.cs (58) : Assert.NotNull(query.Where);
+SelectUserTests.cs (59) : Assert.Equal("columna1", query.Where.ColumnName);
+SelectUserTests.cs (60) : Assert.Equal(">", query.Where.Operator);
+SelectUserTests.cs (61) : // query.Where.LiteralValue doubt
+SelectUserTests.cs (63) : }
+SelectUserTests.cs (64) : */
+SelectUserTests.cs (66) : }
+SelectUserTests.cs (67) : }
+UpdateTests.cs (1) : ﻿using System;
+UpdateTests.cs (2) : using System.Collections.Generic;
+UpdateTests.cs (3) : using System.Linq;
+UpdateTests.cs (4) : using System.Text;
+UpdateTests.cs (5) : using System.Threading.Tasks;
+UpdateTests.cs (6) : using DbManager;
+UpdateTests.cs (7) : using Xunit;
+UpdateTests.cs (9) : namespace OurTests
+UpdateTests.cs (10) : {
+UpdateTests.cs (11) : public class UpdateTests
+UpdateTests.cs (12) : {
+UpdateTests.cs (13) : [Fact]
+UpdateTests.cs (14) : public void Correct()
+UpdateTests.cs (15) : {
+UpdateTests.cs (16) : Update query = MiniSQLParser.Parse("UPDATE joseba SET columna1='valor1',columna2='100' WHERE columna3='texto'") as Update;
+UpdateTests.cs (18) : Assert.NotNull(query);
+UpdateTests.cs (19) : Assert.Equal("joseba", query.Table);
+UpdateTests.cs (21) : Assert.Equal("columna1", query.Columns[0].ColumnName);
+UpdateTests.cs (22) : Assert.Equal("valor1", query.Columns[0].Value);
+UpdateTests.cs (24) : Assert.Equal("columna2", query.Columns[1].ColumnName);
+UpdateTests.cs (25) : Assert.Equal("100", query.Columns[1].Value);
+UpdateTests.cs (27) : Assert.NotNull(query.Where);
+UpdateTests.cs (28) : Assert.Equal("columna3", query.Where.ColumnName);
+UpdateTests.cs (29) : Assert.Equal("=", query.Where.Operator);
+UpdateTests.cs (30) : Assert.Equal("texto", query.Where.LiteralValue);
+UpdateTests.cs (31) : }
+UpdateTests.cs (32) : [Fact]
+UpdateTests.cs (33) : public void CorrectWithSpaces()
+UpdateTests.cs (34) : {
+UpdateTests.cs (35) : Update query = MiniSQLParser.Parse("UPDATE   joseba   SET    columna1='valor1',columna2='100'    WHERE   columna3='texto'") as Update;
+UpdateTests.cs (37) : Assert.NotNull(query);
+UpdateTests.cs (38) : Assert.Equal("joseba", query.Table);
+UpdateTests.cs (40) : Assert.Equal("columna1", query.Columns[0].ColumnName);
+UpdateTests.cs (41) : Assert.Equal("valor1", query.Columns[0].Value);
+UpdateTests.cs (43) : Assert.Equal("columna2", query.Columns[1].ColumnName);
+UpdateTests.cs (44) : Assert.Equal("100", query.Columns[1].Value);
+UpdateTests.cs (46) : Assert.NotNull(query.Where);
+UpdateTests.cs (47) : Assert.Equal("columna3", query.Where.ColumnName);
+UpdateTests.cs (48) : Assert.Equal("=", query.Where.Operator);
+UpdateTests.cs (49) : Assert.Equal("texto", query.Where.LiteralValue);
+UpdateTests.cs (50) : }
+UpdateTests.cs (51) : [Fact]
+UpdateTests.cs (52) : public void CorrectWithOperedDifferent()
+UpdateTests.cs (53) : {
+UpdateTests.cs (54) : Update query = MiniSQLParser.Parse("UPDATE table SET columna1='valor1' WHERE columna2>'50'") as Update;
+UpdateTests.cs (56) : Assert.NotNull(query);
+UpdateTests.cs (57) : Assert.Equal("table", query.Table);
+UpdateTests.cs (59) : Assert.Equal("columna1", query.Columns[0].ColumnName);
+UpdateTests.cs (60) : Assert.Equal("valor1", query.Columns[0].Value);
+UpdateTests.cs (62) : Assert.NotNull(query.Where);
+UpdateTests.cs (63) : Assert.Equal("columna2", query.Where.ColumnName);
+UpdateTests.cs (64) : Assert.Equal(">", query.Where.Operator);
+UpdateTests.cs (65) : Assert.Equal("50", query.Where.LiteralValue);
+UpdateTests.cs (66) : }
+UpdateTests.cs (67) : }
+UpdateTests.cs (68) : }
+Client.cs (24) : try
+Client.cs (25) : {
+Client.cs (26) : m_tcpClient.Connect(ipAddress, port);
+Client.cs (27) : return true;
+Client.cs (28) : }
+Client.cs (29) : catch (Exception)
+Client.cs (30) : {
+Client.cs (32) : }
+CreateTable.cs (17) : Table = table;
+CreateTable.cs (18) : ColumnsParameters = columns;
+Delete.cs (15) : Table = table;
+Delete.cs (16) : Where = where;
+DropTable.cs (15) : Table = table;
+MiniSQLParser.cs (4) : using System.ComponentModel.DataAnnotations.Schema;
+MiniSQLParser.cs (5) : using System.Linq;
+MiniSQLParser.cs (14) : //need to check teacher tests. 92'5% passed
+MiniSQLParser.cs (16) : // utilizamos @ en el codigo para que en c# no tengamos que utilizar el doble \\ porque es un caracter especial en las cadenas
+MiniSQLParser.cs (17) : //done all tests passed
+MiniSQLParser.cs (18) : const string selectPattern = @"^SELECT\s+([\w,]+)*\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)(<|>|=)'(.+)')?$";
+MiniSQLParser.cs (19) : //done passed all tests
+MiniSQLParser.cs (20) : const string insertPattern = @"^INSERT\s+INTO\s+(\w+)\s+VALUES\s+\(('([^']*)'(?:,'([^']*)')*\s*)\)$";
+MiniSQLParser.cs (21) : //done all tests passed
+MiniSQLParser.cs (22) : const string dropTablePattern = @"^DROP\s+TABLE\s+(\w+)$";
+MiniSQLParser.cs (23) : //done || singlecolumns and incorrect need to check
+MiniSQLParser.cs (24) : const string createTablePattern = @"^CREATE\s+TABLE\s+([A-Za-z0-9]+)\s*\(\s*((?:[A-Za-z0-9]+\s+(?:INT|DOUBLE|TEXT)\s*,\s*)*(?:[A-Za-z0-9]+\s+(?:INT|DOUBLE|TEXT))?)\s*\)$";
+MiniSQLParser.cs (25) : //done all tests passed
+MiniSQLParser.cs (26) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+((?:\w+='(?:-?\d+\.\d+|-?\d+|[^']+)',)*\w+='(?:-?\d+\.\d+|-?\d+|[^']+)')\s+WHERE\s+(\w+)(<|>|=)'([^']+)'$";
+MiniSQLParser.cs (27) : //done all tests passed
+MiniSQLParser.cs (28) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(<|>|=)'(.+)'$";
+MiniSQLParser.cs (49) : //SELECT
+MiniSQLParser.cs (50) : Match selectCruce = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (51) : if (selectCruce.Success && miniSQLQuery.Length == selectCruce.Length)
+MiniSQLParser.cs (52) : {
+MiniSQLParser.cs (53) : // cruce.Groups
+MiniSQLParser.cs (54) : string tabla = selectCruce.Groups[2].Value;
+MiniSQLParser.cs (55) : string cond = "NO";
+MiniSQLParser.cs (56) : if (selectCruce.Groups[4].Success && !string.IsNullOrWhiteSpace(selectCruce.Groups[4].Value))
+MiniSQLParser.cs (57) : {
+MiniSQLParser.cs (58) : if (selectCruce.Groups[4].Value.Contains(">"))
+MiniSQLParser.cs (59) : {
+MiniSQLParser.cs (60) : cond = ">";
+MiniSQLParser.cs (61) : }
+MiniSQLParser.cs (62) : else if (selectCruce.Groups[4].Value.Contains("="))
+MiniSQLParser.cs (63) : {
+MiniSQLParser.cs (64) : cond = "=";
+MiniSQLParser.cs (65) : }
+MiniSQLParser.cs (66) : else if (selectCruce.Groups[4].Value.Contains("<"))
+MiniSQLParser.cs (67) : {
+MiniSQLParser.cs (68) : cond = "<";
+MiniSQLParser.cs (69) : }
+MiniSQLParser.cs (70) : }
+MiniSQLParser.cs (71) : List<string> columnas = selectCruce.Groups[1].Value.Split(',').Select(c => c.Trim()).ToList();
+MiniSQLParser.cs (73) : if (!cond.Equals("NO"))
+MiniSQLParser.cs (74) : {
+MiniSQLParser.cs (76) : Condition condicion = new Condition(selectCruce.Groups[3].Value.Trim(), cond, selectCruce.Groups[5].Value.Trim());
+MiniSQLParser.cs (77) : return new Select(tabla, columnas, condicion);
+MiniSQLParser.cs (78) : }
+MiniSQLParser.cs (79) : else
+MiniSQLParser.cs (80) : {
+MiniSQLParser.cs (81) : return new Select(tabla, columnas);
+MiniSQLParser.cs (82) : }
+MiniSQLParser.cs (84) : }
+MiniSQLParser.cs (97) : InsertValue[i] = InsertValue[i].Trim().Trim('\'');
+MiniSQLParser.cs (105) : Match dropPattern = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (107) : //droptable staff
+MiniSQLParser.cs (108) : if (dropPattern.Success)
+MiniSQLParser.cs (109) : {
+MiniSQLParser.cs (110) : string dropTableName = dropPattern.Groups[1].Value;
+MiniSQLParser.cs (111) : return new DropTable(dropTableName);
+MiniSQLParser.cs (112) : }
+MiniSQLParser.cs (114) : //CREATE TABLE
+MiniSQLParser.cs (115) : Match crTablePattern = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (116) : if (crTablePattern.Success)
+MiniSQLParser.cs (117) : {
+MiniSQLParser.cs (118) : string crTableName = crTablePattern.Groups[1].Value;
+MiniSQLParser.cs (119) : string crTablecolumns = crTablePattern.Groups[2].Value;
+MiniSQLParser.cs (120) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+MiniSQLParser.cs (121) : //columns.Add(new ColumnDefinition(ColumnDefinition.DataType.Double, "Nombre Columnas"))
+MiniSQLParser.cs (122) : string[] crColumnas = crTablecolumns.Split(',');
+MiniSQLParser.cs (123) : foreach (string columCr in crColumnas)
+MiniSQLParser.cs (124) : {
+MiniSQLParser.cs (125) : string[] partes = columCr.Trim().Split(' ');
+MiniSQLParser.cs (126) : if (partes.Length == 2)
+MiniSQLParser.cs (127) : {
+MiniSQLParser.cs (128) : string nombreColumna = partes[0];
+MiniSQLParser.cs (129) : string tipoDato = partes[1];
+MiniSQLParser.cs (130) : switch (tipoDato)
+MiniSQLParser.cs (131) : {
+MiniSQLParser.cs (132) : case "INT":
+MiniSQLParser.cs (133) : columns.Add(new ColumnDefinition(ColumnDefinition.DataType.Int, nombreColumna));
+MiniSQLParser.cs (134) : break;
+MiniSQLParser.cs (135) : case "DOUBLE":
+MiniSQLParser.cs (136) : columns.Add(new ColumnDefinition(ColumnDefinition.DataType.Double, nombreColumna));
+MiniSQLParser.cs (137) : break;
+MiniSQLParser.cs (138) : case "TEXT":
+MiniSQLParser.cs (139) : columns.Add(new ColumnDefinition(ColumnDefinition.DataType.String, nombreColumna));
+MiniSQLParser.cs (140) : break;
+MiniSQLParser.cs (141) : default:
+MiniSQLParser.cs (142) : throw new Exception("Tipo de dato desconocido");
+MiniSQLParser.cs (143) : }
+MiniSQLParser.cs (145) : }
+MiniSQLParser.cs (146) : }
+MiniSQLParser.cs (147) : return new CreateTable(crTableName, columns);
+MiniSQLParser.cs (148) : }
+MiniSQLParser.cs (149) : //UPDATE
+MiniSQLParser.cs (150) : Match updPattern = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (151) : if (updPattern.Success && miniSQLQuery.Length == updPattern.Length)
+MiniSQLParser.cs (152) : {
+MiniSQLParser.cs (153) : //Obtener el nombre de la tabla
+MiniSQLParser.cs (154) : string updateNomTabla = updPattern.Groups[1].Value.Trim();
+MiniSQLParser.cs (156) : //Obtener condicion
+MiniSQLParser.cs (157) : string codUPD = updPattern.Groups[4].Value.Trim();
+MiniSQLParser.cs (158) : Condition updCondicion = new Condition(updPattern.Groups[3].Value.Trim(), codUPD, updPattern.Groups[5].Value.Trim().Trim('\''));
+MiniSQLParser.cs (160) : //Las columnas nos pide una Lista<SetValue>
+MiniSQLParser.cs (161) : List<SetValue> columnasUPD = updPattern.Groups[2].Value.Split(',').Select(c =>
+MiniSQLParser.cs (162) : {
+MiniSQLParser.cs (163) : var partes = c.Split('=');
+MiniSQLParser.cs (164) : if (partes.Length == 2)  // Evita el IndexOutOfRangeException
+MiniSQLParser.cs (165) : {
+MiniSQLParser.cs (166) : return new SetValue(partes[0].Trim(), partes[1].Trim().Trim('\''));
+MiniSQLParser.cs (167) : }
+MiniSQLParser.cs (168) : else
+MiniSQLParser.cs (169) : {
+MiniSQLParser.cs (170) : throw new FormatException("No es correcto el formato");
+MiniSQLParser.cs (171) : }
+MiniSQLParser.cs (172) : }).ToList();
+MiniSQLParser.cs (174) : return new Update(updateNomTabla, columnasUPD, updCondicion);
+MiniSQLParser.cs (175) : }
+MiniSQLParser.cs (176) : //DELETE
+MiniSQLParser.cs (178) : Match deleteCruce = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (180) : if (deleteCruce.Success && miniSQLQuery.Length == deleteCruce.Length)
+MiniSQLParser.cs (181) : {
+MiniSQLParser.cs (182) : string deleteNombreT = deleteCruce.Groups[1].Value.Trim();
+MiniSQLParser.cs (183) : string deleteColumna = deleteCruce.Groups[2].Value.Trim();
+MiniSQLParser.cs (184) : string codDelete = deleteCruce.Groups[3].Value.Trim();
+MiniSQLParser.cs (185) : string deleteLitValue = deleteCruce.Groups[4].Value.Trim();
+MiniSQLParser.cs (186) : Condition condicionDelete = new Condition(deleteColumna, codDelete,deleteLitValue);
+MiniSQLParser.cs (187) : return new Delete(deleteNombreT, condicionDelete);
+MiniSQLParser.cs (190) : }
+MiniSQLParser.cs (258) : }
+Select.cs (18) : this.Table = table;
+Select.cs (19) : this.Columns = columns;
+Select.cs (20) : this.Where = condition;
+AddUserTests.cs (12) : namespace OurTests
+CreateSecurityProfileTests.cs (12) : namespace OurTests
+DeleteUserTests.cs (12) : namespace OurTests
+DropSecurityProfileTests.cs (12) : namespace OurTests
+GrantTests.cs (12) : namespace OurTests
+RevokeTests.cs (12) : namespace OurTests

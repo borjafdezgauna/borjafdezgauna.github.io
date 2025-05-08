@@ -1,0 +1,273 @@
+Total written by this student: 12% lines / 8% characters
+
+Database.cs (5) : using System.Data.Common;
+Database.cs (238) : //Crear directorio para la base de datos. dentro de esto crear carpeta por cada tabla.
+Database.cs (239) : // primera fila columnas, siguientes filas cada una una row.
+Database.cs (242) : string databasePath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (244) : if (!Directory.Exists(databasePath))
+Database.cs (245) : {
+Database.cs (246) : Directory.CreateDirectory(databasePath);
+Database.cs (247) : }
+Database.cs (249) : foreach(Table table in Tables)
+Database.cs (250) : {
+Database.cs (251) : string tablePath = Path.Combine(databasePath, table.Name + TableFileExtension);
+Database.cs (252) : TextWriter writer = null;
+Database.cs (253) : try
+Database.cs (254) : {
+Database.cs (255) : writer = File.CreateText(tablePath);
+Database.cs (256) : List<String> columns = new List<String>();
+Database.cs (257) : for(int i = 0; i < table.NumColumns();i++)
+Database.cs (258) : {
+Database.cs (259) : if(table.GetColumn(i).Type == ColumnDefinition.DataType.String)
+Database.cs (260) : {
+Database.cs (261) : columns.Add("S)" + table.GetColumn(i).Name);
+Database.cs (262) : }
+Database.cs (263) : if (table.GetColumn(i).Type == ColumnDefinition.DataType.Int)
+Database.cs (264) : {
+Database.cs (265) : columns.Add("I)" + table.GetColumn(i).Name);
+Database.cs (266) : }
+Database.cs (267) : if (table.GetColumn(i).Type == ColumnDefinition.DataType.Double)
+Database.cs (268) : {
+Database.cs (269) : columns.Add("D)" + table.GetColumn(i).Name);
+Database.cs (270) : }
+Database.cs (271) : }
+Database.cs (273) : for(int i = 0; i < columns.Count; i++)
+Database.cs (274) : {
+Database.cs (275) : writer.Write(columns[i]);
+Database.cs (276) : if(i != columns.Count - 1)
+Database.cs (277) : {
+Database.cs (278) : writer.Write(",");
+Database.cs (279) : }
+Database.cs (280) : }
+Database.cs (281) : writer.WriteLine();
+Database.cs (283) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (284) : {
+Database.cs (285) : String row = table.GetRow(i).AsText();
+Database.cs (286) : writer.WriteLine(row);
+Database.cs (287) : }
+Database.cs (288) : }
+Database.cs (289) : finally
+Database.cs (290) : {
+Database.cs (291) : if(writer != null)
+Database.cs (292) : {
+Database.cs (293) : writer.Close();
+Database.cs (294) : }
+Database.cs (295) : }
+Database.cs (296) : }
+Database.cs (297) : return true;
+Database.cs (298) : }
+Database.cs (299) : catch (Exception ex)
+Database.cs (300) : {
+Database.cs (301) : LastErrorMessage = Constants.Error + ": " + ex.Message;
+Database.cs (302) : return false;
+Database.cs (303) : }
+Database.cs (311) : //Solo est�n las columnas, faltan row (default todas tupo String)
+Database.cs (312) : //Idea: en save en cada columnas poner antes de cada columna su Type(S, I, D), luego aqui mirarlo y con ifs elegir como ser� cada columna
+Database.cs (314) : try {
+Database.cs (315) : String databasePath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (317) : if(!Directory.Exists(databasePath))
+Database.cs (318) : {
+Database.cs (319) : return null;
+Database.cs (320) : }
+Database.cs (322) : Database database = new Database();
+Database.cs (323) : foreach(String tablePath in Directory.GetFiles(databasePath))
+Database.cs (324) : {
+Database.cs (325) : string tableName1 = Path.GetFileName(tablePath);
+Database.cs (326) : string tableName = tableName1.Substring(0, tableName1.Length - 4);
+Database.cs (327) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (328) : List<Row> rows= new List<Row>();
+Database.cs (330) : TextReader reader = null;
+Database.cs (331) : try
+Database.cs (332) : {
+Database.cs (333) : reader = File.OpenText(tablePath);
+Database.cs (334) : string column = reader.ReadLine();
+Database.cs (335) : if(column == null)
+Database.cs (336) : {
+Database.cs (337) : continue;
+Database.cs (338) : }
+Database.cs (340) : string[] columnNames = column.Split(",");
+Database.cs (341) : foreach(String columnName in columnNames)
+Database.cs (342) : {
+Database.cs (343) : string[] columnPart = columnName.Split(")");
+Database.cs (344) : if (columnPart[0] == "S") //S, Name
+Database.cs (345) : {
+Database.cs (346) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.String, columnPart[1]);
+Database.cs (347) : columns.Add(column1);
+Database.cs (348) : }
+Database.cs (349) : if (columnPart[0] == "I") //I, Age
+Database.cs (350) : {
+Database.cs (351) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.Int, columnPart[1]);
+Database.cs (352) : columns.Add(column1);
+Database.cs (353) : }
+Database.cs (354) : if (columnPart[0] == "D") //D, Height
+Database.cs (355) : {
+Database.cs (356) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.Double, columnPart[1]);
+Database.cs (357) : columns.Add(column1);
+Database.cs (358) : }
+Database.cs (359) : }
+Database.cs (361) : string rowLine;
+Database.cs (362) : while((rowLine = reader.ReadLine()) != null)
+Database.cs (363) : {
+Database.cs (364) : Row parsedRow = Row.Parse(columns, rowLine);
+Database.cs (365) : if(parsedRow != null)
+Database.cs (366) : {
+Database.cs (367) : rows.Add(parsedRow);
+Database.cs (368) : }
+Database.cs (369) : }
+Database.cs (370) : }
+Database.cs (371) : finally
+Database.cs (372) : {
+Database.cs (373) : if(reader != null)
+Database.cs (374) : {
+Database.cs (375) : reader.Close();
+Database.cs (376) : }
+Database.cs (377) : }
+Database.cs (379) : Table table = new Table(tableName, columns);
+Database.cs (380) : foreach(Row row in rows)
+Database.cs (381) : {
+Database.cs (382) : table.AddRow(row);
+Database.cs (383) : }
+Database.cs (384) : database.AddTable(table);
+Database.cs (385) : }
+Database.cs (387) : return database;
+Database.cs (388) : }
+Database.cs (389) : catch (Exception ex)
+Database.cs (390) : {
+Database.cs (391) : Console.WriteLine(Constants.Error + ": " + ex.Message);
+Database.cs (395) : }
+Row.cs (128) : result += Encode(s);
+Table.cs (133) : if (NumColumns() == j + 1)
+Table.cs (179) : result.Sort((a, b) => b.CompareTo(a));
+Table.cs (190) : List<ColumnDefinition> selectedColumns = new List<ColumnDefinition>();
+Table.cs (193) : ColumnDefinition column = ColumnByName(columnName);
+Table.cs (194) : if (column != null)
+Table.cs (195) : {
+Table.cs (196) : selectedColumns.Add(column);
+Table.cs (197) : }
+Table.cs (198) : }
+Table.cs (200) : Table Result = new Table("Result", selectedColumns);
+Table.cs (203) : if(condition == null || r.IsTrue(condition))
+Table.cs (205) : List<String> values = new List<String>();
+Table.cs (206) : foreach (string columnName in columnNames)
+Table.cs (208) : string value = r.GetValue(columnName);
+Table.cs (209) : values.Add(value);
+Table.cs (211) : Result.Insert(values);
+DatabaseTests.cs (156) : [Fact]
+DatabaseTests.cs (157) : public void TestSaveAndLoad()
+DatabaseTests.cs (158) : {
+DatabaseTests.cs (159) : Database DB = Database.CreateTestDatabase();
+DatabaseTests.cs (160) : DB.Save("TestDB");
+DatabaseTests.cs (161) : Database loadedDB = Database.Load("TestDB", "admin", "password");
+DatabaseTests.cs (162) : Assert.NotNull(loadedDB);
+DatabaseTests.cs (164) : Assert.Equal(DB.TableByName(Table.TestTableName).NumRows(), loadedDB.TableByName(Table.TestTableName).NumRows());
+DatabaseTests.cs (165) : Assert.Equal(DB.TableByName(Table.TestTableName).NumColumns(), loadedDB.TableByName(Table.TestTableName).NumColumns());
+DatabaseTests.cs (166) : //Prueba valor por valor
+DatabaseTests.cs (167) : for(int i = 0; i < DB.TableByName(Table.TestTableName).NumRows(); i++) //rows
+DatabaseTests.cs (168) : {
+DatabaseTests.cs (169) : for(int j = 0; j < DB.TableByName(Table.TestTableName).NumColumns(); j++) //columns
+DatabaseTests.cs (170) : {
+DatabaseTests.cs (171) : String columnName = DB.TableByName(Table.TestTableName).GetColumn(j).Name;
+DatabaseTests.cs (172) : String DBValue = DB.TableByName(Table.TestTableName).GetRow(i).GetValue(columnName);
+DatabaseTests.cs (173) : String loadedDBValue = loadedDB.TableByName(Table.TestTableName).GetRow(i).GetValue(columnName);
+DatabaseTests.cs (174) : Assert.Equal(DBValue, loadedDBValue);
+DatabaseTests.cs (175) : }
+DatabaseTests.cs (176) : }
+DatabaseTests.cs (178) : Database delimitedDB = Database.CreateTestDatabase();
+DatabaseTests.cs (179) : List<String> values = new List<string>();
+DatabaseTests.cs (180) : values.Add(":Iker:");
+DatabaseTests.cs (181) : values.Add("1:25");
+DatabaseTests.cs (182) : values.Add("2:7");
+DatabaseTests.cs (183) : delimitedDB.TableByName(Table.TestTableName).Insert(values);
+DatabaseTests.cs (184) : delimitedDB.Save("TestDelimitedDB");
+DatabaseTests.cs (185) : Database loadedDelimitedDB = Database.Load("TestDelimitedDB", "admin", "password");
+DatabaseTests.cs (186) : Assert.NotNull(loadedDelimitedDB);
+DatabaseTests.cs (187) : for (int k = 0; k < delimitedDB.TableByName(Table.TestTableName).NumColumns(); k++) //columns
+DatabaseTests.cs (188) : {
+DatabaseTests.cs (189) : for (int l = 0; l < delimitedDB.TableByName(Table.TestTableName).NumRows(); l++) //rows
+DatabaseTests.cs (190) : {
+DatabaseTests.cs (191) : String columnName = delimitedDB.TableByName(Table.TestTableName).GetColumn(k).Name;
+DatabaseTests.cs (192) : String delimitedDBValue = delimitedDB.TableByName(Table.TestTableName).GetRow(l).GetValue(columnName);
+DatabaseTests.cs (193) : String loadedDelimitedDBValue = loadedDelimitedDB.TableByName(Table.TestTableName).GetRow(l).GetValue(columnName);
+DatabaseTests.cs (194) : Assert.Equal(delimitedDBValue, loadedDelimitedDBValue);
+DatabaseTests.cs (195) : }
+DatabaseTests.cs (196) : }
+DatabaseTests.cs (197) : }
+TableTests.cs (45) : Table table = Table.CreateTestTable("table");
+TableTests.cs (46) : Assert.Equal(1, table.ColumnIndexByName("Height"));
+TableTests.cs (52) : Table table = Table.CreateTestTable("table");
+TableTests.cs (53) : Row row1 = table.GetRow(1);
+TableTests.cs (54) : table.DeleteIthRow(0);
+TableTests.cs (55) : Assert.Equal(row1,table.GetRow(0));
+TableTests.cs (74) : [Fact]
+TableTests.cs (75) : public void TestToString()
+TableTests.cs (76) : {
+TableTests.cs (77) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+TableTests.cs (78) : Table table1 = Table.CreateTestTable("table");
+TableTests.cs (79) : Table table2 = new Table("table2", columns);
+TableTests.cs (80) : Table table3 = Table.CreateTestTable();
+TableTests.cs (82) : table3.DeleteIthRow(2);
+TableTests.cs (83) : table3.DeleteIthRow(1);
+TableTests.cs (84) : table3.DeleteIthRow(0);
+TableTests.cs (86) : Assert.Equal("['Name','Height','Age']{'Rodolfo','1.62','25'}{'Maider','1.67','67'}{'Pepe','1.55','51'}", table1.ToString());
+TableTests.cs (88) : Assert.Equal("['Name','Height','Age']", table3.ToString());
+TableTests.cs (93) : }
+TableTests.cs (95) : public void TestColumnByName()
+TableTests.cs (97) : Table table = Table.CreateTestTable("table");
+TableTests.cs (98) : Assert.Equal( "Height",table.ColumnByName("Height").Name);
+TableTests.cs (99) : Assert.Null(table.ColumnByName("MCO"));
+TableTests.cs (112) : }
+TableTests.cs (114) : [Fact]
+TableTests.cs (115) : public void TestGetColumn()
+TableTests.cs (116) : {
+TableTests.cs (117) : Table table = Table.CreateTestTable();
+TableTests.cs (118) : ColumnDefinition column = table.GetColumn(1);
+TableTests.cs (119) : Assert.Equal("Height", column.Name);
+TableTests.cs (124) : }
+TableTests.cs (127) : [Fact]
+TableTests.cs (128) : public void TestDeleteWhere()
+TableTests.cs (129) : {
+TableTests.cs (130) : Table table = Table.CreateTestTable("table");
+TableTests.cs (131) : Condition condition = new Condition("Age", ">", "30");
+TableTests.cs (135) : table.DeleteWhere(condition);
+TableTests.cs (137) : Assert.Equal(1, table.NumRows());
+TableTests.cs (138) : Assert.Equal("Rodolfo", table.GetRow(0).GetValue("Name"));
+TableTests.cs (139) : Assert.Equal("25", table.GetRow(0).GetValue("Age"));
+TableTests.cs (150) : }
+TableTests.cs (152) : [Fact]
+TableTests.cs (153) : public void TestSelect1()
+TableTests.cs (154) : {
+TableTests.cs (155) : Table table = Table.CreateTestTable("table");
+TableTests.cs (156) : List<string> columns = new List<string> { "Name", "Age" };
+TableTests.cs (157) : Condition condition = new Condition("Age", "=", "25");
+TableTests.cs (158) : Condition condition2 = new Condition("Age", ">", "30");
+TableTests.cs (159) : Table resultTable = table.Select(columns, condition);
+TableTests.cs (160) : Table resultTable2 = table.Select(columns, condition2);
+TableTests.cs (161) : Assert.Equal(1, resultTable.NumRows());
+TableTests.cs (162) : Assert.Equal("Rodolfo", resultTable.GetRow(0).GetValue("Name"));
+TableTests.cs (163) : Assert.Equal(2, resultTable2.NumRows());
+TableTests.cs (164) : Assert.Equal("Maider", resultTable2.GetRow(0).GetValue("Name"));
+TableTests.cs (165) : Assert.Equal("67", resultTable2.GetRow(0).GetValue("Age"));
+TableTests.cs (166) : Assert.Equal("Pepe", resultTable2.GetRow(1).GetValue("Name"));
+TableTests.cs (167) : Assert.Equal("51", resultTable2.GetRow(1).GetValue("Age"));
+TableTests.cs (168) : }
+TableTests.cs (170) : [Fact]
+TableTests.cs (171) : public void TestSelect2()
+TableTests.cs (172) : {
+TableTests.cs (173) : Table table = Table.CreateTestTable("table");
+TableTests.cs (174) : List<string> columns = new List<string> { "Name", "Age" };
+TableTests.cs (176) : Table resultTable = table.Select(columns, null);
+TableTests.cs (178) : Assert.Equal(3, resultTable.NumRows());
+TableTests.cs (179) : Assert.Equal("Rodolfo", resultTable.GetRow(0).GetValue("Name"));
+TableTests.cs (180) : Assert.Equal("25", resultTable.GetRow(0).GetValue("Age"));
+TableTests.cs (181) : Assert.Equal("Maider", resultTable.GetRow(1).GetValue("Name"));
+TableTests.cs (182) : Assert.Equal("67", resultTable.GetRow(1).GetValue("Age"));
+TableTests.cs (183) : Assert.Equal("Pepe", resultTable.GetRow(2).GetValue("Name"));
+TableTests.cs (184) : Assert.Equal("51", resultTable.GetRow(2).GetValue("Age"));
+MiniSQLParser.cs (216) : Condition condition1 = null;
+MiniSQLParser.cs (217) : if (conditions[2].Trim().StartsWith("'") && conditions[2].Trim().EndsWith("'"))
+MiniSQLParser.cs (218) : {
+MiniSQLParser.cs (223) : condition1 = new Condition(conditions[0], conditions[1], conditions[2]);
+MiniSQLParser.cs (224) : }
+UpdateTests.cs (40) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad>'21'") as Update;
+UpdateTests.cs (49) : Update query2 = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad<'21'") as Update;
+UpdateTests.cs (69) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE height>'1.98'") as Update;

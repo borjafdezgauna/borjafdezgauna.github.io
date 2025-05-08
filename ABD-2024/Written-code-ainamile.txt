@@ -1,0 +1,393 @@
+Total written by this student: 10% lines / 9% characters
+
+Row.cs (109) : return value.Replace(Delimiter, DelimiterEncoded);
+Row.cs (117) : return value.Replace(DelimiterEncoded, Delimiter);
+Row.cs (128) : {
+Row.cs (134) : }
+Class1.cs (1) : ﻿using System;
+Class1.cs (2) : using System.Collections.Generic;
+Class1.cs (3) : using System.Linq;
+Class1.cs (4) : using System.Text;
+Class1.cs (5) : using System.Threading.Tasks;
+Class1.cs (6) : using Xunit;
+Class1.cs (7) : using DbManager.Security;
+Class1.cs (8) : using DbManager;
+Class1.cs (10) : namespace SecurityParsingTests
+Class1.cs (11) : {
+Class1.cs (12) : public class RevokeTests
+Class1.cs (13) : {
+Class1.cs (14) : [Fact]
+Class1.cs (15) : public void Correct()
+Class1.cs (16) : {
+Class1.cs (17) : Revoke query = MiniSQLParser.Parse("REVOKE DELETE ON Table TO User") as Revoke;
+Class1.cs (18) : Assert.Equal("DELETE", query.PrivilegeName);
+Class1.cs (19) : Assert.Equal("Table", query.TableName);
+Class1.cs (20) : Assert.Equal("User", query.ProfileName);
+Class1.cs (22) : query = MiniSQLParser.Parse("REVOKE INSERT ON Table TO User") as Revoke;
+Class1.cs (23) : Assert.Equal("INSERT", query.PrivilegeName);
+Class1.cs (24) : Assert.Equal("Table", query.TableName);
+Class1.cs (25) : Assert.Equal("User", query.ProfileName);
+Class1.cs (27) : query = MiniSQLParser.Parse("REVOKE SELECT ON Table TO User") as Revoke;
+Class1.cs (28) : Assert.Equal("SELECT", query.PrivilegeName);
+Class1.cs (29) : Assert.Equal("Table", query.TableName);
+Class1.cs (30) : Assert.Equal("User", query.ProfileName);
+Class1.cs (32) : query = MiniSQLParser.Parse("REVOKE UPDATE ON Table TO User") as Revoke;
+Class1.cs (33) : Assert.Equal("UPDATE", query.PrivilegeName);
+Class1.cs (34) : Assert.Equal("Table", query.TableName);
+Class1.cs (35) : Assert.Equal("User", query.ProfileName);
+Class1.cs (36) : }
+Class1.cs (38) : [Fact]
+Class1.cs (39) : public void CorrectWithSpaces()
+Class1.cs (40) : {
+Class1.cs (41) : Revoke query = MiniSQLParser.Parse("REVOKE DELETE    ON Table TO User") as Revoke;
+Class1.cs (42) : Assert.Equal("DELETE", query.PrivilegeName);
+Class1.cs (43) : Assert.Equal("Table", query.TableName);
+Class1.cs (44) : Assert.Equal("User", query.ProfileName);
+Class1.cs (46) : query = MiniSQLParser.Parse("REVOKE INSERT ON Table    TO User") as Revoke;
+Class1.cs (47) : Assert.Equal("INSERT", query.PrivilegeName);
+Class1.cs (48) : Assert.Equal("Table", query.TableName);
+Class1.cs (49) : Assert.Equal("User", query.ProfileName);
+Class1.cs (51) : query = MiniSQLParser.Parse("REVOKE SELECT ON Table TO     User") as Revoke;
+Class1.cs (52) : Assert.Equal("SELECT", query.PrivilegeName);
+Class1.cs (53) : Assert.Equal("Table", query.TableName);
+Class1.cs (54) : Assert.Equal("User", query.ProfileName);
+Class1.cs (56) : query = MiniSQLParser.Parse("REVOKE    UPDATE     ON    Table    TO     User") as Revoke;
+Class1.cs (57) : Assert.Equal("UPDATE", query.PrivilegeName);
+Class1.cs (58) : Assert.Equal("Table", query.TableName);
+Class1.cs (59) : Assert.Equal("User", query.ProfileName);
+Class1.cs (60) : }
+Class1.cs (62) : [Fact]
+Class1.cs (63) : public void IncorrectProfileWithForbiddenChars()
+Class1.cs (64) : {
+Class1.cs (65) : Revoke query = MiniSQLParser.Parse("REVOKE DELETE ON Table TO User 1") as Revoke;
+Class1.cs (66) : Assert.Null(query);
+Class1.cs (68) : query = MiniSQLParser.Parse("REVOKE INSERT ON Table TO Us er") as Revoke;
+Class1.cs (69) : Assert.Null(query);
+Class1.cs (71) : query = MiniSQLParser.Parse("REVOKE SELECT ON Table TO User-1") as Revoke;
+Class1.cs (72) : Assert.Null(query);
+Class1.cs (74) : query = MiniSQLParser.Parse("REVOKE UPDATE ON Table To User_2") as Revoke;
+Class1.cs (75) : Assert.Null(query);
+Class1.cs (76) : }
+Class1.cs (78) : [Fact]
+Class1.cs (79) : public void IncorrectCapitalization()
+Class1.cs (80) : {
+Class1.cs (81) : Revoke query = MiniSQLParser.Parse("Revoke DELETE ON Table TO User") as Revoke;
+Class1.cs (82) : Assert.Null(query);
+Class1.cs (84) : query = MiniSQLParser.Parse("REVOKE Insert ON Table TO User") as Revoke;
+Class1.cs (85) : Assert.Null(query);
+Class1.cs (87) : query = MiniSQLParser.Parse("REVOKE SELECT on Table TO User") as Revoke;
+Class1.cs (88) : Assert.Null(query);
+Class1.cs (90) : query = MiniSQLParser.Parse("REVOKE UPDATE ON Table To User") as Revoke;
+Class1.cs (91) : Assert.Null(query);
+Class1.cs (92) : }
+Class1.cs (94) : [Fact]
+Class1.cs (95) : public void IncorrectPrivileges()
+Class1.cs (96) : {
+Class1.cs (97) : Revoke query = MiniSQLParser.Parse("REVOKE Remove ON Table TO User") as Revoke;
+Class1.cs (98) : Assert.Null(query);
+Class1.cs (100) : query = MiniSQLParser.Parse("REVOKE REMOVE ON Table TO User") as Revoke;
+Class1.cs (101) : Assert.Null(query);
+Class1.cs (103) : query = MiniSQLParser.Parse("REVOKE UPGRADE ON Table TO User") as Revoke;
+Class1.cs (104) : Assert.Null(query);
+Class1.cs (106) : query = MiniSQLParser.Parse("REVOKE SET ON Table TO User") as Revoke;
+Class1.cs (107) : Assert.Null(query);
+Class1.cs (108) : }
+Class1.cs (110) : [Fact]
+Class1.cs (111) : public void IncorrectWithoutOnePart()
+Class1.cs (112) : {
+Class1.cs (113) : Revoke query = MiniSQLParser.Parse("REVOKE ON Table TO User") as Revoke;
+Class1.cs (114) : Assert.Null(query);
+Class1.cs (116) : query = MiniSQLParser.Parse("REVOKE SELECT ON TO User") as Revoke;
+Class1.cs (117) : Assert.Null(query);
+Class1.cs (119) : query = MiniSQLParser.Parse("REVOKE SELECT TO User") as Revoke;
+Class1.cs (120) : Assert.Null(query);
+Class1.cs (122) : query = MiniSQLParser.Parse("REVOKE SELECT ON Table TO") as Revoke;
+Class1.cs (123) : Assert.Null(query);
+Class1.cs (124) : }
+Class1.cs (125) : }
+Class1.cs (126) : }
+ManagerTest.cs (174) : [Fact]
+ManagerTest.cs (175) : public void TestRevokePrivilege()
+ManagerTest.cs (176) : {
+ManagerTest.cs (177) : string tableName = "TestTable";
+ManagerTest.cs (178) : Privilege privilege = Privilege.Insert;
+ManagerTest.cs (179) : manager.GrantPrivilege("UserProfile", tableName, privilege);
+ManagerTest.cs (180) : manager.RevokePrivilege("UserProfile", tableName,privilege);
+ManagerTest.cs (181) : Assert.False(manager.IsGrantedPrivilege("user", tableName, privilege));
+ManagerTest.cs (182) : }
+ProfileTest.cs (66) : [Fact]
+ProfileTest.cs (67) : public void RevokePrivilegeWithNullTable()
+ProfileTest.cs (68) : {
+ProfileTest.cs (69) : Assert.False(profile.RevokePrivilege(null, Privilege.Delete));
+ProfileTest.cs (70) : }
+ProfileTest.cs (72) : [Fact]
+ProfileTest.cs (73) : public void RevokePrivilegeTest()
+ProfileTest.cs (74) : {
+ProfileTest.cs (75) : profile.GrantPrivilege(OtherTable, Privilege.Insert);
+ProfileTest.cs (76) : bool result = profile.RevokePrivilege(OtherTable, Privilege.Insert);
+ProfileTest.cs (77) : Assert.True(result);
+ProfileTest.cs (78) : Assert.False(profile.IsGrantedPrivilege(OtherTable, Privilege.Insert));
+ProfileTest.cs (80) : }
+ProfileTest.cs (81) : [Fact]
+ProfileTest.cs (82) : public void RevokePrivilegeNonExistTest()
+ProfileTest.cs (83) : {
+ProfileTest.cs (84) : bool result = profile.RevokePrivilege(OtherTable, Privilege.Insert);
+ProfileTest.cs (85) : Assert.False(result);
+ProfileTest.cs (86) : }
+RevokeTest.cs (1) : ﻿using System;
+RevokeTest.cs (2) : using System.Collections.Generic;
+RevokeTest.cs (3) : using System.Linq;
+RevokeTest.cs (4) : using System.Text;
+RevokeTest.cs (5) : using System.Threading.Tasks;
+RevokeTest.cs (6) : using DbManager;
+RevokeTest.cs (8) : namespace OurTests
+RevokeTest.cs (9) : {
+RevokeTest.cs (10) : public class RevokeTest
+RevokeTest.cs (11) : {
+RevokeTest.cs (13) : [Fact]
+RevokeTest.cs (14) : public void RevokeSelectTest()
+RevokeTest.cs (15) : {
+RevokeTest.cs (16) : Revoke revoke = MiniSQLParser.Parse("REVOKE SELECT ON tabla TO admin") as Revoke;
+RevokeTest.cs (18) : Assert.NotNull(revoke);
+RevokeTest.cs (19) : Assert.Equal("tabla", revoke.TableName);
+RevokeTest.cs (20) : Assert.Equal("SELECT", revoke.PrivilegeName);
+RevokeTest.cs (21) : Assert.Equal("admin", revoke.ProfileName);
+RevokeTest.cs (23) : }
+RevokeTest.cs (24) : [Fact]
+RevokeTest.cs (25) : public void RevokeDeleteTest()
+RevokeTest.cs (26) : {
+RevokeTest.cs (27) : Revoke revoke = MiniSQLParser.Parse("REVOKE DELETE ON tabla TO admin") as Revoke;
+RevokeTest.cs (29) : Assert.NotNull(revoke);
+RevokeTest.cs (30) : Assert.Equal("tabla", revoke.TableName);
+RevokeTest.cs (31) : Assert.Equal("DELETE", revoke.PrivilegeName);
+RevokeTest.cs (32) : Assert.Equal("admin", revoke.ProfileName);
+RevokeTest.cs (34) : }
+RevokeTest.cs (35) : [Fact]
+RevokeTest.cs (36) : public void RevokeInsertTest()
+RevokeTest.cs (37) : {
+RevokeTest.cs (38) : Revoke revoke = MiniSQLParser.Parse("REVOKE INSERT ON tabla TO admin") as Revoke;
+RevokeTest.cs (40) : Assert.NotNull(revoke);
+RevokeTest.cs (41) : Assert.Equal("tabla", revoke.TableName);
+RevokeTest.cs (42) : Assert.Equal("INSERT", revoke.PrivilegeName);
+RevokeTest.cs (43) : Assert.Equal("admin", revoke.ProfileName);
+RevokeTest.cs (45) : }
+RevokeTest.cs (46) : [Fact]
+RevokeTest.cs (47) : public void RevokeUpdateTest()
+RevokeTest.cs (48) : {
+RevokeTest.cs (49) : Revoke revoke = MiniSQLParser.Parse("REVOKE UPDATE ON tabla TO admin") as Revoke;
+RevokeTest.cs (51) : Assert.NotNull(revoke);
+RevokeTest.cs (52) : Assert.Equal("tabla", revoke.TableName);
+RevokeTest.cs (53) : Assert.Equal("UPDATE", revoke.PrivilegeName);
+RevokeTest.cs (54) : Assert.Equal("admin", revoke.ProfileName);
+RevokeTest.cs (56) : }
+RevokeTest.cs (57) : }
+RevokeTest.cs (58) : }
+RowTests.cs (1) : using DbManager;
+RowTests.cs (8) : List<ColumnDefinition> cd = new List<ColumnDefinition>();
+RowTests.cs (10) : List<string> v = new List<string>();
+RowTests.cs (13) : public void TestAsText()
+RowTests.cs (15) : cd.Add(new ColumnDefinition(ColumnDefinition.DataType.String, "Name"));
+RowTests.cs (16) : cd.Add(new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"));
+RowTests.cs (18) : v.Add("Ana");
+RowTests.cs (19) : v.Add("23");
+RowTests.cs (21) : Row r = new(cd, v);
+RowTests.cs (23) : string result = r.AsText();
+UpdateTest.cs (1) : using DbManager;
+UpdateTest.cs (2) : using DbManager.Parser;
+UpdateTest.cs (3) : using System;
+UpdateTest.cs (4) : using System.Collections.Generic;
+UpdateTest.cs (5) : using System.Globalization;
+UpdateTest.cs (6) : using Xunit;
+UpdateTest.cs (7) : namespace OurTests;
+UpdateTest.cs (10) : public class UpdateTest
+UpdateTest.cs (11) : {
+UpdateTest.cs (12) : private Database db;
+UpdateTest.cs (13) : private Table table;
+UpdateTest.cs (14) : private List<ColumnDefinition> cd;
+UpdateTest.cs (15) : private List<string> values;
+UpdateTest.cs (16) : private MiniSQLParser miniSQLParser;
+UpdateTest.cs (18) : [Fact]
+UpdateTest.cs (19) : public void TestMethod1()
+UpdateTest.cs (20) : {
+UpdateTest.cs (21) : SetUp();
+UpdateTest.cs (22) : }
+UpdateTest.cs (24) : public void SetUp()
+UpdateTest.cs (25) : {
+UpdateTest.cs (26) : db = new Database("User1", "12345");
+UpdateTest.cs (27) : miniSQLParser = new MiniSQLParser();
+UpdateTest.cs (28) : cd = new List<ColumnDefinition>()
+UpdateTest.cs (29) : {
+UpdateTest.cs (30) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name"),
+UpdateTest.cs (31) : new ColumnDefinition(ColumnDefinition.DataType.Int, "Age"),
+UpdateTest.cs (32) : new ColumnDefinition(ColumnDefinition.DataType.Double, "Height")
+UpdateTest.cs (33) : };
+UpdateTest.cs (36) : table = new Table("testTable", cd);
+UpdateTest.cs (38) : values = new List<String>() { "Ana", "32", "1.67" };
+UpdateTest.cs (39) : table.AddRow(new Row(cd, values));
+UpdateTest.cs (40) : values = new List<String>() { "Rodolfo", "45", "1.77" };
+UpdateTest.cs (41) : table.AddRow(new Row(cd, values));
+UpdateTest.cs (42) : values = new List<String>() { "Maider", "23", "1.70" };
+UpdateTest.cs (43) : table.AddRow(new Row(cd, values));
+UpdateTest.cs (45) : db.AddTable(table);
+UpdateTest.cs (46) : }
+UpdateTest.cs (48) : [Fact]
+UpdateTest.cs (49) : public void UpdateTestsStringValue()
+UpdateTest.cs (50) : {
+UpdateTest.cs (51) : Update update = MiniSQLParser.Parse("UPDATE testTable SET Name='Ana Perez' WHERE Name='Ana'") as Update;
+UpdateTest.cs (53) : Assert.NotNull(update);
+UpdateTest.cs (54) : Assert.Equal("testTable", update.Table);
+UpdateTest.cs (55) : Assert.Equal("Name", update.Columns[0].ColumnName);
+UpdateTest.cs (56) : Assert.Equal("Ana Perez", update.Columns[0].Value);
+UpdateTest.cs (57) : Assert.Equal("Name", update.Where.ColumnName);
+UpdateTest.cs (58) : Assert.Equal("Ana", update.Where.LiteralValue);
+UpdateTest.cs (60) : }
+UpdateTest.cs (62) : [Fact]
+UpdateTest.cs (63) : public void UpdateTestsIntValues()
+UpdateTest.cs (64) : {
+UpdateTest.cs (65) : Update update = MiniSQLParser.Parse("UPDATE testTable SET Age='23',Height='1.70' WHERE Name='Ana'") as Update;
+UpdateTest.cs (67) : Assert.NotNull(update);
+UpdateTest.cs (68) : Assert.Equal("testTable", update.Table);
+UpdateTest.cs (69) : Assert.Equal("Age", update.Columns[0].ColumnName);
+UpdateTest.cs (70) : Assert.Equal("23", update.Columns[0].Value);
+UpdateTest.cs (71) : Assert.Equal("Height", update.Columns[1].ColumnName);
+UpdateTest.cs (72) : Assert.Equal("1.70", update.Columns[1].Value);
+UpdateTest.cs (73) : Assert.Equal("Name", update.Where.ColumnName);
+UpdateTest.cs (74) : Assert.Equal("Ana", update.Where.LiteralValue);
+UpdateTest.cs (75) : }
+UpdateTest.cs (77) : [Fact]
+UpdateTest.cs (78) : public void UpdateTestsIncorrectSpacesOrMissingApostrophes()
+UpdateTest.cs (79) : {
+UpdateTest.cs (80) : Update update = MiniSQLParser.Parse("UPDATE testTable SET Age='23', Height='1.70' WHERE Name='Ana'") as Update;
+UpdateTest.cs (82) : Assert.Null(update);
+UpdateTest.cs (83) : }
+UpdateTest.cs (85) : }
+MiniSQLParser.cs (2) : using Microsoft.VisualBasic;
+MiniSQLParser.cs (5) : using System.ComponentModel.Design;
+MiniSQLParser.cs (26) : const string updateTablePattern = @"^UPDATE\s+(?<tableName>\w+)\s+SET\s+(?<update>(\w+)(=)(\'-?\d+(\.\d+)?\'|'[^']+')(,(\w+)(=)(\'-?\d+(\.\d+)?\'|'[^']+'))*)*\s+WHERE\s+(?<columnName>\w+)(?<operator>=|<|>)(?<literalValue>\'-?\d+(?<decimals>\.\d+)?\'|'[^']+')$";
+MiniSQLParser.cs (37) : const string revokePattern = @"REVOKE\s+(?<priType>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<tabName>[a-zA-Z0-9]+)\s+TO\s+(?<secProfile>[a-zA-Z]+)$";
+MiniSQLParser.cs (140) : var match = Regex.Match(miniSQLQuery, updateTablePattern, RegexOptions.IgnoreCase);
+MiniSQLParser.cs (141) : string tableName = match.Groups["tableName"].Value;
+MiniSQLParser.cs (142) : string set = match.Groups["update"].Value;
+MiniSQLParser.cs (143) : List<string> toUpdate = CommaSeparatedNames(set);
+MiniSQLParser.cs (144) : string columnName = match.Groups["columnName"].Value;
+MiniSQLParser.cs (145) : string op = match.Groups["operator"].Value;
+MiniSQLParser.cs (146) : string literalValue = trim(match.Groups["literalValue"].Value);
+MiniSQLParser.cs (147) : List<SetValue> setValue = new List<SetValue>();
+MiniSQLParser.cs (148) : for (int i = 0; i < toUpdate.Count; i++)
+MiniSQLParser.cs (149) : {
+MiniSQLParser.cs (150) : string[] partes = toUpdate[i].Split("=");
+MiniSQLParser.cs (151) : string column = partes[0];
+MiniSQLParser.cs (152) : string value = trim(partes[1]);
+MiniSQLParser.cs (153) : setValue.Add(new SetValue(column, value));
+MiniSQLParser.cs (154) : }
+MiniSQLParser.cs (156) : Condition where = new Condition(columnName, op, literalValue);
+MiniSQLParser.cs (158) : return new Update(tableName, setValue, where);
+MiniSQLParser.cs (214) : else if (Regex.IsMatch(miniSQLQuery, revokePattern))
+MiniSQLParser.cs (215) : {
+MiniSQLParser.cs (216) : Match match = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (217) : string privilegeType = match.Groups["priType"].Value;
+MiniSQLParser.cs (218) : string tableName = match.Groups["tabName"].Value;
+MiniSQLParser.cs (219) : string securityProfile = match.Groups["secProfile"].Value;
+MiniSQLParser.cs (221) : return new Revoke(privilegeType, tableName, securityProfile);
+MiniSQLParser.cs (222) : }
+Revoke.cs (5) : using DbManager.Security;
+Revoke.cs (19) : PrivilegeName = privilegeName;
+Revoke.cs (20) : TableName = tableName;
+Revoke.cs (21) : ProfileName = profileName;
+Revoke.cs (27) : if (!database.SecurityManager.IsUserAdmin())
+Revoke.cs (28) : {
+Revoke.cs (29) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (30) : }
+Revoke.cs (31) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Revoke.cs (33) : if (profile == null)
+Revoke.cs (34) : {
+Revoke.cs (35) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (36) : }
+Revoke.cs (38) : Privilege privilege;
+Revoke.cs (39) : try
+Revoke.cs (40) : {
+Revoke.cs (41) : privilege = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Revoke.cs (42) : }
+Revoke.cs (43) : catch (Exception)
+Revoke.cs (44) : {
+Revoke.cs (45) : return Constants.PrivilegeDoesNotExistError;
+Revoke.cs (46) : }
+Revoke.cs (47) : if (!profile.IsGrantedPrivilege(TableName, privilege))
+Revoke.cs (48) : {
+Revoke.cs (49) : return Constants.PrivilegeDoesNotExistError;
+Revoke.cs (50) : }
+Revoke.cs (51) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, privilege);
+Revoke.cs (53) : return Constants.RevokePrivilegeSuccess;
+Update.cs (2) : using System;
+Update.cs (17) : Table = table;
+Update.cs (18) : Columns=columnNames;
+Update.cs (19) : Where= where;
+Update.cs (27) : //comprobar que todas las columnas existan y que el where no sea null, que la columna exista y se cumpla
+Update.cs (28) : Table table = database.TableByName(Table);
+Update.cs (30) : if (database == null)
+Update.cs (31) : {
+Update.cs (32) : return Constants.Error + "database does not exist";
+Update.cs (33) : }
+Update.cs (37) : return Constants.TableDoesNotExistError;
+Update.cs (38) : }
+Update.cs (42) : if (table.ColumnByName(column.ColumnName) == null)
+Update.cs (43) : {
+Update.cs (44) : return Constants.ColumnDoesNotExistError;
+Update.cs (45) : }
+Update.cs (46) : }
+Update.cs (48) : if (Where != null)
+Update.cs (49) : {
+Update.cs (50) : if (Where.ColumnName == null || (table.ColumnByName(Where.ColumnName) == null))
+Update.cs (51) : {
+Update.cs (52) : return Constants.ColumnDoesNotExistError;
+Update.cs (53) : }
+Update.cs (54) : }
+Update.cs (57) : if (database.Update(Table,Columns, Where) == null)
+Update.cs (58) : {
+Update.cs (59) : return database.LastErrorMessage;
+Update.cs (60) : }
+Update.cs (61) : return Constants.UpdateSuccess;
+Manager.cs (56) : {
+Manager.cs (67) : }
+Manager.cs (73) : if (!IsUserAdmin())
+Manager.cs (74) : {
+Manager.cs (75) : return;
+Manager.cs (76) : }
+Manager.cs (78) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table) || privilege == null)
+Manager.cs (79) : {
+Manager.cs (80) : return;
+Manager.cs (81) : }
+Manager.cs (83) : if (IsUserAdmin() && IsGrantedPrivilege(m_username, table, privilege))
+Manager.cs (84) : {
+Manager.cs (85) : Profile profile = ProfileByName(profileName);
+Manager.cs (86) : if ((profile == null) || (table == null))
+Manager.cs (87) : {
+Manager.cs (88) : return;
+Manager.cs (89) : }
+Manager.cs (91) : profile.RevokePrivilege(table, privilege);
+Manager.cs (95) : }
+Profile.cs (42) : if (privilege == null || table == null)
+Profile.cs (43) : {
+Profile.cs (44) : return false;
+Profile.cs (45) : }
+Profile.cs (46) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (47) : {
+Profile.cs (48) : return false;
+Profile.cs (49) : }
+Profile.cs (51) : if (!PrivilegesOn[table].Contains(privilege))
+Profile.cs (52) : {
+Profile.cs (53) : return false;
+Profile.cs (54) : }
+Profile.cs (55) : if (PrivilegesOn.ContainsKey(table))
+Profile.cs (56) : {
+Profile.cs (57) : List<Privilege> privileges = PrivilegesOn[table];
+Profile.cs (58) : if (privileges == null || !PrivilegesOn[table].Contains(privilege))
+Profile.cs (59) : {
+Profile.cs (60) : return false;
+Profile.cs (61) : }
+Profile.cs (62) : else
+Profile.cs (63) : {
+Profile.cs (64) : return privileges.Remove(privilege);
+Profile.cs (65) : }
+Profile.cs (66) : }
+Profile.cs (67) : return true;

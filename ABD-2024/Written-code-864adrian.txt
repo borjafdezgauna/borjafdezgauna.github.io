@@ -1,0 +1,387 @@
+Total written by this student: 17% lines / 16% characters
+
+ColumnDefinition.cs (3) : using System.Collections.Generic;
+ColumnDefinition.cs (31) : return value.Replace(Delimiter, DelimiterEncoded);
+ColumnDefinition.cs (39) : return value.Replace(DelimiterEncoded, Delimiter);
+ColumnDefinition.cs (47) : return Encode(Name) + Delimiter + Type.ToString();
+ColumnDefinition.cs (54) : DataType type1;
+ColumnDefinition.cs (55) : String[] strings = value.Split(Delimiter);
+ColumnDefinition.cs (56) : if(strings.Length != 2)
+ColumnDefinition.cs (57) : {
+ColumnDefinition.cs (58) : return null;
+ColumnDefinition.cs (59) : }
+ColumnDefinition.cs (60) : if (strings[1] == "String")
+ColumnDefinition.cs (61) : {
+ColumnDefinition.cs (62) : type1 = DataType.String;
+ColumnDefinition.cs (63) : }else if(strings[1] == "Int")
+ColumnDefinition.cs (64) : {
+ColumnDefinition.cs (65) : type1 = DataType.Int;
+ColumnDefinition.cs (66) : }else if (strings[1] == "Double")
+ColumnDefinition.cs (67) : {
+ColumnDefinition.cs (68) : type1 = DataType.Double;
+ColumnDefinition.cs (69) : }
+ColumnDefinition.cs (70) : else
+ColumnDefinition.cs (71) : {
+ColumnDefinition.cs (73) : }
+ColumnDefinition.cs (74) : ColumnDefinition columnDefinition = new ColumnDefinition(type1, Decode(strings[0]));
+ColumnDefinition.cs (75) : return columnDefinition;
+Database.cs (31) : m_username = adminUsername;
+Database.cs (40) : if (table == null)
+Database.cs (41) : {
+Database.cs (43) : }
+Database.cs (44) : Tables.Add(table);
+Database.cs (45) : return true;
+Database.cs (52) : foreach (Table table in Tables)
+Database.cs (53) : {
+Database.cs (55) : {
+Database.cs (56) : return table;
+Database.cs (57) : }
+Database.cs (58) : }
+Table.cs (34) : {
+Table.cs (103) : String tableString = "";
+Table.cs (104) : if (NumColumns() == 0)
+Table.cs (105) : {
+Table.cs (106) : return tableString;
+Table.cs (107) : }
+Table.cs (108) : tableString = "[";
+Table.cs (109) : for (int i = 0; NumColumns() > i; i++)
+Table.cs (110) : {
+Table.cs (112) : if (NumColumns() == i + 1)
+Table.cs (113) : {
+Table.cs (114) : tableString += "]";
+Table.cs (115) : }
+Table.cs (116) : else
+Table.cs (117) : {
+Table.cs (118) : tableString += ",";
+Table.cs (119) : }
+Table.cs (121) : }
+Table.cs (122) : if (NumRows() == 0)
+Table.cs (123) : {
+Table.cs (124) : return tableString;
+Table.cs (125) : }
+Table.cs (127) : for (int i = 0; i < NumRows(); i++)
+Table.cs (128) : {
+Table.cs (129) : tableString += "{";
+Table.cs (130) : for (int j = 0;j < NumColumns(); j++)
+Table.cs (131) : {
+Table.cs (134) : {
+Table.cs (135) : tableString += "}";
+Table.cs (136) : }
+Table.cs (137) : else
+Table.cs (138) : {
+Table.cs (139) : tableString += ",";
+Table.cs (140) : }
+Table.cs (141) : }
+Table.cs (142) : }
+Table.cs (143) : return tableString;
+Table.cs (151) : {
+Table.cs (152) : return;
+Table.cs (153) : }
+ColumnDefinitionTests.cs (1) : using DbManager;
+ColumnDefinitionTests.cs (9) : public void TestAsTextAndParse()
+ColumnDefinitionTests.cs (11) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.String,"PiliYMili");
+ColumnDefinitionTests.cs (12) : ColumnDefinition column2 = new ColumnDefinition(ColumnDefinition.DataType.Int, "5");
+ColumnDefinitionTests.cs (13) : ColumnDefinition column3 = new ColumnDefinition(ColumnDefinition.DataType.Double, "3.17");
+ColumnDefinitionTests.cs (15) : string result1 = column1.AsText();
+ColumnDefinitionTests.cs (16) : Assert.Equal("PiliYMili->String", result1);
+ColumnDefinitionTests.cs (17) : string result2 = column2.AsText();
+ColumnDefinitionTests.cs (18) : Assert.Equal("5->Int", result2);
+ColumnDefinitionTests.cs (19) : string result3 = column3.AsText();
+ColumnDefinitionTests.cs (20) : Assert.Equal("3.17->Double", result3);
+ColumnDefinitionTests.cs (22) : ColumnDefinition column12 = ColumnDefinition.Parse(result1);
+ColumnDefinitionTests.cs (23) : ColumnDefinition column22 = ColumnDefinition.Parse(result2);
+ColumnDefinitionTests.cs (24) : ColumnDefinition column32 = ColumnDefinition.Parse(result3);
+ColumnDefinitionTests.cs (26) : Assert.Equal(column1.Type,column12.Type);
+ColumnDefinitionTests.cs (27) : Assert.Equal(column1.Name, column12.Name);
+ColumnDefinitionTests.cs (28) : Assert.Equal(column2.Type, column22.Type);
+ColumnDefinitionTests.cs (29) : Assert.Equal(column2.Name, column22.Name);
+ColumnDefinitionTests.cs (30) : Assert.Equal(column3.Type, column32.Type);
+ColumnDefinitionTests.cs (31) : Assert.Equal(column3.Name, column32.Name);
+ColumnDefinitionTests.cs (33) : ColumnDefinition column4 = ColumnDefinition.Parse("Int->5");
+ColumnDefinitionTests.cs (34) : Assert.Null(column4);
+ColumnDefinitionTests.cs (35) : ColumnDefinition column5 = ColumnDefinition.Parse("Int->");
+ColumnDefinitionTests.cs (36) : Assert.Null(column5);
+ColumnDefinitionTests.cs (37) : ColumnDefinition column6 = ColumnDefinition.Parse("->");
+ColumnDefinitionTests.cs (38) : Assert.Null(column6);
+ColumnDefinitionTests.cs (39) : ColumnDefinition column7 = ColumnDefinition.Parse("->Int->5");
+ColumnDefinitionTests.cs (40) : Assert.Null(column7);
+ColumnDefinitionTests.cs (43) : ColumnDefinition column8 = new ColumnDefinition(ColumnDefinition.DataType.String, "Vitoria->Gasteiz");
+ColumnDefinitionTests.cs (44) : string result4 = column8.AsText();
+ColumnDefinitionTests.cs (45) : Assert.Equal("Vitoria[ARROW]Gasteiz->String", result4);
+ColumnDefinitionTests.cs (46) : ColumnDefinition column82 = ColumnDefinition.Parse(result4);
+ColumnDefinitionTests.cs (47) : Assert.Equal(column8.Type, column82.Type);
+ColumnDefinitionTests.cs (48) : Assert.Equal(column8.Name, column82.Name);
+ConditionTests.cs (11) : Condition condition1 = new Condition("Name",">","aaa");
+ConditionTests.cs (12) : Condition condition2 = new Condition("Name", "<", "Une");
+ConditionTests.cs (13) : Condition condition3 = new Condition("Name", "=", "Amaia");
+ConditionTests.cs (14) : Condition condition4 = new Condition("Age", "=", "32");
+ConditionTests.cs (15) : Condition condition5 = new Condition("Age", "<", "25");
+ConditionTests.cs (16) : Condition condition6 = new Condition("Age", ">", "25");
+ConditionTests.cs (17) : Condition condition7 = new Condition("Age", "<", "23.56");
+ConditionTests.cs (18) : Condition condition8 = new Condition("Age", "=", "25.87");
+ConditionTests.cs (19) : Condition condition9 = new Condition("Age", ">", "32.01");
+ConditionTests.cs (22) : Assert.True(condition1.IsTrue("bbb",ColumnDefinition.DataType.String));
+ConditionTests.cs (23) : Assert.True(condition2.IsTrue("Ane", ColumnDefinition.DataType.String));
+ConditionTests.cs (24) : Assert.True(condition3.IsTrue("Amaia", ColumnDefinition.DataType.String));
+ConditionTests.cs (25) : Assert.True(condition4.IsTrue("32", ColumnDefinition.DataType.Int));
+ConditionTests.cs (26) : Assert.False(condition5.IsTrue("30", ColumnDefinition.DataType.Int));
+ConditionTests.cs (27) : Assert.True(condition6.IsTrue("30", ColumnDefinition.DataType.Int));
+ConditionTests.cs (28) : Assert.True(condition7.IsTrue("22.24", ColumnDefinition.DataType.Double));
+ConditionTests.cs (29) : Assert.True(condition8.IsTrue("25.87", ColumnDefinition.DataType.Double));
+ConditionTests.cs (30) : Assert.True(condition9.IsTrue("36", ColumnDefinition.DataType.Double));
+ConditionTests.cs (32) : Assert.False(condition9.IsTrue(null, ColumnDefinition.DataType.Double));
+TableTests.cs (9) : [Fact]
+TableTests.cs (10) : public void TestAddRowNotMatchingColumns()
+TableTests.cs (11) : {
+TableTests.cs (12) : Table table = Table.CreateTestTable("table");
+TableTests.cs (13) : Assert.Equal(3, table.NumRows());
+TableTests.cs (14) : List<ColumnDefinition> colums1 = new List<ColumnDefinition>()
+TableTests.cs (15) : {
+TableTests.cs (16) : new ColumnDefinition(ColumnDefinition.DataType.String,"Name"),
+TableTests.cs (17) : new ColumnDefinition(ColumnDefinition.DataType.Int,"Age")
+TableTests.cs (18) : };
+TableTests.cs (19) : List<String> values1 = new List<String>() { "Jacinto", "27" };
+TableTests.cs (20) : Row row1 = new Row(colums1, values1);
+TableTests.cs (21) : table.AddRow(row1);
+TableTests.cs (22) : Assert.Equal(3, table.NumRows());
+TableTests.cs (23) : List<ColumnDefinition> colums2 = new List<ColumnDefinition>()
+TableTests.cs (24) : {
+TableTests.cs (25) : new ColumnDefinition(ColumnDefinition.DataType.String,"Name"),
+TableTests.cs (26) : new ColumnDefinition(ColumnDefinition.DataType.Int,"Age"),
+TableTests.cs (27) : new ColumnDefinition(ColumnDefinition.DataType.Double,"Height"),
+TableTests.cs (28) : new ColumnDefinition(ColumnDefinition.DataType.Int,"Extra")
+TableTests.cs (29) : };
+TableTests.cs (30) : List<String> values2 = new List<String>() { "Jacinto", "27","1.70","3" };
+TableTests.cs (31) : Row row2 = new Row(colums2, values2);
+TableTests.cs (32) : table.AddRow(row2);
+TableTests.cs (33) : Assert.Equal(3, table.NumRows());
+TableTests.cs (34) : }
+TableTests.cs (56) : table.DeleteIthRow(10);
+TableTests.cs (87) : Assert.Equal("", table2.ToString());
+AddUser.cs (19) : Username = username;
+AddUser.cs (20) : Password = password;
+AddUser.cs (21) : ProfileName = profileName;
+CreateSecurityProfile.cs (18) : ProfileName = profileName;
+DeleteUser.cs (17) : Username = username;
+DropSecurityProfile.cs (16) : ProfileName = profileName;
+Grant.cs (5) : using DbManager.Security;
+Grant.cs (19) : ProfileName = profileName;
+Grant.cs (20) : TableName = tableName;
+Grant.cs (21) : PrivilegeName = privilegeName;
+Grant.cs (28) : Security.Privilege privilege = new Security.Privilege();
+Grant.cs (29) : if (database.IsUserAdmin())
+Grant.cs (30) : {
+Grant.cs (31) : if (database.SecurityManager.ProfileByName(ProfileName) != null)
+Grant.cs (32) : {
+Grant.cs (33) : switch (PrivilegeName)
+Grant.cs (34) : {
+Grant.cs (35) : case "DELETE":
+Grant.cs (36) : privilege = Security.Privilege.Delete;
+Grant.cs (37) : break;
+Grant.cs (38) : case "INSERT":
+Grant.cs (39) : privilege = Security.Privilege.Insert;
+Grant.cs (40) : break;
+Grant.cs (41) : case "SELECT":
+Grant.cs (42) : privilege = Security.Privilege.Select;
+Grant.cs (43) : break;
+Grant.cs (44) : case "UPDATE":
+Grant.cs (45) : privilege = Security.Privilege.Update;
+Grant.cs (46) : break;
+Grant.cs (47) : default:
+Grant.cs (48) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (49) : }
+Grant.cs (50) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (51) : List<Privilege> p = profile.PrivilegesOn[TableName];
+Grant.cs (52) : if (!p.Contains(privilege))
+Grant.cs (53) : {
+Grant.cs (54) : database.SecurityManager.GrantPrivilege(ProfileName,TableName,privilege);
+Grant.cs (55) : return Constants.GrantPrivilegeSuccess;
+Grant.cs (56) : }
+Grant.cs (57) : else
+Grant.cs (58) : {
+Grant.cs (59) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (60) : }
+Grant.cs (62) : }
+Grant.cs (63) : else
+Grant.cs (64) : {
+Grant.cs (65) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (66) : }
+Grant.cs (67) : }
+Grant.cs (68) : else
+Grant.cs (69) : {
+Grant.cs (70) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (71) : }
+MiniSQLParser.cs (21) : const string dropTablePattern = @"^DROP\s+TABLE\s+([\w]+)$";
+MiniSQLParser.cs (67) : if (match2.Success)
+MiniSQLParser.cs (69) : return new Insert(match2.Groups[0].Value, CommaSeparatedNames(match2.Groups[1].Value));
+MiniSQLParser.cs (95) : {
+MiniSQLParser.cs (97) : }
+MiniSQLParser.cs (103) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+MiniSQLParser.cs (104) : for (int i = 0;i<columnStrings.Count();i++)
+MiniSQLParser.cs (105) : {
+MiniSQLParser.cs (108) : ColumnDefinition columnDefinition = null;
+MiniSQLParser.cs (109) : switch (parts[1])
+MiniSQLParser.cs (110) : {
+MiniSQLParser.cs (111) : case "INT":
+MiniSQLParser.cs (112) : columnDefinition = new ColumnDefinition(ColumnDefinition.DataType.Int, parts[0]);
+MiniSQLParser.cs (113) : break;
+MiniSQLParser.cs (115) : case "DOUBLE":
+MiniSQLParser.cs (116) : columnDefinition = new ColumnDefinition(ColumnDefinition.DataType.Double, parts[0]);
+MiniSQLParser.cs (117) : break;
+MiniSQLParser.cs (119) : case "TEXT":
+MiniSQLParser.cs (120) : columnDefinition = new ColumnDefinition(ColumnDefinition.DataType.String, parts[0]);
+MiniSQLParser.cs (121) : break;
+MiniSQLParser.cs (123) : default:
+MiniSQLParser.cs (124) : break;
+MiniSQLParser.cs (125) : }
+MiniSQLParser.cs (126) : columns.Add(columnDefinition);
+MiniSQLParser.cs (127) : }
+MiniSQLParser.cs (188) : match = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (189) : if (match.Success)
+MiniSQLParser.cs (190) : {
+MiniSQLParser.cs (191) : string privilegeName = match.Groups[1].Value;
+MiniSQLParser.cs (192) : string tableName = match.Groups[2].Value;
+MiniSQLParser.cs (193) : string securityProfile = match.Groups[3].Value;
+MiniSQLParser.cs (194) : return new Revoke(privilegeName, tableName, securityProfile);
+MiniSQLParser.cs (195) : }
+MiniSQLParser.cs (196) : match = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (197) : if (match.Success)
+MiniSQLParser.cs (198) : {
+MiniSQLParser.cs (199) : string username = match.Groups[1].Value;
+MiniSQLParser.cs (200) : string password = match.Groups[2].Value;
+MiniSQLParser.cs (201) : string securityProfile = match.Groups[3].Value;
+MiniSQLParser.cs (202) : return new AddUser(username, password, securityProfile);
+MiniSQLParser.cs (203) : }
+MiniSQLParser.cs (204) : match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (205) : if (match.Success)
+MiniSQLParser.cs (206) : {
+MiniSQLParser.cs (207) : string username = match.Groups[1].Value;
+MiniSQLParser.cs (208) : return new DeleteUser(username);
+MiniSQLParser.cs (209) : }
+MiniSQLParser.cs (256) : //string[] columnList;
+MiniSQLParser.cs (257) : //foreach (string col in columns)
+MiniSQLParser.cs (258) : //{
+MiniSQLParser.cs (259) : //    columnList = Regex.Split(col, ",");
+MiniSQLParser.cs (260) : //}
+MiniSQLParser.cs (263) : //List<ColumnDefinition> columns1 = new List<ColumnDefinition>();
+MiniSQLParser.cs (264) : //ColumnDefinition.DataType tipo1 = new ColumnDefinition.DataType();
+MiniSQLParser.cs (265) : //ColumnDefinition column = null;
+MiniSQLParser.cs (266) : //string datatype = null;
+MiniSQLParser.cs (267) : //string column1 = null;
+MiniSQLParser.cs (268) : //Boolean datatypeY = false;
+MiniSQLParser.cs (269) : //string column2 = null;
+MiniSQLParser.cs (270) : //List<string> columnsValues = ;
+MiniSQLParser.cs (273) : //for (int i=0; i<columns.Count() ;i++)
+MiniSQLParser.cs (274) : //{
+MiniSQLParser.cs (275) : //    column1= columns[i];
+MiniSQLParser.cs (276) : //    foreach(char a in column1)
+MiniSQLParser.cs (277) : //    {
+MiniSQLParser.cs (278) : //        if (a == ',')
+MiniSQLParser.cs (279) : //        {
+MiniSQLParser.cs (280) : //            datatypeY = true;
+MiniSQLParser.cs (281) : //        }
+MiniSQLParser.cs (282) : //        if (datatypeY && a!=',')
+MiniSQLParser.cs (283) : //        {
+MiniSQLParser.cs (284) : //            datatype += a;
+MiniSQLParser.cs (285) : //        } else if(!datatypeY)
+MiniSQLParser.cs (286) : //        {
+MiniSQLParser.cs (287) : //            column2 += a;
+MiniSQLParser.cs (288) : //        }
+MiniSQLParser.cs (289) : //    }
+MiniSQLParser.cs (290) : //    switch (datatype)
+MiniSQLParser.cs (291) : //    {
+MiniSQLParser.cs (292) : //        case "INT":
+MiniSQLParser.cs (293) : //            tipo1 = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (294) : //            break;
+MiniSQLParser.cs (296) : //        case "DOUBLE":
+MiniSQLParser.cs (297) : //            tipo1 = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (298) : //            break;
+MiniSQLParser.cs (300) : //        case "TEXT":
+MiniSQLParser.cs (301) : //            tipo1 = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (302) : //            break;
+MiniSQLParser.cs (304) : //        default:
+MiniSQLParser.cs (305) : //            break;
+MiniSQLParser.cs (306) : //    }
+MiniSQLParser.cs (307) : //    datatypeY = false;
+MiniSQLParser.cs (308) : //    datatype = null;
+MiniSQLParser.cs (309) : //    column = new ColumnDefinition(tipo1, columns[i]);
+MiniSQLParser.cs (310) : //    columns1.Add(column);
+MiniSQLParser.cs (311) : //    i++;
+MiniSQLParser.cs (312) : //}
+Revoke.cs (18) : ProfileName = profileName;
+Revoke.cs (19) : PrivilegeName = privilegeName;
+Revoke.cs (20) : TableName = tableName;
+CreateTableTests.cs (1) : ﻿using DbManager.Parser;
+CreateTableTests.cs (2) : using DbManager;
+CreateTableTests.cs (3) : using System;
+CreateTableTests.cs (9) : namespace OurTests
+CreateTableTests.cs (11) : public class CreateTableTests
+CreateTableTests.cs (13) : [Fact]
+CreateTableTests.cs (14) : public void SimpleCreate()
+CreateTableTests.cs (15) : {
+CreateTableTests.cs (16) : CreateTable query = MiniSQLParser.Parse("CREATE TABLE table (id INT)") as CreateTable;
+CreateTableTests.cs (17) : Assert.NotNull(query);
+CreateTableTests.cs (18) : Assert.Equal("table", query.Table);
+CreateTableTests.cs (19) : ColumnDefinition columnDefinition = new ColumnDefinition(ColumnDefinition.DataType.Int, "id");
+CreateTableTests.cs (20) : Assert.Equal(columnDefinition.Name, query.ColumnsParameters[0].Name);
+CreateTableTests.cs (21) : Assert.Equal(columnDefinition.Type, query.ColumnsParameters[0].Type);
+CreateTableTests.cs (22) : }
+CreateTableTests.cs (23) : [Fact]
+CreateTableTests.cs (24) : public void CreateWithSpaces()
+CreateTableTests.cs (25) : {
+CreateTableTests.cs (26) : CreateTable query = MiniSQLParser.Parse("CREATE          TABLE           table           (           id            INT           )") as CreateTable;
+CreateTableTests.cs (29) : }
+CreateTableTests.cs (30) : [Fact]
+CreateTableTests.cs (31) : public void CreateMultipleColumns()
+CreateTableTests.cs (32) : {
+CreateTableTests.cs (33) : CreateTable query = MiniSQLParser.Parse("CREATE TABLE table (id INT,height DOUBLE,name TEXT)") as CreateTable;
+CreateTableTests.cs (34) : Assert.NotNull(query);
+CreateTableTests.cs (35) : Assert.Equal("table", query.Table);
+CreateTableTests.cs (36) : ColumnDefinition columnDefinition1 = new ColumnDefinition(ColumnDefinition.DataType.Int, "id");
+CreateTableTests.cs (37) : Assert.Equal(columnDefinition1.Name, query.ColumnsParameters[0].Name);
+CreateTableTests.cs (38) : Assert.Equal(columnDefinition1.Type, query.ColumnsParameters[0].Type);
+CreateTableTests.cs (39) : ColumnDefinition columnDefinition2 = new ColumnDefinition(ColumnDefinition.DataType.Double, "height");
+CreateTableTests.cs (40) : Assert.Equal(columnDefinition2.Name, query.ColumnsParameters[1].Name);
+CreateTableTests.cs (41) : Assert.Equal(columnDefinition2.Type, query.ColumnsParameters[1].Type);
+CreateTableTests.cs (42) : ColumnDefinition columnDefinition3 = new ColumnDefinition(ColumnDefinition.DataType.String, "name");
+CreateTableTests.cs (43) : Assert.Equal(columnDefinition3.Name, query.ColumnsParameters[2].Name);
+CreateTableTests.cs (44) : Assert.Equal(columnDefinition3.Type, query.ColumnsParameters[2].Type);
+CreateTableTests.cs (45) : }
+DropTableTests.cs (1) : ﻿using DbManager;
+DropTableTests.cs (2) : using System;
+DropTableTests.cs (3) : using System.Collections.Generic;
+DropTableTests.cs (4) : using System.Linq;
+DropTableTests.cs (5) : using System.Text;
+DropTableTests.cs (6) : using System.Threading.Tasks;
+DropTableTests.cs (8) : namespace OurTests
+DropTableTests.cs (9) : {
+DropTableTests.cs (10) : public class DropTableTests
+DropTableTests.cs (11) : {
+DropTableTests.cs (12) : [Fact]
+DropTableTests.cs (13) : public void DropTableBasic()
+DropTableTests.cs (14) : {
+DropTableTests.cs (15) : DropTable query = MiniSQLParser.Parse("DROP TABLE table") as DropTable;
+DropTableTests.cs (16) : Assert.NotNull(query);
+DropTableTests.cs (17) : Assert.Equal("table", query.Table);
+DropTableTests.cs (18) : }
+DropTableTests.cs (19) : [Fact]
+DropTableTests.cs (20) : public void DropTableSpaces()
+DropTableTests.cs (21) : {
+DropTableTests.cs (22) : DropTable query = MiniSQLParser.Parse("DROP          TABLE           table") as DropTable;
+DropTableTests.cs (23) : Assert.NotNull(query);
+DropTableTests.cs (24) : Assert.Equal("table", query.Table);
+DropTableTests.cs (25) : }
+DropTableTests.cs (26) : [Fact]
+DropTableTests.cs (27) : public void DropTableWithoutTable()
+DropTableTests.cs (28) : {
+DropTableTests.cs (29) : DropTable query = MiniSQLParser.Parse("DROP TABLE ") as DropTable;
+DropTableTests.cs (30) : Assert.Null(query);
+DropTableTests.cs (31) : }
+DropTableTests.cs (32) : [Fact]
+DropTableTests.cs (33) : public void DropTableMultipleTables()
+DropTableTests.cs (34) : {
+DropTableTests.cs (35) : DropTable query = MiniSQLParser.Parse("DROP TABLE table1,table2") as DropTable;
+DropTableTests.cs (36) : Assert.Null(query);
+DropTableTests.cs (38) : }
+DropTableTests.cs (63) : }
+DropTableTests.cs (64) : }
