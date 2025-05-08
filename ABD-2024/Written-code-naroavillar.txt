@@ -596,16 +596,13 @@ DeleteUser.cs (25) : if (database.SecurityManager.IsUserAdmin() ==false)
 DeleteUser.cs (26) : {
 DeleteUser.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 DeleteUser.cs (29) : }
-DeleteUser.cs (32) : if (database.SecurityManager.UserByName(Username) == null)
-DeleteUser.cs (33) : {
-DeleteUser.cs (34) : return Constants.UserDoesNotExistError;
-DeleteUser.cs (35) : }
-DeleteUser.cs (36) : else
-DeleteUser.cs (37) : {
-DeleteUser.cs (38) : Profile profile = database.SecurityManager.ProfileByUser(Username);
-DeleteUser.cs (39) : database.SecurityManager.RemoveProfile(profile.Name);
-DeleteUser.cs (40) : return Constants.DeleteUserSuccess;
-DeleteUser.cs (41) : }
+DeleteUser.cs (30) : else if (database.SecurityManager.UserByName(Username) == null)
+DeleteUser.cs (31) : {
+DeleteUser.cs (32) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (33) : }
+DeleteUser.cs (35) : Profile profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (36) : database.SecurityManager.RemoveProfile(profile.Name);
+DeleteUser.cs (37) : return Constants.DeleteUserSuccess;
 DropTable.cs (15) : Table = table;
 DropTable.cs (23) : database.DropTable(Table);
 DropTable.cs (24) : return database.LastErrorMessage;
@@ -725,10 +722,11 @@ DeleteUserTests.cs (21) : database.SecurityManager.AddProfile(profile);
 DeleteUserTests.cs (23) : DeleteUser query = MiniSQLParser.Parse("DELETE USER user") as DeleteUser;
 DeleteUserTests.cs (24) : string r = query.Execute(database);
 DeleteUserTests.cs (25) : Assert.Equal(Constants.DeleteUserSuccess, r);
-DeleteUserTests.cs (27) : DeleteUser query1 = MiniSQLParser.Parse("DELETE USER naroa") as DeleteUser;
-DeleteUserTests.cs (28) : string r2 = query1.Execute(database);
-DeleteUserTests.cs (29) : Assert.Equal(Constants.UserDoesNotExistError, r2);
-DeleteUserTests.cs (31) : }
+DeleteUserTests.cs (26) : Assert.Null(database.SecurityManager.UserByName("user"));
+DeleteUserTests.cs (28) : DeleteUser query1 = MiniSQLParser.Parse("DELETE USER naroa") as DeleteUser;
+DeleteUserTests.cs (29) : string r2 = query1.Execute(database);
+DeleteUserTests.cs (30) : Assert.Equal(Constants.UserDoesNotExistError, r2);
+DeleteUserTests.cs (32) : }
 GrantTests.cs (9) : using System.Xml.Linq;
 GrantTests.cs (10) : using System.Collections;
 GrantTests.cs (16) : Database data = new Database("admin", "contrAdmin");
