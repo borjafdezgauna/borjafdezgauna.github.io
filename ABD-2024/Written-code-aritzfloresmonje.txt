@@ -673,6 +673,92 @@ XmlDeserializerTests.cs (87) : Assert.False(XmlDeserializer.ParseCreate(command,
 XmlDeserializerTests.cs (88) : Assert.Null(db);
 XmlDeserializerTests.cs (89) : Assert.Null(user);
 XmlDeserializerTests.cs (90) : Assert.Null(password);
+Server.cs (11) : using System.IO;
+Server.cs (22) : try
+Server.cs (23) : {
+Server.cs (24) : Database lastOpenedDb = null;
+Server.cs (26) : TcpListener server = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
+Server.cs (28) : server.Start();
+Server.cs (29) : Console.WriteLine("Server running and listening on port " + port);
+Server.cs (31) : Socket socket = server.AcceptSocket();
+Server.cs (32) : Console.WriteLine("Connection established with " + socket.RemoteEndPoint);
+Server.cs (34) : bool endLoop = false;
+Server.cs (35) : while (!endLoop)
+Server.cs (36) : {
+Server.cs (37) : // Read the message sent by the connected user
+Server.cs (38) : byte[] buffer = new byte[100];
+Server.cs (39) : int receivedBytes = socket.Receive(buffer);
+Server.cs (40) : buffer[receivedBytes] = 0;
+Server.cs (41) : ASCIIEncoding encoding = new ASCIIEncoding();
+Server.cs (42) : string clientMsg = encoding.GetString(buffer).Substring(0, receivedBytes);
+Server.cs (43) : Console.WriteLine("Message received from client: " + clientMsg);
+Server.cs (45) : // Act according to the received message
+Server.cs (46) : string database;
+Server.cs (47) : string user;
+Server.cs (48) : string password;
+Server.cs (49) : string query;
+Server.cs (50) : string answerContent;
+Server.cs (52) : if(XmlDeserializer.ParseCreate(clientMsg, out database, out user, out password))
+Server.cs (53) : {
+Server.cs (54) : // Create the database
+Server.cs (55) : lastOpenedDb.Save(database);
+Server.cs (56) : lastOpenedDb = new Database(user, password);
+Server.cs (58) : // Send a success message for now
+Server.cs (59) : socket.Send(encoding.GetBytes(XmlSerializer.CreateSuccess));
+Server.cs (60) : }
+Server.cs (61) : else if(XmlDeserializer.ParseOpen(clientMsg, out database, out user, out password))
+Server.cs (62) : {
+Server.cs (63) : // Load the database
+Server.cs (64) : lastOpenedDb = Database.Load(database, user, password);
+Server.cs (66) : // Check for loading errors
+Server.cs (67) : if (lastOpenedDb == null)
+Server.cs (68) : {
+Server.cs (69) : socket.Send(encoding.GetBytes(XmlSerializer.OpenCreateError(Constants.IncorrectLogin)));
+Server.cs (70) : }
+Server.cs (71) : else
+Server.cs (72) : {
+Server.cs (73) : // Send a succes message for now
+Server.cs (74) : socket.Send(encoding.GetBytes(XmlSerializer.OpenCreateSuccess));
+Server.cs (75) : }
+Server.cs (76) : }
+Server.cs (77) : else if(XmlDeserializer.ParseQuery(clientMsg, out query))
+Server.cs (78) : {
+Server.cs (79) : // Execute the query
+Server.cs (80) : if(lastOpenedDb == null)
+Server.cs (81) : {
+Server.cs (82) : socket.Send(encoding.GetBytes(XmlSerializer.ErrorAnswer(Constants.NoDatabaseOpen)));
+Server.cs (83) : }
+Server.cs (84) : else
+Server.cs (85) : {
+Server.cs (86) : answerContent = lastOpenedDb.ExecuteMiniSQLQuery(query);
+Server.cs (87) : string serializedAnswer;
+Server.cs (88) : if(answerContent.StartsWith(Constants.Error))
+Server.cs (89) : {
+Server.cs (90) : serializedAnswer = XmlSerializer.ErrorAnswer(answerContent);
+Server.cs (91) : }
+Server.cs (92) : else
+Server.cs (93) : {
+Server.cs (94) : serializedAnswer = XmlSerializer.SucessfulAnswer(answerContent);
+Server.cs (95) : }
+Server.cs (96) : socket.Send(encoding.GetBytes(serializedAnswer));
+Server.cs (97) : }
+Server.cs (98) : }
+Server.cs (99) : else if (XmlDeserializer.IsCloseCommand(clientMsg))
+Server.cs (100) : {
+Server.cs (101) : lastOpenedDb.Save(database);
+Server.cs (102) : endLoop = true;
+Server.cs (103) : }
+Server.cs (104) : }
+Server.cs (106) : Task.Delay(2000).Wait();
+Server.cs (108) : socket.Close();
+Server.cs (109) : server.Stop();
+Server.cs (111) : Console.WriteLine("Server stopped. Press any key to finish...");
+Server.cs (112) : Console.ReadKey();
+Server.cs (113) : }
+Server.cs (114) : catch(Exception e)
+Server.cs (115) : {
+Server.cs (116) : Console.WriteLine("An error occured: " + e);
+Server.cs (117) : }
 XmlDeserializer.cs (66) : const string xmlCreatePattern = "^<Create Database=\"(\\w+)\" User=\"(\\w+)\" Password=\"(\\w+)\"\\/>$";
 XmlDeserializer.cs (68) : Match match = Regex.Match(command, xmlCreatePattern);
 XmlDeserializer.cs (69) : if (!match.Success) return false;
@@ -818,6 +904,11 @@ Profile.cs (54) : if(!PrivilegesOn.ContainsKey(table))
 Profile.cs (55) : {
 Profile.cs (59) : return PrivilegesOn[table].Contains(privilege);
 Profile.cs (60) : }
+Program.cs (9) : using DbManager.Network;
+Program.cs (17) : Server server = new Server();
+Program.cs (18) : server.Listen(1200);
+Program.cs (19) : /*try
+Program.cs (65) : */
 AddUserTests.cs (14) : /**
 AddUserTests.cs (73) : */
 CreateSecurityProfileTests.cs (14) : /**

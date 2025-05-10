@@ -197,8 +197,69 @@ AddUserTests.cs (67) : Assert.Null(query);
 AddUserTests.cs (69) : query = MiniSQLParser.Parse("ADD USER (,,)") as AddUser;
 AddUserTests.cs (70) : Assert.Null(query);
 AddUserTests.cs (71) : }
-AddUserTests.cs (72) : }
-AddUserTests.cs (73) : }
+AddUserTests.cs (73) : [Fact]
+AddUserTests.cs (74) : public void IncorrectMissingParameters()
+AddUserTests.cs (75) : {
+AddUserTests.cs (76) : AddUser query = MiniSQLParser.Parse("ADD USER (username,password)") as AddUser;
+AddUserTests.cs (77) : Assert.Null(query);
+AddUserTests.cs (79) : query = MiniSQLParser.Parse("ADD USER (username,,profile)") as AddUser;
+AddUserTests.cs (80) : Assert.Null(query);
+AddUserTests.cs (81) : }
+AddUserTests.cs (84) : [Fact]
+AddUserTests.cs (85) : public void IncorrectExtraParameters()
+AddUserTests.cs (86) : {
+AddUserTests.cs (87) : AddUser query = MiniSQLParser.Parse("ADD USER (username,password,profile,extra)") as AddUser;
+AddUserTests.cs (88) : Assert.Null(query);
+AddUserTests.cs (89) : }
+AddUserTests.cs (92) : [Fact]
+AddUserTests.cs (93) : public void IncorrectMalformedSyntax()
+AddUserTests.cs (94) : {
+AddUserTests.cs (95) : AddUser query = MiniSQLParser.Parse("ADD USER username,password,profile") as AddUser;
+AddUserTests.cs (96) : Assert.Null(query);
+AddUserTests.cs (98) : query = MiniSQLParser.Parse("ADD USER (username password profile)") as AddUser;
+AddUserTests.cs (99) : Assert.Null(query);
+AddUserTests.cs (101) : query = MiniSQLParser.Parse("ADD USER (username;password;profile)") as AddUser;
+AddUserTests.cs (102) : Assert.Null(query);
+AddUserTests.cs (103) : }
+AddUserTests.cs (104) : }
+AddUserTests.cs (105) : }
+ColumnDefinitionTests.cs (51) : [Fact]
+ColumnDefinitionTests.cs (52) : public void Constructor_TipoString_NombreConEspacios()
+ColumnDefinitionTests.cs (53) : {
+ColumnDefinitionTests.cs (54) : ColumnDefinition column = new ColumnDefinition(ColumnDefinition.DataType.String, "Nombre Completo");
+ColumnDefinitionTests.cs (55) : Assert.Equal("Nombre Completo", column.Name);
+ColumnDefinitionTests.cs (56) : Assert.Equal(ColumnDefinition.DataType.String, column.Type);
+ColumnDefinitionTests.cs (57) : }
+ColumnDefinitionTests.cs (59) : [Fact]
+ColumnDefinitionTests.cs (60) : public void Constructor_TipoDouble_NombreConCaracteresEspeciales()
+ColumnDefinitionTests.cs (61) : {
+ColumnDefinitionTests.cs (62) : ColumnDefinition column = new ColumnDefinition(ColumnDefinition.DataType.Double, "Precio$");
+ColumnDefinitionTests.cs (63) : Assert.Equal("Precio$", column.Name);
+ColumnDefinitionTests.cs (64) : Assert.Equal(ColumnDefinition.DataType.Double, column.Type);
+ColumnDefinitionTests.cs (65) : }
+ColumnDefinitionTests.cs (67) : [Fact]
+ColumnDefinitionTests.cs (68) : public void Constructor_NombreConNumeros()
+ColumnDefinitionTests.cs (69) : {
+ColumnDefinitionTests.cs (70) : ColumnDefinition column = new ColumnDefinition(ColumnDefinition.DataType.Int, "Campo123");
+ColumnDefinitionTests.cs (71) : Assert.Equal("Campo123", column.Name);
+ColumnDefinitionTests.cs (72) : }
+ColumnDefinitionTests.cs (74) : [Fact]
+ColumnDefinitionTests.cs (75) : public void Constructor_TipoEnumValido()
+ColumnDefinitionTests.cs (76) : {
+ColumnDefinitionTests.cs (77) : ColumnDefinition.DataType[] tipos = (ColumnDefinition.DataType[])Enum.GetValues(typeof(ColumnDefinition.DataType));
+ColumnDefinitionTests.cs (79) : foreach (var tipo in tipos)
+ColumnDefinitionTests.cs (80) : {
+ColumnDefinitionTests.cs (81) : ColumnDefinition column = new ColumnDefinition(tipo, "Columna");
+ColumnDefinitionTests.cs (82) : Assert.Equal(tipo, column.Type);
+ColumnDefinitionTests.cs (83) : }
+ColumnDefinitionTests.cs (84) : }
+ColumnDefinitionTests.cs (86) : [Fact]
+ColumnDefinitionTests.cs (87) : public void Constructor_NombreMuyLargo()
+ColumnDefinitionTests.cs (88) : {
+ColumnDefinitionTests.cs (89) : string nombreLargo = new string('a', 1000);
+ColumnDefinitionTests.cs (90) : ColumnDefinition column = new ColumnDefinition(ColumnDefinition.DataType.String, nombreLargo);
+ColumnDefinitionTests.cs (91) : Assert.Equal(nombreLargo, column.Name);
+ColumnDefinitionTests.cs (92) : }
 ConditionTests.cs (18) : public void stringNoIgual()
 ConditionTests.cs (19) : {
 CreateSecurityProfileTests.cs (1) : ﻿using System;
@@ -253,8 +314,34 @@ CreateSecurityProfileTests.cs (58) : Assert.Null(query);
 CreateSecurityProfileTests.cs (60) : query = MiniSQLParser.Parse("CREATE SECURITY PROFILE") as CreateSecurityProfile;
 CreateSecurityProfileTests.cs (61) : Assert.Null(query);
 CreateSecurityProfileTests.cs (62) : }
-CreateSecurityProfileTests.cs (63) : }
-CreateSecurityProfileTests.cs (64) : }
+CreateSecurityProfileTests.cs (64) : [Fact]
+CreateSecurityProfileTests.cs (65) : public void CorrectWithMixedCaseName()
+CreateSecurityProfileTests.cs (66) : {
+CreateSecurityProfileTests.cs (67) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE ProFileX") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (68) : Assert.Equal("ProFileX", query.ProfileName);
+CreateSecurityProfileTests.cs (69) : }
+CreateSecurityProfileTests.cs (71) : [Fact]
+CreateSecurityProfileTests.cs (72) : public void IncorrectExtraParameters()
+CreateSecurityProfileTests.cs (73) : {
+CreateSecurityProfileTests.cs (74) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE profile extra") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (75) : Assert.Null(query);
+CreateSecurityProfileTests.cs (76) : }
+CreateSecurityProfileTests.cs (78) : [Fact]
+CreateSecurityProfileTests.cs (79) : public void IncorrectMalformedCommand()
+CreateSecurityProfileTests.cs (80) : {
+CreateSecurityProfileTests.cs (81) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE PROFILE profile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (82) : Assert.Null(query);
+CreateSecurityProfileTests.cs (84) : query = MiniSQLParser.Parse("CREATESECURITYPROFILE profile") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (85) : Assert.Null(query);
+CreateSecurityProfileTests.cs (86) : }
+CreateSecurityProfileTests.cs (88) : [Fact]
+CreateSecurityProfileTests.cs (89) : public void IncorrectEmptyProfileName()
+CreateSecurityProfileTests.cs (90) : {
+CreateSecurityProfileTests.cs (91) : CreateSecurityProfile query = MiniSQLParser.Parse("CREATE SECURITY PROFILE ()") as CreateSecurityProfile;
+CreateSecurityProfileTests.cs (92) : Assert.Null(query);
+CreateSecurityProfileTests.cs (93) : }
+CreateSecurityProfileTests.cs (94) : }
+CreateSecurityProfileTests.cs (95) : }
 DatabaseTests.cs (1) : ﻿using System.Collections.Generic;
 DatabaseTests.cs (2) : using System.IO;
 DatabaseTests.cs (3) : using System.Security.Cryptography.X509Certificates;
@@ -330,54 +417,85 @@ DEADLINE3Tests.cs (154) : var nameColumnIndex = db.TableByName("TestTable").Colu
 DEADLINE3Tests.cs (156) : Assert.Equal("Mikel", lastRow.Values[nameColumnIndex]);
 DEADLINE3Tests.cs (204) : Assert.Equal("ERROR: ", result);
 DEADLINE5Tests.cs (3) : using DbManager.Security;
-DEADLINE5Tests.cs (203) : //Los test no se pueden ejecutar hasta que no este creada correctamente la clase Profile
-DEADLINE5Tests.cs (217) : //[Fact]
-DEADLINE5Tests.cs (218) : //public void RevokePrivilegeDoesNotExistTest()
-DEADLINE5Tests.cs (219) : //{
-DEADLINE5Tests.cs (220) : //    Database database = Database.CreateTestDatabase();
-DEADLINE5Tests.cs (222) : //    CreateSecurityProfile createProfile = new CreateSecurityProfile("Perfil");
-DEADLINE5Tests.cs (223) : //    createProfile.Execute(database);
-DEADLINE5Tests.cs (225) : //    Revoke revoke = new Revoke("InvalidPrivilege", "TestTable", "Perfil");
-DEADLINE5Tests.cs (227) : //    string result = revoke.Execute(database);
-DEADLINE5Tests.cs (229) : //    Assert.Equal(Constants.PrivilegeDoesNotExistError, result);
-DEADLINE5Tests.cs (230) : //}
-DEADLINE5Tests.cs (232) : //[Fact]
-DEADLINE5Tests.cs (233) : //public void RevokePrivilegeNotGrantedTest()
-DEADLINE5Tests.cs (234) : //{
-DEADLINE5Tests.cs (235) : //    Database database = Database.CreateTestDatabase();
-DEADLINE5Tests.cs (237) : //    CreateSecurityProfile createProfile = new CreateSecurityProfile("Perfil");
-DEADLINE5Tests.cs (238) : //    createProfile.Execute(database);
-DEADLINE5Tests.cs (240) : //    Revoke revoke = new Revoke("SELECT", "TestTable", "Perfil");
-DEADLINE5Tests.cs (242) : //    string result = revoke.Execute(database);
-DEADLINE5Tests.cs (244) : //    Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
-DEADLINE5Tests.cs (245) : //}
-DEADLINE5Tests.cs (247) : //[Fact]
-DEADLINE5Tests.cs (248) : //public void RevokePrivilegeSuccessTest()
-DEADLINE5Tests.cs (249) : //{
-DEADLINE5Tests.cs (250) : //    Database database = Database.CreateTestDatabase();
-DEADLINE5Tests.cs (252) : //    CreateSecurityProfile createProfile = new CreateSecurityProfile("Perfil");
-DEADLINE5Tests.cs (253) : //    createProfile.Execute(database);
-DEADLINE5Tests.cs (255) : //    Grant grant = new Grant("SELECT", "TestTable", "Perfil");
-DEADLINE5Tests.cs (257) : //    grant.Execute(database);
-DEADLINE5Tests.cs (259) : //    Profile profile = database.SecurityManager.ProfileByName("Perfil");
-DEADLINE5Tests.cs (261) : //    Assert.True(profile.IsGrantedPrivilege("TestTable", Privilege.Select));
-DEADLINE5Tests.cs (263) : //    Revoke revoke = new Revoke("SELECT", "TestTable", "Perfil");
-DEADLINE5Tests.cs (265) : //    string result = revoke.Execute(database);
-DEADLINE5Tests.cs (267) : //    Assert.Equal(Constants.RevokePrivilegeSuccess, result);
-DEADLINE5Tests.cs (269) : //    Assert.False(profile.IsGrantedPrivilege("TestTable", Privilege.Select));
-DEADLINE5Tests.cs (270) : //}
-DEADLINE5Tests.cs (272) : //[Fact]
-DEADLINE5Tests.cs (273) : //public void GrantPrivilegeSuccessTest()
-DEADLINE5Tests.cs (274) : //{
-DEADLINE5Tests.cs (275) : //    Database database = Database.CreateTestDatabase();
-DEADLINE5Tests.cs (276) : //    CreateSecurityProfile createProfile = new CreateSecurityProfile("Perfil");
-DEADLINE5Tests.cs (277) : //    createProfile.Execute(database);
-DEADLINE5Tests.cs (280) : //    Grant grant = new Grant("SELECT", "TestTable", "Perfil");
-DEADLINE5Tests.cs (282) : //    string result = grant.Execute(database);
-DEADLINE5Tests.cs (284) : //    Assert.Equal(Constants.GrantPrivilegeSuccess, result);
-DEADLINE5Tests.cs (287) : //    Profile profile = database.SecurityManager.ProfileByName("Perfil");
-DEADLINE5Tests.cs (289) : //    Assert.True(profile.IsGrantedPrivilege("TestTable", Privilege.Select));
-DEADLINE5Tests.cs (290) : //}
+DEADLINE5Tests.cs (197) : [Fact]
+DEADLINE5Tests.cs (198) : public void AddUserFailsWhenUserAlreadyExists()
+DEADLINE5Tests.cs (199) : {
+DEADLINE5Tests.cs (200) : Database admin = new Database("admin", "password");
+DEADLINE5Tests.cs (202) : Profile profile = new Profile { Name = "ProfileName", Users = new List<User>() };
+DEADLINE5Tests.cs (203) : profile.Users.Add(new User("newuser", "password"));
+DEADLINE5Tests.cs (204) : admin.SecurityManager.AddProfile(profile);
+DEADLINE5Tests.cs (206) : AddUser addUser = new AddUser("newuser", "anotherpassword", "ProfileName");
+DEADLINE5Tests.cs (208) : string result = addUser.Execute(admin);
+DEADLINE5Tests.cs (210) : Assert.Equal(Constants.Error, result);
+DEADLINE5Tests.cs (211) : }
+DEADLINE5Tests.cs (213) : [Fact]
+DEADLINE5Tests.cs (214) : public void AddUserTrimsInput()
+DEADLINE5Tests.cs (215) : {
+DEADLINE5Tests.cs (216) : Database admin = new Database("admin", "password");
+DEADLINE5Tests.cs (218) : Profile profile = new Profile { Name = "ProfileName", Users = new List<User>() };
+DEADLINE5Tests.cs (219) : admin.SecurityManager.AddProfile(profile);
+DEADLINE5Tests.cs (221) : AddUser addUser = new AddUser("   newuser   ", "password", "ProfileName");
+DEADLINE5Tests.cs (223) : string result = addUser.Execute(admin);
+DEADLINE5Tests.cs (225) : Assert.Equal(Constants.AddUserSuccess, result);
+DEADLINE5Tests.cs (226) : }
+DEADLINE5Tests.cs (228) : [Fact]
+DEADLINE5Tests.cs (229) : public void AddUserFailsWithNullPassword()
+DEADLINE5Tests.cs (230) : {
+DEADLINE5Tests.cs (231) : Database admin = new Database("admin", "password");
+DEADLINE5Tests.cs (233) : Profile profile = new Profile { Name = "ProfileName", Users = new List<User>() };
+DEADLINE5Tests.cs (234) : admin.SecurityManager.AddProfile(profile);
+DEADLINE5Tests.cs (236) : AddUser addUser = new AddUser("newuser", null, "ProfileName");
+DEADLINE5Tests.cs (238) : string result = addUser.Execute(admin);
+DEADLINE5Tests.cs (240) : Assert.Equal(Constants.Error, result);
+DEADLINE5Tests.cs (241) : }
+DEADLINE5Tests.cs (250) : //Los test no se pueden ejecutar hasta que no este creada correctamente la clase Profile
+DEADLINE5Tests.cs (264) : //[Fact]
+DEADLINE5Tests.cs (265) : //public void RevokePrivilegeDoesNotExistTest()
+DEADLINE5Tests.cs (266) : //{
+DEADLINE5Tests.cs (267) : //    Database database = Database.CreateTestDatabase();
+DEADLINE5Tests.cs (269) : //    CreateSecurityProfile createProfile = new CreateSecurityProfile("Perfil");
+DEADLINE5Tests.cs (270) : //    createProfile.Execute(database);
+DEADLINE5Tests.cs (272) : //    Revoke revoke = new Revoke("InvalidPrivilege", "TestTable", "Perfil");
+DEADLINE5Tests.cs (274) : //    string result = revoke.Execute(database);
+DEADLINE5Tests.cs (276) : //    Assert.Equal(Constants.PrivilegeDoesNotExistError, result);
+DEADLINE5Tests.cs (277) : //}
+DEADLINE5Tests.cs (279) : //[Fact]
+DEADLINE5Tests.cs (280) : //public void RevokePrivilegeNotGrantedTest()
+DEADLINE5Tests.cs (281) : //{
+DEADLINE5Tests.cs (282) : //    Database database = Database.CreateTestDatabase();
+DEADLINE5Tests.cs (284) : //    CreateSecurityProfile createProfile = new CreateSecurityProfile("Perfil");
+DEADLINE5Tests.cs (285) : //    createProfile.Execute(database);
+DEADLINE5Tests.cs (287) : //    Revoke revoke = new Revoke("SELECT", "TestTable", "Perfil");
+DEADLINE5Tests.cs (289) : //    string result = revoke.Execute(database);
+DEADLINE5Tests.cs (291) : //    Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
+DEADLINE5Tests.cs (292) : //}
+DEADLINE5Tests.cs (294) : //[Fact]
+DEADLINE5Tests.cs (295) : //public void RevokePrivilegeSuccessTest()
+DEADLINE5Tests.cs (296) : //{
+DEADLINE5Tests.cs (297) : //    Database database = Database.CreateTestDatabase();
+DEADLINE5Tests.cs (299) : //    CreateSecurityProfile createProfile = new CreateSecurityProfile("Perfil");
+DEADLINE5Tests.cs (300) : //    createProfile.Execute(database);
+DEADLINE5Tests.cs (302) : //    Grant grant = new Grant("SELECT", "TestTable", "Perfil");
+DEADLINE5Tests.cs (304) : //    grant.Execute(database);
+DEADLINE5Tests.cs (306) : //    Profile profile = database.SecurityManager.ProfileByName("Perfil");
+DEADLINE5Tests.cs (308) : //    Assert.True(profile.IsGrantedPrivilege("TestTable", Privilege.Select));
+DEADLINE5Tests.cs (310) : //    Revoke revoke = new Revoke("SELECT", "TestTable", "Perfil");
+DEADLINE5Tests.cs (312) : //    string result = revoke.Execute(database);
+DEADLINE5Tests.cs (314) : //    Assert.Equal(Constants.RevokePrivilegeSuccess, result);
+DEADLINE5Tests.cs (316) : //    Assert.False(profile.IsGrantedPrivilege("TestTable", Privilege.Select));
+DEADLINE5Tests.cs (317) : //}
+DEADLINE5Tests.cs (319) : //[Fact]
+DEADLINE5Tests.cs (320) : //public void GrantPrivilegeSuccessTest()
+DEADLINE5Tests.cs (321) : //{
+DEADLINE5Tests.cs (322) : //    Database database = Database.CreateTestDatabase();
+DEADLINE5Tests.cs (323) : //    CreateSecurityProfile createProfile = new CreateSecurityProfile("Perfil");
+DEADLINE5Tests.cs (324) : //    createProfile.Execute(database);
+DEADLINE5Tests.cs (327) : //    Grant grant = new Grant("SELECT", "TestTable", "Perfil");
+DEADLINE5Tests.cs (329) : //    string result = grant.Execute(database);
+DEADLINE5Tests.cs (331) : //    Assert.Equal(Constants.GrantPrivilegeSuccess, result);
+DEADLINE5Tests.cs (334) : //    Profile profile = database.SecurityManager.ProfileByName("Perfil");
+DEADLINE5Tests.cs (336) : //    Assert.True(profile.IsGrantedPrivilege("TestTable", Privilege.Select));
+DEADLINE5Tests.cs (337) : //}
 DeleteTests.cs (1) : ﻿using System;
 DeleteTests.cs (2) : using System.Collections.Generic;
 DeleteTests.cs (3) : using System.Linq;
@@ -792,6 +910,49 @@ ProfileTests.cs (163) : Profile profile = new Profile();
 ProfileTests.cs (165) : bool result = profile.IsGrantedPrivilege("empleado", Privilege.Select);
 ProfileTests.cs (167) : Assert.False(result);
 ProfileTests.cs (168) : }
+ProfileTests.cs (170) : [Fact]
+ProfileTests.cs (171) : public void GrantMultiplePrivilegesSameTableTest()
+ProfileTests.cs (172) : {
+ProfileTests.cs (173) : Profile profile = new Profile();
+ProfileTests.cs (175) : profile.GrantPrivilege("empleado", Privilege.Select);
+ProfileTests.cs (176) : profile.GrantPrivilege("empleado", Privilege.Insert);
+ProfileTests.cs (178) : Assert.Contains(Privilege.Select, profile.PrivilegesOn["empleado"]);
+ProfileTests.cs (179) : Assert.Contains(Privilege.Insert, profile.PrivilegesOn["empleado"]);
+ProfileTests.cs (180) : Assert.Equal(2, profile.PrivilegesOn["empleado"].Count);
+ProfileTests.cs (181) : }
+ProfileTests.cs (183) : [Fact]
+ProfileTests.cs (184) : public void RevokePrivilegeFromEmptySetTest()
+ProfileTests.cs (185) : {
+ProfileTests.cs (186) : Profile profile = new Profile();
+ProfileTests.cs (188) : profile.GrantPrivilege("empleado", Privilege.Select);
+ProfileTests.cs (189) : profile.RevokePrivilege("empleado", Privilege.Select);
+ProfileTests.cs (190) : bool result = profile.RevokePrivilege("empleado", Privilege.Select);
+ProfileTests.cs (192) : Assert.False(result);
+ProfileTests.cs (193) : }
+ProfileTests.cs (195) : [Fact]
+ProfileTests.cs (196) : public void RevokePrivilegeFromNullTableTest()
+ProfileTests.cs (197) : {
+ProfileTests.cs (198) : Profile profile = new Profile();
+ProfileTests.cs (200) : bool result = profile.RevokePrivilege(null, Privilege.Delete);
+ProfileTests.cs (201) : Assert.False(result);
+ProfileTests.cs (202) : }
+ProfileTests.cs (204) : [Fact]
+ProfileTests.cs (205) : public void RevokePrivilegeTableBecomesEmptyTest()
+ProfileTests.cs (206) : {
+ProfileTests.cs (207) : Profile profile = new Profile();
+ProfileTests.cs (209) : profile.GrantPrivilege("empleado", Privilege.Select);
+ProfileTests.cs (210) : profile.RevokePrivilege("empleado", Privilege.Select);
+ProfileTests.cs (212) : Assert.Empty(profile.PrivilegesOn["empleado"]);
+ProfileTests.cs (213) : }
+ProfileTests.cs (215) : [Fact]
+ProfileTests.cs (216) : public void GrantPrivilegeMultipleTablesTest()
+ProfileTests.cs (217) : {
+ProfileTests.cs (218) : Profile profile = new Profile();
+ProfileTests.cs (220) : profile.GrantPrivilege("empleado", Privilege.Select);
+ProfileTests.cs (221) : profile.GrantPrivilege("departamento", Privilege.Insert);
+ProfileTests.cs (223) : Assert.True(profile.IsGrantedPrivilege("empleado", Privilege.Select));
+ProfileTests.cs (224) : Assert.True(profile.IsGrantedPrivilege("departamento", Privilege.Insert));
+ProfileTests.cs (225) : }
 RevokeTests.cs (1) : ﻿using System;
 RevokeTests.cs (2) : using System.Collections.Generic;
 RevokeTests.cs (3) : using System.Linq;

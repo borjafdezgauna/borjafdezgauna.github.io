@@ -190,6 +190,19 @@ DatabaseTests.cs (194) : Assert.Equal(delimitedDBValue, loadedDelimitedDBValue);
 DatabaseTests.cs (195) : }
 DatabaseTests.cs (196) : }
 DatabaseTests.cs (197) : }
+ManagerTests.cs (11) : public void SaveAndLoad()
+ManagerTests.cs (13) : //SAVE
+ManagerTests.cs (38) : //LOAD
+ManagerTests.cs (40) : Manager loadedManager = Manager.Load(dbName, username);
+ManagerTests.cs (41) : Assert.NotNull(loadedManager);
+ManagerTests.cs (43) : Profile loadedAdminProfile = loadedManager.ProfileByName(Profile.AdminProfileName);
+ManagerTests.cs (44) : Assert.NotNull(loadedAdminProfile);
+ManagerTests.cs (45) : Assert.True(loadedAdminProfile.PrivilegesOn.ContainsKey("table1"), "No se encontr� la tabla 'table1' en los privilegios");
+ManagerTests.cs (47) : List<Privilege> loadedPrivileges = loadedAdminProfile.PrivilegesOn["table1"];
+ManagerTests.cs (48) : Assert.Contains(Privilege.Delete, loadedPrivileges);
+ManagerTests.cs (49) : Assert.Contains(Privilege.Insert, loadedPrivileges);
+ManagerTests.cs (50) : Assert.Contains(Privilege.Select, loadedPrivileges);
+ManagerTests.cs (51) : Assert.Contains(Privilege.Update, loadedPrivileges);
 TableTests.cs (45) : Table table = Table.CreateTestTable("table");
 TableTests.cs (46) : Assert.Equal(1, table.ColumnIndexByName("Height"));
 TableTests.cs (52) : Table table = Table.CreateTestTable("table");
@@ -266,6 +279,74 @@ MiniSQLParser.cs (217) : if (conditions[2].Trim().StartsWith("'") && conditions[
 MiniSQLParser.cs (218) : {
 MiniSQLParser.cs (223) : condition1 = new Condition(conditions[0], conditions[1], conditions[2]);
 MiniSQLParser.cs (224) : }
+Manager.cs (127) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (128) : string profileFile = Path.Combine(path, "profiles.txt");
+Manager.cs (129) : Manager manager = new Manager(username);
+Manager.cs (131) : if (!File.Exists(profileFile))
+Manager.cs (132) : {
+Manager.cs (133) : return manager;
+Manager.cs (134) : }
+Manager.cs (136) : using(StreamReader reader = new StreamReader(profileFile))
+Manager.cs (137) : {
+Manager.cs (138) : string line;
+Manager.cs (139) : while((line = reader.ReadLine()) != null)
+Manager.cs (140) : {
+Manager.cs (141) : //Primera linea es siempre el nombre del perfil
+Manager.cs (142) : Profile profile = new Profile();
+Manager.cs (143) : profile.Name = line.Trim();
+Manager.cs (145) : while((line = reader.ReadLine()) != null && line.Trim() != "#")
+Manager.cs (146) : {
+Manager.cs (147) : string[] parts = line.Split(',');
+Manager.cs (148) : string idPart = parts[0].Trim();
+Manager.cs (149) : string firstPart = parts[1].Trim(); //username o table
+Manager.cs (150) : string secondPart = parts[2].Trim();//password o privilegio
+Manager.cs (152) : if(idPart == "U"){
+Manager.cs (153) : User user = new User();
+Manager.cs (154) : user.Username = firstPart;
+Manager.cs (155) : user.EncryptedPassword = secondPart;
+Manager.cs (156) : profile.Users.Add(user);
+Manager.cs (157) : }
+Manager.cs (158) : else if(idPart == "P"){
+Manager.cs (159) : Privilege parsedPrivilege;
+Manager.cs (160) : bool parsed = true;
+Manager.cs (161) : switch(secondPart)
+Manager.cs (162) : {
+Manager.cs (163) : case "Delete":
+Manager.cs (164) : parsedPrivilege = Privilege.Delete;
+Manager.cs (165) : break;
+Manager.cs (166) : case "Insert":
+Manager.cs (167) : parsedPrivilege = Privilege.Insert;
+Manager.cs (168) : break;
+Manager.cs (169) : case "Select":
+Manager.cs (170) : parsedPrivilege = Privilege.Select;
+Manager.cs (171) : break;
+Manager.cs (172) : case "Update":
+Manager.cs (173) : parsedPrivilege = Privilege.Update;
+Manager.cs (174) : break;
+Manager.cs (175) : default:
+Manager.cs (176) : parsed = false;
+Manager.cs (177) : parsedPrivilege = default;
+Manager.cs (178) : break;
+Manager.cs (179) : }
+Manager.cs (180) : if(parsed)
+Manager.cs (181) : {
+Manager.cs (182) : if (profile.PrivilegesOn.ContainsKey(firstPart))
+Manager.cs (183) : {
+Manager.cs (184) : profile.PrivilegesOn[firstPart].Add(parsedPrivilege);
+Manager.cs (185) : }
+Manager.cs (186) : else
+Manager.cs (187) : {
+Manager.cs (188) : profile.PrivilegesOn[firstPart] = new List<Privilege> { parsedPrivilege };
+Manager.cs (189) : }
+Manager.cs (190) : }
+Manager.cs (191) : }
+Manager.cs (192) : }
+Manager.cs (193) : manager.AddProfile(profile);
+Manager.cs (194) : }
+Manager.cs (195) : }
+Manager.cs (196) : return manager;
+Manager.cs (217) : writer.WriteLine($"U,{user.Username},{user.EncryptedPassword}");
+Manager.cs (224) : writer.WriteLine($"P,{key},{priv}");
 UpdateTests.cs (40) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad>'21'") as Update;
 UpdateTests.cs (49) : Update query2 = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad<'21'") as Update;
 UpdateTests.cs (69) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE height>'1.98'") as Update;
