@@ -599,8 +599,25 @@ DeleteUser.cs (32) : {
 DeleteUser.cs (33) : return Constants.UserDoesNotExistError;
 DeleteUser.cs (34) : }
 DeleteUser.cs (36) : Profile profile = database.SecurityManager.ProfileByUser(Username);
-DeleteUser.cs (37) : database.SecurityManager.RemoveProfile(profile.Name);
-DeleteUser.cs (38) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (38) : User userDelete = null;
+DeleteUser.cs (39) : foreach (var user in profile.Users)
+DeleteUser.cs (40) : {
+DeleteUser.cs (41) : if (user.Username == Username)
+DeleteUser.cs (42) : {
+DeleteUser.cs (43) : userDelete = user;
+DeleteUser.cs (44) : break; // Encontrado el usuario
+DeleteUser.cs (45) : }
+DeleteUser.cs (46) : }
+DeleteUser.cs (48) : if (userDelete != null)
+DeleteUser.cs (49) : {
+DeleteUser.cs (50) : profile.Users.Remove(userDelete); // Eliminar al usuario
+DeleteUser.cs (51) : }
+DeleteUser.cs (53) : //perfil vacio, eliminar tambi�n
+DeleteUser.cs (54) : if (userDelete != null && profile.Users.Count == 0)
+DeleteUser.cs (55) : {
+DeleteUser.cs (56) : database.SecurityManager.RemoveProfile(profile.Name);
+DeleteUser.cs (57) : }
+DeleteUser.cs (59) : return Constants.DeleteUserSuccess;
 DropTable.cs (15) : Table = table;
 DropTable.cs (23) : database.DropTable(Table);
 DropTable.cs (24) : return database.LastErrorMessage;
