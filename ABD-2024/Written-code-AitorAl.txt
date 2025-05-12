@@ -103,11 +103,7 @@ AddUser.cs (38) : if (profile == null)
 AddUser.cs (39) : {
 AddUser.cs (40) : return Constants.SecurityProfileDoesNotExistError;
 AddUser.cs (41) : }
-AddUser.cs (43) : if (profile != manager.ProfileByName(Profile.AdminProfileName))
-AddUser.cs (44) : {
-AddUser.cs (45) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-AddUser.cs (46) : }
-AddUser.cs (48) : return Constants.AddUserSuccess;
+AddUser.cs (44) : return Constants.AddUserSuccess;
 CreateTable.cs (17) : Table = table;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
@@ -141,10 +137,7 @@ DropSecurityProfile.cs (33) : if (profile == null)
 DropSecurityProfile.cs (34) : {
 DropSecurityProfile.cs (35) : return Constants.SecurityProfileDoesNotExistError;
 DropSecurityProfile.cs (36) : }
-DropSecurityProfile.cs (38) : {
-DropSecurityProfile.cs (39) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-DropSecurityProfile.cs (40) : }
-DropSecurityProfile.cs (42) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (39) : return Constants.DropSecurityProfileSuccess;
 DropTable.cs (15) : Table = table;
 Grant.cs (41) : if (profile.Name !=Profile.AdminProfileName)
 Grant.cs (42) : {
@@ -253,10 +246,6 @@ MiniSQLParser.cs (239) : {
 MiniSQLParser.cs (240) : string profile = matchDeleteUser.Groups[1].Value;
 MiniSQLParser.cs (242) : return new DeleteUser(profile);
 MiniSQLParser.cs (243) : }
-Revoke.cs (40) : if (perfil.Name != Profile.AdminProfileName)
-Revoke.cs (41) : {
-Revoke.cs (42) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Revoke.cs (43) : }
 Select.cs (18) : Table = table;
 Select.cs (26) : Where = condition;
 Update.cs (15) : Table = table;
@@ -266,8 +255,6 @@ Update.cs (26) : return Constants.TableDoesNotExistError;
 Update.cs (32) : return Constants.ColumnDoesNotExistError;
 Manager.cs (23) : Profile profile = ProfileByUser(m_username);
 Manager.cs (24) : if (profile != null && (profile.Name == Profile.AdminProfileName || profile.Name == Database.AdminUsername))
-Manager.cs (52) : if (m_username != null && perfil != null && m_username == Profile.AdminProfileName && table != null)
-Manager.cs (64) : if (perfil != null && m_username != null && m_username == Profile.AdminProfileName && table != null)
 Profile.cs (21) : if (Name != AdminProfileName)
 Profile.cs (22) : {
 Profile.cs (23) : return false;
@@ -579,6 +566,7 @@ UpdateTests.cs (66) : Assert.Null(query);
 UpdateTests.cs (67) : }
 UpdateTests.cs (68) : }
 UpdateTests.cs (69) : }
+AddUserTests.cs (56) : Assert.Equal(Constants.AddUserSuccess, result3);
 AddUserTests.cs (58) : //
 AddUserTests.cs (59) : Database db4 = Database.CreateTestDatabase();
 AddUserTests.cs (60) : Profile adminPerfil4 = new Profile { Name = Profile.AdminProfileName };
@@ -588,14 +576,17 @@ AddUserTests.cs (63) : Username = Database.AdminUsername,
 AddUserTests.cs (64) : EncryptedPassword = Encryption.Encrypt(Database.AdminPassword)
 AddUserTests.cs (65) : });
 AddUserTests.cs (67) : db4.SecurityManager.AddProfile(adminPerfil4);
-AddUserTests.cs (70) : AddUser addUser4 = new AddUser("newUser", "pass123", "UserProfile");
-AddUserTests.cs (71) : String result4 = addUser3.Execute(db4);
+AddUserTests.cs (71) : AddUser addUser4 = new AddUser("newUser", "pass123", "UserProfile");
+AddUserTests.cs (72) : String result4 = addUser3.Execute(db4);
+AddUserTests.cs (73) : Assert.Equal(Constants.AddUserSuccess, result3);
 DeleteUserTests.cs (48) : adminProfile1.Users.Add(new User
 DeleteUserTests.cs (53) : db.SecurityManager.AddProfile(adminProfile1);
 DeleteUserTests.cs (66) : Assert.Equal(Constants.DeleteUserSuccess, result3);
-DropSecurityProfileTests.cs (27) : DropSecurityProfile drop1 = new DropSecurityProfile("noAdminPerfil");
-ManagerTests.cs (58) : Assert.False(manager.IsGrantedPrivilege("regular_user", "Table1", Privilege.Delete));
-ManagerTests.cs (209) : Profile profile = new Profile { Name = "Admin" };
+DropSecurityProfileTests.cs (14) : Database db = new Database("admin", "password");
+DropSecurityProfileTests.cs (15) : string answer = db.ExecuteMiniSQLQuery("DROP SECURITY PROFILE algo");
+DropSecurityProfileTests.cs (29) : DropSecurityProfile drop1 = new DropSecurityProfile("noAdminPerfil");
+ManagerTests.cs (61) : Assert.False(manager.IsGrantedPrivilege("regular_user", "Table1", Privilege.Delete));
+ManagerTests.cs (212) : Profile profile = new Profile { Name = "Admin" };
 ProfileTests.cs (14) : Profile profile = new Profile { Name = "Admin" };
 ProfileTests.cs (15) : bool result = profile.GrantPrivilege("Users1", Privilege.Insert);
 ProfileTests.cs (18) : Assert.True(profile.IsGrantedPrivilege("Users1", Privilege.Insert));

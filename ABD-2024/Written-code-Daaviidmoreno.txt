@@ -138,9 +138,34 @@ RowTests.cs (150) : Assert.Equal(2, result.Values.Count);
 RowTests.cs (151) : Assert.Equal("Alice", result.GetValue("Name"));
 RowTests.cs (152) : Assert.Equal("30", result.GetValue("Age"));
 RowTests.cs (159) : }
+Grant.cs (6) : using DbManager.Security;
 Grant.cs (20) : PrivilegeName = privilegeName;
 Grant.cs (21) : TableName = tableName;
 Grant.cs (22) : ProfileName = profileName;
+Grant.cs (29) : // Verifica si el usuario actual es administrador
+Grant.cs (30) : if (database.SecurityManager == null || !database.SecurityManager.IsUserAdmin())
+Grant.cs (31) : {
+Grant.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (33) : }
+Grant.cs (35) : // Verifica si el perfil existe
+Grant.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (37) : if (profile == null)
+Grant.cs (38) : {
+Grant.cs (39) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (40) : }
+Grant.cs (42) : // Verifica si el privilegio es v�lido
+Grant.cs (43) : if (!Enum.TryParse(PrivilegeName, true, out Privilege privilege))
+Grant.cs (44) : {
+Grant.cs (45) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (48) : // Verifica si el perfil ya tiene el privilegio en la tabla
+Grant.cs (49) : if (profile.IsGrantedPrivilege(TableName, privilege))
+Grant.cs (50) : {
+Grant.cs (51) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (52) : }
+Grant.cs (54) : // Otorga el privilegio
+Grant.cs (55) : profile.GrantPrivilege(TableName, privilege);
+Grant.cs (56) : return Constants.GrantPrivilegeSuccess;
+Grant.cs (58) : }
 MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+([A-Za-z0-9]+)\s+TO\s+([A-Za-z]+)$";
 MiniSQLParser.cs (34) : const string revokePattern = @"^REVOKE\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+([A-Za-z0-9]+)\s+TO\s+([A-Za-z]+)$";
 MiniSQLParser.cs (209) : //GRANT

@@ -1,14 +1,13 @@
 Database.cs (8) : using System.Security.Cryptography;
-Database.cs (161) : int index = Tables.FindIndex(t => t.Name.Equals(tableName));
-Database.cs (162) : if(index == -1)
-Database.cs (163) : {
-Database.cs (164) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (166) : }
-Database.cs (170) : {
-Database.cs (171) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (173) : }
+Database.cs (155) : int index = Tables.FindIndex(t => t.Name.Equals(tableName));
+Database.cs (156) : if (index == -1)
+Database.cs (157) : {
+Database.cs (158) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (160) : }
+Database.cs (164) : {
+Database.cs (165) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (167) : }
 Table.cs (5) : using System.Security.Cryptography.X509Certificates;
-Table.cs (6) : // Change something on this line to keep commit regularity: ABCDEFGH.
 Table.cs (24) : public Row GetRow(int i)
 DatabaseTests.cs (136) : Database db = PrepareDatabaseForTesting();
 DatabaseTests.cs (137) : List<string> columnNames = new List<string>();
@@ -421,6 +420,38 @@ TableTests.cs (226) : Condition c = new Condition("Name", "=", "Maider");
 TableTests.cs (227) : Assert.Equal(1, table.Select(columnNames, c).NumRows());
 TableTests.cs (228) : Assert.Equal(2, table.Select(columnNames, c).NumColumns());
 TableTests.cs (267) : }
+XmlDeserializerTests.cs (9) : using DbManager.Network;
+XmlDeserializerTests.cs (96) : string output;
+XmlDeserializerTests.cs (97) : Assert.True(XmlDeserializer.ParseQuery("<Query>SELECT FROM Users</Query>", out output));
+XmlDeserializerTests.cs (98) : Assert.Equal("SELECT FROM Users", output);
+XmlDeserializerTests.cs (100) : Assert.False(XmlDeserializer.ParseQuery("SELECT FROM Users", out output));
+XmlDeserializerTests.cs (101) : Assert.Null(output);
+XmlDeserializerTests.cs (108) : string output;
+XmlDeserializerTests.cs (109) : Assert.True(XmlDeserializer.ParseQueryAnswer("<Answer>[Name,Surname]{Patxi,Lopez}{Ana,Jimenez}</Answer>", out output));
+XmlDeserializerTests.cs (110) : Assert.Equal("<Answer>[Name,Surname]{Patxi,Lopez}{Ana,Jimenez}</Answer>", output);
+XmlDeserializerTests.cs (112) : Assert.False(XmlDeserializer.ParseQueryAnswer("<Answer>Error<Answer>", out output));
+XmlDeserializerTests.cs (113) : Assert.Null(null);
+XmlDeserializer.cs (86) : const string Pattern = "^<Query>(.+)</Query>";
+XmlDeserializer.cs (88) : Match match = Regex.Match(answer, Pattern);
+XmlDeserializer.cs (89) : if(match.Success)
+XmlDeserializer.cs (90) : {
+XmlDeserializer.cs (91) : query = match.Groups[1].Value;
+XmlDeserializer.cs (92) : return true;
+XmlDeserializer.cs (93) : }
+XmlDeserializer.cs (105) : const string errorPattern = "^<Answer><Error>(.+)</Error></Answer>$";
+XmlDeserializer.cs (106) : Match match = Regex.Match(answer , errorPattern);
+XmlDeserializer.cs (107) : if(match.Success)
+XmlDeserializer.cs (108) : {
+XmlDeserializer.cs (109) : answerContent = match.Groups[1].Value;
+XmlDeserializer.cs (110) : return false;
+XmlDeserializer.cs (111) : }
+XmlDeserializer.cs (113) : const string successPattern = "^<Answer>\\[([\\w,]+)\\]((?:\\{[\\w,]+\\})+)</Answer>$";
+XmlDeserializer.cs (114) : Match match1 = Regex.Match(answer , successPattern);
+XmlDeserializer.cs (115) : if(match1.Success)
+XmlDeserializer.cs (116) : {
+XmlDeserializer.cs (117) : answerContent = answer;
+XmlDeserializer.cs (118) : return true;
+XmlDeserializer.cs (119) : }
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (4) : using System.Linq;
 MiniSQLParser.cs (5) : using System.Net.Http.Headers;

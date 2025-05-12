@@ -21,6 +21,9 @@ ColumnDefinition.cs (65) : return new ColumnDefinition(tipo, nombre);
 Condition.cs (57) : if (Operator == mayor) return value.CompareTo(LiteralValue) > 0;
 Condition.cs (58) : if (Operator == igual) return value == LiteralValue;
 Condition.cs (59) : if (Operator == menor) return value.CompareTo(LiteralValue) < 0;
+Constants.cs (36) : public const string IncorrectLogin = Error + "Incorrect login or non-existing database";
+Constants.cs (37) : public const string CouldNotCreateDatabase = Error + "Could not create database";
+Constants.cs (38) : public const string NoDatabaseOpen = Error + "This operation cannot be done because there is not open database";
 Database.cs (30) : Profile adminProfile = new Profile { Name = Profile.AdminProfileName };
 Database.cs (31) : adminProfile.Users.Add(new User(adminUsername, adminPassword));
 Database.cs (32) : SecurityManager = new Manager(adminUsername);
@@ -977,6 +980,60 @@ TableTests.cs (236) : Assert.Equal(2, tabla.NumRows());
 TableTests.cs (238) : tabla.DeleteWhere(new Condition("Age", ">", "26"));
 TableTests.cs (240) : Assert.Equal(1, tabla.NumRows());
 TableTests.cs (241) : }
+Client.cs (23) : try
+Client.cs (24) : {
+Client.cs (25) : m_tcpClient.Connect(ipAddress, port);
+Client.cs (26) : return true;
+Client.cs (27) : }
+Client.cs (28) : catch (Exception e)
+Client.cs (29) : {
+Client.cs (30) : Console.WriteLine(e);
+Client.cs (32) : }
+Client.cs (41) : try
+Client.cs (42) : {
+Client.cs (43) : NetworkStream stream = m_tcpClient.GetStream();
+Client.cs (44) : ASCIIEncoding encoding = new ASCIIEncoding();
+Client.cs (45) : byte[] bytesToSend = encoding.GetBytes(message);
+Client.cs (46) : stream.Write(bytesToSend, 0, bytesToSend.Length);
+Client.cs (48) : byte[] buffer = new byte[1024];
+Client.cs (49) : int bytesRead = stream.Read(buffer, 0, buffer.Length);
+Client.cs (50) : return encoding.GetString(buffer, 0, bytesRead);
+Client.cs (51) : }
+Client.cs (52) : catch (Exception e)
+Client.cs (53) : {
+Client.cs (54) : Console.WriteLine("Error sending message: " + e.Message);
+Client.cs (56) : }
+Client.cs (64) : string command = XmlSerializer.OpenDatabase(database, username, password);
+Client.cs (65) : string response = SendString(command);
+Client.cs (66) : if (response == null)
+Client.cs (67) : {
+Client.cs (68) : error = "No response from server.";
+Client.cs (70) : }
+Client.cs (71) : return XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (79) : string command = XmlSerializer.CreateDatabase(database, username, password);
+Client.cs (80) : string response = SendString(command);
+Client.cs (81) : if (response == null)
+Client.cs (82) : {
+Client.cs (83) : error = "";
+Client.cs (85) : }
+Client.cs (86) : return XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (92) : string command = XmlSerializer.Query(query);
+Client.cs (93) : string response = SendString(command);
+Client.cs (95) : if (response == null)
+Client.cs (96) : return "Error: No response from server.";
+Client.cs (98) : string content;
+Client.cs (99) : bool success = XmlDeserializer.ParseQueryAnswer(response, out content);
+Client.cs (100) : if (success)
+Client.cs (101) : {
+Client.cs (102) : return content;
+Client.cs (103) : }
+Client.cs (104) : else
+Client.cs (105) : {
+Client.cs (106) : return $"<Error>{content}<Error/>";
+Client.cs (107) : }
+Client.cs (113) : string command = XmlSerializer.CloseConnection;
+Client.cs (114) : SendString(command);
+Client.cs (115) : m_tcpClient.Close();
 XmlDeserializer.cs (23) : string pattern = @"^<Open\s+Database=""(?<Database>\w+)""\s+User=""(?<User>\w+)""\s+Password=""(?<Password>.+)""\/>$";
 XmlDeserializer.cs (24) : Regex regex = new Regex(pattern, RegexOptions.IgnoreCase);
 XmlDeserializer.cs (25) : Match match = regex.Match(command);
@@ -988,7 +1045,7 @@ XmlDeserializer.cs (31) : password = match.Groups["Password"].Value;
 XmlDeserializer.cs (32) : return true;
 XmlDeserializer.cs (33) : }
 XmlDeserializer.cs (45) : string patternSuccess = @"^<Success\/>$";
-XmlDeserializer.cs (46) : string patternError = @"^<Error>(?<Error>.+)<Error\/>$";
+XmlDeserializer.cs (46) : string patternError = @"^<Answer><Error>(?<Error>.+)<\/Error><\/Answer>$";
 XmlDeserializer.cs (47) : Regex regexSuccess = new Regex(patternSuccess, RegexOptions.IgnoreCase);
 XmlDeserializer.cs (48) : Regex regexError = new Regex(patternError, RegexOptions.IgnoreCase);
 XmlDeserializer.cs (49) : Match matchSuccess = regexSuccess.Match(answer);
@@ -1000,6 +1057,19 @@ XmlDeserializer.cs (55) : {
 XmlDeserializer.cs (56) : error = matchError.Groups["Error"].Value;
 XmlDeserializer.cs (57) : return false;
 XmlDeserializer.cs (58) : }
+XmlDeserializer.cs (116) : string patternSuccess = @"^<Answer>(?<Answer>.+)<\/Answer>$";
+XmlDeserializer.cs (117) : string patternError = @"^<Answer><Error>(?<sql_error>.*?)<\/Error><\/Answer>$";
+XmlDeserializer.cs (118) : Regex regexError = new Regex(patternError, RegexOptions.IgnoreCase);
+XmlDeserializer.cs (119) : Regex regexSuccess = new Regex(patternSuccess, RegexOptions.IgnoreCase);
+XmlDeserializer.cs (120) : Match matchError = regexError.Match(answer);
+XmlDeserializer.cs (121) : Match matchSuccess = regexSuccess.Match(answer);
+XmlDeserializer.cs (123) : if (matchSuccess.Success)
+XmlDeserializer.cs (125) : answerContent = matchSuccess.Groups["Answer"].Value;
+XmlDeserializer.cs (126) : return true;
+XmlDeserializer.cs (128) : else if (matchError.Success)
+XmlDeserializer.cs (130) : answerContent = matchError.Groups["sql_error"].Value;
+XmlDeserializer.cs (131) : return false;
+XmlDeserializer.cs (133) : return false;
 AddUser.cs (5) : using DbManager.Security;
 AddUser.cs (20) : this.Username = username;
 AddUser.cs (21) : this.Password = password;

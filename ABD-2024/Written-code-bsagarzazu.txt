@@ -29,11 +29,11 @@ Database.cs (123) : {
 Database.cs (124) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Database.cs (125) : return false;
 Database.cs (126) : }
-Database.cs (155) : if (!(SecurityManager.IsUserAdmin() || SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Select)))
-Database.cs (156) : {
-Database.cs (157) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Database.cs (158) : return null;
-Database.cs (159) : }
+Database.cs (169) : if (!(SecurityManager.IsUserAdmin() || SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Select)))
+Database.cs (170) : {
+Database.cs (171) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (172) : return null;
+Database.cs (173) : }
 Database.cs (190) : if (!(SecurityManager.IsUserAdmin() || SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Delete)))
 Database.cs (191) : {
 Database.cs (192) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
@@ -47,137 +47,145 @@ Database.cs (240) : }
 Database.cs (279) : private const string OrderFileName = "TablesOrder.txt";
 Database.cs (285) : try
 Database.cs (286) : {
-Database.cs (287) : Directory.CreateDirectory(databaseName);
-Database.cs (289) : string filePath = Path.Combine(databaseName, OrderFileName);
-Database.cs (290) : TextWriter writer = File.CreateText(filePath);
-Database.cs (291) : writer.WriteLine(AsText());
-Database.cs (292) : writer.Close();
-Database.cs (294) : foreach (Table table in Tables)
-Database.cs (295) : {
-Database.cs (296) : filePath = Path.Combine(databaseName, table.Name + TableFileExtension);
-Database.cs (297) : writer = File.CreateText(filePath);
-Database.cs (298) : for (int i = 0; i < table.NumColumns(); i++)
-Database.cs (299) : {
-Database.cs (300) : writer.WriteLine(table.GetColumn(i).AsText());
-Database.cs (301) : }
-Database.cs (302) : writer.WriteLine();
-Database.cs (303) : for (int i = 0; i < table.NumRows(); i++)
-Database.cs (304) : {
-Database.cs (305) : writer.WriteLine(table.GetRow(i).AsText());
-Database.cs (306) : }
-Database.cs (307) : writer.Close();
-Database.cs (308) : }
-Database.cs (309) : SecurityManager.Save(databaseName);
-Database.cs (310) : return true;
-Database.cs (311) : }
-Database.cs (312) : catch
-Database.cs (313) : {
-Database.cs (315) : }
-Database.cs (323) : try
-Database.cs (324) : {
-Database.cs (325) : Database database = new Database();
-Database.cs (327) : database.m_username = username;
-Database.cs (328) : database.SecurityManager = Manager.Load(databaseName, username);
-Database.cs (330) : TextReader reader = File.OpenText(Path.Combine(databaseName, OrderFileName));
-Database.cs (331) : string[] tablesInOrder = reader.ReadLine().Split(":").ToArray();
-Database.cs (333) : foreach (string tableName in tablesInOrder)
-Database.cs (334) : {
-Database.cs (335) : reader = File.OpenText(Path.Combine(databaseName, tableName + TableFileExtension));
-Database.cs (336) : string line = reader.ReadLine();
-Database.cs (337) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (338) : while (!String.IsNullOrEmpty(line))
-Database.cs (339) : {
-Database.cs (340) : ColumnDefinition column = ColumnDefinition.Parse(line);
-Database.cs (341) : columns.Add(column);
-Database.cs (342) : line = reader.ReadLine();
-Database.cs (343) : }
-Database.cs (345) : line = reader.ReadLine();
-Database.cs (347) : Table newTable = new Table(tableName, columns);
-Database.cs (348) : database.Tables.Add(newTable);
-Database.cs (350) : while (!String.IsNullOrEmpty(line))
-Database.cs (351) : {
-Database.cs (352) : Row row = Row.Parse(columns, line);
-Database.cs (353) : newTable.Insert(row.Values);
-Database.cs (354) : line = reader.ReadLine();
-Database.cs (355) : }
-Database.cs (356) : }
-Database.cs (358) : if (database.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (287) : if (!Directory.Exists(databaseName)) Directory.CreateDirectory(databaseName);
+Database.cs (288) : else
+Database.cs (289) : {
+Database.cs (290) : string [] files = Directory.GetFiles(databaseName);
+Database.cs (291) : foreach (string file in files)
+Database.cs (292) : {
+Database.cs (293) : File.Delete(file);
+Database.cs (294) : }
+Database.cs (295) : }
+Database.cs (297) : string filePath = Path.Combine(databaseName, OrderFileName);
+Database.cs (298) : TextWriter writer = File.CreateText(filePath);
+Database.cs (299) : writer.WriteLine(AsText());
+Database.cs (300) : writer.Close();
+Database.cs (302) : foreach (Table table in Tables)
+Database.cs (303) : {
+Database.cs (304) : filePath = Path.Combine(databaseName, table.Name + TableFileExtension);
+Database.cs (305) : writer = File.CreateText(filePath);
+Database.cs (306) : for (int i = 0; i < table.NumColumns(); i++)
+Database.cs (307) : {
+Database.cs (308) : writer.WriteLine(table.GetColumn(i).AsText());
+Database.cs (309) : }
+Database.cs (310) : writer.WriteLine();
+Database.cs (311) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (312) : {
+Database.cs (313) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (314) : }
+Database.cs (315) : writer.Close();
+Database.cs (316) : }
+Database.cs (317) : SecurityManager.Save(databaseName);
+Database.cs (318) : return true;
+Database.cs (319) : }
+Database.cs (320) : catch
+Database.cs (321) : {
+Database.cs (323) : }
+Database.cs (331) : try
+Database.cs (332) : {
+Database.cs (333) : Database database = new Database();
+Database.cs (335) : database.m_username = username;
+Database.cs (336) : database.SecurityManager = Manager.Load(databaseName, username);
+Database.cs (338) : TextReader reader = File.OpenText(Path.Combine(databaseName, OrderFileName));
+Database.cs (339) : string[] tablesInOrder = reader.ReadLine().Split(":").ToArray();
+Database.cs (341) : foreach (string tableName in tablesInOrder)
+Database.cs (342) : {
+Database.cs (343) : reader = File.OpenText(Path.Combine(databaseName, tableName + TableFileExtension));
+Database.cs (344) : string line = reader.ReadLine();
+Database.cs (345) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (346) : while (!String.IsNullOrEmpty(line))
+Database.cs (347) : {
+Database.cs (348) : ColumnDefinition column = ColumnDefinition.Parse(line);
+Database.cs (349) : columns.Add(column);
+Database.cs (350) : line = reader.ReadLine();
+Database.cs (351) : }
+Database.cs (353) : line = reader.ReadLine();
+Database.cs (355) : Table newTable = new Table(tableName, columns);
+Database.cs (356) : database.Tables.Add(newTable);
+Database.cs (358) : while (!String.IsNullOrEmpty(line))
 Database.cs (359) : {
-Database.cs (360) : return database;
-Database.cs (361) : }
-Database.cs (362) : else
-Database.cs (363) : {
-Database.cs (364) : return null;
-Database.cs (365) : }
-Database.cs (366) : }
-Database.cs (367) : catch
-Database.cs (368) : {
-Database.cs (371) : }
-Database.cs (373) : public string AsText()
-Database.cs (374) : {
-Database.cs (375) : string tables = "";
-Database.cs (376) : foreach (Table table in Tables)
-Database.cs (377) : {
-Database.cs (378) : tables += table.Name + ":";
+Database.cs (360) : Row row = Row.Parse(columns, line);
+Database.cs (361) : newTable.Insert(row.Values);
+Database.cs (362) : line = reader.ReadLine();
+Database.cs (363) : }
+Database.cs (364) : }
+Database.cs (366) : if (database.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (367) : {
+Database.cs (368) : return database;
+Database.cs (369) : }
+Database.cs (370) : else
+Database.cs (371) : {
+Database.cs (372) : return null;
+Database.cs (373) : }
+Database.cs (374) : }
+Database.cs (375) : catch
+Database.cs (376) : {
 Database.cs (379) : }
-Database.cs (380) : tables = tables.TrimEnd(':');
-Database.cs (381) : return tables;
-Database.cs (382) : }
-Database.cs (403) : public bool Equals(Database database2)
-Database.cs (404) : {
-Database.cs (405) : if (Tables.Count != database2.Tables.Count) return false;
-Database.cs (406) : for (int i = 0; i < Tables.Count; i++)
-Database.cs (407) : {
-Database.cs (408) : if (!Tables[i].Equals(database2.Tables[i])) return false;
-Database.cs (409) : }
-Database.cs (410) : if (!SecurityManager.Equals(database2.SecurityManager)) return false;
-Database.cs (411) : return true;
-Database.cs (412) : }
-Database.cs (427) : public static Database CreateTestDatabase2()
-Database.cs (428) : {
-Database.cs (429) : Database database = new Database(AdminUsername + "2", AdminPassword);
-Database.cs (431) : database.Tables.Add(Table.CreateTestTable());
-Database.cs (433) : return database;
-Database.cs (434) : }
-Database.cs (436) : public static Database CreateTestDatabase3()
-Database.cs (437) : {
-Database.cs (438) : Database database = new Database(AdminUsername, AdminPassword);
-Database.cs (440) : database.Tables.Add(Table.CreateTestTable());
-Database.cs (442) : Manager manager = database.SecurityManager;
-Database.cs (444) : string table1 = "Name";
-Database.cs (445) : string table2 = "Height";
-Database.cs (446) : string table3 = "Age";
-Database.cs (448) : User u1 = new User("John", "1234");
-Database.cs (449) : User u2 = new User("Joe", "2345");
-Database.cs (450) : User u3 = new User("Charles", "3456");
-Database.cs (452) : Profile profile1 = new Profile();
-Database.cs (453) : Profile profile2 = new Profile();
-Database.cs (454) : Profile profile3 = new Profile();
-Database.cs (456) : profile1.Name = "Customer";
-Database.cs (457) : profile2.Name = "Programmer";
-Database.cs (458) : profile3.Name = "Management";
-Database.cs (460) : profile1.GrantPrivilege(table1, Privilege.Delete);
-Database.cs (461) : profile1.GrantPrivilege(table1, Privilege.Select);
-Database.cs (462) : profile1.GrantPrivilege(table2, Privilege.Insert);
-Database.cs (464) : profile2.GrantPrivilege(table1, Privilege.Update);
-Database.cs (465) : profile2.GrantPrivilege(table1, Privilege.Insert);
-Database.cs (466) : profile2.GrantPrivilege(table1, Privilege.Delete);
-Database.cs (467) : profile2.GrantPrivilege(table2, Privilege.Insert);
-Database.cs (468) : profile2.GrantPrivilege(table2, Privilege.Delete);
-Database.cs (469) : profile2.GrantPrivilege(table3, Privilege.Select);
-Database.cs (470) : profile2.GrantPrivilege(table3, Privilege.Update);
-Database.cs (472) : profile3.GrantPrivilege(table1, Privilege.Select);
-Database.cs (473) : profile3.GrantPrivilege(table2, Privilege.Insert);
-Database.cs (474) : profile3.GrantPrivilege(table2, Privilege.Update);
-Database.cs (475) : profile3.GrantPrivilege(table3, Privilege.Delete);
-Database.cs (477) : profile1.Users.Add(u3);
-Database.cs (478) : profile2.Users.Add(u2);
-Database.cs (479) : profile3.Users.Add(u1);
-Database.cs (481) : manager.AddProfile(profile1);
-Database.cs (482) : manager.AddProfile(profile2);
-Database.cs (483) : manager.AddProfile(profile3);
-Database.cs (485) : return database;
-Database.cs (486) : }
+Database.cs (381) : public string AsText()
+Database.cs (382) : {
+Database.cs (383) : string tables = "";
+Database.cs (384) : foreach (Table table in Tables)
+Database.cs (385) : {
+Database.cs (386) : tables += table.Name + ":";
+Database.cs (387) : }
+Database.cs (388) : tables = tables.TrimEnd(':');
+Database.cs (389) : return tables;
+Database.cs (390) : }
+Database.cs (411) : public bool Equals(Database database2)
+Database.cs (412) : {
+Database.cs (413) : if (Tables.Count != database2.Tables.Count) return false;
+Database.cs (414) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (415) : {
+Database.cs (416) : if (!Tables[i].Equals(database2.Tables[i])) return false;
+Database.cs (417) : }
+Database.cs (418) : if (!SecurityManager.Equals(database2.SecurityManager)) return false;
+Database.cs (419) : return true;
+Database.cs (420) : }
+Database.cs (435) : public static Database CreateTestDatabase2()
+Database.cs (436) : {
+Database.cs (437) : Database database = new Database(AdminUsername + "2", AdminPassword);
+Database.cs (439) : database.Tables.Add(Table.CreateTestTable());
+Database.cs (441) : return database;
+Database.cs (442) : }
+Database.cs (444) : public static Database CreateTestDatabase3()
+Database.cs (445) : {
+Database.cs (446) : Database database = new Database(AdminUsername, AdminPassword);
+Database.cs (448) : database.Tables.Add(Table.CreateTestTable());
+Database.cs (450) : Manager manager = database.SecurityManager;
+Database.cs (452) : string table1 = "Name";
+Database.cs (453) : string table2 = "Height";
+Database.cs (454) : string table3 = "Age";
+Database.cs (456) : User u1 = new User("John", "1234");
+Database.cs (457) : User u2 = new User("Joe", "2345");
+Database.cs (458) : User u3 = new User("Charles", "3456");
+Database.cs (460) : Profile profile1 = new Profile();
+Database.cs (461) : Profile profile2 = new Profile();
+Database.cs (462) : Profile profile3 = new Profile();
+Database.cs (464) : profile1.Name = "Customer";
+Database.cs (465) : profile2.Name = "Programmer";
+Database.cs (466) : profile3.Name = "Management";
+Database.cs (468) : profile1.GrantPrivilege(table1, Privilege.Delete);
+Database.cs (469) : profile1.GrantPrivilege(table1, Privilege.Select);
+Database.cs (470) : profile1.GrantPrivilege(table2, Privilege.Insert);
+Database.cs (472) : profile2.GrantPrivilege(table1, Privilege.Update);
+Database.cs (473) : profile2.GrantPrivilege(table1, Privilege.Insert);
+Database.cs (474) : profile2.GrantPrivilege(table1, Privilege.Delete);
+Database.cs (475) : profile2.GrantPrivilege(table2, Privilege.Insert);
+Database.cs (476) : profile2.GrantPrivilege(table2, Privilege.Delete);
+Database.cs (477) : profile2.GrantPrivilege(table3, Privilege.Select);
+Database.cs (478) : profile2.GrantPrivilege(table3, Privilege.Update);
+Database.cs (480) : profile3.GrantPrivilege(table1, Privilege.Select);
+Database.cs (481) : profile3.GrantPrivilege(table2, Privilege.Insert);
+Database.cs (482) : profile3.GrantPrivilege(table2, Privilege.Update);
+Database.cs (483) : profile3.GrantPrivilege(table3, Privilege.Delete);
+Database.cs (485) : profile1.Users.Add(u3);
+Database.cs (486) : profile2.Users.Add(u2);
+Database.cs (487) : profile3.Users.Add(u1);
+Database.cs (489) : manager.AddProfile(profile1);
+Database.cs (490) : manager.AddProfile(profile2);
+Database.cs (491) : manager.AddProfile(profile3);
+Database.cs (493) : return database;
+Database.cs (494) : }
 Row.cs (27) : if (colIndex >= 0 && colIndex < Values.Count)
 Row.cs (28) : {
 Row.cs (31) : else if (colIndex >= Values.Count)
@@ -648,18 +656,37 @@ RowTests.cs (155) : Assert.Equal("43", row.Values[1]);
 RowTests.cs (156) : Assert.Equal("1.67", row.Values[2]);
 RowTests.cs (157) : }
 SelectTests.cs (2) : using DbManager.Security;
+SelectTests.cs (46) : selectTest= new Select("TestTableXXX", columnNames, conditionHeight); //"TestTableXXX" does not exist in db
+SelectTests.cs (47) : result = selectTest.Execute(db);
+SelectTests.cs (48) : Assert.Equal(Constants.TableDoesNotExistError, result);
 SelectTests.cs (50) : Profile profile = new Profile();
 SelectTests.cs (51) : profile.Name = "Manager";
 SelectTests.cs (52) : profile.Users.Add(new User("user", "1234"));
 SelectTests.cs (53) : db.SecurityManager.AddProfile(profile);
 SelectTests.cs (54) : db.SecurityManager.GrantPrivilege("Manager", "TestTable", Privilege.Select);
-SelectTests.cs (55) : db.Save("SelectTest");
-SelectTests.cs (56) : db = Database.Load("SelectTest", "user", "1234");
-SelectTests.cs (58) : selectTest = new Select("TestTable", columnNames, conditionHeight);
-SelectTests.cs (59) : expectedOutput = "['Name','Age']{'Rodolfo','25'}{'Maider','67'}";
-SelectTests.cs (60) : result = selectTest.Execute(db);
-SelectTests.cs (61) : Assert.NotNull(result);
-SelectTests.cs (62) : Assert.Equal(expectedOutput, result); // since the select is correct, we expect a table represented as a string
+SelectTests.cs (55) : profile = new Profile();
+SelectTests.cs (57) : profile.Name = "Programmer";
+SelectTests.cs (58) : profile.Users.Add(new User("user2", "1234"));
+SelectTests.cs (59) : db.SecurityManager.AddProfile(profile);
+SelectTests.cs (60) : db.SecurityManager.GrantPrivilege("Programmer", "TestTable", Privilege.Delete);
+SelectTests.cs (62) : db.Save("SelectTest");
+SelectTests.cs (63) : db = Database.Load("SelectTest", "user", "1234");
+SelectTests.cs (65) : selectTest = new Select("TestTableXXX", columnNames, conditionHeight);//"TestTableXXX" does not exist in db
+SelectTests.cs (66) : result = selectTest.Execute(db);
+SelectTests.cs (67) : Assert.Equal(Constants.TableDoesNotExistError, result);
+SelectTests.cs (69) : selectTest = new Select("TestTable", columnNames, conditionHeight);
+SelectTests.cs (70) : expectedOutput = "['Name','Age']{'Rodolfo','25'}{'Maider','67'}";
+SelectTests.cs (71) : result = selectTest.Execute(db);
+SelectTests.cs (72) : Assert.NotNull(result);
+SelectTests.cs (73) : Assert.Equal(expectedOutput, result); // since the select is correct, we expect a table represented as a string
+SelectTests.cs (75) : db.Save("SelectTest");
+SelectTests.cs (76) : db = Database.Load("SelectTest", "user2", "1234");
+SelectTests.cs (78) : selectTest = new Select("TestTableXXX", columnNames, conditionHeight);//"TestTableXXX" not exist in db
+SelectTests.cs (79) : result= selectTest.Execute(db);
+SelectTests.cs (80) : Assert.Equal(Constants.TableDoesNotExistError, result);
+SelectTests.cs (82) : selectTest = new Select("TestTable", columnNames, conditionHeight);
+SelectTests.cs (83) : result = selectTest.Execute(db);
+SelectTests.cs (84) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
 SetValueTests.cs (1) : ﻿using System;
 SetValueTests.cs (2) : using System.Collections.Generic;
 SetValueTests.cs (3) : using System.Linq;
@@ -869,7 +896,6 @@ XmlDeserializerTests.cs (5) : using System.Linq;
 XmlDeserializerTests.cs (6) : using System.Text;
 XmlDeserializerTests.cs (7) : using System.Threading.Tasks;
 XmlDeserializerTests.cs (8) : using DbManager;
-XmlDeserializerTests.cs (9) : using DbManager.Network;
 XmlDeserializerTests.cs (11) : namespace OurTests
 XmlDeserializerTests.cs (12) : {
 XmlDeserializerTests.cs (13) : public class XmlDeserializerTests
@@ -912,57 +938,56 @@ XmlDeserializerTests.cs (91) : }
 XmlDeserializerTests.cs (93) : [Fact]
 XmlDeserializerTests.cs (94) : public void ParseQueryTest()
 XmlDeserializerTests.cs (95) : {
-XmlDeserializerTests.cs (96) : }
-XmlDeserializerTests.cs (98) : [Fact]
-XmlDeserializerTests.cs (99) : public void ParseQueryAnswerTest()
-XmlDeserializerTests.cs (100) : {
-XmlDeserializerTests.cs (101) : }
-XmlDeserializerTests.cs (102) : }
 XmlDeserializerTests.cs (103) : }
+XmlDeserializerTests.cs (105) : [Fact]
+XmlDeserializerTests.cs (106) : public void ParseQueryAnswerTest()
+XmlDeserializerTests.cs (107) : {
+XmlDeserializerTests.cs (115) : }
+XmlDeserializerTests.cs (116) : }
+XmlDeserializerTests.cs (117) : }
 Client.cs (5) : using System.IO.Pipes;
-Client.cs (24) : try
-Client.cs (25) : {
-Client.cs (26) : TcpClient client = new TcpClient();
-Client.cs (27) : Console.WriteLine("Client running. Waiting 2 seconds...");
-Client.cs (28) : Task.Delay(2000).Wait();
-Client.cs (30) : Console.Write("Connecting");
-Client.cs (31) : client.Connect(ipAddress, port);
-Client.cs (32) : Console.WriteLine("Connected");
-Client.cs (34) : return true;
-Client.cs (35) : }
-Client.cs (36) : catch
-Client.cs (37) : {
-Client.cs (39) : }
-Client.cs (50) : NetworkStream stream = m_tcpClient.GetStream();
-Client.cs (51) : ASCIIEncoding encoding = new ASCIIEncoding();
-Client.cs (52) : byte[] bytes = encoding.GetBytes(message);
-Client.cs (53) : Console.WriteLine("Sending message");
-Client.cs (55) : stream.Write(bytes, 0, bytes.Length);
-Client.cs (57) : byte[] buffer = new byte[100];
-Client.cs (58) : int numBytesRead = stream.Read(buffer, 0, 100);
-Client.cs (60) : string answer = encoding.GetString(buffer);
-Client.cs (61) : Console.WriteLine("Answer from server: " + answer);
-Client.cs (62) : return answer;
-Client.cs (68) : string openMessage = XmlSerializer.OpenDatabase(database, username, password);
-Client.cs (69) : string answer = SendString(openMessage);
-Client.cs (70) : if (answer.Equals(XmlSerializer.OpenCreateSuccess))
-Client.cs (71) : {
-Client.cs (73) : return true;
-Client.cs (74) : }
-Client.cs (75) : error = answer;
-Client.cs (80) : public bool Create(string database, string username, string password, out string error)
-Client.cs (81) : {
-Client.cs (82) : //DEADLINE 6: Send a Create command to the server using SendString
-Client.cs (83) : string openMessage = XmlSerializer.CreateDatabase(database, username, password);
-Client.cs (84) : string answer = SendString(openMessage);
-Client.cs (85) : if (answer.Equals(XmlSerializer.OpenCreateSuccess))
-Client.cs (86) : {
-Client.cs (87) : error = null;
-Client.cs (88) : return true;
-Client.cs (89) : }
-Client.cs (90) : error = answer;
-Client.cs (91) : return false;
-Client.cs (93) : }
+Client.cs (18) : Console.WriteLine("Client running. Waiting 2 seconds...");
+Client.cs (19) : Task.Delay(2000).Wait();
+Client.cs (26) : try
+Client.cs (27) : {
+Client.cs (28) : Console.WriteLine("Connecting");
+Client.cs (29) : m_tcpClient.Connect(ipAddress, port);
+Client.cs (30) : Console.WriteLine("Connected");
+Client.cs (32) : return true;
+Client.cs (33) : }
+Client.cs (34) : catch
+Client.cs (35) : {
+Client.cs (37) : }
+Client.cs (48) : NetworkStream stream = m_tcpClient.GetStream();
+Client.cs (49) : ASCIIEncoding encoding = new ASCIIEncoding();
+Client.cs (50) : byte[] bytes = encoding.GetBytes(message);
+Client.cs (51) : Console.WriteLine("Sending message");
+Client.cs (53) : stream.Write(bytes, 0, bytes.Length);
+Client.cs (55) : byte[] buffer = new byte[100];
+Client.cs (56) : int numBytesRead = stream.Read(buffer, 0, 100);
+Client.cs (58) : string answer = encoding.GetString(buffer, 0, numBytesRead);
+Client.cs (59) : Console.WriteLine("Answer from server: " + answer);
+Client.cs (60) : return answer;
+Client.cs (66) : string openMessage = XmlSerializer.OpenDatabase(database, username, password);
+Client.cs (67) : string answer = SendString(openMessage);
+Client.cs (68) : if (answer.Equals(XmlSerializer.OpenCreateSuccess))
+Client.cs (69) : {
+Client.cs (71) : return true;
+Client.cs (72) : }
+Client.cs (73) : error = answer;
+Client.cs (78) : public bool Create(string database, string username, string password, out string error)
+Client.cs (79) : {
+Client.cs (80) : //DEADLINE 6: Send a Create command to the server using SendString
+Client.cs (81) : string openMessage = XmlSerializer.CreateDatabase(database, username, password);
+Client.cs (82) : string answer = SendString(openMessage);
+Client.cs (83) : if (answer.Equals(XmlSerializer.OpenCreateSuccess))
+Client.cs (84) : {
+Client.cs (85) : error = null;
+Client.cs (86) : return true;
+Client.cs (87) : }
+Client.cs (88) : error = answer;
+Client.cs (89) : return false;
+Client.cs (91) : }
 XmlDeserializer.cs (23) : const string openPattern = "^<Open Database=\"(\\w+)\" User=\"(\\w+)\" Password=\"(\\w+)\"\\/>$";
 XmlDeserializer.cs (24) : Match match = Regex.Match(command, openPattern);
 XmlDeserializer.cs (25) : if (match.Success)
