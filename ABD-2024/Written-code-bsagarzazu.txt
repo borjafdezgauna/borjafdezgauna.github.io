@@ -88,104 +88,106 @@ Database.cs (335) : database.m_username = username;
 Database.cs (336) : database.SecurityManager = Manager.Load(databaseName, username);
 Database.cs (338) : TextReader reader = File.OpenText(Path.Combine(databaseName, OrderFileName));
 Database.cs (339) : string[] tablesInOrder = reader.ReadLine().Split(":").ToArray();
-Database.cs (341) : foreach (string tableName in tablesInOrder)
-Database.cs (342) : {
-Database.cs (343) : reader = File.OpenText(Path.Combine(databaseName, tableName + TableFileExtension));
-Database.cs (344) : string line = reader.ReadLine();
-Database.cs (345) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (346) : while (!String.IsNullOrEmpty(line))
-Database.cs (347) : {
-Database.cs (348) : ColumnDefinition column = ColumnDefinition.Parse(line);
-Database.cs (349) : columns.Add(column);
-Database.cs (350) : line = reader.ReadLine();
-Database.cs (351) : }
-Database.cs (353) : line = reader.ReadLine();
-Database.cs (355) : Table newTable = new Table(tableName, columns);
-Database.cs (356) : database.Tables.Add(newTable);
-Database.cs (358) : while (!String.IsNullOrEmpty(line))
-Database.cs (359) : {
-Database.cs (360) : Row row = Row.Parse(columns, line);
-Database.cs (361) : newTable.Insert(row.Values);
-Database.cs (362) : line = reader.ReadLine();
-Database.cs (363) : }
+Database.cs (340) : reader.Close();
+Database.cs (342) : foreach (string tableName in tablesInOrder)
+Database.cs (343) : {
+Database.cs (344) : reader = File.OpenText(Path.Combine(databaseName, tableName + TableFileExtension));
+Database.cs (345) : string line = reader.ReadLine();
+Database.cs (346) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (347) : while (!String.IsNullOrEmpty(line))
+Database.cs (348) : {
+Database.cs (349) : ColumnDefinition column = ColumnDefinition.Parse(line);
+Database.cs (350) : columns.Add(column);
+Database.cs (351) : line = reader.ReadLine();
+Database.cs (352) : }
+Database.cs (354) : line = reader.ReadLine();
+Database.cs (356) : Table newTable = new Table(tableName, columns);
+Database.cs (357) : database.Tables.Add(newTable);
+Database.cs (359) : while (!String.IsNullOrEmpty(line))
+Database.cs (360) : {
+Database.cs (361) : Row row = Row.Parse(columns, line);
+Database.cs (362) : newTable.Insert(row.Values);
+Database.cs (363) : line = reader.ReadLine();
 Database.cs (364) : }
-Database.cs (366) : if (database.SecurityManager.IsPasswordCorrect(username, password))
-Database.cs (367) : {
-Database.cs (368) : return database;
-Database.cs (369) : }
-Database.cs (370) : else
-Database.cs (371) : {
-Database.cs (372) : return null;
-Database.cs (373) : }
-Database.cs (374) : }
-Database.cs (375) : catch
-Database.cs (376) : {
-Database.cs (379) : }
-Database.cs (381) : public string AsText()
-Database.cs (382) : {
-Database.cs (383) : string tables = "";
-Database.cs (384) : foreach (Table table in Tables)
-Database.cs (385) : {
-Database.cs (386) : tables += table.Name + ":";
-Database.cs (387) : }
-Database.cs (388) : tables = tables.TrimEnd(':');
-Database.cs (389) : return tables;
-Database.cs (390) : }
-Database.cs (411) : public bool Equals(Database database2)
-Database.cs (412) : {
-Database.cs (413) : if (Tables.Count != database2.Tables.Count) return false;
-Database.cs (414) : for (int i = 0; i < Tables.Count; i++)
-Database.cs (415) : {
-Database.cs (416) : if (!Tables[i].Equals(database2.Tables[i])) return false;
-Database.cs (417) : }
-Database.cs (418) : if (!SecurityManager.Equals(database2.SecurityManager)) return false;
-Database.cs (419) : return true;
-Database.cs (420) : }
-Database.cs (435) : public static Database CreateTestDatabase2()
-Database.cs (436) : {
-Database.cs (437) : Database database = new Database(AdminUsername + "2", AdminPassword);
-Database.cs (439) : database.Tables.Add(Table.CreateTestTable());
-Database.cs (441) : return database;
-Database.cs (442) : }
-Database.cs (444) : public static Database CreateTestDatabase3()
-Database.cs (445) : {
-Database.cs (446) : Database database = new Database(AdminUsername, AdminPassword);
-Database.cs (448) : database.Tables.Add(Table.CreateTestTable());
-Database.cs (450) : Manager manager = database.SecurityManager;
-Database.cs (452) : string table1 = "Name";
-Database.cs (453) : string table2 = "Height";
-Database.cs (454) : string table3 = "Age";
-Database.cs (456) : User u1 = new User("John", "1234");
-Database.cs (457) : User u2 = new User("Joe", "2345");
-Database.cs (458) : User u3 = new User("Charles", "3456");
-Database.cs (460) : Profile profile1 = new Profile();
-Database.cs (461) : Profile profile2 = new Profile();
-Database.cs (462) : Profile profile3 = new Profile();
-Database.cs (464) : profile1.Name = "Customer";
-Database.cs (465) : profile2.Name = "Programmer";
-Database.cs (466) : profile3.Name = "Management";
-Database.cs (468) : profile1.GrantPrivilege(table1, Privilege.Delete);
-Database.cs (469) : profile1.GrantPrivilege(table1, Privilege.Select);
-Database.cs (470) : profile1.GrantPrivilege(table2, Privilege.Insert);
-Database.cs (472) : profile2.GrantPrivilege(table1, Privilege.Update);
-Database.cs (473) : profile2.GrantPrivilege(table1, Privilege.Insert);
-Database.cs (474) : profile2.GrantPrivilege(table1, Privilege.Delete);
-Database.cs (475) : profile2.GrantPrivilege(table2, Privilege.Insert);
-Database.cs (476) : profile2.GrantPrivilege(table2, Privilege.Delete);
-Database.cs (477) : profile2.GrantPrivilege(table3, Privilege.Select);
-Database.cs (478) : profile2.GrantPrivilege(table3, Privilege.Update);
-Database.cs (480) : profile3.GrantPrivilege(table1, Privilege.Select);
-Database.cs (481) : profile3.GrantPrivilege(table2, Privilege.Insert);
-Database.cs (482) : profile3.GrantPrivilege(table2, Privilege.Update);
-Database.cs (483) : profile3.GrantPrivilege(table3, Privilege.Delete);
-Database.cs (485) : profile1.Users.Add(u3);
-Database.cs (486) : profile2.Users.Add(u2);
-Database.cs (487) : profile3.Users.Add(u1);
-Database.cs (489) : manager.AddProfile(profile1);
-Database.cs (490) : manager.AddProfile(profile2);
-Database.cs (491) : manager.AddProfile(profile3);
-Database.cs (493) : return database;
-Database.cs (494) : }
+Database.cs (365) : reader.Close();
+Database.cs (366) : }
+Database.cs (368) : if (database.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (369) : {
+Database.cs (370) : return database;
+Database.cs (371) : }
+Database.cs (372) : else
+Database.cs (373) : {
+Database.cs (374) : return null;
+Database.cs (375) : }
+Database.cs (376) : }
+Database.cs (377) : catch
+Database.cs (378) : {
+Database.cs (381) : }
+Database.cs (383) : public string AsText()
+Database.cs (384) : {
+Database.cs (385) : string tables = "";
+Database.cs (386) : foreach (Table table in Tables)
+Database.cs (387) : {
+Database.cs (388) : tables += table.Name + ":";
+Database.cs (389) : }
+Database.cs (390) : tables = tables.TrimEnd(':');
+Database.cs (391) : return tables;
+Database.cs (392) : }
+Database.cs (413) : public bool Equals(Database database2)
+Database.cs (414) : {
+Database.cs (415) : if (Tables.Count != database2.Tables.Count) return false;
+Database.cs (416) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (417) : {
+Database.cs (418) : if (!Tables[i].Equals(database2.Tables[i])) return false;
+Database.cs (419) : }
+Database.cs (420) : if (!SecurityManager.Equals(database2.SecurityManager)) return false;
+Database.cs (421) : return true;
+Database.cs (422) : }
+Database.cs (437) : public static Database CreateTestDatabase2()
+Database.cs (438) : {
+Database.cs (439) : Database database = new Database(AdminUsername + "2", AdminPassword);
+Database.cs (441) : database.Tables.Add(Table.CreateTestTable());
+Database.cs (443) : return database;
+Database.cs (444) : }
+Database.cs (446) : public static Database CreateTestDatabase3()
+Database.cs (447) : {
+Database.cs (448) : Database database = new Database(AdminUsername, AdminPassword);
+Database.cs (450) : database.Tables.Add(Table.CreateTestTable());
+Database.cs (452) : Manager manager = database.SecurityManager;
+Database.cs (454) : string table1 = "Name";
+Database.cs (455) : string table2 = "Height";
+Database.cs (456) : string table3 = "Age";
+Database.cs (458) : User u1 = new User("John", "1234");
+Database.cs (459) : User u2 = new User("Joe", "2345");
+Database.cs (460) : User u3 = new User("Charles", "3456");
+Database.cs (462) : Profile profile1 = new Profile();
+Database.cs (463) : Profile profile2 = new Profile();
+Database.cs (464) : Profile profile3 = new Profile();
+Database.cs (466) : profile1.Name = "Customer";
+Database.cs (467) : profile2.Name = "Programmer";
+Database.cs (468) : profile3.Name = "Management";
+Database.cs (470) : profile1.GrantPrivilege(table1, Privilege.Delete);
+Database.cs (471) : profile1.GrantPrivilege(table1, Privilege.Select);
+Database.cs (472) : profile1.GrantPrivilege(table2, Privilege.Insert);
+Database.cs (474) : profile2.GrantPrivilege(table1, Privilege.Update);
+Database.cs (475) : profile2.GrantPrivilege(table1, Privilege.Insert);
+Database.cs (476) : profile2.GrantPrivilege(table1, Privilege.Delete);
+Database.cs (477) : profile2.GrantPrivilege(table2, Privilege.Insert);
+Database.cs (478) : profile2.GrantPrivilege(table2, Privilege.Delete);
+Database.cs (479) : profile2.GrantPrivilege(table3, Privilege.Select);
+Database.cs (480) : profile2.GrantPrivilege(table3, Privilege.Update);
+Database.cs (482) : profile3.GrantPrivilege(table1, Privilege.Select);
+Database.cs (483) : profile3.GrantPrivilege(table2, Privilege.Insert);
+Database.cs (484) : profile3.GrantPrivilege(table2, Privilege.Update);
+Database.cs (485) : profile3.GrantPrivilege(table3, Privilege.Delete);
+Database.cs (487) : profile1.Users.Add(u3);
+Database.cs (488) : profile2.Users.Add(u2);
+Database.cs (489) : profile3.Users.Add(u1);
+Database.cs (491) : manager.AddProfile(profile1);
+Database.cs (492) : manager.AddProfile(profile2);
+Database.cs (493) : manager.AddProfile(profile3);
+Database.cs (495) : return database;
+Database.cs (496) : }
 Row.cs (27) : if (colIndex >= 0 && colIndex < Values.Count)
 Row.cs (28) : {
 Row.cs (31) : else if (colIndex >= Values.Count)
@@ -1125,79 +1127,81 @@ Manager.cs (198) : try
 Manager.cs (199) : {
 Manager.cs (200) : TextReader reader = File.OpenText(Path.Combine(databaseName, OrderFileName));
 Manager.cs (201) : string[] profilesInOrder = reader.ReadLine().Split(":").ToArray();
-Manager.cs (203) : Manager manager = new Manager(username);
-Manager.cs (204) : foreach (string profileName in profilesInOrder)
-Manager.cs (205) : {
-Manager.cs (206) : reader = File.OpenText(Path.Combine(databaseName, profileName + ProfileFileExtension));
-Manager.cs (207) : string line = reader.ReadLine();
-Manager.cs (208) : List<User> users = new List<User>();
-Manager.cs (209) : while (!String.IsNullOrEmpty(line))
-Manager.cs (210) : {
-Manager.cs (211) : User user = User.Parse(line);
-Manager.cs (212) : users.Add(user);
-Manager.cs (213) : line = reader.ReadLine();
-Manager.cs (214) : }
-Manager.cs (216) : line = reader.ReadLine();
-Manager.cs (218) : Profile profile = new Profile();
-Manager.cs (219) : profile.Name = profileName;
-Manager.cs (220) : profile.Users = users;
-Manager.cs (221) : manager.Profiles.Add(profile);
-Manager.cs (223) : while (!String.IsNullOrEmpty(line))
-Manager.cs (224) : {
-Manager.cs (225) : List<Privilege> privilegesOn = new List<Privilege>();
-Manager.cs (226) : string[] split = line.Split(":");
-Manager.cs (227) : string[] privileges = split[1].Split(",");
-Manager.cs (228) : foreach (string priv in privileges)
-Manager.cs (229) : {
-Manager.cs (230) : switch (priv)
-Manager.cs (231) : {
-Manager.cs (232) : case "Delete":
-Manager.cs (233) : privilegesOn.Add(Privilege.Delete);
-Manager.cs (234) : break;
-Manager.cs (235) : case "Insert":
-Manager.cs (236) : privilegesOn.Add(Privilege.Insert);
-Manager.cs (237) : break;
-Manager.cs (238) : case "Update":
-Manager.cs (239) : privilegesOn.Add(Privilege.Update);
-Manager.cs (240) : break;
-Manager.cs (241) : case "Select":
-Manager.cs (242) : privilegesOn.Add(Privilege.Select);
-Manager.cs (243) : break;
-Manager.cs (244) : }
+Manager.cs (202) : reader.Close();
+Manager.cs (204) : Manager manager = new Manager(username);
+Manager.cs (205) : foreach (string profileName in profilesInOrder)
+Manager.cs (206) : {
+Manager.cs (207) : reader = File.OpenText(Path.Combine(databaseName, profileName + ProfileFileExtension));
+Manager.cs (208) : string line = reader.ReadLine();
+Manager.cs (209) : List<User> users = new List<User>();
+Manager.cs (210) : while (!String.IsNullOrEmpty(line))
+Manager.cs (211) : {
+Manager.cs (212) : User user = User.Parse(line);
+Manager.cs (213) : users.Add(user);
+Manager.cs (214) : line = reader.ReadLine();
+Manager.cs (215) : }
+Manager.cs (217) : line = reader.ReadLine();
+Manager.cs (219) : Profile profile = new Profile();
+Manager.cs (220) : profile.Name = profileName;
+Manager.cs (221) : profile.Users = users;
+Manager.cs (222) : manager.Profiles.Add(profile);
+Manager.cs (224) : while (!String.IsNullOrEmpty(line))
+Manager.cs (225) : {
+Manager.cs (226) : List<Privilege> privilegesOn = new List<Privilege>();
+Manager.cs (227) : string[] split = line.Split(":");
+Manager.cs (228) : string[] privileges = split[1].Split(",");
+Manager.cs (229) : foreach (string priv in privileges)
+Manager.cs (230) : {
+Manager.cs (231) : switch (priv)
+Manager.cs (232) : {
+Manager.cs (233) : case "Delete":
+Manager.cs (234) : privilegesOn.Add(Privilege.Delete);
+Manager.cs (235) : break;
+Manager.cs (236) : case "Insert":
+Manager.cs (237) : privilegesOn.Add(Privilege.Insert);
+Manager.cs (238) : break;
+Manager.cs (239) : case "Update":
+Manager.cs (240) : privilegesOn.Add(Privilege.Update);
+Manager.cs (241) : break;
+Manager.cs (242) : case "Select":
+Manager.cs (243) : privilegesOn.Add(Privilege.Select);
+Manager.cs (244) : break;
 Manager.cs (245) : }
-Manager.cs (246) : foreach (Privilege priv in privilegesOn)
-Manager.cs (247) : {
-Manager.cs (248) : profile.GrantPrivilege(split[0], priv);
-Manager.cs (249) : }
-Manager.cs (250) : line = reader.ReadLine();
-Manager.cs (251) : }
+Manager.cs (246) : }
+Manager.cs (247) : foreach (Privilege priv in privilegesOn)
+Manager.cs (248) : {
+Manager.cs (249) : profile.GrantPrivilege(split[0], priv);
+Manager.cs (250) : }
+Manager.cs (251) : line = reader.ReadLine();
 Manager.cs (252) : }
-Manager.cs (253) : return manager;
+Manager.cs (253) : reader.Close();
 Manager.cs (254) : }
-Manager.cs (255) : catch
-Manager.cs (256) : {
-Manager.cs (257) : Console.WriteLine("An error ocurred while loading the manager");
-Manager.cs (259) : }
-Manager.cs (263) : public string AsText()
-Manager.cs (264) : {
-Manager.cs (265) : string profiles = "";
-Manager.cs (266) : foreach (Profile profile in Profiles)
-Manager.cs (267) : {
-Manager.cs (268) : profiles += profile.Name + ":";
-Manager.cs (269) : }
-Manager.cs (270) : profiles = profiles.TrimEnd(':');
-Manager.cs (271) : return profiles;
-Manager.cs (272) : }
-Manager.cs (274) : public bool Equals(Manager manager2)
-Manager.cs (275) : {
-Manager.cs (276) : if (Profiles.Count != manager2.Profiles.Count) return false;
-Manager.cs (277) : for (int i = 0; i < Profiles.Count; i++)
-Manager.cs (278) : {
-Manager.cs (279) : if (!Profiles[i].Equals(manager2.Profiles[i])) return false;
-Manager.cs (280) : }
-Manager.cs (281) : return true;
+Manager.cs (255) : return manager;
+Manager.cs (256) : }
+Manager.cs (257) : catch
+Manager.cs (258) : {
+Manager.cs (259) : Console.WriteLine("An error ocurred while loading the manager");
+Manager.cs (261) : }
+Manager.cs (265) : public string AsText()
+Manager.cs (266) : {
+Manager.cs (267) : string profiles = "";
+Manager.cs (268) : foreach (Profile profile in Profiles)
+Manager.cs (269) : {
+Manager.cs (270) : profiles += profile.Name + ":";
+Manager.cs (271) : }
+Manager.cs (272) : profiles = profiles.TrimEnd(':');
+Manager.cs (273) : return profiles;
+Manager.cs (274) : }
+Manager.cs (276) : public bool Equals(Manager manager2)
+Manager.cs (277) : {
+Manager.cs (278) : if (Profiles.Count != manager2.Profiles.Count) return false;
+Manager.cs (279) : for (int i = 0; i < Profiles.Count; i++)
+Manager.cs (280) : {
+Manager.cs (281) : if (!Profiles[i].Equals(manager2.Profiles[i])) return false;
 Manager.cs (282) : }
+Manager.cs (283) : return true;
 Manager.cs (284) : }
+Manager.cs (286) : }
 Profile.cs (62) : public bool Equals(Profile profile2)
 Profile.cs (63) : {
 Profile.cs (64) : if (!Name.Equals(profile2.Name)) return false;

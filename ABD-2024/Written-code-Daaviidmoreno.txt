@@ -69,41 +69,106 @@ ManagerTests.cs (154) : manager.GrantPrivilege("TestProfile", table, privilege);
 ManagerTests.cs (157) : var updatedProfile = manager.ProfileByName("TestProfile");
 ManagerTests.cs (158) : Assert.True(updatedProfile.IsGrantedPrivilege(table, privilege));
 ManagerTests.cs (159) : }
-ManagerTests.cs (162) : [Fact]
-ManagerTests.cs (164) : public void RevokePrivilege()
-ManagerTests.cs (165) : {
-ManagerTests.cs (166) : var manager = new Manager("admin");
-ManagerTests.cs (167) : var profile = new Profile { Name = "TestProfile" };
-ManagerTests.cs (168) : profile.GrantPrivilege("Orders", Privilege.Update); // Añadimos primero el privilegio
-ManagerTests.cs (169) : manager.AddProfile(profile);
-ManagerTests.cs (172) : manager.RevokePrivilege("TestProfile", "Orders", Privilege.Update);
-ManagerTests.cs (175) : var updatedProfile = manager.ProfileByName("TestProfile");
-ManagerTests.cs (176) : Assert.False(updatedProfile.IsGrantedPrivilege("Orders", Privilege.Update));
-ManagerTests.cs (178) : }
-ManagerTests.cs (181) : [Fact]
-ManagerTests.cs (183) : public void IsGrantedPrivilege()
-ManagerTests.cs (184) : {
-ManagerTests.cs (186) : var manager = new Manager("admin");
-ManagerTests.cs (188) : // Perfil con privilegio
-ManagerTests.cs (189) : var profileWithPrivilege = new Profile { Name = "ProfileWithPrivilege" };
-ManagerTests.cs (190) : var alice = new User("alice", Encryption.Encrypt("pass1"));
-ManagerTests.cs (191) : profileWithPrivilege.Users.Add(alice);
-ManagerTests.cs (192) : profileWithPrivilege.GrantPrivilege("Sales", Privilege.Select);
-ManagerTests.cs (193) : manager.AddProfile(profileWithPrivilege);
-ManagerTests.cs (195) : // Perfil sin privilegio
-ManagerTests.cs (196) : var profileWithoutPrivilege = new Profile { Name = "ProfileWithoutPrivilege" };
-ManagerTests.cs (197) : var bob = new User("bob", Encryption.Encrypt("pass2"));
-ManagerTests.cs (198) : profileWithoutPrivilege.Users.Add(bob);
-ManagerTests.cs (199) : manager.AddProfile(profileWithoutPrivilege);
-ManagerTests.cs (202) : Assert.True(manager.IsGrantedPrivilege("alice", "Sales", Privilege.Select)); //
-ManagerTests.cs (203) : Assert.False(manager.IsGrantedPrivilege("bob", "Sales", Privilege.Select)); //
-ManagerTests.cs (205) : Assert.False(manager.IsGrantedPrivilege("charlie", "Sales", Privilege.Select));
-ManagerTests.cs (206) : Assert.False(manager.IsGrantedPrivilege(null, "Sales", Privilege.Select));
-ManagerTests.cs (207) : Assert.False(manager.IsGrantedPrivilege("", "Sales", Privilege.Select));
-ManagerTests.cs (208) : Assert.False(manager.IsGrantedPrivilege("alice", null, Privilege.Select));
-ManagerTests.cs (209) : Assert.False(manager.IsGrantedPrivilege("alice", "", Privilege.Select));
-ManagerTests.cs (210) : Assert.False(manager.IsGrantedPrivilege("alice", "NonExistentTable", Privilege.Select));
-ManagerTests.cs (212) : }
+ManagerTests.cs (161) : [Fact]
+ManagerTests.cs (162) : public void GrantPrivilege_WithNonExistentProfile_ShouldDoNothing()
+ManagerTests.cs (163) : {
+ManagerTests.cs (164) : var manager = new Manager("admin");
+ManagerTests.cs (165) : string table = "Products";
+ManagerTests.cs (166) : Privilege privilege = Privilege.Select;
+ManagerTests.cs (168) : // Intentar conceder un privilegio a un perfil que no existe
+ManagerTests.cs (169) : manager.GrantPrivilege("NonExistentProfile", table, privilege);
+ManagerTests.cs (171) : // Verificar que no se ha concedido el privilegio
+ManagerTests.cs (172) : var profile = manager.ProfileByName("NonExistentProfile");
+ManagerTests.cs (173) : Assert.Null(profile);  // El perfil no debe existir
+ManagerTests.cs (174) : }
+ManagerTests.cs (176) : [Fact]
+ManagerTests.cs (177) : public void GrantPrivilege_WithEmptyTable_ShouldDoNothing()
+ManagerTests.cs (178) : {
+ManagerTests.cs (179) : var manager = new Manager("admin");
+ManagerTests.cs (180) : var profile = new Profile { Name = "TestProfile" };
+ManagerTests.cs (181) : manager.AddProfile(profile);
+ManagerTests.cs (183) : // Intentar conceder un privilegio a una tabla vacía
+ManagerTests.cs (184) : manager.GrantPrivilege("TestProfile", "", Privilege.Select);
+ManagerTests.cs (186) : var updatedProfile = manager.ProfileByName("TestProfile");
+ManagerTests.cs (187) : Assert.False(updatedProfile.IsGrantedPrivilege("", Privilege.Select)); // No debería haberse concedido
+ManagerTests.cs (188) : }
+ManagerTests.cs (192) : [Fact]
+ManagerTests.cs (194) : public void RevokePrivilege()
+ManagerTests.cs (195) : {
+ManagerTests.cs (196) : var manager = new Manager("admin");
+ManagerTests.cs (197) : var profile = new Profile { Name = "TestProfile" };
+ManagerTests.cs (198) : profile.GrantPrivilege("Orders", Privilege.Update); // Añadimos primero el privilegio
+ManagerTests.cs (199) : manager.AddProfile(profile);
+ManagerTests.cs (202) : manager.RevokePrivilege("TestProfile", "Orders", Privilege.Update);
+ManagerTests.cs (205) : var updatedProfile = manager.ProfileByName("TestProfile");
+ManagerTests.cs (206) : Assert.False(updatedProfile.IsGrantedPrivilege("Orders", Privilege.Update));
+ManagerTests.cs (208) : }
+ManagerTests.cs (210) : [Fact]
+ManagerTests.cs (211) : public void RevokePrivilege_WithNonExistentProfile_ShouldDoNothing()
+ManagerTests.cs (212) : {
+ManagerTests.cs (213) : var manager = new Manager("admin");
+ManagerTests.cs (214) : string table = "Products";
+ManagerTests.cs (215) : Privilege privilege = Privilege.Select;
+ManagerTests.cs (217) : // Intentar revocar un privilegio de un perfil que no existe
+ManagerTests.cs (218) : manager.RevokePrivilege("NonExistentProfile", table, privilege);
+ManagerTests.cs (220) : // Verificar que no se ha modificado nada
+ManagerTests.cs (221) : var profile = manager.ProfileByName("NonExistentProfile");
+ManagerTests.cs (222) : Assert.Null(profile);  // El perfil no debe existir
+ManagerTests.cs (223) : }
+ManagerTests.cs (225) : [Fact]
+ManagerTests.cs (226) : public void RevokePrivilege_WhenPrivilegeDoesNotExist_ShouldDoNothing()
+ManagerTests.cs (227) : {
+ManagerTests.cs (228) : var manager = new Manager("admin");
+ManagerTests.cs (229) : var profile = new Profile { Name = "TestProfile" };
+ManagerTests.cs (230) : manager.AddProfile(profile);
+ManagerTests.cs (232) : // Intentar revocar un privilegio que no existe
+ManagerTests.cs (233) : manager.RevokePrivilege("TestProfile", "Products", Privilege.Delete); // Privilegio no otorgado
+ManagerTests.cs (235) : var updatedProfile = manager.ProfileByName("TestProfile");
+ManagerTests.cs (236) : Assert.False(updatedProfile.IsGrantedPrivilege("Products", Privilege.Delete)); // No debería haberse revocado
+ManagerTests.cs (237) : }
+ManagerTests.cs (240) : [Fact]
+ManagerTests.cs (242) : public void IsGrantedPrivilege()
+ManagerTests.cs (243) : {
+ManagerTests.cs (245) : var manager = new Manager("admin");
+ManagerTests.cs (247) : // Perfil con privilegio
+ManagerTests.cs (248) : var profileWithPrivilege = new Profile { Name = "ProfileWithPrivilege" };
+ManagerTests.cs (249) : var alice = new User("alice", Encryption.Encrypt("pass1"));
+ManagerTests.cs (250) : profileWithPrivilege.Users.Add(alice);
+ManagerTests.cs (251) : profileWithPrivilege.GrantPrivilege("Sales", Privilege.Select);
+ManagerTests.cs (252) : manager.AddProfile(profileWithPrivilege);
+ManagerTests.cs (254) : // Perfil sin privilegio
+ManagerTests.cs (255) : var profileWithoutPrivilege = new Profile { Name = "ProfileWithoutPrivilege" };
+ManagerTests.cs (256) : var bob = new User("bob", Encryption.Encrypt("pass2"));
+ManagerTests.cs (257) : profileWithoutPrivilege.Users.Add(bob);
+ManagerTests.cs (258) : manager.AddProfile(profileWithoutPrivilege);
+ManagerTests.cs (261) : Assert.True(manager.IsGrantedPrivilege("alice", "Sales", Privilege.Select)); //
+ManagerTests.cs (262) : Assert.False(manager.IsGrantedPrivilege("bob", "Sales", Privilege.Select)); //
+ManagerTests.cs (264) : Assert.False(manager.IsGrantedPrivilege("charlie", "Sales", Privilege.Select));
+ManagerTests.cs (265) : Assert.False(manager.IsGrantedPrivilege(null, "Sales", Privilege.Select));
+ManagerTests.cs (266) : Assert.False(manager.IsGrantedPrivilege("", "Sales", Privilege.Select));
+ManagerTests.cs (267) : Assert.False(manager.IsGrantedPrivilege("alice", null, Privilege.Select));
+ManagerTests.cs (268) : Assert.False(manager.IsGrantedPrivilege("alice", "", Privilege.Select));
+ManagerTests.cs (269) : Assert.False(manager.IsGrantedPrivilege("alice", "NonExistentTable", Privilege.Select));
+ManagerTests.cs (271) : }
+ManagerTests.cs (273) : [Fact]
+ManagerTests.cs (274) : public void IsGrantedPrivilege_WithNonExistentProfile_ShouldReturnFalse()
+ManagerTests.cs (275) : {
+ManagerTests.cs (276) : var manager = new Manager("admin");
+ManagerTests.cs (278) : // Verificar que un perfil no existente no tiene privilegios
+ManagerTests.cs (279) : Assert.False(manager.IsGrantedPrivilege("NonExistentUser", "Products", Privilege.Select));
+ManagerTests.cs (280) : }
+ManagerTests.cs (282) : [Fact]
+ManagerTests.cs (283) : public void IsGrantedPrivilege_WithInvalidPrivilege_ShouldReturnFalse()
+ManagerTests.cs (284) : {
+ManagerTests.cs (285) : var manager = new Manager("admin");
+ManagerTests.cs (286) : var profile = new Profile { Name = "TestProfile" };
+ManagerTests.cs (287) : var user = new User("Juan", "password");
+ManagerTests.cs (288) : profile.Users.Add(user);
+ManagerTests.cs (289) : profile.GrantPrivilege("Products", Privilege.Select);
+ManagerTests.cs (290) : manager.AddProfile(profile);
+ManagerTests.cs (292) : // Verificar que un privilegio inválido devuelve False
+ManagerTests.cs (293) : Assert.False(manager.IsGrantedPrivilege("Juan", "Products", (Privilege)0)); // Privilegio inválido
+ManagerTests.cs (294) : }
 RowTests.cs (88) : [Fact]
 RowTests.cs (89) : public void TestAsText()
 RowTests.cs (90) : {
