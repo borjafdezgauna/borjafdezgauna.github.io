@@ -1,77 +1,77 @@
-Manager.cs (227) : string dir = "data";
-Manager.cs (228) : string filePath = Path.Combine(dir, $"security_{databaseName}.txt");
-Manager.cs (229) : if (!File.Exists(filePath))
-Manager.cs (232) : var manager = new Manager(username);
-Manager.cs (233) : Profile currentProfile = null;
-Manager.cs (235) : foreach (var rawLine in File.ReadAllLines(filePath))
-Manager.cs (236) : {
-Manager.cs (237) : if (rawLine.StartsWith("Profile="))
-Manager.cs (238) : {
-Manager.cs (239) : // guardamos el anterior (si exist�a)
-Manager.cs (240) : if (currentProfile != null)
-Manager.cs (241) : manager.Profiles.Add(currentProfile);
-Manager.cs (243) : // arrancamos uno nuevo
-Manager.cs (244) : string profileName = rawLine.Substring("Profile=".Length);
-Manager.cs (245) : currentProfile = new Profile { Name = profileName };
-Manager.cs (246) : }
-Manager.cs (247) : else if (rawLine.StartsWith("User=") && currentProfile != null)
-Manager.cs (248) : {
-Manager.cs (249) : string userName = rawLine.Substring("User=".Length);
-Manager.cs (250) : // creamos usuario con contrase�a provisional (se ajusta al leer "Password=")
-Manager.cs (251) : currentProfile.Users.Add(new User { Username = userName });
+Manager.cs (233) : string dir = "data";
+Manager.cs (234) : string filePath = Path.Combine(dir, $"security_{databaseName}.txt");
+Manager.cs (235) : if (!File.Exists(filePath))
+Manager.cs (238) : var manager = new Manager(username);
+Manager.cs (239) : Profile currentProfile = null;
+Manager.cs (241) : foreach (var rawLine in File.ReadAllLines(filePath))
+Manager.cs (242) : {
+Manager.cs (243) : if (rawLine.StartsWith("Profile="))
+Manager.cs (244) : {
+Manager.cs (245) : // guardamos el anterior (si exist�a)
+Manager.cs (246) : if (currentProfile != null)
+Manager.cs (247) : manager.Profiles.Add(currentProfile);
+Manager.cs (249) : // arrancamos uno nuevo
+Manager.cs (250) : string profileName = rawLine.Substring("Profile=".Length);
+Manager.cs (251) : currentProfile = new Profile { Name = profileName };
 Manager.cs (252) : }
-Manager.cs (253) : else if (rawLine.StartsWith("Password=") && currentProfile != null)
+Manager.cs (253) : else if (rawLine.StartsWith("User=") && currentProfile != null)
 Manager.cs (254) : {
-Manager.cs (255) : string enc = rawLine.Substring("Password=".Length);
-Manager.cs (256) : // asignamos la contrase�a al �ltimo usuario a�adido
-Manager.cs (257) : var lastUser = currentProfile.Users[currentProfile.Users.Count - 1];
-Manager.cs (258) : lastUser.EncryptedPassword = enc;
-Manager.cs (259) : }
-Manager.cs (260) : else if (currentProfile != null)
-Manager.cs (261) : {
-Manager.cs (262) : // debe ser �tabla=PRIV1,PRIV2,...�
-Manager.cs (263) : int equals = rawLine.IndexOf('=');
-Manager.cs (264) : if (equals > 0)
-Manager.cs (265) : {
-Manager.cs (266) : string table = rawLine.Substring(0, equals);
-Manager.cs (267) : string privList = rawLine.Substring(equals + 1);
-Manager.cs (268) : // sin usar string.Split: recorremos y separamos por comas
-Manager.cs (270) : for (int i = 0; i < privList.Length; i++)
+Manager.cs (255) : string userName = rawLine.Substring("User=".Length);
+Manager.cs (256) : // creamos usuario con contrase�a provisional (se ajusta al leer "Password=")
+Manager.cs (257) : currentProfile.Users.Add(new User { Username = userName });
+Manager.cs (258) : }
+Manager.cs (259) : else if (rawLine.StartsWith("Password=") && currentProfile != null)
+Manager.cs (260) : {
+Manager.cs (261) : string enc = rawLine.Substring("Password=".Length);
+Manager.cs (262) : // asignamos la contrase�a al �ltimo usuario a�adido
+Manager.cs (263) : var lastUser = currentProfile.Users[currentProfile.Users.Count - 1];
+Manager.cs (264) : lastUser.EncryptedPassword = enc;
+Manager.cs (265) : }
+Manager.cs (266) : else if (currentProfile != null)
+Manager.cs (267) : {
+Manager.cs (268) : // debe ser �tabla=PRIV1,PRIV2,...�
+Manager.cs (269) : int equals = rawLine.IndexOf('=');
+Manager.cs (270) : if (equals > 0)
 Manager.cs (271) : {
-Manager.cs (272) : char c = privList[i];
-Manager.cs (273) : if (c == ',')
-Manager.cs (274) : {
-Manager.cs (275) : // a�adimos lo acumulado en sb
-Manager.cs (276) : if (sb.Length > 0)
+Manager.cs (272) : string table = rawLine.Substring(0, equals);
+Manager.cs (273) : string privList = rawLine.Substring(equals + 1);
+Manager.cs (274) : // sin usar string.Split: recorremos y separamos por comas
+Manager.cs (276) : for (int i = 0; i < privList.Length; i++)
 Manager.cs (277) : {
-Manager.cs (279) : currentProfile.GrantPrivilege(table, p);
-Manager.cs (281) : }
-Manager.cs (282) : }
-Manager.cs (283) : else
-Manager.cs (284) : {
-Manager.cs (286) : }
+Manager.cs (278) : char c = privList[i];
+Manager.cs (279) : if (c == ',')
+Manager.cs (280) : {
+Manager.cs (281) : // a�adimos lo acumulado en sb
+Manager.cs (282) : if (sb.Length > 0)
+Manager.cs (283) : {
+Manager.cs (285) : currentProfile.GrantPrivilege(table, p);
 Manager.cs (287) : }
-Manager.cs (288) : // agregamos el �ltimo
-Manager.cs (289) : if (sb.Length > 0)
+Manager.cs (288) : }
+Manager.cs (289) : else
 Manager.cs (290) : {
-Manager.cs (292) : currentProfile.GrantPrivilege(table, p);
+Manager.cs (292) : }
 Manager.cs (293) : }
-Manager.cs (294) : }
-Manager.cs (295) : }
-Manager.cs (296) : }
-Manager.cs (298) : // no olvidar a�adir el �ltimo perfil que est� en currentProfile
-Manager.cs (299) : if (currentProfile != null)
-Manager.cs (300) : manager.Profiles.Add(currentProfile);
-Manager.cs (325) : return manager;
-Manager.cs (350) : var privileges = entry.Value;
-Manager.cs (352) : // Montamos la l�nea manualmente con concatenaci�n b�sica
-Manager.cs (353) : string line = table + "=";
-Manager.cs (354) : for (int i = 0; i < privileges.Count; i++)
-Manager.cs (355) : {
-Manager.cs (356) : line += privileges[i].ToString();
-Manager.cs (357) : if (i < privileges.Count - 1)
-Manager.cs (358) : {
-Manager.cs (359) : line += ",";  // a�adimos la coma s�lo entre elementos
-Manager.cs (360) : }
-Manager.cs (361) : }
-Manager.cs (363) : lines.Add(line);
+Manager.cs (294) : // agregamos el �ltimo
+Manager.cs (295) : if (sb.Length > 0)
+Manager.cs (296) : {
+Manager.cs (298) : currentProfile.GrantPrivilege(table, p);
+Manager.cs (299) : }
+Manager.cs (300) : }
+Manager.cs (301) : }
+Manager.cs (302) : }
+Manager.cs (304) : // no olvidar a�adir el �ltimo perfil que est� en currentProfile
+Manager.cs (305) : if (currentProfile != null)
+Manager.cs (306) : manager.Profiles.Add(currentProfile);
+Manager.cs (331) : return manager;
+Manager.cs (356) : var privileges = entry.Value;
+Manager.cs (358) : // Montamos la l�nea manualmente con concatenaci�n b�sica
+Manager.cs (359) : string line = table + "=";
+Manager.cs (360) : for (int i = 0; i < privileges.Count; i++)
+Manager.cs (361) : {
+Manager.cs (362) : line += privileges[i].ToString();
+Manager.cs (363) : if (i < privileges.Count - 1)
+Manager.cs (364) : {
+Manager.cs (365) : line += ",";  // a�adimos la coma s�lo entre elementos
+Manager.cs (366) : }
+Manager.cs (367) : }
+Manager.cs (369) : lines.Add(line);

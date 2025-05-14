@@ -347,9 +347,9 @@ DropTable.cs (30) : {
 DropTable.cs (31) : return Constants.DropTableSuccess;
 DropTable.cs (32) : }
 DropTable.cs (34) : return Constants.Error;
-Grant.cs (19) : this.PrivilegeName = privilegeName;
-Grant.cs (20) : this.TableName = tableName;
-Grant.cs (21) : this.ProfileName = profileName;
+Grant.cs (20) : this.PrivilegeName = privilegeName;
+Grant.cs (21) : this.TableName = tableName;
+Grant.cs (22) : this.ProfileName = profileName;
 Insert.cs (27) : Table table = database.TableByName(Table);
 Insert.cs (28) : if (table == null)
 Insert.cs (29) : {
@@ -361,85 +361,87 @@ Insert.cs (38) : {
 Insert.cs (39) : return Constants.InsertSuccess;
 Insert.cs (40) : }
 Insert.cs (41) : return Constants.ColumnCountsDontMatch;
-Manager.cs (172) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Manager.cs (173) : string profileFile = Path.Combine(path, "pf.txt");
-Manager.cs (175) : Manager manager = new Manager(username);
-Manager.cs (177) : if (!File.Exists(profileFile))
-Manager.cs (178) : return manager;
-Manager.cs (180) : using (StreamReader reader = new StreamReader(profileFile))
-Manager.cs (181) : {
-Manager.cs (182) : string line;
-Manager.cs (183) : Profile currentProfile = null;
-Manager.cs (185) : while ((line = reader.ReadLine()) != null)
-Manager.cs (186) : {
-Manager.cs (187) : line = line.Trim();
-Manager.cs (189) : if (line == "#")
-Manager.cs (190) : {
-Manager.cs (191) : if (currentProfile != null)
-Manager.cs (192) : {
-Manager.cs (193) : manager.Profiles.Add(currentProfile);
-Manager.cs (194) : currentProfile = null;
+Manager.cs (39) : string encrypted = Encryption.Encrypt(password);
+Manager.cs (47) : return encrypted == u.EncryptedPassword;
+Manager.cs (171) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (172) : string profileFile = Path.Combine(path, "pf.txt");
+Manager.cs (174) : Manager manager = new Manager(username);
+Manager.cs (176) : if (!File.Exists(profileFile))
+Manager.cs (177) : return manager;
+Manager.cs (179) : using (StreamReader reader = new StreamReader(profileFile))
+Manager.cs (180) : {
+Manager.cs (181) : string line;
+Manager.cs (182) : Profile currentProfile = null;
+Manager.cs (184) : while ((line = reader.ReadLine()) != null)
+Manager.cs (185) : {
+Manager.cs (186) : line = line.Trim();
+Manager.cs (188) : if (line == "#")
+Manager.cs (189) : {
+Manager.cs (190) : if (currentProfile != null)
+Manager.cs (191) : {
+Manager.cs (192) : manager.Profiles.Add(currentProfile);
+Manager.cs (193) : currentProfile = null;
+Manager.cs (194) : }
 Manager.cs (195) : }
-Manager.cs (196) : }
-Manager.cs (197) : else if (!line.StartsWith("U,") && !line.StartsWith("P,"))
-Manager.cs (198) : {
-Manager.cs (200) : currentProfile = new Profile { Name = line };
-Manager.cs (201) : }
-Manager.cs (202) : else if (line.StartsWith("U,"))
-Manager.cs (203) : {
-Manager.cs (204) : string[] parts = line.Split(',');
-Manager.cs (205) : if (parts.Length == 3 && currentProfile != null)
-Manager.cs (206) : {
-Manager.cs (207) : currentProfile.Users.Add(new User
-Manager.cs (208) : {
-Manager.cs (209) : Username = parts[1],
-Manager.cs (210) : EncryptedPassword = parts[2]
-Manager.cs (211) : });
+Manager.cs (196) : else if (!line.StartsWith("U,") && !line.StartsWith("P,"))
+Manager.cs (197) : {
+Manager.cs (199) : currentProfile = new Profile { Name = line };
+Manager.cs (200) : }
+Manager.cs (201) : else if (line.StartsWith("U,"))
+Manager.cs (202) : {
+Manager.cs (203) : string[] parts = line.Split(',');
+Manager.cs (204) : if (parts.Length == 3 && currentProfile != null)
+Manager.cs (205) : {
+Manager.cs (206) : currentProfile.Users.Add(new User
+Manager.cs (207) : {
+Manager.cs (208) : Username = parts[1],
+Manager.cs (209) : EncryptedPassword = parts[2]
+Manager.cs (210) : });
+Manager.cs (211) : }
 Manager.cs (212) : }
-Manager.cs (213) : }
-Manager.cs (214) : else if (line.StartsWith("P,"))
-Manager.cs (215) : {
-Manager.cs (216) : string[] parts = line.Split(',');
-Manager.cs (217) : if (parts.Length == 3 && currentProfile != null)
-Manager.cs (218) : {
-Manager.cs (219) : if (Enum.TryParse(parts[2], out Privilege privilege))
-Manager.cs (220) : {
-Manager.cs (221) : if (!currentProfile.PrivilegesOn.ContainsKey(parts[1]))
-Manager.cs (222) : {
-Manager.cs (223) : currentProfile.PrivilegesOn[parts[1]] = new List<Privilege>();
-Manager.cs (224) : }
-Manager.cs (225) : currentProfile.PrivilegesOn[parts[1]].Add(privilege);
+Manager.cs (213) : else if (line.StartsWith("P,"))
+Manager.cs (214) : {
+Manager.cs (215) : string[] parts = line.Split(',');
+Manager.cs (216) : if (parts.Length == 3 && currentProfile != null)
+Manager.cs (217) : {
+Manager.cs (218) : if (Enum.TryParse(parts[2], out Privilege privilege))
+Manager.cs (219) : {
+Manager.cs (220) : if (!currentProfile.PrivilegesOn.ContainsKey(parts[1]))
+Manager.cs (221) : {
+Manager.cs (222) : currentProfile.PrivilegesOn[parts[1]] = new List<Privilege>();
+Manager.cs (223) : }
+Manager.cs (224) : currentProfile.PrivilegesOn[parts[1]].Add(privilege);
+Manager.cs (225) : }
 Manager.cs (226) : }
 Manager.cs (227) : }
 Manager.cs (228) : }
-Manager.cs (229) : }
-Manager.cs (232) : if (currentProfile != null)
-Manager.cs (233) : {
-Manager.cs (234) : manager.Profiles.Add(currentProfile);
+Manager.cs (231) : if (currentProfile != null)
+Manager.cs (232) : {
+Manager.cs (233) : manager.Profiles.Add(currentProfile);
+Manager.cs (234) : }
 Manager.cs (235) : }
-Manager.cs (236) : }
-Manager.cs (238) : return manager;
-Manager.cs (245) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Manager.cs (248) : if (!Directory.Exists(path))
-Manager.cs (249) : Directory.CreateDirectory(path);
-Manager.cs (251) : string profileFile = Path.Combine(path, "pf.txt");
-Manager.cs (253) : using (StreamWriter writer = new StreamWriter(profileFile, false))
-Manager.cs (254) : {
-Manager.cs (255) : foreach (var profile in Profiles)
-Manager.cs (256) : {
-Manager.cs (257) : writer.WriteLine(profile.Name);
-Manager.cs (259) : foreach (var user in profile.Users)
-Manager.cs (260) : {
-Manager.cs (261) : writer.WriteLine($"U,{user.Username},{user.EncryptedPassword}");
-Manager.cs (262) : }
-Manager.cs (264) : foreach (var kvp in profile.PrivilegesOn)
-Manager.cs (265) : {
-Manager.cs (266) : string table = kvp.Key;
-Manager.cs (267) : foreach (var privilege in kvp.Value)
-Manager.cs (268) : {
-Manager.cs (269) : writer.WriteLine($"P,{table},{privilege}");
+Manager.cs (237) : return manager;
+Manager.cs (244) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (247) : if (!Directory.Exists(path))
+Manager.cs (248) : Directory.CreateDirectory(path);
+Manager.cs (250) : string profileFile = Path.Combine(path, "pf.txt");
+Manager.cs (252) : using (StreamWriter writer = new StreamWriter(profileFile, false))
+Manager.cs (253) : {
+Manager.cs (254) : foreach (var profile in Profiles)
+Manager.cs (255) : {
+Manager.cs (256) : writer.WriteLine(profile.Name);
+Manager.cs (258) : foreach (var user in profile.Users)
+Manager.cs (259) : {
+Manager.cs (260) : writer.WriteLine($"U,{user.Username},{user.EncryptedPassword}");
+Manager.cs (261) : }
+Manager.cs (263) : foreach (var kvp in profile.PrivilegesOn)
+Manager.cs (264) : {
+Manager.cs (265) : string table = kvp.Key;
+Manager.cs (266) : foreach (var privilege in kvp.Value)
+Manager.cs (267) : {
+Manager.cs (268) : writer.WriteLine($"P,{table},{privilege}");
+Manager.cs (269) : }
 Manager.cs (270) : }
-Manager.cs (271) : }
-Manager.cs (273) : writer.WriteLine("#");
+Manager.cs (272) : writer.WriteLine("#");
+Manager.cs (273) : }
 Manager.cs (274) : }
-Manager.cs (275) : }
