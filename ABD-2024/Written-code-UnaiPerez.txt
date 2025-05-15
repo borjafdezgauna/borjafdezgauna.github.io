@@ -585,37 +585,77 @@ DeleteUserExecuteTests.cs (16) : Profile profile = new Profile { Name = "Test" }
 DeleteUserExecuteTests.cs (17) : User user = new User("Paco", "1234");
 DeleteUserExecuteTests.cs (18) : profile.Users.Add(user);
 DeleteUserExecuteTests.cs (19) : manager.AddProfile(profile);
-DeleteUserExecuteTests.cs (21) : DeleteUser delete = new DeleteUser("Paco");
-DeleteUserExecuteTests.cs (22) : String result = delete.Execute(db);
-DeleteUserExecuteTests.cs (24) : Assert.Equal(Constants.DeleteUserSuccess, result);
-DeleteUserExecuteTests.cs (25) : Assert.Null(manager.UserByName("Test"));
-DeleteUserExecuteTests.cs (26) : }
-DeleteUserExecuteTests.cs (28) : [Fact] public void ExecuteDeleteUserFailure_NotAdmin()
-DeleteUserExecuteTests.cs (29) : {
-DeleteUserExecuteTests.cs (30) : Database db = new Database("notAdmin", "1234");
-DeleteUserExecuteTests.cs (31) : Manager manager = db.SecurityManager;
-DeleteUserExecuteTests.cs (33) : Profile profile = new Profile { Name = "Test" };
-DeleteUserExecuteTests.cs (34) : User user = new User("Paco", "1234");
-DeleteUserExecuteTests.cs (35) : profile.Users.Add(user);
-DeleteUserExecuteTests.cs (36) : manager.AddProfile(profile);
-DeleteUserExecuteTests.cs (38) : DeleteUser delete = new DeleteUser("Paco");
-DeleteUserExecuteTests.cs (39) : String result = delete.Execute(db);
-DeleteUserExecuteTests.cs (41) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
-DeleteUserExecuteTests.cs (43) : }
-DeleteUserExecuteTests.cs (45) : [Fact] public void ExecuteDeleteUserFailure_UserNotExist()
-DeleteUserExecuteTests.cs (46) : {
-DeleteUserExecuteTests.cs (47) : Database db = new Database("Admin", "1234");
-DeleteUserExecuteTests.cs (48) : Manager manager = db.SecurityManager;
-DeleteUserExecuteTests.cs (50) : Profile profile = new Profile { Name = "Test" };
-DeleteUserExecuteTests.cs (51) : User user = new User("Paco", "1234");
-DeleteUserExecuteTests.cs (52) : profile.Users.Add(user);
-DeleteUserExecuteTests.cs (53) : manager.AddProfile(profile);
-DeleteUserExecuteTests.cs (55) : DeleteUser delete = new DeleteUser("Jon");
-DeleteUserExecuteTests.cs (56) : String result = delete.Execute(db);
-DeleteUserExecuteTests.cs (58) : Assert.Equal(Constants.UserDoesNotExistError, result);
-DeleteUserExecuteTests.cs (60) : }
-DeleteUserExecuteTests.cs (62) : }
+DeleteUserExecuteTests.cs (21) : Assert.NotNull(manager.UserByName("Paco"));
+DeleteUserExecuteTests.cs (23) : DeleteUser delete = new DeleteUser("Paco");
+DeleteUserExecuteTests.cs (24) : String result = delete.Execute(db);
+DeleteUserExecuteTests.cs (27) : Assert.Equal(Constants.DeleteUserSuccess, result);
+DeleteUserExecuteTests.cs (28) : Assert.Null(manager.UserByName("Paco"));
+DeleteUserExecuteTests.cs (29) : }
+DeleteUserExecuteTests.cs (31) : [Fact] public void ExecuteDeleteUserFailure_NotAdmin()
+DeleteUserExecuteTests.cs (32) : {
+DeleteUserExecuteTests.cs (33) : Database db = new Database("notAdmin", "1234");
+DeleteUserExecuteTests.cs (34) : Manager manager = db.SecurityManager;
+DeleteUserExecuteTests.cs (36) : Profile profile = new Profile { Name = "Test" };
+DeleteUserExecuteTests.cs (37) : User user = new User("Paco", "1234");
+DeleteUserExecuteTests.cs (38) : profile.Users.Add(user);
+DeleteUserExecuteTests.cs (39) : manager.AddProfile(profile);
+DeleteUserExecuteTests.cs (41) : DeleteUser delete = new DeleteUser("Paco");
+DeleteUserExecuteTests.cs (42) : String result = delete.Execute(db);
+DeleteUserExecuteTests.cs (44) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
+DeleteUserExecuteTests.cs (46) : }
+DeleteUserExecuteTests.cs (48) : [Fact] public void ExecuteDeleteUserFailure_UserNotExist()
+DeleteUserExecuteTests.cs (49) : {
+DeleteUserExecuteTests.cs (50) : Database db = new Database("Admin", "1234");
+DeleteUserExecuteTests.cs (51) : Manager manager = db.SecurityManager;
+DeleteUserExecuteTests.cs (53) : Profile profile = new Profile { Name = "Test" };
+DeleteUserExecuteTests.cs (54) : User user = new User("Paco", "1234");
+DeleteUserExecuteTests.cs (55) : profile.Users.Add(user);
+DeleteUserExecuteTests.cs (56) : manager.AddProfile(profile);
+DeleteUserExecuteTests.cs (58) : DeleteUser delete = new DeleteUser("Jon");
+DeleteUserExecuteTests.cs (59) : String result = delete.Execute(db);
+DeleteUserExecuteTests.cs (61) : Assert.Equal(Constants.UserDoesNotExistError, result);
 DeleteUserExecuteTests.cs (63) : }
+DeleteUserExecuteTests.cs (64) : }
+DeleteUserExecuteTests.cs (65) : }
+DropSecurityProfileExecuteTests.cs (1) : using DbManager;
+DropSecurityProfileExecuteTests.cs (2) : using DbManager.Parser;
+DropSecurityProfileExecuteTests.cs (3) : using DbManager.Security;
+DropSecurityProfileExecuteTests.cs (5) : namespace OurTests
+DropSecurityProfileExecuteTests.cs (6) : {
+DropSecurityProfileExecuteTests.cs (7) : public class DropSecurityProfileExecuteTests
+DropSecurityProfileExecuteTests.cs (8) : {
+DropSecurityProfileExecuteTests.cs (10) : [Fact]
+DropSecurityProfileExecuteTests.cs (11) : public void ExecuteDropSecurityProfile_Success()
+DropSecurityProfileExecuteTests.cs (12) : {
+DropSecurityProfileExecuteTests.cs (14) : Database db = new Database("Admin", "adminPassword");
+DropSecurityProfileExecuteTests.cs (15) : Profile profile = new Profile { Name = "TestProfile" };
+DropSecurityProfileExecuteTests.cs (16) : db.SecurityManager.AddProfile(profile);
+DropSecurityProfileExecuteTests.cs (18) : Assert.NotNull(db.SecurityManager.ProfileByName("TestProfile"));
+DropSecurityProfileExecuteTests.cs (20) : DropSecurityProfile drop = new DropSecurityProfile("TestProfile");
+DropSecurityProfileExecuteTests.cs (21) : string result = drop.Execute(db);
+DropSecurityProfileExecuteTests.cs (23) : Assert.Equal(Constants.DropSecurityProfileSuccess, result);
+DropSecurityProfileExecuteTests.cs (24) : Assert.Null(db.SecurityManager.ProfileByName("TestProfile"));
+DropSecurityProfileExecuteTests.cs (25) : }
+DropSecurityProfileExecuteTests.cs (26) : [Fact]
+DropSecurityProfileExecuteTests.cs (27) : public void ExecuteDropSecurityProfile_NotAdmin()
+DropSecurityProfileExecuteTests.cs (28) : {
+DropSecurityProfileExecuteTests.cs (30) : Database db = new Database("NotAdmin", "somePassword");
+DropSecurityProfileExecuteTests.cs (31) : Profile profile = new Profile { Name = "TestProfile" };
+DropSecurityProfileExecuteTests.cs (32) : db.SecurityManager.AddProfile(profile);
+DropSecurityProfileExecuteTests.cs (34) : DropSecurityProfile drop = new DropSecurityProfile("TestProfile");
+DropSecurityProfileExecuteTests.cs (35) : string result = drop.Execute(db);
+DropSecurityProfileExecuteTests.cs (37) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
+DropSecurityProfileExecuteTests.cs (38) : }
+DropSecurityProfileExecuteTests.cs (40) : [Fact]
+DropSecurityProfileExecuteTests.cs (41) : public void ExecuteDropSecurityProfile_ProfileDoesNotExist()
+DropSecurityProfileExecuteTests.cs (42) : {
+DropSecurityProfileExecuteTests.cs (44) : Database db = new Database("Admin", "adminPassword");
+DropSecurityProfileExecuteTests.cs (46) : DropSecurityProfile drop = new DropSecurityProfile("NonExistentProfile");
+DropSecurityProfileExecuteTests.cs (47) : string result = drop.Execute(db);
+DropSecurityProfileExecuteTests.cs (49) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, result);
+DropSecurityProfileExecuteTests.cs (50) : }
+DropSecurityProfileExecuteTests.cs (52) : }
+DropSecurityProfileExecuteTests.cs (53) : }
 InsertTest.cs (3) : using System.Collections;
 InsertTest.cs (14) : Insert consulta = MiniSQLParser.Parse("INSERT INTO usuarios VALUES ('Alice','25','1.70')") as Insert;
 InsertTest.cs (18) : consulta = MiniSQLParser.Parse("INSERT INTO Clientes VALUES ('John','Doe','USA')") as Insert;
@@ -628,7 +668,6 @@ ManagerTests.cs (2) : using DbManager.Security;
 ManagerTests.cs (3) : using System;
 ManagerTests.cs (4) : namespace OurTests
 ManagerTests.cs (5) : {
-ManagerTests.cs (6) : public class ManagerTests
 ManagerTests.cs (7) : {
 ManagerTests.cs (54) : [Fact]
 ManagerTests.cs (55) : public void IsPasswordCorrect()
@@ -724,8 +763,8 @@ ManagerTests.cs (186) : Grant grant3 = new Grant("UPDATE", "Users", "Pro");
 ManagerTests.cs (187) : String result5 = grant3.Execute(database);
 ManagerTests.cs (188) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, result5);
 ManagerTests.cs (189) : }
-ManagerTests.cs (239) : }
-ManagerTests.cs (240) : }
+ManagerTests.cs (323) : }
+ManagerTests.cs (324) : }
 SelectTest.cs (91) : Assert.Equal(result4, Constants.TableDoesNotExistError);
 SelectTest.cs (96) : [Fact]
 SelectTest.cs (97) : public void TestSelectParsing()
@@ -965,18 +1004,34 @@ DeleteUser.cs (24) : if (!database.SecurityManager.IsUserAdmin())
 DeleteUser.cs (25) : {
 DeleteUser.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 DeleteUser.cs (27) : }
-DeleteUser.cs (29) : User user = database.SecurityManager.UserByName(Username);
-DeleteUser.cs (30) : if ( user == null )
-DeleteUser.cs (31) : {
-DeleteUser.cs (32) : return Constants.UserDoesNotExistError;
-DeleteUser.cs (33) : }
-DeleteUser.cs (35) : Profile profile = database.SecurityManager.ProfileByUser(Username);
-DeleteUser.cs (36) : if(profile == null)
-DeleteUser.cs (37) : {
-DeleteUser.cs (38) : return Constants.UserDoesNotExistError;
-DeleteUser.cs (39) : }
-DeleteUser.cs (41) : profile.Users.Remove(user);
-DeleteUser.cs (42) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (28) : else
+DeleteUser.cs (29) : {
+DeleteUser.cs (30) : User user = database.SecurityManager.UserByName(Username);
+DeleteUser.cs (31) : Profile profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (32) : if (user != null && profile != null)
+DeleteUser.cs (33) : {
+DeleteUser.cs (34) : profile.Users.Remove(user);
+DeleteUser.cs (35) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (36) : }
+DeleteUser.cs (37) : else
+DeleteUser.cs (38) : {
+DeleteUser.cs (39) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (40) : }
+DeleteUser.cs (42) : }
+DropSecurityProfile.cs (5) : using DbManager.Security;
+DropSecurityProfile.cs (25) : if (!database.SecurityManager.IsUserAdmin())
+DropSecurityProfile.cs (26) : {
+DropSecurityProfile.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (28) : }
+DropSecurityProfile.cs (29) : else
+DropSecurityProfile.cs (30) : {
+DropSecurityProfile.cs (31) : bool removed = database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (32) : if(!removed)
+DropSecurityProfile.cs (33) : {
+DropSecurityProfile.cs (34) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (37) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (38) : }
+DropSecurityProfile.cs (39) : }
 Grant.cs (5) : using DbManager.Security;
 Grant.cs (19) : PrivilegeName = privilegeName;
 Grant.cs (20) : TableName = tableName;
@@ -1128,45 +1183,48 @@ Update.cs (27) : {
 Update.cs (28) : return Constants.UpdateSuccess;
 Update.cs (29) : }
 Update.cs (31) : return database.LastErrorMessage;
-Manager.cs (30) : String encryted = Encryption.Encrypt(password);
-Manager.cs (31) : for (int i = 0; i < Profiles.Count; i++)
-Manager.cs (32) : {
-Manager.cs (33) : if (Profiles[i] != null)
-Manager.cs (34) : {
-Manager.cs (35) : for (int j = 0; j < Profiles[i].Users.Count; j++)
-Manager.cs (36) : {
-Manager.cs (37) : if (Profiles[i].Users[j].Username == username && Profiles[i].Users[j].EncryptedPassword == encryted)
-Manager.cs (38) : {
-Manager.cs (39) : return true;
-Manager.cs (40) : }
+Manager.cs (31) : String encryted = Encryption.Encrypt(password);
+Manager.cs (32) : for (int i = 0; i < Profiles.Count; i++)
+Manager.cs (33) : {
+Manager.cs (34) : if (Profiles[i] != null)
+Manager.cs (35) : {
+Manager.cs (36) : for (int j = 0; j < Profiles[i].Users.Count; j++)
+Manager.cs (37) : {
+Manager.cs (38) : if (Profiles[i].Users[j].Username == username && Profiles[i].Users[j].EncryptedPassword == encryted)
+Manager.cs (39) : {
+Manager.cs (40) : return true;
 Manager.cs (41) : }
 Manager.cs (42) : }
 Manager.cs (43) : }
-Manager.cs (55) : if(!IsUserAdmin())
-Manager.cs (56) : {
-Manager.cs (57) : return;
-Manager.cs (58) : }
-Manager.cs (60) : Profile profileGrant = ProfileByName(profileName);
-Manager.cs (61) : if(profileGrant != null && table != null)
-Manager.cs (62) : {
-Manager.cs (63) : profileGrant.GrantPrivilege(table, privilege);
-Manager.cs (64) : }
-Manager.cs (72) : if (!IsUserAdmin())
-Manager.cs (73) : {
-Manager.cs (74) : return;
-Manager.cs (75) : }
-Manager.cs (77) : Profile profile = ProfileByName(profileName);
-Manager.cs (78) : if (profile != null && table != null)
-Manager.cs (79) : {
-Manager.cs (80) : profile.RevokePrivilege(table, privilege);
-Manager.cs (81) : }
-Manager.cs (168) : foreach(Profile profile in Profiles)
-Manager.cs (169) : {
-Manager.cs (170) : if (profile.Name == profileName)
-Manager.cs (171) : {
-Manager.cs (172) : return profile;
-Manager.cs (173) : }
-Manager.cs (174) : }
+Manager.cs (44) : }
+Manager.cs (56) : if(!IsUserAdmin())
+Manager.cs (57) : {
+Manager.cs (58) : return;
+Manager.cs (59) : }
+Manager.cs (61) : Profile profileGrant = ProfileByName(profileName);
+Manager.cs (62) : if(profileGrant != null && table != null)
+Manager.cs (63) : {
+Manager.cs (64) : profileGrant.GrantPrivilege(table, privilege);
+Manager.cs (65) : }
+Manager.cs (73) : if (!IsUserAdmin())
+Manager.cs (74) : {
+Manager.cs (75) : return;
+Manager.cs (76) : }
+Manager.cs (78) : Profile profile = ProfileByName(profileName);
+Manager.cs (79) : if (profile != null && table != null)
+Manager.cs (80) : {
+Manager.cs (81) : profile.RevokePrivilege(table, privilege);
+Manager.cs (82) : }
+Manager.cs (110) : return;
+Manager.cs (111) : }
+Manager.cs (113) : if(profile != null && !Profiles.Contains(profile))
+Manager.cs (150) : foreach(Profile profile in Profiles)
+Manager.cs (151) : {
+Manager.cs (152) : if (profile.Name == profileName)
+Manager.cs (153) : {
+Manager.cs (154) : return profile;
+Manager.cs (155) : }
+Manager.cs (156) : }
 Profile.cs (25) : if (!PrivilegesOn.ContainsKey(table))
 Profile.cs (27) : PrivilegesOn[table] = new List<Privilege>();
 Profile.cs (30) : if (PrivilegesOn[table].Contains(privilege))

@@ -78,6 +78,7 @@ InsertTest.cs (89) : }
 InsertTest.cs (90) : }
 InsertTest.cs (91) : }
 ManagerTests.cs (1) : ﻿using DbManager;
+ManagerTests.cs (6) : public class ManagerTests : IDisposable
 ManagerTests.cs (190) : [Fact]
 ManagerTests.cs (191) : public void RemoveProfile()
 ManagerTests.cs (192) : {
@@ -120,6 +121,78 @@ ManagerTests.cs (235) : Assert.False(mgr4.IsUserAdmin());
 ManagerTests.cs (236) : var mgr5 = new Manager("   ");
 ManagerTests.cs (237) : Assert.False(mgr5.IsUserAdmin());
 ManagerTests.cs (238) : }
+ManagerTests.cs (239) : // Al terminar cada test borramos los ficheros que se puedan haber creado en "data/"
+ManagerTests.cs (240) : public void Dispose()
+ManagerTests.cs (241) : {
+ManagerTests.cs (242) : const string dir = "data";
+ManagerTests.cs (243) : if (!Directory.Exists(dir)) return;
+ManagerTests.cs (244) : foreach (var f in Directory.GetFiles(dir, "security_testdb_*.txt"))
+ManagerTests.cs (245) : File.Delete(f);
+ManagerTests.cs (246) : }
+ManagerTests.cs (247) : [Fact]
+ManagerTests.cs (248) : public void SaveAndLoad_WithCorrectCredentials_Succeeds()
+ManagerTests.cs (249) : {
+ManagerTests.cs (250) : var mgr = new Manager("Admin");
+ManagerTests.cs (251) : var prof = new Profile { Name = "P1" };
+ManagerTests.cs (252) : var usr = new User("alice", "pwd");
+ManagerTests.cs (253) : prof.Users.Add(usr);
+ManagerTests.cs (254) : prof.GrantPrivilege("MyTable", Privilege.Select);
+ManagerTests.cs (255) : mgr.AddProfile(prof);
+ManagerTests.cs (257) : const string db = "testdb_01";
+ManagerTests.cs (258) : mgr.Save(db);
+ManagerTests.cs (260) : var loaded = Manager.Load(db, "alice");
+ManagerTests.cs (261) : Assert.NotNull(loaded);
+ManagerTests.cs (263) : // perfil y usuario existen
+ManagerTests.cs (264) : Assert.NotNull(loaded.ProfileByName("P1"));
+ManagerTests.cs (265) : Assert.True(loaded.IsPasswordCorrect("alice", "pwd"));
+ManagerTests.cs (267) : // privilegio mantenido
+ManagerTests.cs (268) : Assert.True(loaded.IsGrantedPrivilege("alice", "MyTable", Privilege.Select));
+ManagerTests.cs (269) : }
+ManagerTests.cs (271) : [Fact]
+ManagerTests.cs (272) : public void SaveAndLoad_WithWrongUser_Fails()
+ManagerTests.cs (273) : {
+ManagerTests.cs (274) : var mgr = new Manager("Admin");
+ManagerTests.cs (275) : var prof = new Profile { Name = "P2" };
+ManagerTests.cs (276) : var usr = new User("bob", "1234");
+ManagerTests.cs (277) : prof.Users.Add(usr);
+ManagerTests.cs (278) : mgr.AddProfile(prof);
+ManagerTests.cs (280) : const string db = "testdb_02";
+ManagerTests.cs (281) : mgr.Save(db);
+ManagerTests.cs (283) : // intento con usuario distinto
+ManagerTests.cs (284) : var loaded = Manager.Load(db, "otraPersona");
+ManagerTests.cs (285) : Assert.Null(loaded);
+ManagerTests.cs (286) : }
+ManagerTests.cs (288) : [Fact]
+ManagerTests.cs (289) : public void SaveAndLoad_WhenFileDoesNotExist_ReturnsNull()
+ManagerTests.cs (290) : {
+ManagerTests.cs (291) : // nunca hemos guardado "noExiste" → no hay fichero
+ManagerTests.cs (292) : var loaded = Manager.Load("noExiste", "cualquiera");
+ManagerTests.cs (293) : Assert.Null(loaded);
+ManagerTests.cs (294) : }
+ManagerTests.cs (296) : [Fact]
+ManagerTests.cs (297) : public void CheckPrivileges_AfterSaveAndLoad_MatchesOriginal()
+ManagerTests.cs (298) : {
+ManagerTests.cs (299) : var mgr = new Manager("Admin");
+ManagerTests.cs (300) : var prof = new Profile { Name = "P3" };
+ManagerTests.cs (301) : var usr = new User("carol", "abc");
+ManagerTests.cs (302) : prof.Users.Add(usr);
+ManagerTests.cs (303) : // varios privilegios
+ManagerTests.cs (304) : prof.GrantPrivilege("T1", Privilege.Update);
+ManagerTests.cs (305) : prof.GrantPrivilege("T1", Privilege.Insert);
+ManagerTests.cs (306) : prof.GrantPrivilege("T2", Privilege.Delete);
+ManagerTests.cs (307) : mgr.AddProfile(prof);
+ManagerTests.cs (309) : const string db = "testdb_03";
+ManagerTests.cs (310) : mgr.Save(db);
+ManagerTests.cs (312) : var loaded = Manager.Load(db, "carol");
+ManagerTests.cs (313) : Assert.NotNull(loaded);
+ManagerTests.cs (315) : // los que sí dio
+ManagerTests.cs (316) : Assert.True(loaded.IsGrantedPrivilege("carol", "T1", Privilege.Update));
+ManagerTests.cs (317) : Assert.True(loaded.IsGrantedPrivilege("carol", "T1", Privilege.Insert));
+ManagerTests.cs (318) : Assert.True(loaded.IsGrantedPrivilege("carol", "T2", Privilege.Delete));
+ManagerTests.cs (319) : // los que no
+ManagerTests.cs (320) : Assert.False(loaded.IsGrantedPrivilege("carol", "T1", Privilege.Delete));
+ManagerTests.cs (321) : Assert.False(loaded.IsGrantedPrivilege("carol", "T3", Privilege.Select));
+ManagerTests.cs (322) : }
 SelectTest.cs (1) : ﻿using DbManager;
 SelectTest.cs (2) : using DbManager.Parser;
 SelectTest.cs (3) : using Xunit;
@@ -254,86 +327,61 @@ MiniSQLParser.cs (298) : commaSeparator.Add(textParts[i].Trim());
 Select.cs (18) : this.Columns = columns;
 Select.cs (19) : this.Table = table;
 Select.cs (20) : this.Where = condition;
-Manager.cs (24) : return m_username=="Admin";
-Manager.cs (94) : foreach(Profile p in Profiles)
-Manager.cs (95) : {
-Manager.cs (96) : bool userFound = false;
-Manager.cs (97) : foreach(User u in p.Users)
-Manager.cs (98) : {
-Manager.cs (99) : if(u.Username == username)
-Manager.cs (100) : {
-Manager.cs (101) : userFound = true;
-Manager.cs (102) : break;
-Manager.cs (103) : }
-Manager.cs (104) : }
-Manager.cs (106) : if (userFound)
-Manager.cs (107) : {
-Manager.cs (108) : if (p.PrivilegesOn.ContainsKey(table))
+Manager.cs (25) : return m_username=="Admin";
+Manager.cs (97) : {
+Manager.cs (99) : }
+Manager.cs (108) : if (!IsUserAdmin())
 Manager.cs (109) : {
-Manager.cs (110) : List<Privilege> privileges = p.PrivilegesOn[table];
-Manager.cs (111) : foreach(Privilege pr in privileges)
-Manager.cs (112) : {
-Manager.cs (113) : if(pr == privilege)
-Manager.cs (114) : {
-Manager.cs (115) : return true;
-Manager.cs (116) : }
-Manager.cs (117) : }
-Manager.cs (118) : }
-Manager.cs (119) : }
-Manager.cs (120) : }
-Manager.cs (128) : if (!IsUserAdmin())
-Manager.cs (129) : {
-Manager.cs (131) : }else if(profile != null && !Profiles.Contains(profile))
-Manager.cs (140) : if (string.IsNullOrWhiteSpace(username))
-Manager.cs (141) : return null;
-Manager.cs (143) : // Recorre cada perfil
-Manager.cs (144) : foreach (var profile in Profiles)
-Manager.cs (145) : {
-Manager.cs (146) : if (profile?.Users == null)
-Manager.cs (147) : continue;
-Manager.cs (149) : // Busca el usuario dentro de ese perfil
-Manager.cs (150) : foreach (var user in profile.Users)
-Manager.cs (151) : {
-Manager.cs (152) : if (string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase))
-Manager.cs (153) : return user;
-Manager.cs (154) : }
-Manager.cs (155) : }
-Manager.cs (157) : // Si no lo hemos encontrado, devolvemos null
-Manager.cs (204) : //No se puede eliminar perfiles so no se es admin
-Manager.cs (205) : if (IsUserAdmin()==false)
-Manager.cs (206) : {
-Manager.cs (207) : return false;
-Manager.cs (208) : }
-Manager.cs (209) : //el admin no puede eliminar al admin
-Manager.cs (210) : if (profileName==Profile.AdminProfileName)
-Manager.cs (211) : {
-Manager.cs (212) : return false;
-Manager.cs (213) : }
-Manager.cs (215) : if (string.IsNullOrWhiteSpace(profileName))
-Manager.cs (216) : return false;
-Manager.cs (219) : // Buscar el perfil
-Manager.cs (220) : var profile = ProfileByName(profileName);
-Manager.cs (221) : if (profile == null)
-Manager.cs (222) : return false;
-Manager.cs (224) : // Eliminarlo de la lista de perfiles
-Manager.cs (225) : return Profiles.Remove(profile);
-Manager.cs (338) : string filePath = $"data/security_{databaseName}.txt";
-Manager.cs (339) : Directory.CreateDirectory("data");
-Manager.cs (341) : List<string> lines = new List<string>();
-Manager.cs (343) : foreach (var profile in Profiles)
-Manager.cs (344) : {
-Manager.cs (345) : lines.Add("Profile=" + profile.Name);
-Manager.cs (347) : foreach (var user in profile.Users)
-Manager.cs (348) : {
-Manager.cs (349) : lines.Add("User=" + user.Username);
-Manager.cs (350) : lines.Add("Password=" + user.EncryptedPassword);
-Manager.cs (351) : }
-Manager.cs (353) : foreach (var entry in profile.PrivilegesOn)
-Manager.cs (354) : {
-Manager.cs (355) : string table = entry.Key;
-Manager.cs (370) : }
-Manager.cs (371) : }
-Manager.cs (373) : File.WriteAllLines(filePath, lines);
+Manager.cs (122) : if (string.IsNullOrWhiteSpace(username))
+Manager.cs (123) : return null;
+Manager.cs (125) : // Recorre cada perfil
+Manager.cs (126) : foreach (var profile in Profiles)
+Manager.cs (127) : {
+Manager.cs (128) : if (profile?.Users == null)
+Manager.cs (129) : continue;
+Manager.cs (131) : // Busca el usuario dentro de ese perfil
+Manager.cs (132) : foreach (var user in profile.Users)
+Manager.cs (133) : {
+Manager.cs (134) : if (string.Equals(user.Username, username, StringComparison.OrdinalIgnoreCase))
+Manager.cs (135) : return user;
+Manager.cs (136) : }
+Manager.cs (137) : }
+Manager.cs (139) : // Si no lo hemos encontrado, devolvemos null
+Manager.cs (186) : //No se puede eliminar perfiles so no se es admin
+Manager.cs (187) : if (IsUserAdmin()==false)
+Manager.cs (188) : {
+Manager.cs (189) : return false;
+Manager.cs (190) : }
+Manager.cs (191) : //el admin no puede eliminar al admin
+Manager.cs (192) : if (profileName==Profile.AdminProfileName)
+Manager.cs (193) : {
+Manager.cs (194) : return false;
+Manager.cs (195) : }
+Manager.cs (197) : if (string.IsNullOrWhiteSpace(profileName))
+Manager.cs (198) : return false;
+Manager.cs (201) : // Buscar el perfil
+Manager.cs (202) : var profile = ProfileByName(profileName);
+Manager.cs (203) : if (profile == null)
+Manager.cs (204) : return false;
+Manager.cs (206) : // Eliminarlo de la lista de perfiles
+Manager.cs (207) : return Profiles.Remove(profile);
+Manager.cs (320) : string filePath = $"data/security_{databaseName}.txt";
+Manager.cs (321) : Directory.CreateDirectory("data");
+Manager.cs (323) : List<string> lines = new List<string>();
+Manager.cs (325) : foreach (var profile in Profiles)
+Manager.cs (326) : {
+Manager.cs (327) : lines.Add("Profile=" + profile.Name);
+Manager.cs (329) : foreach (var user in profile.Users)
+Manager.cs (330) : {
+Manager.cs (331) : lines.Add("User=" + user.Username);
+Manager.cs (332) : lines.Add("Password=" + user.EncryptedPassword);
+Manager.cs (333) : }
+Manager.cs (335) : foreach (var entry in profile.PrivilegesOn)
+Manager.cs (336) : {
+Manager.cs (337) : string table = entry.Key;
+Manager.cs (352) : }
+Manager.cs (353) : }
+Manager.cs (355) : File.WriteAllLines(filePath, lines);
 User.cs (16) : //We can she if the user don't put the username or the password
 User.cs (17) : if (string.IsNullOrWhiteSpace(username)) {
 User.cs (18) : throw new ArgumentException("The username can't be empty", nameof(username));

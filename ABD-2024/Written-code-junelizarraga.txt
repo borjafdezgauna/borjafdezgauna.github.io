@@ -309,27 +309,29 @@ TableTests.cs (353) : Condition c = new Condition("Age", ">", "20");
 TableTests.cs (354) : table.DeleteWhere(c);
 TableTests.cs (355) : Assert.Equal(1, table.NumRows());
 TableTests.cs (357) : }
-AddUser.cs (19) : Username = username;
-AddUser.cs (20) : Password = password;
-AddUser.cs (21) : ProfileName = profileName;
-AddUser.cs (28) : // if(database.AddUser(this.Username, this.Password, this.ProfileName)) { }
-AddUser.cs (30) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
-AddUser.cs (31) : {
-AddUser.cs (32) : return Constants.SecurityProfileDoesNotExistError;
-AddUser.cs (33) : }
-AddUser.cs (34) : else if (!database.SecurityManager.IsGrantedPrivilege(this.Username, "Users", Security.Privilege.Insert))
-AddUser.cs (35) : {
-AddUser.cs (36) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-AddUser.cs (39) : else if (database.SecurityManager.IsPasswordCorrect(this.Username, this.Password))
-AddUser.cs (40) : {
-AddUser.cs (41) : database.SecurityManager.Profiles.Add(database.SecurityManager.ProfileByName(ProfileName));
-AddUser.cs (42) : return Constants.AddUserSuccess;
-AddUser.cs (43) : }
-AddUser.cs (44) : else
-AddUser.cs (45) : {
-AddUser.cs (46) : return null;
-AddUser.cs (47) : }
+AddUser.cs (5) : using DbManager.Security;
+AddUser.cs (20) : Username = username;
+AddUser.cs (21) : Password = password;
+AddUser.cs (22) : ProfileName = profileName;
+AddUser.cs (29) : // if(database.AddUser(this.Username, this.Password, this.ProfileName)) { }
+AddUser.cs (31) : if (!database.SecurityManager.IsUserAdmin())
+AddUser.cs (32) : {
+AddUser.cs (33) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (35) : else
+AddUser.cs (36) : {
+AddUser.cs (37) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (38) : if (profile == null)
+AddUser.cs (39) : {
+AddUser.cs (40) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (41) : }
+AddUser.cs (42) : else
+AddUser.cs (43) : {
+AddUser.cs (44) : User u = new User(Username, Password);
+AddUser.cs (45) : profile.Users.Add(u);
+AddUser.cs (46) : return Constants.AddUserSuccess;
 AddUser.cs (48) : }
+AddUser.cs (50) : }
+AddUser.cs (52) : }
 DropTable.cs (15) : Table = table;
 DropTable.cs (24) : if (database.DropTable(Table))
 DropTable.cs (25) : {
@@ -381,35 +383,40 @@ Revoke.cs (27) : /*if(database.Revoke(PrivilegeName, TableName, ProfileName))
 Revoke.cs (28) : {
 Revoke.cs (29) : return Constants.AddUserSuccess;
 Revoke.cs (30) : }*/
-Manager.cs (89) : if(Profiles == null || Profiles.Count == 0)
-Manager.cs (90) : {
-Manager.cs (91) : return false;
-Manager.cs (92) : }
-Manager.cs (275) : string sb = "";
-Manager.cs (284) : var p = (Privilege)Enum.Parse(typeof(Privilege), sb);
-Manager.cs (286) : sb = "";
-Manager.cs (291) : sb += c;
-Manager.cs (297) : var p = (Privilege)Enum.Parse(typeof(Privilege), sb);
-Manager.cs (308) : bool userExists = false;
-Manager.cs (309) : foreach(Profile p in manager.Profiles)
-Manager.cs (310) : {
-Manager.cs (311) : foreach(User u in p.Users)
-Manager.cs (312) : {
-Manager.cs (313) : if(u.Username == username)
-Manager.cs (314) : {
-Manager.cs (315) : userExists = true;
-Manager.cs (316) : break;
-Manager.cs (317) : }
-Manager.cs (318) : }
-Manager.cs (320) : if (userExists)
-Manager.cs (321) : {
-Manager.cs (322) : break;
-Manager.cs (323) : }
-Manager.cs (324) : }
-Manager.cs (326) : if (!userExists)
-Manager.cs (327) : {
-Manager.cs (328) : return null;
-Manager.cs (329) : }
+Manager.cs (3) : using System.Data;
+Manager.cs (90) : if(string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(table))
+Manager.cs (91) : {
+Manager.cs (92) : return false;
+Manager.cs (93) : }
+Manager.cs (95) : Profile p = ProfileByUser(username);
+Manager.cs (96) : if(p == null)
+Manager.cs (98) : return false;
+Manager.cs (101) : return p.IsGrantedPrivilege(table, privilege);
+Manager.cs (257) : string sb = "";
+Manager.cs (266) : var p = (Privilege)Enum.Parse(typeof(Privilege), sb);
+Manager.cs (268) : sb = "";
+Manager.cs (273) : sb += c;
+Manager.cs (279) : var p = (Privilege)Enum.Parse(typeof(Privilege), sb);
+Manager.cs (290) : bool userExists = false;
+Manager.cs (291) : foreach(Profile p in manager.Profiles)
+Manager.cs (292) : {
+Manager.cs (293) : foreach(User u in p.Users)
+Manager.cs (294) : {
+Manager.cs (295) : if(u.Username == username)
+Manager.cs (296) : {
+Manager.cs (297) : userExists = true;
+Manager.cs (298) : break;
+Manager.cs (299) : }
+Manager.cs (300) : }
+Manager.cs (302) : if (userExists)
+Manager.cs (303) : {
+Manager.cs (304) : break;
+Manager.cs (305) : }
+Manager.cs (306) : }
+Manager.cs (308) : if (!userExists)
+Manager.cs (309) : {
+Manager.cs (310) : return null;
+Manager.cs (311) : }
 Profile.cs (20) : if (table == null || privilege == null)
 Profile.cs (21) : {
 Profile.cs (22) : return false;
@@ -439,20 +446,21 @@ Profile.cs (77) : }
 AddUserTests.cs (75) : [Fact]
 AddUserTests.cs (76) : public void Execute()
 AddUserTests.cs (77) : {
-AddUserTests.cs (78) : /*string username = "Eduardo";
-AddUserTests.cs (79) : string password = "password";
+AddUserTests.cs (78) : /*string adminUsername = "admin";
+AddUserTests.cs (79) : string adminPassword = "adminPassword";
 AddUserTests.cs (80) : string profileName = "name";
-AddUserTests.cs (83) : Database db = new Database(username, password);
-AddUserTests.cs (85) : Profile p = new Profile();
-AddUserTests.cs (86) : p.Name = profileName;
-AddUserTests.cs (87) : db.SecurityManager.AddProfile(p);
-AddUserTests.cs (88) : password = Encryption.Encrypt(password);
-AddUserTests.cs (91) : db.SecurityManager.GrantPrivilege(profileName, "Users" , Privilege.Insert);
-AddUserTests.cs (92) : AddUser u = new AddUser(username, password, profileName);
-AddUserTests.cs (93) : string result = u.Execute(db);
-AddUserTests.cs (95) : Assert.Equal(Constants.AddUserSuccess, result);
-AddUserTests.cs (96) : User user = db.SecurityManager.UserByName(username);
-AddUserTests.cs (97) : Assert.NotNull(user);
-AddUserTests.cs (98) : Assert.Equal(username, user.Username);
-AddUserTests.cs (99) : Assert.Equal(Encryption.Encrypt(password), user.EncryptedPassword);*/
-AddUserTests.cs (102) : }
+AddUserTests.cs (83) : Database db = new Database(adminUsername, adminPassword);
+AddUserTests.cs (84) : Profile pAdmin = new Profile();
+AddUserTests.cs (85) : pAdmin.Name = profileName;
+AddUserTests.cs (86) : db.SecurityManager.AddProfile(pAdmin);
+AddUserTests.cs (88) : db.SecurityManager.GrantPrivilege(profileName, "Users", Privilege.Insert);
+AddUserTests.cs (92) : string username = "Eduardo";
+AddUserTests.cs (93) : string password = "password";
+AddUserTests.cs (95) : AddUser au = new AddUser(username, password, profileName);
+AddUserTests.cs (96) : string result = au.Execute(db);
+AddUserTests.cs (98) : Assert.Equal(Constants.AddUserSuccess, result);
+AddUserTests.cs (100) : User u = db.SecurityManager.UserByName(username);
+AddUserTests.cs (101) : Assert.NotNull(u);
+AddUserTests.cs (102) : Assert.Equal(username, u.Username);
+AddUserTests.cs (103) : Assert.Equal(Encryption.Encrypt(password), u.EncryptedPassword);*/
+AddUserTests.cs (108) : }

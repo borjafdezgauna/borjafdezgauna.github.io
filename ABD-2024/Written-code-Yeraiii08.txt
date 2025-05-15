@@ -62,6 +62,10 @@ Database.cs (195) : for (int i = table.NumRows()-1; i >= 0; i--)
 Database.cs (197) : if (table.GetRow(i).IsTrue(columnCondition))
 Database.cs (199) : table.DeleteIthRow(i);
 Database.cs (203) : LastErrorMessage = Constants.DeleteSuccess;
+Database.cs (366) : if(db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (367) : {
+Database.cs (371) : return null;
+Database.cs (372) : }
 Row.cs (31) : if(pos == -1)
 Row.cs (33) : return;
 Row.cs (34) : }
@@ -277,6 +281,25 @@ DatabaseTests.cs (331) : }
 DatabaseTests.cs (379) : Condition condition1 = new Condition("Age", "=", "25");
 DatabaseTests.cs (388) : Condition condition2 = new Condition("Age", "=", "30");
 DatabaseTests.cs (396) : Condition condition3 = new Condition("Salary", "=", "5000");
+DatabaseTests.cs (468) : [Fact]
+DatabaseTests.cs (469) : public void TestSaveAndLoadDatabaseUserIncorrect()
+DatabaseTests.cs (470) : {
+DatabaseTests.cs (472) : Database db = new Database("admin", "password");
+DatabaseTests.cs (474) : db.CreateTable("Users", new List<ColumnDefinition>
+DatabaseTests.cs (475) : {
+DatabaseTests.cs (476) : new ColumnDefinition(ColumnDefinition.DataType.String, "ID"),
+DatabaseTests.cs (477) : new ColumnDefinition(ColumnDefinition.DataType.String, "Name")
+DatabaseTests.cs (478) : });
+DatabaseTests.cs (480) : db.Insert("Users", new List<string> { "1", "Alice" });
+DatabaseTests.cs (481) : db.Insert("Users", new List<string> { "2", "Bob" });
+DatabaseTests.cs (483) : db.Save("prueba");
+DatabaseTests.cs (484) : Database prueba = Database.Load("prueba", "user", "password");
+DatabaseTests.cs (485) : Assert.Null(prueba);
+DatabaseTests.cs (487) : prueba = Database.Load("prueba", "admin", "123");
+DatabaseTests.cs (488) : Assert.Null(prueba);
+DatabaseTests.cs (490) : prueba = Database.Load("prueba", "admin", "password");
+DatabaseTests.cs (491) : Assert.Equal(db.ToString(), prueba.ToString());
+DatabaseTests.cs (492) : }
 ParseTests.cs (5) : using System.Xml.Linq;
 ParseTests.cs (39) : MiniSqlQuery query4 = MiniSQLParser.Parse("CREATE TABLE Customers (ID INT,Name TEXT)");
 ParseTests.cs (53) : MiniSqlQuery query5 = MiniSQLParser.Parse("UPDATE Users SET Age='31' WHERE Name='Alice'");
@@ -722,7 +745,11 @@ Manager.cs (148) : {
 Manager.cs (149) : return profile;
 Manager.cs (150) : }
 Manager.cs (151) : }
+Manager.cs (212) : String[] profileNameSplit = Path.GetFileNameWithoutExtension(filePath).Split(databaseName + "_Profile_");
+Manager.cs (213) : String profileName = profileNameSplit[1];
 User.cs (16) : Username = username;
+CreateSecurityProfileTests.cs (96) : Profile profile = new Profile { Name = "AAA" };
+CreateSecurityProfileTests.cs (100) : db.SecurityManager.ProfileByName("AAA").Users.Add(user);
 DropSecurityProfileTests.cs (1) : ﻿using System;
 DropSecurityProfileTests.cs (64) : [Fact]
 DropSecurityProfileTests.cs (65) : public void Execute_DropSecurityProfile_Successful()

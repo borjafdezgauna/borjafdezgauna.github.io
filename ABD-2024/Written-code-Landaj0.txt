@@ -29,9 +29,9 @@ Database.cs (205) : }
 Database.cs (265) : this.SecurityManager.Save(databaseName+"manager");
 Database.cs (293) : db.m_username = username;
 Database.cs (357) : db.SecurityManager = Manager.Load(databaseName+"manager", username);
-Database.cs (427) : {
-Database.cs (428) : return Tables;
-Database.cs (429) : }
+Database.cs (432) : {
+Database.cs (433) : return Tables;
+Database.cs (434) : }
 Row.cs (65) : if (condition == null)
 Row.cs (66) : {
 Row.cs (68) : }
@@ -514,97 +514,96 @@ Manager.cs (205) : {
 Manager.cs (206) : List<string> names = new List<string>();
 Manager.cs (207) : List<string> passwords = new List<string>();
 Manager.cs (209) : String filePath = tableFiles[i];
-Manager.cs (210) : String profileName = Path.GetFileNameWithoutExtension(filePath).Replace(databaseName + "_Profile_", "");
-Manager.cs (212) : StreamReader reader = new StreamReader(filePath);
-Manager.cs (213) : try
-Manager.cs (214) : {
-Manager.cs (215) : string usersLine = reader.ReadLine();
-Manager.cs (216) : int startPosition = usersLine.IndexOf("]") + 1;
-Manager.cs (217) : usersLine = usersLine.Substring(startPosition);
-Manager.cs (219) : string[] entries = usersLine.Split(new[] { "}" }, StringSplitOptions.RemoveEmptyEntries);
-Manager.cs (221) : foreach (string entry in entries)
-Manager.cs (222) : {
-Manager.cs (223) : string cleanEntry = entry.Replace("{", "").Replace("'", "").Trim();
-Manager.cs (224) : string[] parts = cleanEntry.Split(',');
-Manager.cs (226) : if (parts.Length == 2)
-Manager.cs (227) : {
-Manager.cs (228) : names.Add(parts[0]);
-Manager.cs (229) : passwords.Add(parts[1]);
-Manager.cs (230) : }
-Manager.cs (231) : }
-Manager.cs (232) : Profile profile = new Profile { Name = profileName };
-Manager.cs (234) : for (int j = 0; j < names.Count; j++)
-Manager.cs (235) : {
-Manager.cs (240) : }
-Manager.cs (242) : String privilegesLine = reader.ReadLine();
-Manager.cs (244) : entries = privilegesLine.Split(new[] { "}" }, StringSplitOptions.RemoveEmptyEntries);
-Manager.cs (246) : foreach (string entry in entries)
-Manager.cs (247) : {
-Manager.cs (248) : string cleanEntry = entry.Replace("{", "").Replace("'", "").Trim();
-Manager.cs (250) : string[] parts = cleanEntry.Split(',');
-Manager.cs (252) : if (parts.Length >= 2)
-Manager.cs (253) : {
-Manager.cs (254) : string tableName = parts[0];
-Manager.cs (256) : for (int j = 1; j < parts.Length; j++)
-Manager.cs (257) : {
-Manager.cs (258) : string privilegeStr = parts[j];
-Manager.cs (260) : if (Enum.TryParse(privilegeStr, true, out Privilege privilege))
-Manager.cs (261) : {
-Manager.cs (262) : profile.GrantPrivilege(tableName, privilege);
-Manager.cs (263) : }
-Manager.cs (264) : else
-Manager.cs (265) : {
-Manager.cs (266) : Console.WriteLine("Privilegio inv�lido");
-Manager.cs (267) : }
-Manager.cs (268) : }
-Manager.cs (269) : }
+Manager.cs (215) : StreamReader reader = new StreamReader(filePath);
+Manager.cs (216) : try
+Manager.cs (217) : {
+Manager.cs (218) : string usersLine = reader.ReadLine();
+Manager.cs (219) : int startPosition = usersLine.IndexOf("]") + 1;
+Manager.cs (220) : usersLine = usersLine.Substring(startPosition);
+Manager.cs (222) : string[] entries = usersLine.Split(new[] { "}" }, StringSplitOptions.RemoveEmptyEntries);
+Manager.cs (224) : foreach (string entry in entries)
+Manager.cs (225) : {
+Manager.cs (226) : string cleanEntry = entry.Replace("{", "").Replace("'", "").Trim();
+Manager.cs (227) : string[] parts = cleanEntry.Split(',');
+Manager.cs (229) : if (parts.Length == 2)
+Manager.cs (230) : {
+Manager.cs (231) : names.Add(parts[0]);
+Manager.cs (232) : passwords.Add(parts[1]);
+Manager.cs (233) : }
+Manager.cs (234) : }
+Manager.cs (235) : Profile profile = new Profile { Name = profileName };
+Manager.cs (237) : for (int j = 0; j < names.Count; j++)
+Manager.cs (238) : {
+Manager.cs (243) : }
+Manager.cs (245) : String privilegesLine = reader.ReadLine();
+Manager.cs (247) : entries = privilegesLine.Split(new[] { "}" }, StringSplitOptions.RemoveEmptyEntries);
+Manager.cs (249) : foreach (string entry in entries)
+Manager.cs (250) : {
+Manager.cs (251) : string cleanEntry = entry.Replace("{", "").Replace("'", "").Trim();
+Manager.cs (253) : string[] parts = cleanEntry.Split(',');
+Manager.cs (255) : if (parts.Length >= 2)
+Manager.cs (256) : {
+Manager.cs (257) : string tableName = parts[0];
+Manager.cs (259) : for (int j = 1; j < parts.Length; j++)
+Manager.cs (260) : {
+Manager.cs (261) : string privilegeStr = parts[j];
+Manager.cs (263) : if (Enum.TryParse(privilegeStr, true, out Privilege privilege))
+Manager.cs (264) : {
+Manager.cs (265) : profile.GrantPrivilege(tableName, privilege);
+Manager.cs (266) : }
+Manager.cs (267) : else
+Manager.cs (268) : {
+Manager.cs (269) : Console.WriteLine("Privilegio inv�lido");
 Manager.cs (270) : }
-Manager.cs (271) : result.AddProfile(profile);
+Manager.cs (271) : }
 Manager.cs (272) : }
-Manager.cs (273) : finally
-Manager.cs (274) : {
-Manager.cs (275) : reader.Close();
-Manager.cs (276) : }
-Manager.cs (277) : }
-Manager.cs (279) : if (result.UserByName(username) == null) return null;
-Manager.cs (281) : return result;
-Manager.cs (288) : try
-Manager.cs (289) : {
-Manager.cs (290) : for (int i = 0; i < Profiles.Count; i++)
-Manager.cs (291) : {
-Manager.cs (292) : string filePath = i + databaseName + "_Profile_" + Profiles[i].Name + TableFileExtension;
-Manager.cs (293) : StreamWriter writer = new StreamWriter(filePath);
-Manager.cs (294) : try
-Manager.cs (295) : {
-Manager.cs (296) : writer.WriteLine(Profiles[i].ToString());
-Manager.cs (297) : writer.WriteLine(Profiles[i].WritePrivileges());
-Manager.cs (299) : }
-Manager.cs (300) : finally
-Manager.cs (301) : {
-Manager.cs (302) : writer.Close();
-Manager.cs (303) : }
-Manager.cs (304) : }
-Manager.cs (305) : }
-Manager.cs (306) : catch (Exception ex)
-Manager.cs (307) : {
-Manager.cs (308) : Console.WriteLine("Error al guardar la base de datos: " + ex.Message);
-Manager.cs (309) : }
-Manager.cs (313) : public bool Equals(Manager manager)
-Manager.cs (314) : {
-Manager.cs (315) : if (this == manager) return true;
-Manager.cs (317) : return false;
-Manager.cs (320) : private static String[] Order(String[] list)
-Manager.cs (321) : {
-Manager.cs (322) : String[] result = new String[list.Length];
-Manager.cs (324) : for (int i = 0; i <= list.Length-1; i++)
-Manager.cs (325) : {
-Manager.cs (326) : string dir = Path.GetDirectoryName(list[i]);
-Manager.cs (327) : string file = Path.GetFileName(list[i]);
-Manager.cs (328) : string newFile = i.ToString() + file;
-Manager.cs (329) : result[i] = Path.Combine(dir, newFile);
-Manager.cs (330) : }
-Manager.cs (332) : return result;
+Manager.cs (273) : }
+Manager.cs (274) : result.AddProfile(profile);
+Manager.cs (275) : }
+Manager.cs (276) : finally
+Manager.cs (277) : {
+Manager.cs (278) : reader.Close();
+Manager.cs (279) : }
+Manager.cs (280) : }
+Manager.cs (282) : if (result.UserByName(username) == null) return null;
+Manager.cs (284) : return result;
+Manager.cs (291) : try
+Manager.cs (292) : {
+Manager.cs (293) : for (int i = 0; i < Profiles.Count; i++)
+Manager.cs (294) : {
+Manager.cs (295) : string filePath = i + databaseName + "_Profile_" + Profiles[i].Name + TableFileExtension;
+Manager.cs (296) : StreamWriter writer = new StreamWriter(filePath);
+Manager.cs (297) : try
+Manager.cs (298) : {
+Manager.cs (299) : writer.WriteLine(Profiles[i].ToString());
+Manager.cs (300) : writer.WriteLine(Profiles[i].WritePrivileges());
+Manager.cs (302) : }
+Manager.cs (303) : finally
+Manager.cs (304) : {
+Manager.cs (305) : writer.Close();
+Manager.cs (306) : }
+Manager.cs (307) : }
+Manager.cs (308) : }
+Manager.cs (309) : catch (Exception ex)
+Manager.cs (310) : {
+Manager.cs (311) : Console.WriteLine("Error al guardar la base de datos: " + ex.Message);
+Manager.cs (312) : }
+Manager.cs (316) : public bool Equals(Manager manager)
+Manager.cs (317) : {
+Manager.cs (318) : if (this == manager) return true;
+Manager.cs (320) : return false;
+Manager.cs (323) : private static String[] Order(String[] list)
+Manager.cs (324) : {
+Manager.cs (325) : String[] result = new String[list.Length];
+Manager.cs (327) : for (int i = 0; i <= list.Length-1; i++)
+Manager.cs (328) : {
+Manager.cs (329) : string dir = Path.GetDirectoryName(list[i]);
+Manager.cs (330) : string file = Path.GetFileName(list[i]);
+Manager.cs (331) : string newFile = i.ToString() + file;
+Manager.cs (332) : result[i] = Path.Combine(dir, newFile);
 Manager.cs (333) : }
+Manager.cs (335) : return result;
+Manager.cs (336) : }
 Profile.cs (65) : public override String ToString()
 Profile.cs (66) : {
 Profile.cs (67) : String result = "['Username','Password']";
@@ -655,10 +654,8 @@ CreateSecurityProfileTests.cs (90) : new ColumnDefinition(ColumnDefinition.DataT
 CreateSecurityProfileTests.cs (91) : });
 CreateSecurityProfileTests.cs (93) : db.Insert("Users", new List<string> { "1", "Alice" });
 CreateSecurityProfileTests.cs (94) : db.Insert("Users", new List<string> { "2", "Bob" });
-CreateSecurityProfileTests.cs (96) : Profile profile = new Profile { Name = "Lector" };
 CreateSecurityProfileTests.cs (97) : User user = new User("Hola", "password");
 CreateSecurityProfileTests.cs (99) : db.SecurityManager.AddProfile(profile);
-CreateSecurityProfileTests.cs (100) : db.SecurityManager.ProfileByName("Lector").Users.Add(user);
 CreateSecurityProfileTests.cs (102) : db.Save(dbName);
 CreateSecurityProfileTests.cs (104) : Database loadedDb = Database.Load(dbName, "Hola", "password");
 CreateSecurityProfileTests.cs (106) : MiniSqlQuery query = MiniSQLParser.Parse("CREATE SECURITY PROFILE SecurityProfile");

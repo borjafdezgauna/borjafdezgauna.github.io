@@ -140,13 +140,13 @@ Database.cs (361) : {
 Database.cs (362) : reader.Close();
 Database.cs (363) : }
 Database.cs (364) : }
-Database.cs (366) : return db;
-Database.cs (367) : }
-Database.cs (368) : catch (Exception ex)
-Database.cs (369) : {
-Database.cs (370) : Console.WriteLine("Error al cargar la base de datos: " + ex.Message);
-Database.cs (373) : }
-Database.cs (426) : public List<Table> GetTables()
+Database.cs (368) : return db;
+Database.cs (369) : }
+Database.cs (373) : catch (Exception ex)
+Database.cs (374) : {
+Database.cs (375) : Console.WriteLine("Error al cargar la base de datos: " + ex.Message);
+Database.cs (378) : }
+Database.cs (431) : public List<Table> GetTables()
 Row.cs (67) : return true;
 Row.cs (71) : if (pos == -1)
 Row.cs (72) : {
@@ -498,27 +498,27 @@ TableTests.cs (394) : string expectedOutput = "['Name','Age']{'Adolfo','23'}{'Ja
 TableTests.cs (395) : Assert.Equal(expectedOutput, tableWithRows.ToString());
 TableTests.cs (396) : }
 AddUser.cs (3) : using System.Linq;
-AddUser.cs (6) : using DbManager.Security;
-AddUser.cs (21) : Username = username;
-AddUser.cs (22) : Password = password;
-AddUser.cs (23) : ProfileName = profileName;
-AddUser.cs (30) : // Verifica que el SecurityManager existe y que el admin est� presente.
-AddUser.cs (31) : if (database.SecurityManager == null || !database.SecurityManager.IsUserAdmin())
-AddUser.cs (32) : {
-AddUser.cs (33) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-AddUser.cs (34) : }
+AddUser.cs (5) : using System.Xml.Linq;
+AddUser.cs (7) : using DbManager.Security;
+AddUser.cs (22) : Username = username;
+AddUser.cs (23) : Password = password;
+AddUser.cs (24) : ProfileName = profileName;
+AddUser.cs (31) : // Verifica que el SecurityManager existe y que el admin est� presente.
+AddUser.cs (34) : if (database.SecurityManager.IsUserAdmin())
+AddUser.cs (35) : {
 AddUser.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
-AddUser.cs (37) : if (profile == null)
-AddUser.cs (38) : {
-AddUser.cs (39) : return Constants.SecurityProfileDoesNotExistError;
-AddUser.cs (40) : }
-AddUser.cs (43) : if (profile.Users.Any(u => u.Username == Username))
-AddUser.cs (44) : {
-AddUser.cs (45) : return Constants.Error + "User already exists";
-AddUser.cs (46) : }
-AddUser.cs (49) : User newUser = new User(Username, Password);
-AddUser.cs (50) : profile.Users.Add(newUser);
-AddUser.cs (52) : return Constants.AddUserSuccess;
+AddUser.cs (38) : if (profile == null)
+AddUser.cs (39) : {
+AddUser.cs (40) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (41) : }
+AddUser.cs (42) : else
+AddUser.cs (43) : {
+AddUser.cs (44) : User newUser = new User(Username, Password);
+AddUser.cs (45) : profile.Users.Add(newUser);
+AddUser.cs (46) : return Constants.AddUserSuccess;
+AddUser.cs (47) : }
+AddUser.cs (50) : }
+AddUser.cs (51) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 CreateTable.cs (17) : Table = table;
 CreateTable.cs (18) : ColumnsParameters = columns;
 Delete.cs (15) : Table = table;
@@ -526,20 +526,20 @@ Delete.cs (16) : Where = where;
 DeleteUser.cs (3) : using System.Linq;
 DeleteUser.cs (6) : using DbManager.Security;
 DeleteUser.cs (18) : Username=username;
-DeleteUser.cs (26) : if (database.SecurityManager == null || !database.SecurityManager.IsUserAdmin())
+DeleteUser.cs (26) : if (database.SecurityManager.IsUserAdmin())
 DeleteUser.cs (27) : {
-DeleteUser.cs (28) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-DeleteUser.cs (29) : }
-DeleteUser.cs (31) : var profileWithUser = database.SecurityManager
-DeleteUser.cs (32) : .Profiles
-DeleteUser.cs (33) : .FirstOrDefault(p => p.Users.Any(u => u.Username == Username));
-DeleteUser.cs (35) : if (profileWithUser == null)
-DeleteUser.cs (36) : {
-DeleteUser.cs (37) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (28) : Profile profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (29) : if (profile == null)
+DeleteUser.cs (30) : {
+DeleteUser.cs (31) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (32) : }
+DeleteUser.cs (33) : else
+DeleteUser.cs (34) : {
+DeleteUser.cs (35) : profile.Users.Remove(database.SecurityManager.UserByName(Username));
+DeleteUser.cs (36) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (37) : }
 DeleteUser.cs (38) : }
-DeleteUser.cs (40) : var userToRemove = profileWithUser.Users.First(u => u.Username == Username);
-DeleteUser.cs (41) : profileWithUser.Users.Remove(userToRemove);
-DeleteUser.cs (43) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (39) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
 MiniSQLParser.cs (1) : ﻿    using DbManager.Parser;
@@ -661,10 +661,10 @@ Select.cs (20) : Where = condition;
 Update.cs (16) : Table = table;
 Update.cs (17) : Columns = columnNames;
 Update.cs (18) : Where = where;
-Manager.cs (236) : var user = new User("temp", "temp");
-Manager.cs (237) : user.Username = names[j];
-Manager.cs (238) : user.EncryptedPassword = passwords[j];
-Manager.cs (239) : profile.Users.Add(user);
+Manager.cs (239) : var user = new User("temp", "temp");
+Manager.cs (240) : user.Username = names[j];
+Manager.cs (241) : user.EncryptedPassword = passwords[j];
+Manager.cs (242) : profile.Users.Add(user);
 Profile.cs (21) : if (string.IsNullOrEmpty(table)) return false;
 Profile.cs (23) : if (!PrivilegesOn.ContainsKey(table))
 Profile.cs (24) : {
