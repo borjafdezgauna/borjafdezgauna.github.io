@@ -21,10 +21,14 @@ ColumnDefinition.cs (82) : else
 ColumnDefinition.cs (83) : {
 ColumnDefinition.cs (85) : }
 ColumnDefinition.cs (88) : return new ColumnDefinition(columnType, columnName);
-Database.cs (487) : public void SetSecurityManager(Manager manager)
-Database.cs (488) : {
-Database.cs (489) : this.SecurityManager = manager;
-Database.cs (490) : }
+Database.cs (34) : SecurityManager = new Manager(adminUsername);
+Database.cs (35) : Profile profile = new Profile { Name = Profile.AdminProfileName };
+Database.cs (36) : SecurityManager.AddProfile(profile);
+Database.cs (37) : SecurityManager.ProfileByName(Profile.AdminProfileName).Users.Add(new User(adminUsername, adminPassword));
+Database.cs (491) : public void SetSecurityManager(Manager manager)
+Database.cs (492) : {
+Database.cs (493) : this.SecurityManager = manager;
+Database.cs (494) : }
 Row.cs (5) : using System.Runtime.CompilerServices;
 Row.cs (29) : int position = -1;
 Row.cs (31) : for (int i = 0; i < ColumnDefinitions.Count; i++)
@@ -315,7 +319,7 @@ AddUser.cs (5) : using DbManager.Security;
 AddUser.cs (20) : this.Username = username;
 AddUser.cs (21) : this.Password = password;
 AddUser.cs (22) : this.ProfileName = profileName;
-AddUser.cs (30) : if (!database.IsUserAdmin())
+AddUser.cs (30) : /*if (!database.IsUserAdmin())
 AddUser.cs (31) : {
 AddUser.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 AddUser.cs (33) : }
@@ -333,9 +337,34 @@ AddUser.cs (45) : }
 AddUser.cs (46) : }
 AddUser.cs (48) : User newUser = new User(Username, Password);
 AddUser.cs (50) : profile.Users.Add(newUser);
-AddUser.cs (52) : return Constants.AddUserSuccess;
+AddUser.cs (52) : return Constants.AddUserSuccess;*/
+AddUser.cs (55) : bool isAdmin = database.SecurityManager.IsUserAdmin();
+AddUser.cs (57) : if (isAdmin)
+AddUser.cs (58) : {
+AddUser.cs (59) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (61) : if(profile != null)
+AddUser.cs (62) : {
+AddUser.cs (63) : profile.Users.Add(new User(Username, Password));
+AddUser.cs (64) : return Constants.AddUserSuccess;
+AddUser.cs (67) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (68) : }
+AddUser.cs (70) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (71) : }
 CreateTable.cs (16) : //TODO
 CreateTable.cs (17) : //: Initialize member variables
+DeleteUser.cs (25) : bool isAdmin = database.SecurityManager.IsUserAdmin();
+DeleteUser.cs (27) : if (isAdmin)
+DeleteUser.cs (28) : {
+DeleteUser.cs (29) : Profile profile = database.SecurityManager.ProfileByName(Username);
+DeleteUser.cs (31) : if (profile != null)
+DeleteUser.cs (32) : {
+DeleteUser.cs (33) : User user = database.SecurityManager.UserByName(Username);
+DeleteUser.cs (34) : profile.Users.Remove(user);
+DeleteUser.cs (35) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (36) : }
+DeleteUser.cs (38) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (39) : }
+DeleteUser.cs (41) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 DropTable.cs (23) : Table table = database.TableByName(Table);
 DropTable.cs (24) : if (table == null)
 DropTable.cs (25) : {
@@ -350,6 +379,13 @@ DropTable.cs (34) : return Constants.Error;
 Grant.cs (20) : this.PrivilegeName = privilegeName;
 Grant.cs (21) : this.TableName = tableName;
 Grant.cs (22) : this.ProfileName = profileName;
+Grant.cs (33) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (40) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (59) : if(profile.IsGrantedPrivilege(TableName, privilege))
+Grant.cs (60) : {
+Grant.cs (61) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (62) : }
+Grant.cs (64) : profile.GrantPrivilege(TableName, privilege);
 Insert.cs (27) : Table table = database.TableByName(Table);
 Insert.cs (28) : if (table == null)
 Insert.cs (29) : {
