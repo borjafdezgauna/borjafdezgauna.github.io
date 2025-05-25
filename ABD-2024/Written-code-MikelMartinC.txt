@@ -354,6 +354,14 @@ AddUser.cs (67) : return Constants.SecurityProfileDoesNotExistError;
 AddUser.cs (68) : }
 AddUser.cs (70) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 AddUser.cs (71) : }
+CreateSecurityProfile.cs (5) : using DbManager.Security;
+CreateSecurityProfile.cs (40) : Manager manager = database.SecurityManager;
+CreateSecurityProfile.cs (42) : if (manager.IsUserAdmin())
+CreateSecurityProfile.cs (43) : {
+CreateSecurityProfile.cs (44) : manager.AddProfile(new Profile { Name = ProfileName });
+CreateSecurityProfile.cs (46) : return Constants.CreateSecurityProfileSuccess;
+CreateSecurityProfile.cs (47) : }
+CreateSecurityProfile.cs (49) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 CreateTable.cs (16) : //TODO
 CreateTable.cs (17) : //: Initialize member variables
 DeleteUser.cs (25) : bool isAdmin = database.SecurityManager.IsUserAdmin();
@@ -369,6 +377,10 @@ DeleteUser.cs (36) : }
 DeleteUser.cs (38) : return Constants.UserDoesNotExistError;
 DeleteUser.cs (39) : }
 DeleteUser.cs (41) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (24) : Manager manager = database.SecurityManager;
+DropSecurityProfile.cs (26) : if (manager.IsUserAdmin())
+DropSecurityProfile.cs (28) : manager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 DropTable.cs (23) : Table table = database.TableByName(Table);
 DropTable.cs (24) : if (table == null)
 DropTable.cs (25) : {
@@ -401,6 +413,12 @@ Insert.cs (38) : {
 Insert.cs (39) : return Constants.InsertSuccess;
 Insert.cs (40) : }
 Insert.cs (41) : return Constants.ColumnCountsDontMatch;
+Revoke.cs (28) : if (database.SecurityManager.IsUserAdmin())
+Revoke.cs (29) : {
+Revoke.cs (30) : database.SecurityManager.ProfileByName(ProfileName).RevokePrivilege(TableName, PrivilegeUtils.FromPrivilegeName(PrivilegeName));
+Revoke.cs (32) : return Constants.RevokePrivilegeSuccess;
+Revoke.cs (33) : }
+Revoke.cs (35) : return Constants.Error;
 Manager.cs (39) : string encrypted = Encryption.Encrypt(password);
 Manager.cs (47) : return encrypted == u.EncryptedPassword;
 Manager.cs (171) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
