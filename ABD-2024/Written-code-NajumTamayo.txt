@@ -1,3 +1,4 @@
+Constants.cs (31) : public const string UserDoesNotExistError = Error + "User does not exist";
 Database.cs (5) : using System.Data.Common;
 Database.cs (238) : //Crear directorio para la base de datos. dentro de esto crear carpeta por cada tabla.
 Database.cs (239) : // primera fila columnas, siguientes filas cada una una row.
@@ -52,87 +53,89 @@ Database.cs (293) : writer.Close();
 Database.cs (294) : }
 Database.cs (295) : }
 Database.cs (296) : }
-Database.cs (297) : return true;
-Database.cs (298) : }
-Database.cs (299) : catch (Exception ex)
-Database.cs (300) : {
-Database.cs (301) : LastErrorMessage = Constants.Error + ": " + ex.Message;
-Database.cs (302) : return false;
-Database.cs (303) : }
-Database.cs (311) : //Solo est�n las columnas, faltan row (default todas tupo String)
-Database.cs (312) : //Idea: en save en cada columnas poner antes de cada columna su Type(S, I, D), luego aqui mirarlo y con ifs elegir como ser� cada columna
-Database.cs (314) : try {
-Database.cs (315) : String databasePath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Database.cs (317) : if(!Directory.Exists(databasePath))
-Database.cs (318) : {
-Database.cs (319) : return null;
-Database.cs (320) : }
-Database.cs (322) : Database database = new Database();
-Database.cs (323) : foreach(String tablePath in Directory.GetFiles(databasePath))
-Database.cs (324) : {
-Database.cs (325) : string tableName1 = Path.GetFileName(tablePath);
-Database.cs (326) : string tableName = tableName1.Substring(0, tableName1.Length - 4);
-Database.cs (327) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (328) : List<Row> rows= new List<Row>();
-Database.cs (330) : TextReader reader = null;
-Database.cs (331) : try
-Database.cs (332) : {
-Database.cs (333) : reader = File.OpenText(tablePath);
-Database.cs (334) : string column = reader.ReadLine();
-Database.cs (335) : if(column == null)
-Database.cs (336) : {
-Database.cs (337) : continue;
-Database.cs (338) : }
-Database.cs (340) : string[] columnNames = column.Split(",");
-Database.cs (341) : foreach(String columnName in columnNames)
-Database.cs (342) : {
-Database.cs (343) : string[] columnPart = columnName.Split(")");
-Database.cs (344) : if (columnPart[0] == "S") //S, Name
-Database.cs (345) : {
-Database.cs (346) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.String, columnPart[1]);
-Database.cs (347) : columns.Add(column1);
-Database.cs (348) : }
-Database.cs (349) : if (columnPart[0] == "I") //I, Age
-Database.cs (350) : {
-Database.cs (351) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.Int, columnPart[1]);
-Database.cs (352) : columns.Add(column1);
-Database.cs (353) : }
-Database.cs (354) : if (columnPart[0] == "D") //D, Height
-Database.cs (355) : {
-Database.cs (356) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.Double, columnPart[1]);
-Database.cs (357) : columns.Add(column1);
-Database.cs (358) : }
+Database.cs (297) : SecurityManager.Save(databaseName);
+Database.cs (298) : return true;
+Database.cs (299) : }
+Database.cs (300) : catch (Exception ex)
+Database.cs (301) : {
+Database.cs (302) : LastErrorMessage = Constants.Error + ": " + ex.Message;
+Database.cs (303) : return false;
+Database.cs (304) : }
+Database.cs (312) : //Solo est�n las columnas, faltan row (default todas tupo String)
+Database.cs (313) : //Idea: en save en cada columnas poner antes de cada columna su Type(S, I, D), luego aqui mirarlo y con ifs elegir como ser� cada columna
+Database.cs (315) : try {
+Database.cs (316) : String databasePath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (318) : if(!Directory.Exists(databasePath))
+Database.cs (319) : {
+Database.cs (320) : return null;
+Database.cs (321) : }
+Database.cs (323) : Database database = new Database();
+Database.cs (324) : foreach(String tablePath in Directory.GetFiles(databasePath))
+Database.cs (325) : {
+Database.cs (326) : string tableName1 = Path.GetFileName(tablePath);
+Database.cs (327) : string tableName = tableName1.Substring(0, tableName1.Length - 4);
+Database.cs (328) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (329) : List<Row> rows= new List<Row>();
+Database.cs (331) : TextReader reader = null;
+Database.cs (332) : try
+Database.cs (333) : {
+Database.cs (334) : reader = File.OpenText(tablePath);
+Database.cs (335) : string column = reader.ReadLine();
+Database.cs (336) : if(column == null)
+Database.cs (337) : {
+Database.cs (338) : continue;
+Database.cs (339) : }
+Database.cs (341) : string[] columnNames = column.Split(",");
+Database.cs (342) : foreach(String columnName in columnNames)
+Database.cs (343) : {
+Database.cs (344) : string[] columnPart = columnName.Split(")");
+Database.cs (345) : if (columnPart[0] == "S") //S, Name
+Database.cs (346) : {
+Database.cs (347) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.String, columnPart[1]);
+Database.cs (348) : columns.Add(column1);
+Database.cs (349) : }
+Database.cs (350) : if (columnPart[0] == "I") //I, Age
+Database.cs (351) : {
+Database.cs (352) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.Int, columnPart[1]);
+Database.cs (353) : columns.Add(column1);
+Database.cs (354) : }
+Database.cs (355) : if (columnPart[0] == "D") //D, Height
+Database.cs (356) : {
+Database.cs (357) : ColumnDefinition column1 = new ColumnDefinition(ColumnDefinition.DataType.Double, columnPart[1]);
+Database.cs (358) : columns.Add(column1);
 Database.cs (359) : }
-Database.cs (361) : string rowLine;
-Database.cs (362) : while((rowLine = reader.ReadLine()) != null)
-Database.cs (363) : {
-Database.cs (364) : Row parsedRow = Row.Parse(columns, rowLine);
-Database.cs (365) : if(parsedRow != null)
-Database.cs (366) : {
-Database.cs (367) : rows.Add(parsedRow);
-Database.cs (368) : }
+Database.cs (360) : }
+Database.cs (362) : string rowLine;
+Database.cs (363) : while((rowLine = reader.ReadLine()) != null)
+Database.cs (364) : {
+Database.cs (365) : Row parsedRow = Row.Parse(columns, rowLine);
+Database.cs (366) : if(parsedRow != null)
+Database.cs (367) : {
+Database.cs (368) : rows.Add(parsedRow);
 Database.cs (369) : }
 Database.cs (370) : }
-Database.cs (371) : finally
-Database.cs (372) : {
-Database.cs (373) : if(reader != null)
-Database.cs (374) : {
-Database.cs (375) : reader.Close();
-Database.cs (376) : }
+Database.cs (371) : }
+Database.cs (372) : finally
+Database.cs (373) : {
+Database.cs (374) : if(reader != null)
+Database.cs (375) : {
+Database.cs (376) : reader.Close();
 Database.cs (377) : }
-Database.cs (379) : Table table = new Table(tableName, columns);
-Database.cs (380) : foreach(Row row in rows)
-Database.cs (381) : {
-Database.cs (382) : table.AddRow(row);
-Database.cs (383) : }
-Database.cs (384) : database.AddTable(table);
-Database.cs (385) : }
-Database.cs (387) : return database;
-Database.cs (388) : }
-Database.cs (389) : catch (Exception ex)
-Database.cs (390) : {
-Database.cs (391) : Console.WriteLine(Constants.Error + ": " + ex.Message);
-Database.cs (395) : }
+Database.cs (378) : }
+Database.cs (380) : Table table = new Table(tableName, columns);
+Database.cs (381) : foreach(Row row in rows)
+Database.cs (382) : {
+Database.cs (383) : table.AddRow(row);
+Database.cs (384) : }
+Database.cs (385) : database.AddTable(table);
+Database.cs (386) : }
+Database.cs (387) : database.SecurityManager = Manager.Load(databaseName, username);
+Database.cs (388) : return database;
+Database.cs (389) : }
+Database.cs (390) : catch (Exception ex)
+Database.cs (391) : {
+Database.cs (392) : Console.WriteLine(Constants.Error + ": " + ex.Message);
+Database.cs (396) : }
 Row.cs (128) : result += Encode(s);
 Table.cs (133) : if (NumColumns() == j + 1)
 Table.cs (179) : result.Sort((a, b) => b.CompareTo(a));
@@ -274,6 +277,7 @@ TableTests.cs (181) : Assert.Equal("Maider", resultTable.GetRow(1).GetValue("Nam
 TableTests.cs (182) : Assert.Equal("67", resultTable.GetRow(1).GetValue("Age"));
 TableTests.cs (183) : Assert.Equal("Pepe", resultTable.GetRow(2).GetValue("Name"));
 TableTests.cs (184) : Assert.Equal("51", resultTable.GetRow(2).GetValue("Age"));
+MiniSQLParser.cs (40) : const string addUserPattern = @"^ADD\s+USER\s+\(([A-Za-z]+),(\w+),(\w+)\)$";
 MiniSQLParser.cs (216) : Condition condition1 = null;
 MiniSQLParser.cs (217) : if (conditions[2].Trim().StartsWith("'") && conditions[2].Trim().EndsWith("'"))
 MiniSQLParser.cs (218) : {
@@ -348,3 +352,23 @@ Manager.cs (228) : writer.WriteLine($"P,{key},{priv}");
 UpdateTests.cs (40) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad>'21'") as Update;
 UpdateTests.cs (49) : Update query2 = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad<'21'") as Update;
 UpdateTests.cs (69) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE height>'1.98'") as Update;
+AddUserTests.cs (73) : [Fact]
+AddUserTests.cs (74) : public void AddAsAdmin()
+AddUserTests.cs (75) : {
+AddUserTests.cs (76) : var db = new Database("user1", "password"); //Se crea perfil con nombre "Admin" y se mete dentro el user1
+AddUserTests.cs (77) : var result = db.ExecuteMiniSQLQuery("ADD USER (user,password,Admin)"); //No deja poner user con un numero
+AddUserTests.cs (78) : Assert.Equal(Constants.AddUserSuccess, result);
+AddUserTests.cs (79) : }
+AddUserTests.cs (81) : [Fact]
+AddUserTests.cs (82) : public void AddAsNonAdmin()
+AddUserTests.cs (83) : {
+AddUserTests.cs (84) : //Creo db user1 = Admin, creo nuevo perfil no admin
+AddUserTests.cs (85) : var db = new Database("user1", "password");
+AddUserTests.cs (86) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE profileNonAdmin");
+AddUserTests.cs (87) : db.ExecuteMiniSQLQuery("ADD USER (userNonAdmin,password,profileNonAdmin)");
+AddUserTests.cs (88) : //Guardo y cargo la db con el perfil no admin.
+AddUserTests.cs (89) : db.Save("TestDB");
+AddUserTests.cs (90) : Database dbNonAdmin = Database.Load("TestDB", "userNonAdmin", "password");
+AddUserTests.cs (91) : var result = dbNonAdmin.ExecuteMiniSQLQuery("ADD USER (user,password,profileNonAdmin)");
+AddUserTests.cs (92) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
+AddUserTests.cs (93) : }
