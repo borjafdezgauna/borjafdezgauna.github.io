@@ -412,9 +412,23 @@ DeleteUser.cs (67) : return Constants.DeleteUserSuccess;
 DeleteUser.cs (68) : }
 DeleteUser.cs (70) : return Constants.UserDoesNotExistError;
 DropSecurityProfile.cs (24) : Manager manager = database.SecurityManager;
-DropSecurityProfile.cs (26) : if (manager.IsUserAdmin())
-DropSecurityProfile.cs (28) : manager.RemoveProfile(ProfileName);
-DropSecurityProfile.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (26) : if (!manager.IsUserAdmin())
+DropSecurityProfile.cs (28) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (31) : bool profileExists = false;
+DropSecurityProfile.cs (33) : foreach (Profile profile in manager.Profiles)
+DropSecurityProfile.cs (34) : {
+DropSecurityProfile.cs (35) : if (profile.Name == ProfileName)
+DropSecurityProfile.cs (36) : {
+DropSecurityProfile.cs (37) : profileExists = true;
+DropSecurityProfile.cs (38) : break;
+DropSecurityProfile.cs (39) : }
+DropSecurityProfile.cs (40) : }
+DropSecurityProfile.cs (42) : if (!profileExists)
+DropSecurityProfile.cs (43) : {
+DropSecurityProfile.cs (44) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (45) : }
+DropSecurityProfile.cs (47) : manager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (48) : return Constants.DropSecurityProfileSuccess;
 DropTable.cs (23) : Table table = database.TableByName(Table);
 DropTable.cs (24) : if (table == null)
 DropTable.cs (25) : {
