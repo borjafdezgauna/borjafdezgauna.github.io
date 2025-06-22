@@ -277,8 +277,11 @@ TableTests.cs (181) : Assert.Equal("Maider", resultTable.GetRow(1).GetValue("Nam
 TableTests.cs (182) : Assert.Equal("67", resultTable.GetRow(1).GetValue("Age"));
 TableTests.cs (183) : Assert.Equal("Pepe", resultTable.GetRow(2).GetValue("Name"));
 TableTests.cs (184) : Assert.Equal("51", resultTable.GetRow(2).GetValue("Age"));
+CreateSecurityProfile.cs (31) : } else
+CreateSecurityProfile.cs (32) : {
 Grant.cs (51) : if (!profile.IsGrantedPrivilege(TableName, privilege))
 Grant.cs (53) : profile.GrantPrivilege(TableName,privilege);
+MiniSQLParser.cs (36) : const string grantPattern = @"^GRANT\s+([A-Z]+)\s+ON\s+(\w+)\s+TO\s+([A-Za-z]+)$";
 MiniSQLParser.cs (40) : const string addUserPattern = @"^ADD\s+USER\s+\(([A-Za-z]+),(\w+),(\w+)\)$";
 MiniSQLParser.cs (216) : Condition condition1 = null;
 MiniSQLParser.cs (217) : if (conditions[2].Trim().StartsWith("'") && conditions[2].Trim().EndsWith("'"))
@@ -410,49 +413,76 @@ DropSecurityProfileTests.cs (76) : var result = nonAdminDb.ExecuteMiniSQLQuery("
 DropSecurityProfileTests.cs (78) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
 DropSecurityProfileTests.cs (79) : }
 GrantTests.cs (9) : using System.IO;
-GrantTests.cs (127) : [Fact]
-GrantTests.cs (128) : public void GrantPrivilegeNotBeingAdminShouldDoNothing()
-GrantTests.cs (129) : {
-GrantTests.cs (130) : var db = new Database("admin", "pass");
-GrantTests.cs (131) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE userProfile");
-GrantTests.cs (132) : db.ExecuteMiniSQLQuery("ADD USER (user,pass,userProfile)");
-GrantTests.cs (133) : db.Save("TestDB");
-GrantTests.cs (135) : var nonAdminDb = Database.Load("TestDB", "user", "pass");
-GrantTests.cs (137) : var result = nonAdminDb.ExecuteMiniSQLQuery("GRANT SELECT ON TestTable TO userProfile");
-GrantTests.cs (139) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
-GrantTests.cs (140) : }
-GrantTests.cs (142) : [Fact]
-GrantTests.cs (143) : public void AdminCanGrantPrivilege()
-GrantTests.cs (144) : {
-GrantTests.cs (145) : var db = new Database("user1", "password");
-GrantTests.cs (146) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE profileNonAdmin");
-GrantTests.cs (147) : db.ExecuteMiniSQLQuery("ADD USER (userNonAdmin,password,profileNonAdmin)");
-GrantTests.cs (148) : var result = db.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO profileNonAdmin");
-GrantTests.cs (149) : Assert.NotNull(result);
-GrantTests.cs (150) : Assert.Equal(Constants.GrantPrivilegeSuccess, result);
-GrantTests.cs (151) : }
-GrantTests.cs (153) : [Fact]
-GrantTests.cs (154) : public void GrantAlreadyGrantedPrivilege()
-GrantTests.cs (155) : {
-GrantTests.cs (156) : var db = new Database("user1", "password");
-GrantTests.cs (157) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE profileNonAdmin");
-GrantTests.cs (158) : db.ExecuteMiniSQLQuery("ADD USER (userNonAdmin,password,profileNonAdmin)");
-GrantTests.cs (159) : db.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO profileNonAdmin");
-GrantTests.cs (160) : var result = db.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO profileNonAdmin");
-GrantTests.cs (161) : Assert.NotNull(result);
-GrantTests.cs (162) : Assert.Equal(Constants.ProfileAlreadyHasPrivilege, result);
-GrantTests.cs (163) : }
-GrantTests.cs (165) : [Fact]
-GrantTests.cs (166) : public void GrantAsNonAdmin()
-GrantTests.cs (167) : {
-GrantTests.cs (168) : var db = new Database("user1", "password");
-GrantTests.cs (169) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE profileNonAdmin");
-GrantTests.cs (170) : db.ExecuteMiniSQLQuery("ADD USER (userNonAdmin,password,profileNonAdmin)");
-GrantTests.cs (171) : db.Save("TestGrantDB");
-GrantTests.cs (173) : Database dbNonAdmin = Database.Load("TestGrantDB", "userNonAdmin", "password");
-GrantTests.cs (174) : var result = dbNonAdmin.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO profileNonAdmin");
-GrantTests.cs (175) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
-GrantTests.cs (176) : }
+GrantTests.cs (96) : public void IncorrectWithoutOnePart()
+GrantTests.cs (98) : Grant query = MiniSQLParser.Parse("GRANT ON Table TO User") as Grant;
+GrantTests.cs (101) : query = MiniSQLParser.Parse("GRANT SELECT ON TO User") as Grant;
+GrantTests.cs (104) : query = MiniSQLParser.Parse("GRANT SELECT TO User") as Grant;
+GrantTests.cs (107) : query = MiniSQLParser.Parse("GRANT SELECT ON Table TO") as Grant;
+GrantTests.cs (112) : public void GrantIncorrectPrivileges()
+GrantTests.cs (114) : var db = new Database("admin", "password");
+GrantTests.cs (115) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE User");
+GrantTests.cs (116) : var result = db.ExecuteMiniSQLQuery("GRANT REMOVE ON Table TO User");
+GrantTests.cs (117) : var result2 = db.ExecuteMiniSQLQuery("GRANT UPGRADE ON Table TO User");
+GrantTests.cs (119) : Assert.Equal(result, Constants.PrivilegeDoesNotExistError);
+GrantTests.cs (120) : Assert.Equal(result2, Constants.PrivilegeDoesNotExistError);
+GrantTests.cs (124) : [Fact]
+GrantTests.cs (125) : public void GrantPrivilegeNotBeingAdminShouldDoNothing()
+GrantTests.cs (126) : {
+GrantTests.cs (127) : var db = new Database("admin", "pass");
+GrantTests.cs (128) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE userProfile");
+GrantTests.cs (129) : db.ExecuteMiniSQLQuery("ADD USER (user,pass,userProfile)");
+GrantTests.cs (130) : db.Save("TestDB");
+GrantTests.cs (132) : var nonAdminDb = Database.Load("TestDB", "user", "pass");
+GrantTests.cs (134) : var result = nonAdminDb.ExecuteMiniSQLQuery("GRANT SELECT ON TestTable TO userProfile");
+GrantTests.cs (136) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
+GrantTests.cs (137) : }
+GrantTests.cs (139) : [Fact]
+GrantTests.cs (140) : public void AdminCanGrantPrivilege()
+GrantTests.cs (141) : {
+GrantTests.cs (142) : var db = new Database("user1", "password");
+GrantTests.cs (143) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE profileNonAdmin");
+GrantTests.cs (144) : db.ExecuteMiniSQLQuery("ADD USER (userNonAdmin,password,profileNonAdmin)");
+GrantTests.cs (145) : var result = db.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO profileNonAdmin");
+GrantTests.cs (146) : Assert.NotNull(result);
+GrantTests.cs (147) : Assert.Equal(Constants.GrantPrivilegeSuccess, result);
+GrantTests.cs (148) : }
+GrantTests.cs (150) : [Fact]
+GrantTests.cs (151) : public void GrantAlreadyGrantedPrivilege()
+GrantTests.cs (152) : {
+GrantTests.cs (153) : var db = new Database("user1", "password");
+GrantTests.cs (154) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE profileNonAdmin");
+GrantTests.cs (155) : db.ExecuteMiniSQLQuery("ADD USER (userNonAdmin,password,profileNonAdmin)");
+GrantTests.cs (156) : db.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO profileNonAdmin");
+GrantTests.cs (157) : var result = db.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO profileNonAdmin");
+GrantTests.cs (158) : Assert.NotNull(result);
+GrantTests.cs (159) : Assert.Equal(Constants.ProfileAlreadyHasPrivilege, result);
+GrantTests.cs (160) : }
+GrantTests.cs (162) : [Fact]
+GrantTests.cs (163) : public void GrantAsNonAdmin()
+GrantTests.cs (164) : {
+GrantTests.cs (165) : var db = new Database("user1", "password");
+GrantTests.cs (166) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE profileNonAdmin");
+GrantTests.cs (167) : db.ExecuteMiniSQLQuery("ADD USER (userNonAdmin,password,profileNonAdmin)");
+GrantTests.cs (168) : db.Save("TestGrantDB");
+GrantTests.cs (170) : Database dbNonAdmin = Database.Load("TestGrantDB", "userNonAdmin", "password");
+GrantTests.cs (171) : var result = dbNonAdmin.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO profileNonAdmin");
+GrantTests.cs (172) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
+GrantTests.cs (173) : }
+GrantTests.cs (175) : [Fact]
+GrantTests.cs (176) : public void GrantNonExistentProfile()
+GrantTests.cs (177) : {
+GrantTests.cs (178) : var db = new Database("user1", "password");
+GrantTests.cs (179) : var result = db.ExecuteMiniSQLQuery("GRANT SELECT ON table1 TO NonExistentProfile");
+GrantTests.cs (181) : Assert.Equal(Constants.SecurityProfileDoesNotExistError, result);
+GrantTests.cs (182) : }
+GrantTests.cs (184) : [Fact]
+GrantTests.cs (185) : public void GrantNonExistentPrivilege()
+GrantTests.cs (186) : {
+GrantTests.cs (187) : var db = new Database("user1", "password");
+GrantTests.cs (188) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE userProfile");
+GrantTests.cs (189) : var result = db.ExecuteMiniSQLQuery("GRANT INVALID ON table1 TO userProfile");
+GrantTests.cs (191) : Assert.Equal(Constants.PrivilegeDoesNotExistError, result);
+GrantTests.cs (192) : }
 RevokeTests.cs (126) : [Fact]
 RevokeTests.cs (127) : public void AdminCanRevokePrivilege()
 RevokeTests.cs (128) : {
