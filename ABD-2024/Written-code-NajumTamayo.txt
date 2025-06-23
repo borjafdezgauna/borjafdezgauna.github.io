@@ -239,14 +239,32 @@ ProfileTests.cs (37) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privileg
 ProfileTests.cs (38) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Delete));
 ProfileTests.cs (39) : }
 ProfileTests.cs (41) : [Fact]
-ProfileTests.cs (42) : public void RevokePrivilegeNonExistant()
+ProfileTests.cs (42) : public void RevokePrivilegeNonExistantTable()
 ProfileTests.cs (43) : {
 ProfileTests.cs (44) : var profile = new Profile();
 ProfileTests.cs (46) : bool result = profile.RevokePrivilege("NonExistentTable", Privilege.Insert);
 ProfileTests.cs (48) : Assert.False(result);
 ProfileTests.cs (49) : }
-ProfileTests.cs (50) : }
-ProfileTests.cs (51) : }
+ProfileTests.cs (51) : [Fact]
+ProfileTests.cs (52) : public void RevokeNonExistentPrivilege()
+ProfileTests.cs (53) : {
+ProfileTests.cs (54) : var profile = new Profile();
+ProfileTests.cs (55) : profile.GrantPrivilege("tabla1", Privilege.Select);
+ProfileTests.cs (57) : bool result = profile.RevokePrivilege("tabla1", Privilege.Update);
+ProfileTests.cs (59) : Assert.False(result);
+ProfileTests.cs (60) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Select));
+ProfileTests.cs (61) : }
+ProfileTests.cs (63) : [Fact]
+ProfileTests.cs (64) : public void RevokeLastPrivilegeRemoveTable()
+ProfileTests.cs (65) : {
+ProfileTests.cs (66) : var profile = new Profile();
+ProfileTests.cs (67) : profile.GrantPrivilege("tabla1", Privilege.Insert);
+ProfileTests.cs (69) : bool result = profile.RevokePrivilege("tabla1", Privilege.Insert);
+ProfileTests.cs (71) : Assert.True(result);
+ProfileTests.cs (72) : Assert.False(profile.PrivilegesOn.ContainsKey("tabla1"));
+ProfileTests.cs (73) : }
+ProfileTests.cs (75) : }
+ProfileTests.cs (76) : }
 TableTests.cs (45) : Table table = Table.CreateTestTable("table");
 TableTests.cs (46) : Assert.Equal(1, table.ColumnIndexByName("Height"));
 TableTests.cs (52) : Table table = Table.CreateTestTable("table");
@@ -419,8 +437,19 @@ Manager.cs (199) : }
 Manager.cs (200) : return manager;
 Manager.cs (221) : writer.WriteLine($"U,{user.Username},{user.EncryptedPassword}");
 Manager.cs (228) : writer.WriteLine($"P,{key},{priv}");
-Profile.cs (34) : return true;
-Profile.cs (35) : }
+Profile.cs (21) : if(table == null || table.Length == 0) return false;
+Profile.cs (23) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (25) : PrivilegesOn[table] = new List<Privilege>();
+Profile.cs (27) : if (PrivilegesOn[table].Contains(privilege)) return false;
+Profile.cs (31) : return true;
+Profile.cs (32) : }
+Profile.cs (37) : if(table == null || table.Length == 0) return false;
+Profile.cs (38) : if (!PrivilegesOn.ContainsKey(table)) return false;
+Profile.cs (40) : if (PrivilegesOn[table].Contains(privilege))
+Profile.cs (43) : if (PrivilegesOn[table].Count == 0)
+Profile.cs (44) : {
+Profile.cs (45) : PrivilegesOn.Remove(table);
+Profile.cs (46) : }
 UpdateTests.cs (40) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad>'21'") as Update;
 UpdateTests.cs (49) : Update query2 = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad<'21'") as Update;
 UpdateTests.cs (69) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE height>'1.98'") as Update;

@@ -122,63 +122,63 @@ Database.cs (299) : writer.WriteLine();
 Database.cs (304) : this.SecurityManager.Save(Path.Combine(databaseName, "manager"));
 Database.cs (308) : catch (Exception ex)
 Database.cs (310) : Console.WriteLine("Error al guardar la base de datos: " + ex.Message);
-Database.cs (325) : string[] tableFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), databaseName + "_*" + TableFileExtension);
-Database.cs (326) : if (tableFiles.Length == 0)
-Database.cs (328) : Console.WriteLine(Constants.TableDoesNotExistError);
-Database.cs (329) : return null;
-Database.cs (330) : }
-Database.cs (332) : Database db = new Database();
-Database.cs (334) : db.m_username = username;
-Database.cs (336) : for (int i = 0; i < tableFiles.Length; i++)
-Database.cs (338) : string filePath = tableFiles[i];
-Database.cs (339) : string tableName = Path.GetFileNameWithoutExtension(filePath).Replace(databaseName + "_", "");
-Database.cs (340) : StreamReader reader = new StreamReader(filePath);
-Database.cs (341) : try
-Database.cs (343) : string tableData = reader.ReadLine();
-Database.cs (344) : if (string.IsNullOrWhiteSpace(tableData))
-Database.cs (346) : continue;
-Database.cs (347) : }
-Database.cs (349) : int startColumns = tableData.IndexOf('[') + 1;
-Database.cs (350) : int endColumns = tableData.IndexOf(']');
-Database.cs (351) : if (startColumns == 0 || endColumns == -1)
-Database.cs (353) : continue;
-Database.cs (356) : string[] columnNamesArray = tableData.Substring(startColumns, endColumns - startColumns).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-Database.cs (357) : List<string> columnNames = new List<string>();
-Database.cs (358) : for (int j = 0; j < columnNamesArray.Length; j++)
-Database.cs (360) : columnNames.Add(columnNamesArray[j].Trim('\''));
-Database.cs (363) : List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
-Database.cs (364) : for (int j = 0; j < columnNames.Count; j++)
-Database.cs (366) : columnDefinitions.Add(new ColumnDefinition(ColumnDefinition.DataType.String, columnNames[j]));
-Database.cs (367) : }
-Database.cs (369) : Table table = new Table(tableName, columnDefinitions);
-Database.cs (371) : string rowsPart = tableData.Substring(endColumns + 1).Trim();
-Database.cs (372) : while (!string.IsNullOrEmpty(rowsPart))
-Database.cs (374) : int startRow = rowsPart.IndexOf('{');
-Database.cs (375) : int endRow = rowsPart.IndexOf('}');
-Database.cs (376) : if (startRow == -1 || endRow == -1 || startRow > endRow)
-Database.cs (378) : break;
-Database.cs (381) : string[] rowValuesArray = rowsPart.Substring(startRow + 1, endRow - startRow - 1).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-Database.cs (382) : List<string> values = new List<string>();
-Database.cs (383) : for (int j = 0; j < rowValuesArray.Length; j++)
-Database.cs (385) : values.Add(rowValuesArray[j].Trim('\''));
-Database.cs (388) : if (values.Count != columnDefinitions.Count)
-Database.cs (390) : throw new FormatException("Row values do not match column count");
-Database.cs (393) : table.AddRow(new Row(columnDefinitions, values));
-Database.cs (394) : rowsPart = rowsPart.Substring(endRow + 1).Trim();
-Database.cs (397) : db.Tables.Add(table);
-Database.cs (398) : db.SecurityManager = Manager.Load(databaseName + "manager", username);
-Database.cs (401) : finally
-Database.cs (403) : reader.Close();
-Database.cs (407) : if (db.SecurityManager.IsPasswordCorrect(username, password))
-Database.cs (408) : {
-Database.cs (409) : return db;
-Database.cs (412) : return null;
-Database.cs (414) : catch (Exception ex)
-Database.cs (416) : Console.WriteLine("Error al cargar la base de datos: " + ex.Message);
-Database.cs (472) : public void SetSecurityManager(Manager manager)
-Database.cs (473) : {
-Database.cs (474) : this.SecurityManager = manager;
-Database.cs (475) : }
+Database.cs (325) : string[] tableFiles = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), databaseName), "*" + TableFileExtension);
+Database.cs (327) : if (tableFiles.Length == 0)
+Database.cs (329) : Console.WriteLine(Constants.TableDoesNotExistError);
+Database.cs (330) : return null;
+Database.cs (331) : }
+Database.cs (333) : Database db = new Database();
+Database.cs (335) : db.m_username = username;
+Database.cs (337) : for (int i = 0; i < tableFiles.Length; i++)
+Database.cs (339) : string filePath = tableFiles[i];
+Database.cs (340) : string tableName = Path.GetFileNameWithoutExtension(filePath).Replace(databaseName + "_", "");
+Database.cs (341) : StreamReader reader = new StreamReader(filePath);
+Database.cs (342) : try
+Database.cs (344) : string tableData = reader.ReadLine();
+Database.cs (345) : if (string.IsNullOrWhiteSpace(tableData))
+Database.cs (347) : continue;
+Database.cs (348) : }
+Database.cs (350) : int startColumns = tableData.IndexOf('[') + 1;
+Database.cs (351) : int endColumns = tableData.IndexOf(']');
+Database.cs (352) : if (startColumns == 0 || endColumns == -1)
+Database.cs (354) : continue;
+Database.cs (357) : string[] columnNamesArray = tableData.Substring(startColumns, endColumns - startColumns).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+Database.cs (358) : List<string> columnNames = new List<string>();
+Database.cs (359) : for (int j = 0; j < columnNamesArray.Length; j++)
+Database.cs (361) : columnNames.Add(columnNamesArray[j].Trim('\''));
+Database.cs (364) : List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
+Database.cs (365) : for (int j = 0; j < columnNames.Count; j++)
+Database.cs (367) : columnDefinitions.Add(new ColumnDefinition(ColumnDefinition.DataType.String, columnNames[j]));
+Database.cs (368) : }
+Database.cs (370) : Table table = new Table(tableName, columnDefinitions);
+Database.cs (372) : string rowsPart = tableData.Substring(endColumns + 1).Trim();
+Database.cs (373) : while (!string.IsNullOrEmpty(rowsPart))
+Database.cs (375) : int startRow = rowsPart.IndexOf('{');
+Database.cs (376) : int endRow = rowsPart.IndexOf('}');
+Database.cs (377) : if (startRow == -1 || endRow == -1 || startRow > endRow)
+Database.cs (379) : break;
+Database.cs (382) : string[] rowValuesArray = rowsPart.Substring(startRow + 1, endRow - startRow - 1).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+Database.cs (383) : List<string> values = new List<string>();
+Database.cs (384) : for (int j = 0; j < rowValuesArray.Length; j++)
+Database.cs (386) : values.Add(rowValuesArray[j].Trim('\''));
+Database.cs (389) : if (values.Count != columnDefinitions.Count)
+Database.cs (391) : throw new FormatException("Row values do not match column count");
+Database.cs (394) : table.AddRow(new Row(columnDefinitions, values));
+Database.cs (395) : rowsPart = rowsPart.Substring(endRow + 1).Trim();
+Database.cs (398) : db.Tables.Add(table);
+Database.cs (399) : db.SecurityManager = Manager.Load(Path.Combine(databaseName, "manager"), username);
+Database.cs (403) : finally
+Database.cs (405) : reader.Close();
+Database.cs (409) : if (db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (410) : {
+Database.cs (411) : return db;
+Database.cs (414) : return null;
+Database.cs (416) : catch (Exception ex)
+Database.cs (418) : Console.WriteLine("Error al cargar la base de datos: " + ex.Message);
+Database.cs (474) : public void SetSecurityManager(Manager manager)
+Database.cs (475) : {
+Database.cs (476) : this.SecurityManager = manager;
+Database.cs (477) : }
 Row.cs (5) : using System.Runtime.CompilerServices;
 Row.cs (29) : int position = -1;
 Row.cs (31) : for (int i = 0; i < ColumnDefinitions.Count; i++)
@@ -328,65 +328,69 @@ PermissionsTest.cs (14) : {
 PermissionsTest.cs (15) : Database db = new Database("usuario", "password");
 PermissionsTest.cs (18) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfilnoadmin");
 PermissionsTest.cs (19) : db.ExecuteMiniSQLQuery("ADD USER (usuarionoadmin,password,perfilnoadmin)");
-PermissionsTest.cs (20) : db.Save("BD_Privilegios");
-PermissionsTest.cs (22) : Database dbNoAdmin = Database.Load("BD_Privilegios", "usuarionoadmin", "password");
-PermissionsTest.cs (24) : string resultado = dbNoAdmin.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfilnoadmin");
-PermissionsTest.cs (26) : Assert.NotNull(resultado);
-PermissionsTest.cs (27) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, resultado);
-PermissionsTest.cs (28) : }
-PermissionsTest.cs (31) : [Fact]
-PermissionsTest.cs (32) : public void AdminPuedeOtorgarPrivilegio()
-PermissionsTest.cs (33) : {
-PermissionsTest.cs (34) : Database db = new Database("usuario", "password");
-PermissionsTest.cs (36) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfilNoAdmin");
-PermissionsTest.cs (37) : db.ExecuteMiniSQLQuery("ADD USER (usuarioNoAdmin,password,perfilNoAdmin)");
-PermissionsTest.cs (39) : string resultado = db.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfilNoAdmin");
-PermissionsTest.cs (41) : Assert.NotNull(resultado);
-PermissionsTest.cs (42) : Assert.Equal(Constants.GrantPrivilegeSuccess, resultado);
-PermissionsTest.cs (43) : }
-PermissionsTest.cs (45) : [Fact]
-PermissionsTest.cs (46) : public void NoSePuedeOtorgarDosVecesElMismoPrivilegio()
-PermissionsTest.cs (47) : {
-PermissionsTest.cs (48) : Database db = new Database("usuario", "password");
-PermissionsTest.cs (50) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfilNoAdmin");
-PermissionsTest.cs (51) : db.ExecuteMiniSQLQuery("ADD USER (usuarioNoAdmin,password,perfilNoAdmin)");
-PermissionsTest.cs (52) : db.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfilNoAdmin");
-PermissionsTest.cs (54) : string resultado = db.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfilNoAdmin");
-PermissionsTest.cs (56) : Assert.NotNull(resultado);
-PermissionsTest.cs (57) : Assert.Equal(Constants.ProfileAlreadyHasPrivilege, resultado);
-PermissionsTest.cs (58) : }
-PermissionsTest.cs (60) : [Fact]
-PermissionsTest.cs (61) : public void PerfilPuedeTenerMultiplesPrivilegios()
-PermissionsTest.cs (62) : {
-PermissionsTest.cs (63) : Database db = new Database("admin", "adminpass");
-PermissionsTest.cs (65) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfil");
-PermissionsTest.cs (67) : string r1 = db.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfil");
-PermissionsTest.cs (68) : string r2 = db.ExecuteMiniSQLQuery("GRANT INSERT ON tabla2 TO perfil");
-PermissionsTest.cs (70) : Assert.Equal(Constants.GrantPrivilegeSuccess, r1);
-PermissionsTest.cs (71) : Assert.Equal(Constants.GrantPrivilegeSuccess, r2);
-PermissionsTest.cs (72) : }
-PermissionsTest.cs (74) : [Fact]
-PermissionsTest.cs (75) : public void AdminPuedeAnularPrivilegio()
-PermissionsTest.cs (76) : {
-PermissionsTest.cs (77) : Database db = new Database("admin", "adminpass");
-PermissionsTest.cs (79) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfil");
-PermissionsTest.cs (80) : db.ExecuteMiniSQLQuery("GRANT DELETE ON tabla1 TO perfil");
-PermissionsTest.cs (82) : string resultado = db.ExecuteMiniSQLQuery("REVOKE DELETE ON tabla1 TO perfil");
-PermissionsTest.cs (84) : Assert.Equal(Constants.RevokePrivilegeSuccess, resultado);
-PermissionsTest.cs (85) : }
-PermissionsTest.cs (87) : [Fact]
-PermissionsTest.cs (88) : public void UsuarioNoAdminNoPuedeAnularPrivilegios()
-PermissionsTest.cs (89) : {
-PermissionsTest.cs (90) : Database db = new Database("admin", "adminpass");
-PermissionsTest.cs (92) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfilNoAdmin");
-PermissionsTest.cs (93) : db.ExecuteMiniSQLQuery("ADD USER(usuario,password,perfilNoAdmin)");
-PermissionsTest.cs (94) : db.Save("BD_RevokeTest");
-PermissionsTest.cs (96) : Database dbNoAdmin = Database.Load("BD_RevokeTest", "usuario", "password");
-PermissionsTest.cs (99) : string resultado = dbNoAdmin.ExecuteMiniSQLQuery("REVOKE INSERT ON tabla1 TO perfilNoAdmin");
-PermissionsTest.cs (101) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, resultado);
-PermissionsTest.cs (102) : }
-PermissionsTest.cs (106) : }
-PermissionsTest.cs (107) : }
+PermissionsTest.cs (22) : db.ExecuteMiniSQLQuery("CREATE TABLE tabla1 (col1 TEXT)");
+PermissionsTest.cs (23) : db.ExecuteMiniSQLQuery("INSERT INTO tabla1 VALUES ('dato1')");
+PermissionsTest.cs (24) : db.ExecuteMiniSQLQuery("INSERT INTO tabla1 VALUES ('dato2')");
+PermissionsTest.cs (25) : db.ExecuteMiniSQLQuery("INSERT INTO tabla1 VALUES ('dato3')");
+PermissionsTest.cs (27) : db.Save("BD_Privilegios");
+PermissionsTest.cs (30) : Database dbNoAdmin = Database.Load("BD_Privilegios", "usuarionoadmin", "password");
+PermissionsTest.cs (33) : string resultado = dbNoAdmin.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfilnoadmin");
+PermissionsTest.cs (35) : Assert.NotNull(resultado);
+PermissionsTest.cs (36) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, resultado);
+PermissionsTest.cs (37) : }
+PermissionsTest.cs (42) : [Fact]
+PermissionsTest.cs (43) : public void AdminPuedeOtorgarPrivilegio()
+PermissionsTest.cs (44) : {
+PermissionsTest.cs (45) : Database db = new Database("usuario", "password");
+PermissionsTest.cs (47) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfilNoAdmin");
+PermissionsTest.cs (48) : db.ExecuteMiniSQLQuery("ADD USER (usuarioNoAdmin,password,perfilNoAdmin)");
+PermissionsTest.cs (50) : string resultado = db.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfilNoAdmin");
+PermissionsTest.cs (52) : Assert.NotNull(resultado);
+PermissionsTest.cs (53) : Assert.Equal(Constants.GrantPrivilegeSuccess, resultado);
+PermissionsTest.cs (54) : }
+PermissionsTest.cs (56) : [Fact]
+PermissionsTest.cs (57) : public void NoSePuedeOtorgarDosVecesElMismoPrivilegio()
+PermissionsTest.cs (58) : {
+PermissionsTest.cs (59) : Database db = new Database("usuario", "password");
+PermissionsTest.cs (61) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfilNoAdmin");
+PermissionsTest.cs (62) : db.ExecuteMiniSQLQuery("ADD USER (usuarioNoAdmin,password,perfilNoAdmin)");
+PermissionsTest.cs (63) : db.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfilNoAdmin");
+PermissionsTest.cs (65) : string resultado = db.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfilNoAdmin");
+PermissionsTest.cs (67) : Assert.NotNull(resultado);
+PermissionsTest.cs (68) : Assert.Equal(Constants.ProfileAlreadyHasPrivilege, resultado);
+PermissionsTest.cs (69) : }
+PermissionsTest.cs (71) : [Fact]
+PermissionsTest.cs (72) : public void PerfilPuedeTenerMultiplesPrivilegios()
+PermissionsTest.cs (73) : {
+PermissionsTest.cs (74) : Database db = new Database("admin", "adminpass");
+PermissionsTest.cs (76) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfil");
+PermissionsTest.cs (78) : string r1 = db.ExecuteMiniSQLQuery("GRANT SELECT ON tabla1 TO perfil");
+PermissionsTest.cs (79) : string r2 = db.ExecuteMiniSQLQuery("GRANT INSERT ON tabla2 TO perfil");
+PermissionsTest.cs (81) : Assert.Equal(Constants.GrantPrivilegeSuccess, r1);
+PermissionsTest.cs (82) : Assert.Equal(Constants.GrantPrivilegeSuccess, r2);
+PermissionsTest.cs (83) : }
+PermissionsTest.cs (85) : [Fact]
+PermissionsTest.cs (86) : public void AdminPuedeAnularPrivilegio()
+PermissionsTest.cs (87) : {
+PermissionsTest.cs (88) : Database db = new Database("admin", "adminpass");
+PermissionsTest.cs (90) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfil");
+PermissionsTest.cs (91) : db.ExecuteMiniSQLQuery("GRANT DELETE ON tabla1 TO perfil");
+PermissionsTest.cs (93) : string resultado = db.ExecuteMiniSQLQuery("REVOKE DELETE ON tabla1 TO perfil");
+PermissionsTest.cs (95) : Assert.Equal(Constants.RevokePrivilegeSuccess, resultado);
+PermissionsTest.cs (96) : }
+PermissionsTest.cs (98) : [Fact]
+PermissionsTest.cs (99) : public void UsuarioNoAdminNoPuedeAnularPrivilegios()
+PermissionsTest.cs (100) : {
+PermissionsTest.cs (101) : Database db = new Database("admin", "adminpass");
+PermissionsTest.cs (103) : db.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE perfilNoAdmin");
+PermissionsTest.cs (104) : db.ExecuteMiniSQLQuery("ADD USER (usuario,password,perfilNoAdmin)");
+PermissionsTest.cs (105) : db.Save("BD_RevokeTest");
+PermissionsTest.cs (107) : Database dbNoAdmin = Database.Load("BD_RevokeTest", "usuario", "password");
+PermissionsTest.cs (110) : string resultado = dbNoAdmin.ExecuteMiniSQLQuery("REVOKE INSERT ON tabla1 TO perfilNoAdmin");
+PermissionsTest.cs (112) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, resultado);
+PermissionsTest.cs (113) : }
+PermissionsTest.cs (117) : }
+PermissionsTest.cs (118) : }
 RowTests.cs (13) : public void TestGetSetValue()
 RowTests.cs (29) : rowPrueba.SetValue("peso", "123");
 RowTests.cs (30) : Assert.Equal("casados", rowPrueba.GetValue("casa"));
@@ -757,20 +761,23 @@ Manager.cs (253) : }
 Manager.cs (255) : return result.UserByName(username) == null ? null : result;
 Manager.cs (261) : try
 Manager.cs (262) : {
-Manager.cs (263) : foreach (var profile in Profiles)
-Manager.cs (264) : {
-Manager.cs (265) : string filePath = Path.Combine(databaseName, profile.Name + ".profile");
-Manager.cs (266) : using (StreamWriter writer = new StreamWriter(filePath))
+Manager.cs (263) : if (!Directory.Exists(databaseName)) {
+Manager.cs (264) : Directory.CreateDirectory(databaseName);
+Manager.cs (265) : }
+Manager.cs (266) : foreach (var profile in Profiles)
 Manager.cs (267) : {
-Manager.cs (268) : writer.WriteLine(profile.ToString());
-Manager.cs (269) : writer.WriteLine(profile.WritePrivileges());
-Manager.cs (270) : }
-Manager.cs (271) : }
-Manager.cs (272) : }
-Manager.cs (273) : catch (Exception ex)
-Manager.cs (274) : {
-Manager.cs (275) : Console.WriteLine("Error al guardar perfiles: " + ex.Message);
-Manager.cs (276) : }
+Manager.cs (268) : string filePath = Path.Combine(databaseName, profile.Name + ".profile");
+Manager.cs (269) : using (StreamWriter writer = new StreamWriter(filePath))
+Manager.cs (270) : {
+Manager.cs (271) : writer.WriteLine(profile.ToString());
+Manager.cs (272) : writer.WriteLine(profile.WritePrivileges());
+Manager.cs (273) : }
+Manager.cs (274) : }
+Manager.cs (275) : }
+Manager.cs (276) : catch (Exception ex)
+Manager.cs (277) : {
+Manager.cs (278) : Console.WriteLine("Error al guardar perfiles: " + ex.Message);
+Manager.cs (279) : }
 Profile.cs (21) : if (string.IsNullOrWhiteSpace(table))
 Profile.cs (22) : return false;
 Profile.cs (24) : List<Privilege> privileges;
