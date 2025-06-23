@@ -206,6 +206,131 @@ ManagerTests.cs (48) : Assert.Contains(Privilege.Delete, loadedPrivileges);
 ManagerTests.cs (49) : Assert.Contains(Privilege.Insert, loadedPrivileges);
 ManagerTests.cs (50) : Assert.Contains(Privilege.Select, loadedPrivileges);
 ManagerTests.cs (51) : Assert.Contains(Privilege.Update, loadedPrivileges);
+ManagerTests.cs (54) : private Manager CreateAdminManager()
+ManagerTests.cs (55) : {
+ManagerTests.cs (56) : Profile adminProfile = new Profile { Name = Profile.AdminProfileName };
+ManagerTests.cs (57) : User adminUser = new User("admin", "pass");
+ManagerTests.cs (58) : adminProfile.Users.Add(adminUser);
+ManagerTests.cs (60) : Manager manager = new Manager("admin");
+ManagerTests.cs (61) : manager.Profiles.Add(adminProfile);
+ManagerTests.cs (63) : return manager;
+ManagerTests.cs (64) : }
+ManagerTests.cs (66) : [Fact]
+ManagerTests.cs (67) : public void IsUserAdmin()
+ManagerTests.cs (68) : {
+ManagerTests.cs (69) : Manager manager = CreateAdminManager();
+ManagerTests.cs (71) : Assert.True(manager.IsUserAdmin());
+ManagerTests.cs (72) : }
+ManagerTests.cs (74) : [Fact]
+ManagerTests.cs (75) : public void IsUserAdminIfNotAdmin()
+ManagerTests.cs (76) : {
+ManagerTests.cs (77) : Profile profile = new Profile { Name = "User" };
+ManagerTests.cs (78) : profile.Users.Add(new User("user1", "pass"));
+ManagerTests.cs (80) : Manager manager = new Manager("user1");
+ManagerTests.cs (81) : manager.Profiles.Add(profile);
+ManagerTests.cs (83) : Assert.False(manager.IsUserAdmin());
+ManagerTests.cs (84) : }
+ManagerTests.cs (86) : [Fact]
+ManagerTests.cs (87) : public void IsPasswordCorrect()
+ManagerTests.cs (88) : {
+ManagerTests.cs (89) : Profile profile = new Profile { Name = "User" };
+ManagerTests.cs (90) : User user = new User("user1", "pass");
+ManagerTests.cs (91) : profile.Users.Add(user);
+ManagerTests.cs (93) : Manager manager = new Manager("manager");
+ManagerTests.cs (94) : manager.Profiles.Add(profile);
+ManagerTests.cs (96) : Assert.True(manager.IsPasswordCorrect("user1", "pass"));
+ManagerTests.cs (97) : }
+ManagerTests.cs (99) : [Fact]
+ManagerTests.cs (100) : public void PasswordIsNotCorrect()
+ManagerTests.cs (101) : {
+ManagerTests.cs (102) : Profile profile = new Profile { Name = "User" };
+ManagerTests.cs (103) : User user = new User("user1", "pass");
+ManagerTests.cs (104) : profile.Users.Add(user);
+ManagerTests.cs (106) : Manager manager = new Manager("admin");
+ManagerTests.cs (107) : manager.Profiles.Add(profile);
+ManagerTests.cs (109) : Assert.False(manager.IsPasswordCorrect("user1", "nopass"));
+ManagerTests.cs (110) : }
+ManagerTests.cs (112) : [Fact]
+ManagerTests.cs (113) : public void GrantPrivilegeAddsPrivilegeAdmin()
+ManagerTests.cs (114) : {
+ManagerTests.cs (115) : Manager manager = CreateAdminManager();
+ManagerTests.cs (116) : Profile profile = new Profile { Name = "UserProfile" };
+ManagerTests.cs (117) : manager.Profiles.Add(profile);
+ManagerTests.cs (119) : manager.GrantPrivilege("UserProfile", "user", Privilege.Select);
+ManagerTests.cs (121) : Assert.True(profile.IsGrantedPrivilege("user", Privilege.Select));
+ManagerTests.cs (122) : }
+ManagerTests.cs (124) : [Fact]
+ManagerTests.cs (125) : public void RevokePrivilegeRemovesPrivilegeAdmin()
+ManagerTests.cs (126) : {
+ManagerTests.cs (127) : Manager manager = CreateAdminManager();
+ManagerTests.cs (128) : Profile profile = new Profile { Name = "UserProfile" };
+ManagerTests.cs (129) : profile.GrantPrivilege("user", Privilege.Select);
+ManagerTests.cs (130) : manager.Profiles.Add(profile);
+ManagerTests.cs (132) : manager.RevokePrivilege("UserProfile", "user", Privilege.Select);
+ManagerTests.cs (134) : Assert.False(profile.IsGrantedPrivilege("user", Privilege.Select));
+ManagerTests.cs (135) : }
+ManagerTests.cs (137) : [Fact]
+ManagerTests.cs (138) : public void IsGrantedPrivilegeIfPrivilegeExists()
+ManagerTests.cs (139) : {
+ManagerTests.cs (140) : Profile profile = new Profile { Name = "UserProfile" };
+ManagerTests.cs (141) : profile.Users.Add(new User("user", "pass"));
+ManagerTests.cs (142) : profile.GrantPrivilege("tabla1", Privilege.Select);
+ManagerTests.cs (144) : Manager manager = new Manager("manager");
+ManagerTests.cs (145) : manager.Profiles.Add(profile);
+ManagerTests.cs (147) : Assert.True(manager.IsGrantedPrivilege("user", "tabla1", Privilege.Select));
+ManagerTests.cs (148) : }
+ManagerTests.cs (150) : [Fact]
+ManagerTests.cs (151) : public void AddProfileAddsProfileIfAdmin()
+ManagerTests.cs (152) : {
+ManagerTests.cs (153) : Manager manager = CreateAdminManager();
+ManagerTests.cs (154) : Profile profile = new Profile { Name = "UserProfile" };
+ManagerTests.cs (156) : manager.AddProfile(profile);
+ManagerTests.cs (158) : Assert.Contains(profile, manager.Profiles);
+ManagerTests.cs (159) : }
+ManagerTests.cs (161) : [Fact]
+ManagerTests.cs (162) : public void RemoveProfileRemovesProfileIfAdmin()
+ManagerTests.cs (163) : {
+ManagerTests.cs (164) : Manager manager = CreateAdminManager();
+ManagerTests.cs (165) : Profile profile = new Profile { Name = "UserProfile" };
+ManagerTests.cs (166) : manager.Profiles.Add(profile);
+ManagerTests.cs (168) : bool removed = manager.RemoveProfile("UserProfile");
+ManagerTests.cs (170) : Assert.True(removed);
+ManagerTests.cs (171) : Assert.DoesNotContain(profile, manager.Profiles);
+ManagerTests.cs (172) : }
+ManagerTests.cs (174) : [Fact]
+ManagerTests.cs (175) : public void UserByName()
+ManagerTests.cs (176) : {
+ManagerTests.cs (177) : Profile profile = new Profile { Name = "UserProfile" };
+ManagerTests.cs (178) : User user = new User("user", "pass");
+ManagerTests.cs (179) : profile.Users.Add(user);
+ManagerTests.cs (181) : Manager manager = new Manager("manager");
+ManagerTests.cs (182) : manager.Profiles.Add(profile);
+ManagerTests.cs (184) : User found = manager.UserByName("user");
+ManagerTests.cs (186) : Assert.NotNull(found);
+ManagerTests.cs (187) : Assert.Equal("user", found.Username);
+ManagerTests.cs (188) : }
+ManagerTests.cs (190) : [Fact]
+ManagerTests.cs (191) : public void ProfileByName()
+ManagerTests.cs (192) : {
+ManagerTests.cs (193) : Profile profile = new Profile { Name = "UserProfile" };
+ManagerTests.cs (195) : Manager manager = new Manager("somemanagerone");
+ManagerTests.cs (196) : manager.Profiles.Add(profile);
+ManagerTests.cs (198) : Profile found = manager.ProfileByName("UserProfile");
+ManagerTests.cs (200) : Assert.NotNull(found);
+ManagerTests.cs (201) : Assert.Equal("UserProfile", found.Name);
+ManagerTests.cs (202) : }
+ManagerTests.cs (204) : [Fact]
+ManagerTests.cs (205) : public void ProfileByUser()
+ManagerTests.cs (206) : {
+ManagerTests.cs (207) : Profile profile = new Profile { Name = "UserProfile" };
+ManagerTests.cs (208) : User user = new User("user", "pass");
+ManagerTests.cs (209) : profile.Users.Add(user);
+ManagerTests.cs (211) : Manager manager = new Manager("pass");
+ManagerTests.cs (212) : manager.Profiles.Add(profile);
+ManagerTests.cs (214) : Profile found = manager.ProfileByUser("user");
+ManagerTests.cs (216) : Assert.NotNull(found);
+ManagerTests.cs (217) : Assert.Equal("UserProfile", found.Name);
+ManagerTests.cs (218) : }
 ProfileTests.cs (1) : ﻿using System;
 ProfileTests.cs (2) : using System.Collections.Generic;
 ProfileTests.cs (3) : using System.Linq;
@@ -255,16 +380,32 @@ ProfileTests.cs (59) : Assert.False(result);
 ProfileTests.cs (60) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Select));
 ProfileTests.cs (61) : }
 ProfileTests.cs (63) : [Fact]
-ProfileTests.cs (64) : public void RevokeLastPrivilegeRemoveTable()
+ProfileTests.cs (64) : public void RevokeLastPrivilegeRemovesTable()
 ProfileTests.cs (65) : {
 ProfileTests.cs (66) : var profile = new Profile();
-ProfileTests.cs (67) : profile.GrantPrivilege("tabla1", Privilege.Insert);
-ProfileTests.cs (69) : bool result = profile.RevokePrivilege("tabla1", Privilege.Insert);
-ProfileTests.cs (71) : Assert.True(result);
+ProfileTests.cs (68) : profile.GrantPrivilege("tabla1", Privilege.Insert);
+ProfileTests.cs (69) : profile.RevokePrivilege("tabla1", Privilege.Insert);
+ProfileTests.cs (71) : Assert.False(profile.IsGrantedPrivilege("tabla1", Privilege.Insert));
 ProfileTests.cs (72) : Assert.False(profile.PrivilegesOn.ContainsKey("tabla1"));
 ProfileTests.cs (73) : }
-ProfileTests.cs (75) : }
-ProfileTests.cs (76) : }
+ProfileTests.cs (75) : [Fact]
+ProfileTests.cs (76) : public void IsGrantedPrivilegeReturnsTrueForAdmin()
+ProfileTests.cs (77) : {
+ProfileTests.cs (78) : Profile profile = new Profile();
+ProfileTests.cs (79) : profile.Name = Profile.AdminProfileName;
+ProfileTests.cs (81) : bool granted = profile.IsGrantedPrivilege("Users", Privilege.Delete);
+ProfileTests.cs (82) : Assert.True(granted);
+ProfileTests.cs (83) : }
+ProfileTests.cs (85) : [Fact]
+ProfileTests.cs (86) : public void IsGrantedPrivilegeReturnsFalseIfNotGranted()
+ProfileTests.cs (87) : {
+ProfileTests.cs (88) : Profile profile = new Profile();
+ProfileTests.cs (89) : profile.Name = "user";
+ProfileTests.cs (91) : bool granted = profile.IsGrantedPrivilege("tabla1", Privilege.Update);
+ProfileTests.cs (92) : Assert.False(granted);
+ProfileTests.cs (93) : }
+ProfileTests.cs (94) : }
+ProfileTests.cs (95) : }
 TableTests.cs (45) : Table table = Table.CreateTestTable("table");
 TableTests.cs (46) : Assert.Equal(1, table.ColumnIndexByName("Height"));
 TableTests.cs (52) : Table table = Table.CreateTestTable("table");
@@ -336,6 +477,7 @@ TableTests.cs (181) : Assert.Equal("Maider", resultTable.GetRow(1).GetValue("Nam
 TableTests.cs (182) : Assert.Equal("67", resultTable.GetRow(1).GetValue("Age"));
 TableTests.cs (183) : Assert.Equal("Pepe", resultTable.GetRow(2).GetValue("Name"));
 TableTests.cs (184) : Assert.Equal("51", resultTable.GetRow(2).GetValue("Age"));
+AddUser.cs (28) : if (database.SecurityManager != null && database.SecurityManager.IsUserAdmin())
 AddUser.cs (31) : if (profile != null)
 AddUser.cs (32) : {
 AddUser.cs (33) : foreach ( Security.User user1 in profile.Users)
@@ -347,9 +489,12 @@ AddUser.cs (38) : }
 AddUser.cs (39) : }
 AddUser.cs (41) : Security.User newUser = new Security.User(Username,Password);
 AddUser.cs (42) : profile.Users.Add(newUser);
-CreateSecurityProfile.cs (31) : } else
-CreateSecurityProfile.cs (32) : {
-Grant.cs (29) : if (database.IsUserAdmin() && database.SecurityManager != null)
+CreateSecurityProfile.cs (25) : var manager = database.SecurityManager;
+CreateSecurityProfile.cs (27) : if (!manager.IsUserAdmin())
+CreateSecurityProfile.cs (30) : manager.AddProfile(new Profile { Name = ProfileName });
+CreateSecurityProfile.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (24) : if (database.SecurityManager != null && database.SecurityManager.IsUserAdmin())
+Grant.cs (29) : if (database.SecurityManager != null && database.SecurityManager.IsUserAdmin())
 Grant.cs (31) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
 Grant.cs (32) : if (profile != null)
 Grant.cs (51) : if (!profile.IsGrantedPrivilege(TableName, privilege))
@@ -362,8 +507,10 @@ MiniSQLParser.cs (218) : {
 MiniSQLParser.cs (223) : condition1 = new Condition(conditions[0], conditions[1], conditions[2]);
 MiniSQLParser.cs (224) : }
 Revoke.cs (5) : using DbManager.Security;
+Revoke.cs (29) : if (database.SecurityManager != null && database.SecurityManager.IsUserAdmin())
 Revoke.cs (31) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
 Revoke.cs (32) : if (profile!=null)
+Revoke.cs (49) : return Constants.PrivilegeDoesNotExistError;
 Revoke.cs (51) : if(profile.IsGrantedPrivilege(TableName, Privilege))
 Revoke.cs (52) : {
 Revoke.cs (57) : {
@@ -371,72 +518,79 @@ Revoke.cs (58) : return Constants.PrivilegeDoesNotExistError;
 Revoke.cs (59) : }
 Revoke.cs (60) : }
 Revoke.cs (61) : else
-Manager.cs (127) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Manager.cs (128) : string profileFile = Path.Combine(path, "profiles.txt");
-Manager.cs (129) : Manager manager = new Manager(username);
-Manager.cs (133) : if (!File.Exists(profileFile))
-Manager.cs (134) : {
-Manager.cs (135) : return manager;
-Manager.cs (136) : }
-Manager.cs (138) : using(StreamReader reader = new StreamReader(profileFile))
-Manager.cs (139) : {
-Manager.cs (140) : string line;
-Manager.cs (141) : while((line = reader.ReadLine()) != null)
-Manager.cs (142) : {
-Manager.cs (143) : //Primera linea es siempre el nombre del perfil
-Manager.cs (144) : Profile profile = new Profile();
-Manager.cs (145) : profile.Name = line.Trim();
-Manager.cs (147) : while((line = reader.ReadLine()) != null && line.Trim() != "#")
+Manager.cs (54) : if(IsUserAdmin())
+Manager.cs (55) : {
+Manager.cs (62) : }
+Manager.cs (68) : if (IsUserAdmin())
+Manager.cs (69) : {
+Manager.cs (76) : }
+Manager.cs (84) : return p.IsGrantedPrivilege(table, privilege);
+Manager.cs (133) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (134) : string profileFile = Path.Combine(path, "profiles.txt");
+Manager.cs (135) : Manager manager = new Manager(username);
+Manager.cs (139) : if (!File.Exists(profileFile))
+Manager.cs (140) : {
+Manager.cs (141) : return manager;
+Manager.cs (142) : }
+Manager.cs (144) : using(StreamReader reader = new StreamReader(profileFile))
+Manager.cs (145) : {
+Manager.cs (146) : string line;
+Manager.cs (147) : while((line = reader.ReadLine()) != null)
 Manager.cs (148) : {
-Manager.cs (149) : string[] parts = line.Split(',');
-Manager.cs (150) : string idPart = parts[0].Trim();
-Manager.cs (151) : string firstPart = parts[1].Trim(); //username o table
-Manager.cs (152) : string secondPart = parts[2].Trim();//password o privilegio
-Manager.cs (156) : User user = new User();
-Manager.cs (157) : user.Username = firstPart;
-Manager.cs (158) : user.EncryptedPassword = secondPart;
-Manager.cs (159) : profile.Users.Add(user);
-Manager.cs (160) : }
-Manager.cs (163) : Privilege parsedPrivilege;
-Manager.cs (164) : bool parsed = true;
-Manager.cs (165) : switch(secondPart)
-Manager.cs (166) : {
-Manager.cs (167) : case "Delete":
-Manager.cs (168) : parsedPrivilege = Privilege.Delete;
-Manager.cs (169) : break;
-Manager.cs (170) : case "Insert":
-Manager.cs (171) : parsedPrivilege = Privilege.Insert;
-Manager.cs (172) : break;
-Manager.cs (173) : case "Select":
-Manager.cs (174) : parsedPrivilege = Privilege.Select;
+Manager.cs (149) : //Primera linea es siempre el nombre del perfil
+Manager.cs (150) : Profile profile = new Profile();
+Manager.cs (151) : profile.Name = line.Trim();
+Manager.cs (153) : while((line = reader.ReadLine()) != null && line.Trim() != "#")
+Manager.cs (154) : {
+Manager.cs (155) : string[] parts = line.Split(',');
+Manager.cs (156) : string idPart = parts[0].Trim();
+Manager.cs (157) : string firstPart = parts[1].Trim(); //username o table
+Manager.cs (158) : string secondPart = parts[2].Trim();//password o privilegio
+Manager.cs (162) : User user = new User();
+Manager.cs (163) : user.Username = firstPart;
+Manager.cs (164) : user.EncryptedPassword = secondPart;
+Manager.cs (165) : profile.Users.Add(user);
+Manager.cs (166) : }
+Manager.cs (169) : Privilege parsedPrivilege;
+Manager.cs (170) : bool parsed = true;
+Manager.cs (171) : switch(secondPart)
+Manager.cs (172) : {
+Manager.cs (173) : case "Delete":
+Manager.cs (174) : parsedPrivilege = Privilege.Delete;
 Manager.cs (175) : break;
-Manager.cs (176) : case "Update":
-Manager.cs (177) : parsedPrivilege = Privilege.Update;
+Manager.cs (176) : case "Insert":
+Manager.cs (177) : parsedPrivilege = Privilege.Insert;
 Manager.cs (178) : break;
-Manager.cs (179) : default:
-Manager.cs (180) : parsed = false;
-Manager.cs (181) : parsedPrivilege = default;
-Manager.cs (182) : break;
-Manager.cs (183) : }
-Manager.cs (184) : if(parsed)
-Manager.cs (185) : {
-Manager.cs (186) : if (profile.PrivilegesOn.ContainsKey(firstPart))
-Manager.cs (187) : {
-Manager.cs (188) : profile.PrivilegesOn[firstPart].Add(parsedPrivilege);
+Manager.cs (179) : case "Select":
+Manager.cs (180) : parsedPrivilege = Privilege.Select;
+Manager.cs (181) : break;
+Manager.cs (182) : case "Update":
+Manager.cs (183) : parsedPrivilege = Privilege.Update;
+Manager.cs (184) : break;
+Manager.cs (185) : default:
+Manager.cs (186) : parsed = false;
+Manager.cs (187) : parsedPrivilege = default;
+Manager.cs (188) : break;
 Manager.cs (189) : }
-Manager.cs (190) : else
+Manager.cs (190) : if(parsed)
 Manager.cs (191) : {
-Manager.cs (192) : profile.PrivilegesOn[firstPart] = new List<Privilege> { parsedPrivilege };
-Manager.cs (193) : }
-Manager.cs (194) : }
+Manager.cs (192) : if (profile.PrivilegesOn.ContainsKey(firstPart))
+Manager.cs (193) : {
+Manager.cs (194) : profile.PrivilegesOn[firstPart].Add(parsedPrivilege);
 Manager.cs (195) : }
-Manager.cs (196) : }
-Manager.cs (197) : manager.AddProfile(profile);
-Manager.cs (198) : }
+Manager.cs (196) : else
+Manager.cs (197) : {
+Manager.cs (198) : profile.PrivilegesOn[firstPart] = new List<Privilege> { parsedPrivilege };
 Manager.cs (199) : }
-Manager.cs (200) : return manager;
-Manager.cs (221) : writer.WriteLine($"U,{user.Username},{user.EncryptedPassword}");
-Manager.cs (228) : writer.WriteLine($"P,{key},{priv}");
+Manager.cs (200) : }
+Manager.cs (201) : }
+Manager.cs (202) : }
+Manager.cs (203) : manager.AddProfile(profile);
+Manager.cs (204) : }
+Manager.cs (205) : }
+Manager.cs (206) : return manager;
+Manager.cs (227) : writer.WriteLine($"U,{user.Username},{user.EncryptedPassword}");
+Manager.cs (234) : writer.WriteLine($"P,{key},{priv}");
 Profile.cs (21) : if(table == null || table.Length == 0) return false;
 Profile.cs (23) : if (!PrivilegesOn.ContainsKey(table))
 Profile.cs (25) : PrivilegesOn[table] = new List<Privilege>();
@@ -450,6 +604,7 @@ Profile.cs (43) : if (PrivilegesOn[table].Count == 0)
 Profile.cs (44) : {
 Profile.cs (45) : PrivilegesOn.Remove(table);
 Profile.cs (46) : }
+Profile.cs (56) : if (Name == AdminProfileName) return true;
 UpdateTests.cs (40) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad>'21'") as Update;
 UpdateTests.cs (49) : Update query2 = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE edad<'21'") as Update;
 UpdateTests.cs (69) : Update query = MiniSQLParser.Parse("UPDATE table SET edad='42' WHERE height>'1.98'") as Update;

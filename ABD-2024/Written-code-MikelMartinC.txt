@@ -122,63 +122,52 @@ Database.cs (299) : writer.WriteLine();
 Database.cs (304) : this.SecurityManager.Save(Path.Combine(databaseName, "manager"));
 Database.cs (308) : catch (Exception ex)
 Database.cs (310) : Console.WriteLine("Error al guardar la base de datos: " + ex.Message);
-Database.cs (325) : string[] tableFiles = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), databaseName), "*" + TableFileExtension);
-Database.cs (327) : if (tableFiles.Length == 0)
-Database.cs (329) : Console.WriteLine(Constants.TableDoesNotExistError);
-Database.cs (330) : return null;
-Database.cs (331) : }
-Database.cs (333) : Database db = new Database();
+Database.cs (325) : string dbPath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (326) : string[] tableFiles = Directory.GetFiles(dbPath, "*" + TableFileExtension);
+Database.cs (328) : if (tableFiles.Length == 0)
+Database.cs (330) : Console.WriteLine(Constants.TableDoesNotExistError);
+Database.cs (331) : return null;
+Database.cs (332) : }
+Database.cs (334) : Database db = new Database();
 Database.cs (335) : db.m_username = username;
-Database.cs (337) : for (int i = 0; i < tableFiles.Length; i++)
-Database.cs (339) : string filePath = tableFiles[i];
-Database.cs (340) : string tableName = Path.GetFileNameWithoutExtension(filePath).Replace(databaseName + "_", "");
-Database.cs (341) : StreamReader reader = new StreamReader(filePath);
-Database.cs (342) : try
-Database.cs (344) : string tableData = reader.ReadLine();
-Database.cs (345) : if (string.IsNullOrWhiteSpace(tableData))
-Database.cs (347) : continue;
-Database.cs (348) : }
-Database.cs (350) : int startColumns = tableData.IndexOf('[') + 1;
-Database.cs (351) : int endColumns = tableData.IndexOf(']');
-Database.cs (352) : if (startColumns == 0 || endColumns == -1)
-Database.cs (354) : continue;
-Database.cs (357) : string[] columnNamesArray = tableData.Substring(startColumns, endColumns - startColumns).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-Database.cs (358) : List<string> columnNames = new List<string>();
-Database.cs (359) : for (int j = 0; j < columnNamesArray.Length; j++)
-Database.cs (361) : columnNames.Add(columnNamesArray[j].Trim('\''));
-Database.cs (364) : List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
-Database.cs (365) : for (int j = 0; j < columnNames.Count; j++)
-Database.cs (367) : columnDefinitions.Add(new ColumnDefinition(ColumnDefinition.DataType.String, columnNames[j]));
-Database.cs (368) : }
-Database.cs (370) : Table table = new Table(tableName, columnDefinitions);
-Database.cs (372) : string rowsPart = tableData.Substring(endColumns + 1).Trim();
-Database.cs (373) : while (!string.IsNullOrEmpty(rowsPart))
-Database.cs (375) : int startRow = rowsPart.IndexOf('{');
-Database.cs (376) : int endRow = rowsPart.IndexOf('}');
-Database.cs (377) : if (startRow == -1 || endRow == -1 || startRow > endRow)
-Database.cs (379) : break;
-Database.cs (382) : string[] rowValuesArray = rowsPart.Substring(startRow + 1, endRow - startRow - 1).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-Database.cs (383) : List<string> values = new List<string>();
-Database.cs (384) : for (int j = 0; j < rowValuesArray.Length; j++)
-Database.cs (386) : values.Add(rowValuesArray[j].Trim('\''));
-Database.cs (389) : if (values.Count != columnDefinitions.Count)
-Database.cs (391) : throw new FormatException("Row values do not match column count");
-Database.cs (394) : table.AddRow(new Row(columnDefinitions, values));
-Database.cs (395) : rowsPart = rowsPart.Substring(endRow + 1).Trim();
-Database.cs (398) : db.Tables.Add(table);
-Database.cs (399) : db.SecurityManager = Manager.Load(Path.Combine(databaseName, "manager"), username);
-Database.cs (403) : finally
-Database.cs (405) : reader.Close();
-Database.cs (409) : if (db.SecurityManager.IsPasswordCorrect(username, password))
-Database.cs (410) : {
-Database.cs (411) : return db;
-Database.cs (414) : return null;
-Database.cs (416) : catch (Exception ex)
-Database.cs (418) : Console.WriteLine("Error al cargar la base de datos: " + ex.Message);
-Database.cs (474) : public void SetSecurityManager(Manager manager)
-Database.cs (475) : {
-Database.cs (476) : this.SecurityManager = manager;
-Database.cs (477) : }
+Database.cs (338) : db.SecurityManager = Manager.Load(Path.Combine(databaseName, "manager"), username);
+Database.cs (341) : if (!db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (343) : return null;
+Database.cs (344) : }
+Database.cs (346) : foreach (string filePath in tableFiles)
+Database.cs (348) : string tableName = Path.GetFileNameWithoutExtension(filePath);
+Database.cs (349) : using (StreamReader reader = new StreamReader(filePath))
+Database.cs (351) : string tableData = reader.ReadLine();
+Database.cs (352) : if (string.IsNullOrWhiteSpace(tableData)) continue;
+Database.cs (354) : int startColumns = tableData.IndexOf('[') + 1;
+Database.cs (355) : int endColumns = tableData.IndexOf(']');
+Database.cs (356) : if (startColumns == 0 || endColumns == -1) continue;
+Database.cs (358) : string[] columnNamesArray = tableData.Substring(startColumns, endColumns - startColumns)
+Database.cs (359) : .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+Database.cs (360) : List<string> columnNames = columnNamesArray.Select(c => c.Trim('\'')).ToList();
+Database.cs (362) : List<ColumnDefinition> columnDefinitions = columnNames
+Database.cs (363) : .Select(name => new ColumnDefinition(ColumnDefinition.DataType.String, name)).ToList();
+Database.cs (365) : Table table = new Table(tableName, columnDefinitions);
+Database.cs (367) : string rowsPart = tableData.Substring(endColumns + 1).Trim();
+Database.cs (368) : while (!string.IsNullOrEmpty(rowsPart))
+Database.cs (370) : int startRow = rowsPart.IndexOf('{');
+Database.cs (371) : int endRow = rowsPart.IndexOf('}');
+Database.cs (372) : if (startRow == -1 || endRow == -1 || startRow > endRow) break;
+Database.cs (374) : string[] rowValuesArray = rowsPart.Substring(startRow + 1, endRow - startRow - 1)
+Database.cs (375) : .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+Database.cs (376) : List<string> values = rowValuesArray.Select(v => v.Trim('\'')).ToList();
+Database.cs (378) : if (values.Count != columnDefinitions.Count)
+Database.cs (379) : throw new FormatException("Row values do not match column count");
+Database.cs (381) : table.AddRow(new Row(columnDefinitions, values));
+Database.cs (382) : rowsPart = rowsPart.Substring(endRow + 1).Trim();
+Database.cs (385) : db.Tables.Add(table);
+Database.cs (389) : return db;
+Database.cs (391) : catch (Exception ex)
+Database.cs (393) : Console.WriteLine("Error al cargar la base de datos: " + ex.Message);
+Database.cs (449) : public void SetSecurityManager(Manager manager)
+Database.cs (450) : {
+Database.cs (451) : this.SecurityManager = manager;
+Database.cs (452) : }
 Row.cs (5) : using System.Runtime.CompilerServices;
 Row.cs (29) : int position = -1;
 Row.cs (31) : for (int i = 0; i < ColumnDefinitions.Count; i++)
@@ -688,96 +677,102 @@ Revoke.cs (35) : }
 Revoke.cs (37) : return Constants.Error;
 Manager.cs (39) : string encrypted = Encryption.Encrypt(password);
 Manager.cs (47) : return encrypted == u.EncryptedPassword;
-Manager.cs (170) : string databasePath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Manager.cs (172) : if (!Directory.Exists(databasePath))
-Manager.cs (173) : {
-Manager.cs (174) : Console.WriteLine("Database does not exist");
-Manager.cs (175) : return null;
-Manager.cs (176) : }
-Manager.cs (178) : string[] profileFiles = Directory.GetFiles(databasePath, "*.profile");
-Manager.cs (179) : if (profileFiles.Length == 0)
-Manager.cs (180) : {
-Manager.cs (181) : Console.WriteLine("No profiles found in database");
-Manager.cs (182) : return null;
-Manager.cs (183) : }
-Manager.cs (185) : Manager result = new Manager(username);
-Manager.cs (187) : foreach (string filePath in profileFiles)
-Manager.cs (188) : {
-Manager.cs (189) : string profileName = Path.GetFileNameWithoutExtension(filePath);
-Manager.cs (191) : using (StreamReader reader = new StreamReader(filePath))
-Manager.cs (192) : {
-Manager.cs (193) : try
-Manager.cs (194) : {
-Manager.cs (195) : List<string> names = new List<string>();
-Manager.cs (196) : List<string> passwords = new List<string>();
-Manager.cs (198) : string usersLine = reader.ReadLine();
-Manager.cs (199) : int startPosition = usersLine.IndexOf("]") + 1;
-Manager.cs (200) : usersLine = usersLine.Substring(startPosition);
-Manager.cs (202) : string[] entries = usersLine.Split(new[] { "}" }, StringSplitOptions.RemoveEmptyEntries);
-Manager.cs (203) : foreach (string entry in entries)
+Manager.cs (171) : string databasePath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (174) : if (!Directory.Exists(databasePath))
+Manager.cs (175) : {
+Manager.cs (176) : Console.WriteLine("Database directory not found: " + databasePath);
+Manager.cs (177) : return null;
+Manager.cs (178) : }
+Manager.cs (181) : string[] profileFiles = Directory.GetFiles(databasePath, "*.profile");
+Manager.cs (183) : if (profileFiles.Length == 0)
+Manager.cs (184) : {
+Manager.cs (185) : Console.WriteLine("No profile files found in the database folder.");
+Manager.cs (186) : return null;
+Manager.cs (187) : }
+Manager.cs (190) : Manager result = new Manager(username);
+Manager.cs (192) : foreach (string filePath in profileFiles)
+Manager.cs (193) : {
+Manager.cs (194) : try
+Manager.cs (195) : {
+Manager.cs (196) : string profileName = Path.GetFileNameWithoutExtension(filePath);
+Manager.cs (197) : Profile profile = new Profile { Name = profileName };
+Manager.cs (199) : using (StreamReader reader = new StreamReader(filePath))
+Manager.cs (200) : {
+Manager.cs (202) : string usersLine = reader.ReadLine();
+Manager.cs (203) : if (!string.IsNullOrWhiteSpace(usersLine))
 Manager.cs (204) : {
-Manager.cs (205) : string cleanEntry = entry.Replace("{", "").Replace("'", "").Trim();
-Manager.cs (206) : string[] parts = cleanEntry.Split(',');
-Manager.cs (208) : if (parts.Length == 2)
-Manager.cs (209) : {
-Manager.cs (210) : names.Add(parts[0]);
-Manager.cs (211) : passwords.Add(parts[1]);
-Manager.cs (212) : }
-Manager.cs (213) : }
-Manager.cs (215) : Profile profile = new Profile { Name = profileName };
-Manager.cs (217) : for (int j = 0; j < names.Count; j++)
-Manager.cs (218) : {
-Manager.cs (219) : var user = new User("temp", "temp");
-Manager.cs (220) : user.Username = names[j];
-Manager.cs (221) : user.EncryptedPassword = passwords[j];
-Manager.cs (222) : profile.Users.Add(user);
+Manager.cs (205) : int startPosition = usersLine.IndexOf("]") + 1;
+Manager.cs (206) : usersLine = usersLine.Substring(startPosition);
+Manager.cs (208) : string[] entries = usersLine.Split(new[] { "}" }, StringSplitOptions.RemoveEmptyEntries);
+Manager.cs (209) : foreach (string entry in entries)
+Manager.cs (210) : {
+Manager.cs (211) : string cleanEntry = entry.Replace("{", "").Replace("'", "").Trim();
+Manager.cs (212) : string[] parts = cleanEntry.Split(',');
+Manager.cs (214) : if (parts.Length == 2)
+Manager.cs (215) : {
+Manager.cs (216) : User user = new User("temp", "temp")
+Manager.cs (217) : {
+Manager.cs (218) : Username = parts[0].Trim(),
+Manager.cs (219) : EncryptedPassword = parts[1].Trim()
+Manager.cs (220) : };
+Manager.cs (221) : profile.Users.Add(user);
+Manager.cs (222) : }
 Manager.cs (223) : }
-Manager.cs (225) : string privilegesLine = reader.ReadLine();
-Manager.cs (226) : entries = privilegesLine.Split(new[] { "}" }, StringSplitOptions.RemoveEmptyEntries);
-Manager.cs (228) : foreach (string entry in entries)
+Manager.cs (224) : }
+Manager.cs (227) : string privilegesLine = reader.ReadLine();
+Manager.cs (228) : if (!string.IsNullOrWhiteSpace(privilegesLine))
 Manager.cs (229) : {
-Manager.cs (230) : string cleanEntry = entry.Replace("{", "").Replace("'", "").Trim();
-Manager.cs (231) : string[] parts = cleanEntry.Split(',');
-Manager.cs (233) : if (parts.Length >= 2)
-Manager.cs (234) : {
-Manager.cs (235) : string tableName = parts[0];
-Manager.cs (236) : for (int j = 1; j < parts.Length; j++)
+Manager.cs (230) : string[] entries = privilegesLine.Split(new[] { "}" }, StringSplitOptions.RemoveEmptyEntries);
+Manager.cs (231) : foreach (string entry in entries)
+Manager.cs (232) : {
+Manager.cs (233) : string cleanEntry = entry.Replace("{", "").Replace("'", "").Trim();
+Manager.cs (234) : string[] parts = cleanEntry.Split(',');
+Manager.cs (236) : if (parts.Length >= 2)
 Manager.cs (237) : {
-Manager.cs (238) : if (Enum.TryParse(parts[j], true, out Privilege privilege))
-Manager.cs (239) : {
-Manager.cs (240) : profile.GrantPrivilege(tableName, privilege);
-Manager.cs (241) : }
-Manager.cs (242) : }
-Manager.cs (243) : }
+Manager.cs (238) : string tableName = parts[0].Trim();
+Manager.cs (239) : for (int i = 1; i < parts.Length; i++)
+Manager.cs (240) : {
+Manager.cs (241) : if (Enum.TryParse(parts[i].Trim(), true, out Privilege privilege))
+Manager.cs (242) : {
+Manager.cs (243) : profile.GrantPrivilege(tableName, privilege);
 Manager.cs (244) : }
-Manager.cs (246) : result.AddProfile(profile);
+Manager.cs (245) : }
+Manager.cs (246) : }
 Manager.cs (247) : }
-Manager.cs (248) : catch (Exception ex)
-Manager.cs (249) : {
-Manager.cs (250) : Console.WriteLine("Error reading profile: " + ex.Message);
-Manager.cs (251) : }
-Manager.cs (252) : }
+Manager.cs (248) : }
+Manager.cs (249) : }
+Manager.cs (252) : result.Profiles.Add(profile);
 Manager.cs (253) : }
-Manager.cs (255) : return result.UserByName(username) == null ? null : result;
-Manager.cs (261) : try
+Manager.cs (254) : catch (Exception ex)
+Manager.cs (255) : {
+Manager.cs (256) : Console.WriteLine($"Error loading profile from {filePath}: {ex.Message}");
+Manager.cs (257) : }
+Manager.cs (258) : }
+Manager.cs (261) : if (result.UserByName(username) == null)
 Manager.cs (262) : {
-Manager.cs (263) : if (!Directory.Exists(databaseName)) {
-Manager.cs (264) : Directory.CreateDirectory(databaseName);
+Manager.cs (263) : Console.WriteLine($"El usuario '{username}' no existe en los perfiles cargados.");
+Manager.cs (264) : return result;
 Manager.cs (265) : }
-Manager.cs (266) : foreach (var profile in Profiles)
-Manager.cs (267) : {
-Manager.cs (268) : string filePath = Path.Combine(databaseName, profile.Name + ".profile");
-Manager.cs (269) : using (StreamWriter writer = new StreamWriter(filePath))
-Manager.cs (270) : {
-Manager.cs (271) : writer.WriteLine(profile.ToString());
-Manager.cs (272) : writer.WriteLine(profile.WritePrivileges());
-Manager.cs (273) : }
-Manager.cs (274) : }
-Manager.cs (275) : }
-Manager.cs (276) : catch (Exception ex)
-Manager.cs (277) : {
-Manager.cs (278) : Console.WriteLine("Error al guardar perfiles: " + ex.Message);
-Manager.cs (279) : }
+Manager.cs (267) : return result;
+Manager.cs (274) : try
+Manager.cs (275) : {
+Manager.cs (276) : if (!Directory.Exists(databaseName)) {
+Manager.cs (277) : Directory.CreateDirectory(databaseName);
+Manager.cs (278) : }
+Manager.cs (279) : foreach (var profile in Profiles)
+Manager.cs (280) : {
+Manager.cs (281) : string filePath = Path.Combine(databaseName, profile.Name + ".profile");
+Manager.cs (282) : using (StreamWriter writer = new StreamWriter(filePath))
+Manager.cs (283) : {
+Manager.cs (284) : writer.WriteLine(profile.ToString());
+Manager.cs (285) : writer.WriteLine(profile.WritePrivileges());
+Manager.cs (286) : }
+Manager.cs (287) : }
+Manager.cs (288) : }
+Manager.cs (289) : catch (Exception ex)
+Manager.cs (290) : {
+Manager.cs (291) : Console.WriteLine("Error al guardar perfiles: " + ex.Message);
+Manager.cs (292) : }
 Profile.cs (21) : if (string.IsNullOrWhiteSpace(table))
 Profile.cs (22) : return false;
 Profile.cs (24) : List<Privilege> privileges;
