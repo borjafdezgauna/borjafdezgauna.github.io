@@ -336,76 +336,77 @@ ProfileTests.cs (2) : using System.Collections.Generic;
 ProfileTests.cs (3) : using System.Linq;
 ProfileTests.cs (4) : using System.Text;
 ProfileTests.cs (5) : using System.Threading.Tasks;
-ProfileTests.cs (6) : using DbManager.Security;
-ProfileTests.cs (8) : namespace OurTests
-ProfileTests.cs (9) : {
-ProfileTests.cs (10) : public class ProfilePrivilegeTests
-ProfileTests.cs (11) : {
-ProfileTests.cs (13) : [Fact]
-ProfileTests.cs (14) : public void RevokePrivilege()
-ProfileTests.cs (15) : {
-ProfileTests.cs (16) : var profile = new Profile();
-ProfileTests.cs (17) : var privilege = Privilege.Update;
-ProfileTests.cs (18) : profile.GrantPrivilege("tabla1", privilege);
-ProfileTests.cs (20) : bool result = profile.RevokePrivilege("tabla1", privilege);
-ProfileTests.cs (22) : Assert.True(result);
-ProfileTests.cs (23) : Assert.False(profile.IsGrantedPrivilege("tabla1", privilege));
-ProfileTests.cs (24) : }
-ProfileTests.cs (26) : [Fact]
-ProfileTests.cs (27) : public void GrantPrivilege()
-ProfileTests.cs (28) : {
-ProfileTests.cs (29) : var profile = new Profile();
-ProfileTests.cs (31) : profile.GrantPrivilege("tabla1", Privilege.Select);
-ProfileTests.cs (32) : profile.GrantPrivilege("tabla1", Privilege.Update);
-ProfileTests.cs (33) : bool result = profile.GrantPrivilege("tabla1", Privilege.Delete);
-ProfileTests.cs (35) : Assert.True(result);
-ProfileTests.cs (36) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Select));
-ProfileTests.cs (37) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Update));
-ProfileTests.cs (38) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Delete));
-ProfileTests.cs (39) : }
-ProfileTests.cs (41) : [Fact]
-ProfileTests.cs (42) : public void RevokePrivilegeNonExistantTable()
-ProfileTests.cs (43) : {
-ProfileTests.cs (44) : var profile = new Profile();
-ProfileTests.cs (46) : bool result = profile.RevokePrivilege("NonExistentTable", Privilege.Insert);
-ProfileTests.cs (48) : Assert.False(result);
-ProfileTests.cs (49) : }
-ProfileTests.cs (51) : [Fact]
-ProfileTests.cs (52) : public void RevokeNonExistentPrivilege()
-ProfileTests.cs (53) : {
-ProfileTests.cs (54) : var profile = new Profile();
-ProfileTests.cs (55) : profile.GrantPrivilege("tabla1", Privilege.Select);
-ProfileTests.cs (57) : bool result = profile.RevokePrivilege("tabla1", Privilege.Update);
-ProfileTests.cs (59) : Assert.False(result);
-ProfileTests.cs (60) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Select));
-ProfileTests.cs (61) : }
-ProfileTests.cs (63) : [Fact]
-ProfileTests.cs (64) : public void RevokeLastPrivilegeRemovesTable()
-ProfileTests.cs (65) : {
-ProfileTests.cs (66) : var profile = new Profile();
-ProfileTests.cs (68) : profile.GrantPrivilege("tabla1", Privilege.Insert);
-ProfileTests.cs (69) : profile.RevokePrivilege("tabla1", Privilege.Insert);
-ProfileTests.cs (71) : Assert.False(profile.IsGrantedPrivilege("tabla1", Privilege.Insert));
-ProfileTests.cs (72) : Assert.False(profile.PrivilegesOn.ContainsKey("tabla1"));
-ProfileTests.cs (73) : }
-ProfileTests.cs (75) : [Fact]
-ProfileTests.cs (76) : public void IsGrantedPrivilegeReturnsTrueForAdmin()
-ProfileTests.cs (77) : {
-ProfileTests.cs (78) : Profile profile = new Profile();
-ProfileTests.cs (79) : profile.Name = Profile.AdminProfileName;
-ProfileTests.cs (81) : bool granted = profile.IsGrantedPrivilege("Users", Privilege.Delete);
-ProfileTests.cs (82) : Assert.True(granted);
-ProfileTests.cs (83) : }
-ProfileTests.cs (85) : [Fact]
-ProfileTests.cs (86) : public void IsGrantedPrivilegeReturnsFalseIfNotGranted()
-ProfileTests.cs (87) : {
-ProfileTests.cs (88) : Profile profile = new Profile();
-ProfileTests.cs (89) : profile.Name = "user";
-ProfileTests.cs (91) : bool granted = profile.IsGrantedPrivilege("tabla1", Privilege.Update);
-ProfileTests.cs (92) : Assert.False(granted);
-ProfileTests.cs (93) : }
+ProfileTests.cs (6) : using DbManager;
+ProfileTests.cs (7) : using DbManager.Security;
+ProfileTests.cs (9) : namespace OurTests
+ProfileTests.cs (10) : {
+ProfileTests.cs (11) : public class ProfilePrivilegeTests
+ProfileTests.cs (12) : {
+ProfileTests.cs (14) : [Fact]
+ProfileTests.cs (15) : public void RevokePrivilege()
+ProfileTests.cs (16) : {
+ProfileTests.cs (17) : var profile = new Profile();
+ProfileTests.cs (18) : var privilege = Privilege.Update;
+ProfileTests.cs (19) : profile.GrantPrivilege("tabla1", privilege);
+ProfileTests.cs (21) : bool result = profile.RevokePrivilege("tabla1", privilege);
+ProfileTests.cs (23) : Assert.True(result);
+ProfileTests.cs (24) : Assert.False(profile.IsGrantedPrivilege("tabla1", privilege));
+ProfileTests.cs (25) : }
+ProfileTests.cs (27) : [Fact]
+ProfileTests.cs (28) : public void GrantPrivilege()
+ProfileTests.cs (29) : {
+ProfileTests.cs (30) : var profile = new Profile();
+ProfileTests.cs (32) : profile.GrantPrivilege("tabla1", Privilege.Select);
+ProfileTests.cs (33) : profile.GrantPrivilege("tabla1", Privilege.Update);
+ProfileTests.cs (34) : bool result = profile.GrantPrivilege("tabla1", Privilege.Delete);
+ProfileTests.cs (36) : Assert.True(result);
+ProfileTests.cs (37) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Select));
+ProfileTests.cs (38) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Update));
+ProfileTests.cs (39) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Delete));
+ProfileTests.cs (40) : }
+ProfileTests.cs (42) : [Fact]
+ProfileTests.cs (43) : public void RevokePrivilegeNonExistantTable()
+ProfileTests.cs (44) : {
+ProfileTests.cs (45) : var profile = new Profile();
+ProfileTests.cs (47) : bool result = profile.RevokePrivilege("NonExistentTable", Privilege.Insert);
+ProfileTests.cs (49) : Assert.False(result);
+ProfileTests.cs (50) : }
+ProfileTests.cs (52) : [Fact]
+ProfileTests.cs (53) : public void RevokeNonExistentPrivilege()
+ProfileTests.cs (54) : {
+ProfileTests.cs (55) : var profile = new Profile();
+ProfileTests.cs (56) : profile.GrantPrivilege("tabla1", Privilege.Select);
+ProfileTests.cs (58) : bool result = profile.RevokePrivilege("tabla1", Privilege.Update);
+ProfileTests.cs (60) : Assert.False(result);
+ProfileTests.cs (61) : Assert.True(profile.IsGrantedPrivilege("tabla1", Privilege.Select));
+ProfileTests.cs (62) : }
+ProfileTests.cs (64) : [Fact]
+ProfileTests.cs (65) : public void RevokeLastPrivilegeRemovesTable()
+ProfileTests.cs (66) : {
+ProfileTests.cs (67) : var profile = new Profile();
+ProfileTests.cs (69) : profile.GrantPrivilege("tabla1", Privilege.Insert);
+ProfileTests.cs (70) : profile.RevokePrivilege("tabla1", Privilege.Insert);
+ProfileTests.cs (72) : Assert.False(profile.IsGrantedPrivilege("tabla1", Privilege.Insert));
+ProfileTests.cs (73) : Assert.False(profile.PrivilegesOn.ContainsKey("tabla1"));
+ProfileTests.cs (74) : }
+ProfileTests.cs (76) : [Fact]
+ProfileTests.cs (77) : public void IsGrantedPrivilegeForAdmin()
+ProfileTests.cs (78) : {
+ProfileTests.cs (79) : Profile profile = new Profile();
+ProfileTests.cs (80) : profile.Name = Profile.AdminProfileName;
+ProfileTests.cs (82) : bool granted = profile.IsGrantedPrivilege("Users", Privilege.Delete);
+ProfileTests.cs (83) : Assert.True(granted);
+ProfileTests.cs (84) : }
+ProfileTests.cs (86) : [Fact]
+ProfileTests.cs (87) : public void IsGrantedPrivilegeIfNotGranted()
+ProfileTests.cs (88) : {
+ProfileTests.cs (89) : Profile profile = new Profile();
+ProfileTests.cs (90) : profile.Name = "user";
+ProfileTests.cs (92) : bool granted = profile.IsGrantedPrivilege("tabla1", Privilege.Update);
+ProfileTests.cs (93) : Assert.False(granted);
 ProfileTests.cs (94) : }
 ProfileTests.cs (95) : }
+ProfileTests.cs (96) : }
 TableTests.cs (45) : Table table = Table.CreateTestTable("table");
 TableTests.cs (46) : Assert.Equal(1, table.ColumnIndexByName("Height"));
 TableTests.cs (52) : Table table = Table.CreateTestTable("table");
@@ -494,6 +495,7 @@ CreateSecurityProfile.cs (27) : if (!manager.IsUserAdmin())
 CreateSecurityProfile.cs (30) : manager.AddProfile(new Profile { Name = ProfileName });
 CreateSecurityProfile.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 DeleteUser.cs (24) : if (database.SecurityManager != null && database.SecurityManager.IsUserAdmin())
+DropSecurityProfile.cs (23) : if(database.SecurityManager != null && database.SecurityManager.IsUserAdmin())
 Grant.cs (29) : if (database.SecurityManager != null && database.SecurityManager.IsUserAdmin())
 Grant.cs (31) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
 Grant.cs (32) : if (profile != null)
@@ -655,7 +657,10 @@ CreateSecurityProfileTests.cs (71) : db.Save("TestDB");
 CreateSecurityProfileTests.cs (73) : var nonAdminDb = Database.Load("TestDB", "user", "pass");
 CreateSecurityProfileTests.cs (75) : var result = nonAdminDb.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE newProfile");
 CreateSecurityProfileTests.cs (77) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
-CreateSecurityProfileTests.cs (78) : }
+CreateSecurityProfileTests.cs (79) : var adminDb = Database.Load("TestDB", "admin", "pass");
+CreateSecurityProfileTests.cs (81) : Assert.Null(adminDb.SecurityManager.ProfileByName("testNewProfile"));
+CreateSecurityProfileTests.cs (82) : Assert.NotNull(adminDb.SecurityManager.ProfileByName("userProfile"));
+CreateSecurityProfileTests.cs (83) : }
 DeleteUserTests.cs (65) : [Fact]
 DeleteUserTests.cs (66) : public void DeleteUser()
 DeleteUserTests.cs (67) : {
