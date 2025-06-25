@@ -674,8 +674,20 @@ CreateSecurityProfile.cs (44) : manager.AddProfile(new Profile { Name = ProfileN
 CreateSecurityProfile.cs (46) : return Constants.CreateSecurityProfileSuccess;
 CreateSecurityProfile.cs (47) : }
 CreateSecurityProfile.cs (49) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-CreateTable.cs (16) : //TODO
-CreateTable.cs (17) : //: Initialize member variables
+CreateTable.cs (5) : using DbManager.Security;
+CreateTable.cs (17) : //TODO
+CreateTable.cs (18) : //: Initialize member variables
+CreateTable.cs (26) : Manager manager = database.SecurityManager;
+CreateTable.cs (28) : if (!manager.IsUserAdmin())
+CreateTable.cs (29) : {
+CreateTable.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateTable.cs (31) : }
+Delete.cs (4) : using DbManager.Security;
+Delete.cs (26) : Manager manager = database.SecurityManager;
+Delete.cs (28) : if (!manager.IsUserAdmin())
+Delete.cs (29) : {
+Delete.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Delete.cs (31) : }
 DeleteUser.cs (25) : var securityManager = database.SecurityManager;
 DeleteUser.cs (27) : if (securityManager == null || !securityManager.IsUserAdmin())
 DeleteUser.cs (28) : {
@@ -732,48 +744,93 @@ DropSecurityProfile.cs (44) : return Constants.SecurityProfileDoesNotExistError;
 DropSecurityProfile.cs (45) : }
 DropSecurityProfile.cs (47) : manager.RemoveProfile(ProfileName);
 DropSecurityProfile.cs (48) : return Constants.DropSecurityProfileSuccess;
-DropTable.cs (23) : Table table = database.TableByName(Table);
-DropTable.cs (24) : if (table == null)
-DropTable.cs (25) : {
-DropTable.cs (26) : return Constants.TableDoesNotExistError;
-DropTable.cs (27) : }
-DropTable.cs (28) : bool success = database.DropTable(Table);
-DropTable.cs (29) : if (success)
-DropTable.cs (30) : {
-DropTable.cs (31) : return Constants.DropTableSuccess;
-DropTable.cs (32) : }
-DropTable.cs (34) : return Constants.Error;
+DropTable.cs (2) : using DbManager.Security;
+DropTable.cs (24) : Manager manager = database.SecurityManager;
+DropTable.cs (26) : if (!manager.IsUserAdmin())
+DropTable.cs (27) : {
+DropTable.cs (28) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropTable.cs (29) : }
+DropTable.cs (30) : Table table = database.TableByName(Table);
+DropTable.cs (31) : if (table == null)
+DropTable.cs (32) : {
+DropTable.cs (33) : return Constants.TableDoesNotExistError;
+DropTable.cs (34) : }
+DropTable.cs (35) : bool success = database.DropTable(Table);
+DropTable.cs (36) : if (success)
+DropTable.cs (37) : {
+DropTable.cs (38) : return Constants.DropTableSuccess;
+DropTable.cs (39) : }
+DropTable.cs (41) : return Constants.Error;
 Grant.cs (20) : this.PrivilegeName = privilegeName;
 Grant.cs (21) : this.TableName = tableName;
 Grant.cs (22) : this.ProfileName = profileName;
-Grant.cs (29) : if (database.SecurityManager == null || !database.SecurityManager.IsUserAdmin())
-Grant.cs (35) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
-Grant.cs (42) : if (!Enum.TryParse(PrivilegeName, true, out Privilege privilege))
-Grant.cs (43) : {
-Grant.cs (45) : }
-Grant.cs (48) : if (profile.IsGrantedPrivilege(TableName, privilege))
-Grant.cs (49) : {
-Grant.cs (50) : return Constants.ProfileAlreadyHasPrivilege;
-Grant.cs (51) : }
-Grant.cs (54) : profile.GrantPrivilege(TableName, privilege);
-Insert.cs (27) : Table table = database.TableByName(Table);
-Insert.cs (28) : if (table == null)
-Insert.cs (29) : {
-Insert.cs (30) : return Constants.TableDoesNotExistError;
-Insert.cs (31) : }
-Insert.cs (34) : bool success = database.Insert(Table, Values);
-Insert.cs (37) : if (success)
-Insert.cs (38) : {
-Insert.cs (39) : return Constants.InsertSuccess;
-Insert.cs (40) : }
-Insert.cs (41) : return Constants.ColumnCountsDontMatch;
+Grant.cs (29) : Manager manager = database.SecurityManager;
+Grant.cs (31) : if (!manager.IsUserAdmin())
+Grant.cs (36) : Privilege priv;
+Grant.cs (37) : if (PrivilegeName.Equals("SELECT"))
+Grant.cs (39) : priv = Privilege.Select;
+Grant.cs (41) : else if (PrivilegeName.Equals("DELETE"))
+Grant.cs (42) : {
+Grant.cs (43) : priv = Privilege.Delete;
+Grant.cs (44) : }
+Grant.cs (45) : else if (PrivilegeName.Equals("INSERT"))
+Grant.cs (46) : {
+Grant.cs (47) : priv = Privilege.Insert;
+Grant.cs (48) : }
+Grant.cs (49) : else if (PrivilegeName.Equals("UPDATE"))
+Grant.cs (50) : {
+Grant.cs (51) : priv = Privilege.Update;
+Grant.cs (52) : }
+Grant.cs (53) : else
+Grant.cs (54) : {
+Grant.cs (56) : }
+Grant.cs (58) : Profile profile = null;
+Grant.cs (59) : foreach (Profile pro in manager.Profiles)
+Grant.cs (60) : {
+Grant.cs (61) : if (pro.Name == ProfileName)
+Grant.cs (62) : {
+Grant.cs (63) : profile = pro;
+Grant.cs (64) : }
+Grant.cs (65) : }
+Grant.cs (66) : if (profile == null)
+Grant.cs (67) : {
+Grant.cs (68) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (69) : }
+Grant.cs (71) : if (profile.IsGrantedPrivilege(TableName, priv))
+Grant.cs (72) : {
+Grant.cs (73) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (74) : }
+Grant.cs (76) : manager.GrantPrivilege(ProfileName, TableName, priv);
+Insert.cs (6) : using DbManager.Security;
+Insert.cs (27) : Manager manager = database.SecurityManager;
+Insert.cs (29) : if (!manager.IsUserAdmin())
+Insert.cs (30) : {
+Insert.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Insert.cs (32) : }
+Insert.cs (34) : Table table = database.TableByName(Table);
+Insert.cs (35) : if (table == null)
+Insert.cs (36) : {
+Insert.cs (37) : return Constants.TableDoesNotExistError;
+Insert.cs (38) : }
+Insert.cs (41) : bool success = database.Insert(Table, Values);
+Insert.cs (44) : if (success)
+Insert.cs (45) : {
+Insert.cs (46) : return Constants.InsertSuccess;
+Insert.cs (47) : }
+Insert.cs (48) : return Constants.ColumnCountsDontMatch;
 Revoke.cs (5) : using DbManager.Security;
 Revoke.cs (30) : if (database.SecurityManager.IsUserAdmin())
 Revoke.cs (31) : {
 Revoke.cs (32) : database.SecurityManager.ProfileByName(ProfileName).RevokePrivilege(TableName, PrivilegeUtils.FromPrivilegeName(PrivilegeName));
 Revoke.cs (34) : return Constants.RevokePrivilegeSuccess;
 Revoke.cs (35) : }
-Revoke.cs (37) : return Constants.Error;
+Revoke.cs (37) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Update.cs (2) : using DbManager.Security;
+Update.cs (27) : Manager manager = database.SecurityManager;
+Update.cs (29) : if (!manager.IsUserAdmin())
+Update.cs (30) : {
+Update.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Update.cs (32) : }
 Manager.cs (39) : string encrypted = Encryption.Encrypt(password);
 Manager.cs (47) : return encrypted == u.EncryptedPassword;
 Manager.cs (171) : string basePath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
