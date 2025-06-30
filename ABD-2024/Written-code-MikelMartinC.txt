@@ -392,8 +392,22 @@ PermissionsTest.cs (91) : db.ExecuteMiniSQLQuery("GRANT DELETE ON tabla1 TO perf
 PermissionsTest.cs (93) : string resultado = db.ExecuteMiniSQLQuery("REVOKE DELETE ON tabla1 TO perfil");
 PermissionsTest.cs (95) : Assert.Equal(Constants.RevokePrivilegeSuccess, resultado);
 PermissionsTest.cs (96) : }
-PermissionsTest.cs (101) : }
-PermissionsTest.cs (102) : }
+PermissionsTest.cs (97) : [Fact]
+PermissionsTest.cs (98) : public void CheckPermissionsNotBeingAdminForRegularQueries()
+PermissionsTest.cs (99) : {
+PermissionsTest.cs (100) : Database db = new Database("admin", "pass");
+PermissionsTest.cs (102) : Profile userProfile = new Profile { Name = "User" };
+PermissionsTest.cs (103) : userProfile.GrantPrivilege("priv1", Privilege.Select);
+PermissionsTest.cs (104) : userProfile.Users.Add(new User { Username = "user", EncryptedPassword = Encryption.Encrypt("userpass") });
+PermissionsTest.cs (105) : db.SecurityManager.AddProfile(userProfile);
+PermissionsTest.cs (107) : db.CreateTable("priv1", new List<ColumnDefinition> { new ColumnDefinition(ColumnDefinition.DataType.String, "name") });
+PermissionsTest.cs (108) : db.Save("TestDbPermissions");
+PermissionsTest.cs (109) : Database nonAdminDB = Database.Load("TestDbPermissions", "user", "userpass");
+PermissionsTest.cs (111) : Assert.False(nonAdminDB.IsUserAdmin());
+PermissionsTest.cs (112) : Assert.NotNull(nonAdminDB.Select("priv1", new List<string> { "name" }, null));
+PermissionsTest.cs (113) : }
+PermissionsTest.cs (117) : }
+PermissionsTest.cs (118) : }
 RowTests.cs (13) : public void TestGetSetValue()
 RowTests.cs (29) : rowPrueba.SetValue("peso", "123");
 RowTests.cs (30) : Assert.Equal("casados", rowPrueba.GetValue("casa"));
