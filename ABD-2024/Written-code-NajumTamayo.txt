@@ -750,6 +750,19 @@ CreateSecurityProfileTests.cs (120) : Database nonAdminDB = Database.Load("TestD
 CreateSecurityProfileTests.cs (122) : Assert.False(nonAdminDB.IsUserAdmin());
 CreateSecurityProfileTests.cs (123) : Assert.NotNull(nonAdminDB.Select("priv1", new List<string> { "name" }, null));
 CreateSecurityProfileTests.cs (124) : }
+CreateSecurityProfileTests.cs (126) : [Fact]
+CreateSecurityProfileTests.cs (127) : public void CreateSecurityProfileCheckPermissionsExecution()
+CreateSecurityProfileTests.cs (128) : {
+CreateSecurityProfileTests.cs (129) : Database adminDb = new Database("admin", "adminpass");
+CreateSecurityProfileTests.cs (130) : adminDb.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE RegularUser");
+CreateSecurityProfileTests.cs (131) : adminDb.ExecuteMiniSQLQuery("ADD USER user1 TO RegularUser WITH PASSWORD 'userpass'");
+CreateSecurityProfileTests.cs (132) : adminDb.Save("test_DB");
+CreateSecurityProfileTests.cs (134) : Database userDb = Database.Load("test_DB", "user1", "userpass");
+CreateSecurityProfileTests.cs (135) : string result = userDb.ExecuteMiniSQLQuery("CREATE SECURITY PROFILE profile1");
+CreateSecurityProfileTests.cs (137) : Assert.Equal(Constants.UsersProfileIsNotGrantedRequiredPrivilege, result);
+CreateSecurityProfileTests.cs (139) : Database adminCheckDb = Database.Load("test_DB", "admin", "adminpass");
+CreateSecurityProfileTests.cs (140) : Assert.Null(adminCheckDb.SecurityManager.ProfileByName("profile1"));
+CreateSecurityProfileTests.cs (141) : }
 DeleteUserTests.cs (65) : [Fact]
 DeleteUserTests.cs (66) : public void DeleteUser()
 DeleteUserTests.cs (67) : {
