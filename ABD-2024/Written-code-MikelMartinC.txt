@@ -734,6 +734,8 @@ SecurityClassMethodTests.cs (36) : Assert.Equal(Constants.SecurityProfileDoesNot
 SecurityClassMethodTests.cs (37) : }
 SecurityClassMethodTests.cs (42) : }
 SecurityClassMethodTests.cs (43) : }
+SelectTests.cs (13) : /*  [Fact]
+SelectTests.cs (35) : }*/
 AddUser.cs (5) : using DbManager.Security;
 AddUser.cs (20) : this.Username = username;
 AddUser.cs (21) : this.Password = password;
@@ -880,49 +882,29 @@ Revoke.cs (51) : return Constants.PrivilegeDoesNotExistError;
 Revoke.cs (52) : }
 Revoke.cs (53) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, privilege);
 Revoke.cs (55) : return Constants.RevokePrivilegeSuccess;
-Select.cs (29) : Table result = database.TableByName(Table);
-Select.cs (30) : if (result == null)
-Select.cs (31) : {
-Select.cs (32) : return Constants.TableDoesNotExistError;
-Select.cs (33) : }
-Select.cs (34) : Table esperados = database.Select(this.Table, this.Columns, this.Where);
-Select.cs (36) : if (esperados != null)
+Select.cs (29) : Table table = database.TableByName(Table);
+Select.cs (31) : if (table == null)
+Select.cs (32) : {
+Select.cs (33) : return Constants.TableDoesNotExistError;
+Select.cs (34) : }
+Select.cs (36) : foreach (string column in Columns)
 Select.cs (37) : {
-Select.cs (38) : return esperados.ToString();
-Select.cs (39) : }
-Select.cs (40) : else
-Select.cs (41) : {
-Select.cs (42) : if (Columns == null || Columns.Count == 0)
-Select.cs (43) : {
-Select.cs (44) : return Constants.ColumnDoesNotExistError;
-Select.cs (45) : }
-Select.cs (46) : else if (Columns != null && Columns.Count == 1 && Columns[0]== "*")
-Select.cs (47) : {
-Select.cs (48) : if (result == null)
-Select.cs (49) : {
-Select.cs (50) : return Constants.TableDoesNotExistError;
-Select.cs (51) : }
-Select.cs (52) : }
-Select.cs (53) : else
-Select.cs (54) : {
-Select.cs (55) : foreach (string columna in Columns)
-Select.cs (56) : {
-Select.cs (57) : bool existeColumna = false;
-Select.cs (58) : for (int i = 0; i < result.NumColumns(); i++)
-Select.cs (59) : {
-Select.cs (60) : ColumnDefinition columnTable = result.GetColumn(i);
-Select.cs (61) : if (columnTable != null && columnTable.Name.Equals(columna))
-Select.cs (62) : {
-Select.cs (63) : existeColumna = true;
-Select.cs (64) : break;
-Select.cs (65) : }
-Select.cs (66) : }
-Select.cs (67) : if (!existeColumna)
-Select.cs (69) : return Constants.ColumnDoesNotExistError;
-Select.cs (70) : }
-Select.cs (71) : }
-Select.cs (72) : }
-Select.cs (76) : return Constants.ColumnDoesNotExistError;
+Select.cs (38) : if (table.ColumnByName(column) == null)
+Select.cs (39) : {
+Select.cs (40) : return Constants.ColumnDoesNotExistError;
+Select.cs (41) : }
+Select.cs (42) : }
+Select.cs (44) : if (Where != null)
+Select.cs (45) : {
+Select.cs (46) : if (Where.ColumnName == null || (table.ColumnByName(Where.ColumnName) == null))
+Select.cs (48) : return Constants.ColumnDoesNotExistError;
+Select.cs (49) : }
+Select.cs (53) : Table resultTable = database.Select(Table, Columns, Where);
+Select.cs (56) : if (resultTable == null)
+Select.cs (57) : {
+Select.cs (58) : return database.LastErrorMessage;
+Select.cs (59) : }
+Select.cs (61) : return resultTable.ToString();
 Update.cs (2) : using DbManager.Security;
 Update.cs (27) : Manager manager = database.SecurityManager;
 Update.cs (52) : return database.LastErrorMessage;
