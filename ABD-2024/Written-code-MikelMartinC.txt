@@ -307,6 +307,62 @@ ColumnDefinitionTests.cs (38) : Assert.Equal(column7.AsText(), ColumnDefinition.
 ColumnDefinitionTests.cs (40) : var column8 = new ColumnDefinition(ColumnDefinition.DataType.String, "Simple");
 ColumnDefinitionTests.cs (42) : Assert.Equal(column8.AsText(), ColumnDefinition.Parse(column8.AsText()).AsText());
 ColumnDefinitionTests.cs (43) : }
+DeleteTests.cs (5) : using Xunit;
+DeleteTests.cs (7) : namespace AlternativeTests
+DeleteTests.cs (11) : private Database _database;
+DeleteTests.cs (12) : private Table _peopleTable;
+DeleteTests.cs (13) : private List<ColumnDefinition> _columnList;
+DeleteTests.cs (14) : private MiniSQLParser _parser;
+DeleteTests.cs (16) : public DeleteTests()
+DeleteTests.cs (17) : {
+DeleteTests.cs (18) : Initialize();
+DeleteTests.cs (19) : }
+DeleteTests.cs (21) : private void Initialize()
+DeleteTests.cs (22) : {
+DeleteTests.cs (23) : _database = new Database("u", "1234");
+DeleteTests.cs (24) : _parser = new MiniSQLParser();
+DeleteTests.cs (26) : _columnList = new List<ColumnDefinition>
+DeleteTests.cs (28) : new(ColumnDefinition.DataType.String, "Name"),
+DeleteTests.cs (29) : new(ColumnDefinition.DataType.Int, "Age"),
+DeleteTests.cs (30) : new(ColumnDefinition.DataType.Double, "Height")
+DeleteTests.cs (31) : };
+DeleteTests.cs (33) : _peopleTable = new Table("People", _columnList);
+DeleteTests.cs (35) : _peopleTable.AddRow(new Row(_columnList, new List<string> { "Asier", "24", "1.85" }));
+DeleteTests.cs (36) : _peopleTable.AddRow(new Row(_columnList, new List<string> { "Ainara", "23", "1.70" }));
+DeleteTests.cs (37) : _peopleTable.AddRow(new Row(_columnList, new List<string> { "Naroa", "22", "1.55" }));
+DeleteTests.cs (38) : _peopleTable.AddRow(new Row(_columnList, new List<string> { "Olga", "28", "1.53" }));
+DeleteTests.cs (40) : _database.AddTable(_peopleTable);
+DeleteTests.cs (44) : public void DeleteStatement_ShouldBeParsedCorrectly()
+DeleteTests.cs (46) : var command = MiniSQLParser.Parse("DELETE FROM People WHERE Name='Naroa'");
+DeleteTests.cs (48) : Assert.NotNull(command);
+DeleteTests.cs (49) : Assert.IsType<Delete>(command);
+DeleteTests.cs (50) : }
+DeleteTests.cs (52) : [Fact]
+DeleteTests.cs (53) : public void Delete_NonExistentTable_ReturnsError()
+DeleteTests.cs (54) : {
+DeleteTests.cs (55) : var command = MiniSQLParser.Parse("DELETE FROM Gente WHERE Name='Naroa'");
+DeleteTests.cs (56) : var output = command.Execute(_database);
+DeleteTests.cs (58) : Assert.Equal(Constants.TableDoesNotExistError, output);
+DeleteTests.cs (62) : public void Delete_SingleRowSuccessfully()
+DeleteTests.cs (64) : var command = MiniSQLParser.Parse("DELETE FROM People WHERE Name='Naroa'");
+DeleteTests.cs (65) : var output = command.Execute(_database);
+DeleteTests.cs (67) : Assert.Equal(Constants.DeleteSuccess, output);
+DeleteTests.cs (68) : Assert.Equal(3, _database.TableByName("People").NumRows());
+DeleteTests.cs (70) : foreach (var rowIndex in new[] { 0, 1, 2 })
+DeleteTests.cs (71) : {
+DeleteTests.cs (72) : var row = _database.TableByName("People").GetRow(rowIndex);
+DeleteTests.cs (73) : Console.WriteLine($"{row.GetValue("Name")} - {row.GetValue("Age")} - {row.GetValue("Height")}");
+DeleteTests.cs (74) : }
+DeleteTests.cs (78) : public void Delete_UsingDoubleComparison_RemovesCorrectRows()
+DeleteTests.cs (80) : var command = MiniSQLParser.Parse("DELETE FROM People WHERE Height<'1.60'");
+DeleteTests.cs (81) : var output = command.Execute(_database);
+DeleteTests.cs (83) : Assert.Equal(Constants.DeleteSuccess, output);
+DeleteTests.cs (85) : var remainingRows = _database.TableByName("People");
+DeleteTests.cs (87) : for (int i = 0; i < remainingRows.NumRows(); i++)
+DeleteTests.cs (88) : {
+DeleteTests.cs (89) : var row = remainingRows.GetRow(i);
+DeleteTests.cs (90) : Console.WriteLine($"{row.GetValue("Name")} | {row.GetValue("Age")} | {row.GetValue("Height")}");
+DeleteTests.cs (91) : }
 MiniSqlQueryTest.cs (1) : ﻿using System;
 MiniSqlQueryTest.cs (2) : using System.Collections.Generic;
 MiniSqlQueryTest.cs (3) : using System.IO;
@@ -857,6 +913,7 @@ Select.cs (72) : }
 Select.cs (76) : return Constants.ColumnDoesNotExistError;
 Update.cs (2) : using DbManager.Security;
 Update.cs (27) : Manager manager = database.SecurityManager;
+Update.cs (52) : return database.LastErrorMessage;
 Manager.cs (39) : string encrypted = Encryption.Encrypt(password);
 Manager.cs (47) : return encrypted == u.EncryptedPassword;
 Manager.cs (171) : string basePath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
