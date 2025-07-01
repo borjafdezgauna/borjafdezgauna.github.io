@@ -104,143 +104,151 @@ Database.cs (34) : SecurityManager = new Manager(adminUsername);
 Database.cs (35) : Profile profile = new Profile { Name = Profile.AdminProfileName };
 Database.cs (36) : SecurityManager.Profiles.Add(profile);
 Database.cs (37) : SecurityManager.ProfileByName(Profile.AdminProfileName).Users.Add(new User(adminUsername, adminPassword));
-Database.cs (124) : Table table = TableByName(tableName);
-Database.cs (132) : if (SecurityManager.IsUserAdmin())
-Database.cs (133) : {
-Database.cs (135) : }
-Database.cs (136) : else
-Database.cs (137) : {
-Database.cs (138) : //Para usuarios no admin  verificar privilegios
-Database.cs (139) : Profile userProfile = SecurityManager.ProfileByUser(m_username);
-Database.cs (141) : if (userProfile == null || !userProfile.IsGrantedPrivilege(tableName, Privilege.Insert))
-Database.cs (142) : {
-Database.cs (143) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Database.cs (144) : return false;
-Database.cs (145) : }
-Database.cs (146) : }
-Database.cs (175) : if (!SecurityManager.IsUserAdmin())
-Database.cs (176) : {
-Database.cs (177) : Profile userProfile = SecurityManager.ProfileByUser(m_username);
-Database.cs (179) : if (userProfile == null || !userProfile.IsGrantedPrivilege(tableName, Privilege.Select))
-Database.cs (180) : {
-Database.cs (181) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Database.cs (182) : return null;
-Database.cs (183) : }
-Database.cs (184) : }
-Database.cs (207) : if (condition != null && table.ColumnByName(condition.ColumnName) == null)
-Database.cs (208) : {
-Database.cs (209) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (210) : return null;
-Database.cs (211) : }
-Database.cs (227) : if (condition == null || row.IsTrue(condition))
-Database.cs (265) : if (!SecurityManager.IsUserAdmin())
-Database.cs (266) : {
-Database.cs (267) : Profile userProfile = SecurityManager.ProfileByUser(m_username);
-Database.cs (269) : if (userProfile == null || !userProfile.IsGrantedPrivilege(tableName, Privilege.Delete))
-Database.cs (270) : {
-Database.cs (271) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Database.cs (272) : return false;
-Database.cs (273) : }
-Database.cs (274) : }
-Database.cs (278) : LastErrorMessage = Constants.DeleteSuccess;
-Database.cs (298) : if (!SecurityManager.IsUserAdmin())
-Database.cs (299) : {
-Database.cs (300) : Profile userProfile = SecurityManager.ProfileByUser(m_username);
-Database.cs (302) : if (userProfile == null || !userProfile.IsGrantedPrivilege(tableName, Privilege.Update))
-Database.cs (303) : {
-Database.cs (304) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Database.cs (305) : return false;
-Database.cs (306) : }
-Database.cs (307) : }
-Database.cs (352) : string rootDir = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Database.cs (354) : if (!Directory.Exists(rootDir))
-Database.cs (355) : Directory.CreateDirectory(rootDir);
-Database.cs (357) : foreach (var tbl in Tables)
-Database.cs (359) : string fileName = $"{tbl.Name}{TableFileExtension}";
-Database.cs (360) : string fullFilePath = Path.Combine(rootDir, fileName);
-Database.cs (362) : using (var output = new StreamWriter(fullFilePath, false))
-Database.cs (364) : var header = new List<string>();
-Database.cs (366) : for (int colIdx = 0; colIdx < tbl.NumColumns(); colIdx++)
-Database.cs (368) : var currentCol = tbl.GetColumn(colIdx);
-Database.cs (369) : string prefix = currentCol.Type switch
-Database.cs (370) : {
-Database.cs (371) : ColumnDefinition.DataType.String => "S)",
-Database.cs (372) : ColumnDefinition.DataType.Int => "I)",
-Database.cs (373) : ColumnDefinition.DataType.Double => "D)",
-Database.cs (374) : _ => ""
-Database.cs (375) : };
-Database.cs (377) : header.Add(prefix + currentCol.Name);
-Database.cs (378) : }
-Database.cs (380) : output.WriteLine(string.Join(",", header));
-Database.cs (382) : for (int rowIdx = 0; rowIdx < tbl.NumRows(); rowIdx++)
-Database.cs (384) : var rowData = tbl.GetRow(rowIdx).AsText();
-Database.cs (385) : output.WriteLine(rowData);
-Database.cs (390) : SecurityManager.Save(databaseName);
-Database.cs (393) : catch (Exception err)
-Database.cs (395) : LastErrorMessage = $"{Constants.Error}: {err.Message}";
-Database.cs (411) : string fullPath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Database.cs (413) : if (!Directory.Exists(fullPath))
-Database.cs (414) : return null;
-Database.cs (416) : Database db = new Database(); // constructor privado
-Database.cs (417) : string[] fileList = Directory.GetFiles(fullPath);
-Database.cs (419) : foreach (string file in fileList)
-Database.cs (421) : if (!file.EndsWith(".tbl"))
-Database.cs (422) : continue;
-Database.cs (424) : string tableFileName = Path.GetFileNameWithoutExtension(file);
-Database.cs (425) : List<ColumnDefinition> columnDefs = new List<ColumnDefinition>();
-Database.cs (426) : List<Row> tableRows = new List<Row>();
-Database.cs (428) : using (StreamReader fileReader = new StreamReader(file))
-Database.cs (430) : string headerLine = fileReader.ReadLine();
-Database.cs (431) : if (string.IsNullOrWhiteSpace(headerLine))
-Database.cs (432) : continue;
-Database.cs (434) : string[] headerParts = headerLine.Split(',');
-Database.cs (436) : foreach (string part in headerParts)
-Database.cs (437) : {
-Database.cs (438) : string[] typeAndName = part.Split(')');
-Database.cs (439) : if (typeAndName.Length != 2)
-Database.cs (440) : continue;
-Database.cs (442) : string typeCode = typeAndName[0];
-Database.cs (443) : string columnName = typeAndName[1];
-Database.cs (445) : ColumnDefinition.DataType dataType;
-Database.cs (446) : switch (typeCode)
-Database.cs (448) : case "S":
-Database.cs (449) : dataType = ColumnDefinition.DataType.String;
-Database.cs (450) : break;
-Database.cs (451) : case "I":
-Database.cs (452) : dataType = ColumnDefinition.DataType.Int;
-Database.cs (453) : break;
-Database.cs (454) : case "D":
-Database.cs (455) : dataType = ColumnDefinition.DataType.Double;
+Database.cs (83) : foreach (Table t in Tables)
+Database.cs (84) : {
+Database.cs (85) : if (t.Name.Equals(tableName))
+Database.cs (90) : }
+Database.cs (98) : else
+Database.cs (99) : {
+Database.cs (101) : return AddTable(new Table(tableName, ColumnDefinition));
+Database.cs (102) : }
+Database.cs (130) : Table table = TableByName(tableName);
+Database.cs (138) : if (SecurityManager.IsUserAdmin())
+Database.cs (139) : {
+Database.cs (141) : }
+Database.cs (142) : else
+Database.cs (143) : {
+Database.cs (144) : //Para usuarios no admin  verificar privilegios
+Database.cs (145) : Profile userProfile = SecurityManager.ProfileByUser(m_username);
+Database.cs (147) : if (userProfile == null || !userProfile.IsGrantedPrivilege(tableName, Privilege.Insert))
+Database.cs (148) : {
+Database.cs (149) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (150) : return false;
+Database.cs (151) : }
+Database.cs (152) : }
+Database.cs (181) : if (!SecurityManager.IsUserAdmin())
+Database.cs (182) : {
+Database.cs (183) : Profile userProfile = SecurityManager.ProfileByUser(m_username);
+Database.cs (185) : if (userProfile == null || !userProfile.IsGrantedPrivilege(tableName, Privilege.Select))
+Database.cs (186) : {
+Database.cs (187) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (188) : return null;
+Database.cs (189) : }
+Database.cs (190) : }
+Database.cs (213) : if (condition != null && table.ColumnByName(condition.ColumnName) == null)
+Database.cs (214) : {
+Database.cs (215) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (216) : return null;
+Database.cs (217) : }
+Database.cs (233) : if (condition == null || row.IsTrue(condition))
+Database.cs (271) : if (!SecurityManager.IsUserAdmin())
+Database.cs (272) : {
+Database.cs (273) : Profile userProfile = SecurityManager.ProfileByUser(m_username);
+Database.cs (275) : if (userProfile == null || !userProfile.IsGrantedPrivilege(tableName, Privilege.Delete))
+Database.cs (276) : {
+Database.cs (277) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (278) : return false;
+Database.cs (279) : }
+Database.cs (280) : }
+Database.cs (284) : LastErrorMessage = Constants.DeleteSuccess;
+Database.cs (304) : if (!SecurityManager.IsUserAdmin())
+Database.cs (305) : {
+Database.cs (306) : Profile userProfile = SecurityManager.ProfileByUser(m_username);
+Database.cs (308) : if (userProfile == null || !userProfile.IsGrantedPrivilege(tableName, Privilege.Update))
+Database.cs (309) : {
+Database.cs (310) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (311) : return false;
+Database.cs (312) : }
+Database.cs (313) : }
+Database.cs (358) : string rootDir = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (360) : if (!Directory.Exists(rootDir))
+Database.cs (361) : Directory.CreateDirectory(rootDir);
+Database.cs (363) : foreach (var tbl in Tables)
+Database.cs (365) : string fileName = $"{tbl.Name}{TableFileExtension}";
+Database.cs (366) : string fullFilePath = Path.Combine(rootDir, fileName);
+Database.cs (368) : using (var output = new StreamWriter(fullFilePath, false))
+Database.cs (370) : var header = new List<string>();
+Database.cs (372) : for (int colIdx = 0; colIdx < tbl.NumColumns(); colIdx++)
+Database.cs (374) : var currentCol = tbl.GetColumn(colIdx);
+Database.cs (375) : string prefix = currentCol.Type switch
+Database.cs (376) : {
+Database.cs (377) : ColumnDefinition.DataType.String => "S)",
+Database.cs (378) : ColumnDefinition.DataType.Int => "I)",
+Database.cs (379) : ColumnDefinition.DataType.Double => "D)",
+Database.cs (380) : _ => ""
+Database.cs (381) : };
+Database.cs (383) : header.Add(prefix + currentCol.Name);
+Database.cs (384) : }
+Database.cs (386) : output.WriteLine(string.Join(",", header));
+Database.cs (388) : for (int rowIdx = 0; rowIdx < tbl.NumRows(); rowIdx++)
+Database.cs (390) : var rowData = tbl.GetRow(rowIdx).AsText();
+Database.cs (391) : output.WriteLine(rowData);
+Database.cs (396) : SecurityManager.Save(databaseName);
+Database.cs (399) : catch (Exception err)
+Database.cs (401) : LastErrorMessage = $"{Constants.Error}: {err.Message}";
+Database.cs (417) : string fullPath = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (419) : if (!Directory.Exists(fullPath))
+Database.cs (420) : return null;
+Database.cs (422) : Database db = new Database(); // constructor privado
+Database.cs (423) : string[] fileList = Directory.GetFiles(fullPath);
+Database.cs (425) : foreach (string file in fileList)
+Database.cs (427) : if (!file.EndsWith(".tbl"))
+Database.cs (428) : continue;
+Database.cs (430) : string tableFileName = Path.GetFileNameWithoutExtension(file);
+Database.cs (431) : List<ColumnDefinition> columnDefs = new List<ColumnDefinition>();
+Database.cs (432) : List<Row> tableRows = new List<Row>();
+Database.cs (434) : using (StreamReader fileReader = new StreamReader(file))
+Database.cs (436) : string headerLine = fileReader.ReadLine();
+Database.cs (437) : if (string.IsNullOrWhiteSpace(headerLine))
+Database.cs (438) : continue;
+Database.cs (440) : string[] headerParts = headerLine.Split(',');
+Database.cs (442) : foreach (string part in headerParts)
+Database.cs (443) : {
+Database.cs (444) : string[] typeAndName = part.Split(')');
+Database.cs (445) : if (typeAndName.Length != 2)
+Database.cs (446) : continue;
+Database.cs (448) : string typeCode = typeAndName[0];
+Database.cs (449) : string columnName = typeAndName[1];
+Database.cs (451) : ColumnDefinition.DataType dataType;
+Database.cs (452) : switch (typeCode)
+Database.cs (454) : case "S":
+Database.cs (455) : dataType = ColumnDefinition.DataType.String;
 Database.cs (456) : break;
-Database.cs (457) : default:
-Database.cs (458) : continue;
-Database.cs (459) : }
-Database.cs (461) : columnDefs.Add(new ColumnDefinition(dataType, columnName));
-Database.cs (462) : }
-Database.cs (464) : string line;
-Database.cs (465) : while ((line = fileReader.ReadLine()) != null)
-Database.cs (466) : {
-Database.cs (467) : Row row = Row.Parse(columnDefs, line);
-Database.cs (468) : if (row != null)
-Database.cs (469) : tableRows.Add(row);
-Database.cs (470) : }
-Database.cs (473) : Table newTable = new Table(tableFileName, columnDefs);
-Database.cs (474) : foreach (Row row in tableRows)
-Database.cs (475) : {
-Database.cs (476) : newTable.AddRow(row);
-Database.cs (479) : db.AddTable(newTable);
-Database.cs (482) : db.SecurityManager = Manager.Load(databaseName, username);
-Database.cs (485) : if (db.SecurityManager == null || !db.SecurityManager.IsPasswordCorrect(username, password))
-Database.cs (486) : return null;
-Database.cs (489) : db.m_username = username;
-Database.cs (490) : db.m_password = password;
-Database.cs (492) : return db;
-Database.cs (494) : catch (Exception e)
-Database.cs (496) : Console.WriteLine($"{Constants.Error}: {e.Message}");
-Database.cs (552) : public void SetSecurityManager(Manager manager)
-Database.cs (553) : {
-Database.cs (554) : this.SecurityManager = manager;
-Database.cs (555) : }
+Database.cs (457) : case "I":
+Database.cs (458) : dataType = ColumnDefinition.DataType.Int;
+Database.cs (459) : break;
+Database.cs (460) : case "D":
+Database.cs (461) : dataType = ColumnDefinition.DataType.Double;
+Database.cs (462) : break;
+Database.cs (463) : default:
+Database.cs (464) : continue;
+Database.cs (465) : }
+Database.cs (467) : columnDefs.Add(new ColumnDefinition(dataType, columnName));
+Database.cs (468) : }
+Database.cs (470) : string line;
+Database.cs (471) : while ((line = fileReader.ReadLine()) != null)
+Database.cs (472) : {
+Database.cs (473) : Row row = Row.Parse(columnDefs, line);
+Database.cs (474) : if (row != null)
+Database.cs (475) : tableRows.Add(row);
+Database.cs (476) : }
+Database.cs (479) : Table newTable = new Table(tableFileName, columnDefs);
+Database.cs (480) : foreach (Row row in tableRows)
+Database.cs (481) : {
+Database.cs (482) : newTable.AddRow(row);
+Database.cs (485) : db.AddTable(newTable);
+Database.cs (488) : db.SecurityManager = Manager.Load(databaseName, username);
+Database.cs (491) : if (db.SecurityManager == null || !db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (492) : return null;
+Database.cs (495) : db.m_username = username;
+Database.cs (496) : db.m_password = password;
+Database.cs (498) : return db;
+Database.cs (500) : catch (Exception e)
+Database.cs (502) : Console.WriteLine($"{Constants.Error}: {e.Message}");
+Database.cs (558) : public void SetSecurityManager(Manager manager)
+Database.cs (559) : {
+Database.cs (560) : this.SecurityManager = manager;
+Database.cs (561) : }
 Row.cs (5) : using System.Runtime.CompilerServices;
 Row.cs (29) : int position = -1;
 Row.cs (31) : for (int i = 0; i < ColumnDefinitions.Count; i++)
@@ -776,6 +784,8 @@ CreateTable.cs (5) : using DbManager.Security;
 CreateTable.cs (17) : //TODO
 CreateTable.cs (18) : //: Initialize member variables
 CreateTable.cs (26) : Manager manager = database.SecurityManager;
+CreateTable.cs (28) : if (!database.IsUserAdmin())
+CreateTable.cs (29) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Delete.cs (4) : using DbManager.Security;
 Delete.cs (26) : if (database == null)
 Delete.cs (28) : return Constants.Error + "database does not exist";
@@ -809,11 +819,13 @@ DropSecurityProfile.cs (34) : }
 DropSecurityProfile.cs (36) : return Constants.DropSecurityProfileSuccess;
 DropSecurityProfile.cs (38) : }
 DropTable.cs (2) : using DbManager.Security;
-DropTable.cs (24) : if (database.DropTable(Table))
-DropTable.cs (25) : {
-DropTable.cs (26) : return Constants.DropTableSuccess;
-DropTable.cs (27) : }
-DropTable.cs (29) : return database.LastErrorMessage;
+DropTable.cs (24) : if (!database.IsUserAdmin())
+DropTable.cs (25) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropTable.cs (26) : if (database.DropTable(Table))
+DropTable.cs (27) : {
+DropTable.cs (28) : return Constants.DropTableSuccess;
+DropTable.cs (29) : }
+DropTable.cs (31) : return database.LastErrorMessage;
 Grant.cs (20) : this.PrivilegeName = privilegeName;
 Grant.cs (21) : this.TableName = tableName;
 Grant.cs (22) : this.ProfileName = profileName;
