@@ -1,0 +1,1238 @@
+Utils.cs (1) : ﻿using System;
+Utils.cs (2) : using System.Globalization;
+Utils.cs (4) : namespace Lists
+Utils.cs (5) : {
+Utils.cs (6) : public class Utils
+Utils.cs (7) : {
+Utils.cs (8) : public static string ToString(double number, int numMaxDecimalDigits = 0)
+Utils.cs (9) : {
+Utils.cs (10) : double value = number;
+Utils.cs (11) : if (numMaxDecimalDigits > 0)
+Utils.cs (12) : value = Math.Round(value, numMaxDecimalDigits);
+Utils.cs (13) : return value.ToString(CultureInfo.InvariantCulture);
+Utils.cs (14) : }
+Utils.cs (15) : }
+Utils.cs (16) : }
+Program.cs (2) : using System;
+Program.cs (3) : using Lists;
+Program.cs (6) : namespace RunTestsConsoleApp
+Program.cs (7) : {
+Program.cs (8) : public class Program
+Program.cs (9) : {
+Program.cs (10) : public static void Main(string[] args)
+Program.cs (11) : {
+Program.cs (12) : Console.WriteLine("## Testing IntList class");
+Program.cs (13) : if (!IntTests.IntListTest(new IntList()))
+Program.cs (14) : return;
+Program.cs (16) : Console.WriteLine("\n\n## Testing IntArrayList class");
+Program.cs (17) : if (!IntTests.IntListTest(new IntArrayList(1000000)))
+Program.cs (18) : return;
+Program.cs (20) : Console.WriteLine("\n\n## Testing List class");
+Program.cs (21) : if (!ListTests.ListTest(new List<int>()))
+Program.cs (22) : return;
+Program.cs (24) : bool listPerformancePasses = ListTests.MeasurePerformance(new List<int>(), new int[] { 1, 2, 4, 3 });
+Program.cs (26) : Console.WriteLine("\n\n## Testing ArrayList class");
+Program.cs (27) : if (!ListTests.ListTest(new ArrayList<int>(1000000)))
+Program.cs (28) : return;
+Program.cs (30) : bool listArrayPerformancePasses = ListTests.MeasurePerformance(new ArrayList<int>(), new int[] { 1, 2, 4, 3 });
+Program.cs (32) : Console.WriteLine("\n\n## Testing Stack class");
+Program.cs (33) : int[] testIntValues = new int[] { 3, 2, 6, 1, 2 };
+Program.cs (34) : string[] testStringValues = new string[] { "aB", "0x0", "ro", "123", "hitza" };
+Program.cs (36) : if (!StackAndQueuesTests.Test(new Stack<int>(), testIntValues))
+Program.cs (37) : return;
+Program.cs (39) : if (!StackAndQueuesTests.Test(new Stack<string>(), testStringValues))
+Program.cs (40) : return;
+Program.cs (42) : bool stackPerformancePasses = StackAndQueuesTests.MeasurePerformance(new Stack<int>(), testIntValues);
+Program.cs (45) : Console.WriteLine("\n\n## Testing Queue class");
+Program.cs (46) : if (!StackAndQueuesTests.Test(new Queue<int>(), testIntValues, true))
+Program.cs (47) : return;
+Program.cs (49) : if (!StackAndQueuesTests.Test(new Queue<string>(), testStringValues, true))
+Program.cs (50) : return;
+Program.cs (52) : bool queuePerformancePasses = StackAndQueuesTests.MeasurePerformance(new Queue<int>(), testIntValues);
+Program.cs (54) : if (listPerformancePasses && listArrayPerformancePasses && stackPerformancePasses && queuePerformancePasses)
+Program.cs (55) : Console.WriteLine("ASSIGNMENT FINISHED: ALL TESTS PASSED");
+Program.cs (56) : else
+Program.cs (57) : Console.WriteLine("ALL THE CLASSES WORK PROPERLY BUT DIDN'T PASS THE PERFORMANCE TEST");
+Program.cs (58) : }
+Program.cs (59) : }
+Program.cs (60) : }
+UnitTests.cs (1) : using Lists;
+UnitTests.cs (3) : namespace Tests
+UnitTests.cs (4) : {
+UnitTests.cs (5) : public class UnitTests
+UnitTests.cs (6) : {
+UnitTests.cs (7) : [Fact]
+UnitTests.cs (8) : public void IntListBasicTests()
+UnitTests.cs (9) : {
+UnitTests.cs (10) : Assert.True(ListTests.IntListTest(new IntList()));
+UnitTests.cs (11) : }
+UnitTests.cs (13) : [Fact]
+UnitTests.cs (14) : public void IntListEnumerator()
+UnitTests.cs (15) : {
+UnitTests.cs (16) : Assert.True(ListTests.ListEnumeratorTest(new IntList()));
+UnitTests.cs (18) : }
+UnitTests.cs (20) : [Fact]
+UnitTests.cs (21) : public void IntArrayListResize()
+UnitTests.cs (22) : {
+UnitTests.cs (23) : IntArrayList arrayList = new IntArrayList(10);
+UnitTests.cs (24) : for(int i= 0; i< 20; i++)
+UnitTests.cs (25) : arrayList.Add(i);
+UnitTests.cs (26) : Assert.Equal(20, arrayList.Count());
+UnitTests.cs (27) : }
+UnitTests.cs (29) : [Fact]
+UnitTests.cs (30) : public void IntArrayListBasicTests()
+UnitTests.cs (31) : {
+UnitTests.cs (33) : Assert.True(ListTests.IntListTest(new IntArrayList(1000000)));
+UnitTests.cs (34) : }
+UnitTests.cs (36) : [Fact]
+UnitTests.cs (37) : public void IntArrayListEnumerator()
+UnitTests.cs (38) : {
+UnitTests.cs (39) : Assert.True(ListTests.ListEnumeratorTest(new IntArrayList(1000000)));
+UnitTests.cs (41) : }
+UnitTests.cs (43) : [Fact]
+UnitTests.cs (44) : public void ArrayListResize()
+UnitTests.cs (45) : {
+UnitTests.cs (47) : ArrayList<int> arrayList = new ArrayList<int>(10);
+UnitTests.cs (48) : for (int i = 0; i < 20; i++)
+UnitTests.cs (49) : arrayList.Add(i);
+UnitTests.cs (50) : Assert.Equal(20, arrayList.Count());
+UnitTests.cs (51) : }
+UnitTests.cs (52) : [Fact]
+UnitTests.cs (53) : public void ListBasicTests()
+UnitTests.cs (54) : {
+UnitTests.cs (56) : Assert.True(ListTests.ListTest(new List<int>()));
+UnitTests.cs (57) : }
+UnitTests.cs (58) : [Fact]
+UnitTests.cs (59) : public void ListEnumerator()
+UnitTests.cs (60) : {
+UnitTests.cs (61) : Assert.True(ListTests.ListEnumeratorTest(new List<int>()));
+UnitTests.cs (63) : }
+UnitTests.cs (64) : [Fact]
+UnitTests.cs (65) : public void ArrayListBasicTests()
+UnitTests.cs (66) : {
+UnitTests.cs (67) : Assert.True(ListTests.ListTest(new ArrayList<int>(1000000)));
+UnitTests.cs (68) : }
+UnitTests.cs (69) : [Fact]
+UnitTests.cs (70) : public void ArrayListEnumerator()
+UnitTests.cs (71) : {
+UnitTests.cs (72) : Assert.True(ListTests.ListEnumeratorTest(new ArrayList<int>(1000000)));
+UnitTests.cs (74) : }
+UnitTests.cs (75) : [Fact]
+UnitTests.cs (76) : public void StackIntBasicTests()
+UnitTests.cs (77) : {
+UnitTests.cs (78) : int[] testIntValues = new int[] { 3, 2, 6, 1, 2 };
+UnitTests.cs (79) : Assert.True(StackAndQueuesTests.Test(new Lists.Stack<int>(), testIntValues));
+UnitTests.cs (80) : }
+UnitTests.cs (81) : [Fact]
+UnitTests.cs (82) : public void StackStringeBasicTests()
+UnitTests.cs (83) : {
+UnitTests.cs (84) : string[] testStringValues = new string[] { "aB", "0x0", "ro", "123", "hitza" };
+UnitTests.cs (85) : Assert.True(StackAndQueuesTests.Test(new Lists.Stack<string>(), testStringValues));
+UnitTests.cs (86) : }
+UnitTests.cs (87) : [Fact]
+UnitTests.cs (88) : public void QueueIntBasicTests()
+UnitTests.cs (89) : {
+UnitTests.cs (90) : int[] testIntValues = new int[] { 3, 2, 6, 1, 2 };
+UnitTests.cs (91) : Assert.True(StackAndQueuesTests.Test(new Lists.Queue<int>(), testIntValues, true));
+UnitTests.cs (92) : }
+UnitTests.cs (93) : [Fact]
+UnitTests.cs (94) : public void QueueStringBasicTests()
+UnitTests.cs (95) : {
+UnitTests.cs (96) : string[] testStringValues = new string[] { "aB", "0x0", "ro", "123", "hitza" };
+UnitTests.cs (97) : Assert.True(StackAndQueuesTests.Test(new Lists.Queue<string>(), testStringValues, true));
+UnitTests.cs (98) : }
+UnitTests.cs (100) : [Fact]
+UnitTests.cs (101) : public void ListPerformanceTests()
+UnitTests.cs (102) : {
+UnitTests.cs (103) : int[] testIntValues = new int[] { 3, 2, 6, 1, 2 };
+UnitTests.cs (104) : Assert.True(ListTests.MeasurePerformance(new List<int>(), testIntValues));
+UnitTests.cs (105) : }
+UnitTests.cs (107) : [Fact]
+UnitTests.cs (108) : public void ArrayListPerformanceTests()
+UnitTests.cs (109) : {
+UnitTests.cs (110) : int[] testIntValues = new int[] { 3, 2, 6, 1, 2 };
+UnitTests.cs (111) : Assert.True(ListTests.MeasurePerformance(new List<int>(), testIntValues));
+UnitTests.cs (112) : }
+UnitTests.cs (114) : [Fact]
+UnitTests.cs (115) : public void StackPerformanceTests()
+UnitTests.cs (116) : {
+UnitTests.cs (117) : int[] testIntValues = new int[] { 3, 2, 6, 1, 2 };
+UnitTests.cs (118) : Assert.True(StackAndQueuesTests.MeasurePerformance(new Lists.Stack<int>(), testIntValues));
+UnitTests.cs (119) : }
+UnitTests.cs (121) : [Fact]
+UnitTests.cs (122) : public void QueuePerformanceTests()
+UnitTests.cs (123) : {
+UnitTests.cs (124) : int[] testIntValues = new int[] { 3, 2, 6, 1, 2 };
+UnitTests.cs (125) : Assert.True(StackAndQueuesTests.MeasurePerformance(new Lists.Queue<int>(), testIntValues));
+UnitTests.cs (126) : }
+UnitTests.cs (127) : }
+UnitTests.cs (128) : }
+IIntList.cs (1) : ﻿using System;
+IIntList.cs (2) : using System.Collections;
+IIntList.cs (3) : using System.Text;
+IIntList.cs (5) : namespace Lists
+IIntList.cs (6) : {
+IIntList.cs (7) : public interface IIntList : System.Collections.IEnumerable
+IIntList.cs (8) : {
+IIntList.cs (9) : int Count();
+IIntList.cs (11) : int Get(int index);
+IIntList.cs (13) : void Add(int value);
+IIntList.cs (15) : int Remove(int index);
+IIntList.cs (17) : void Clear();
+IIntList.cs (18) : }
+IIntList.cs (19) : }
+IntArrayList.cs (1) : using System;
+IntArrayList.cs (2) : using System.Collections;
+IntArrayList.cs (4) : namespace Lists
+IntArrayList.cs (5) : {
+IntArrayList.cs (6) : public class IntArrayList : IIntList
+IntArrayList.cs (7) : {
+IntArrayList.cs (8) : const int InitialSize = 10; //any arbitrary size
+IntArrayList.cs (9) : int[] Values;
+IntArrayList.cs (10) : int NumElements = 0;
+IntArrayList.cs (14) : public IntArrayList(int n)
+IntArrayList.cs (15) : {
+IntArrayList.cs (16) : Values = new int[n];
+IntArrayList.cs (17) : NumElements = 0;
+IntArrayList.cs (18) : }
+IntArrayList.cs (20) : public override string ToString()
+IntArrayList.cs (21) : {
+IntArrayList.cs (22) : string output = "[";
+IntArrayList.cs (24) : for (int i = 0; i < Count(); i++)
+IntArrayList.cs (25) : output += Values[i] + ",";
+IntArrayList.cs (26) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+IntArrayList.cs (28) : return output;
+IntArrayList.cs (29) : }
+IntArrayList.cs (32) : public int Count()
+IntArrayList.cs (33) : {
+IntArrayList.cs (34) : //TODO #6: return the number of elements on the list
+IntArrayList.cs (36) : }
+IntArrayList.cs (39) : public int Get(int index)
+IntArrayList.cs (40) : {
+IntArrayList.cs (41) : //TODO #7: return the element on the index-th position. O if the position is out of bounds
+IntArrayList.cs (44) : return 0;
+IntArrayList.cs (47) : }
+IntArrayList.cs (49) : public void Add(int value)
+IntArrayList.cs (50) : {
+IntArrayList.cs (51) : //TODO #8: add a new integer to the end of the list.
+IntArrayList.cs (52) : //[After #12 -> If there is no place, resize (double the size) and add]
+IntArrayList.cs (55) : }
+IntArrayList.cs (58) : public int Remove(int index)
+IntArrayList.cs (59) : {
+IntArrayList.cs (60) : //TODO #9: remove the element on the index-th position. Do nothing if position is out of bounds
+IntArrayList.cs (61) : //Return the removed item, -1 if the position is incorrect
+IntArrayList.cs (63) : return 0;
+IntArrayList.cs (65) : }
+IntArrayList.cs (68) : public void Clear()
+IntArrayList.cs (69) : {
+IntArrayList.cs (70) : //TODO #10: remove all the elements on the list
+IntArrayList.cs (72) : }
+IntArrayList.cs (74) : private void Resize(int newSize)
+IntArrayList.cs (75) : {
+IntArrayList.cs (76) : //TODO #11: return the element on the index-th position. O if the position is out of bounds
+IntArrayList.cs (78) : }
+IntArrayList.cs (80) : public IEnumerator GetEnumerator()
+IntArrayList.cs (81) : {
+IntArrayList.cs (82) : //TODO #12 : Return an enumerator using "yield return" for each of the values in this list
+IntArrayList.cs (84) : yield return null;
+IntArrayList.cs (86) : }
+IntArrayList.cs (87) : }
+IntArrayList.cs (88) : }
+IntList.cs (1) : using System;
+IntList.cs (2) : using System.Collections;
+IntList.cs (4) : namespace Lists
+IntList.cs (5) : {
+IntList.cs (6) : public class IntListNode
+IntList.cs (7) : {
+IntList.cs (8) : public int Value;
+IntList.cs (9) : public IntListNode Next = null;
+IntList.cs (11) : public IntListNode(int value)
+IntList.cs (12) : {
+IntList.cs (13) : Value = value;
+IntList.cs (14) : }
+IntList.cs (15) : }
+IntList.cs (17) : public class IntList : IIntList
+IntList.cs (18) : {
+IntList.cs (19) : IntListNode First = null;
+IntList.cs (21) : //This method returns all the elements on the list as a string
+IntList.cs (22) : //Use it as an example on how to access all the elements on the list
+IntList.cs (23) : public override string ToString()
+IntList.cs (24) : {
+IntList.cs (25) : IntListNode node = First;
+IntList.cs (26) : string output = "[";
+IntList.cs (28) : while (node != null)
+IntList.cs (29) : {
+IntList.cs (30) : output += node.Value + ",";
+IntList.cs (31) : node = node.Next;
+IntList.cs (32) : }
+IntList.cs (33) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+IntList.cs (35) : return output;
+IntList.cs (36) : }
+IntList.cs (40) : public int Count()
+IntList.cs (41) : {
+IntList.cs (42) : //TODO #1: return the number of elements on the list
+IntList.cs (51) : }
+IntList.cs (54) : public int Get(int index)
+IntList.cs (55) : {
+IntList.cs (56) : //TODO #2: return the element on the index-th position. O if the position is out of bounds
+IntList.cs (61) : return 0;
+IntList.cs (73) : }
+IntList.cs (76) : public void Add(int value)
+IntList.cs (77) : {
+IntList.cs (78) : //TODO #3: add a new integer to the end of the list
+IntList.cs (91) : }
+IntList.cs (94) : public int Remove(int index)
+IntList.cs (95) : {
+IntList.cs (96) : //TODO #4: remove the element on the index-th position. Do nothing if position is out of bounds
+IntList.cs (97) : //Return the removed item, -1 if the position is incorrect
+IntList.cs (118) : }
+IntList.cs (121) : public void Clear()
+IntList.cs (122) : {
+IntList.cs (123) : //TODO #5: remove all the elements on the list
+IntList.cs (125) : }
+IntList.cs (127) : public IEnumerator GetEnumerator()
+IntList.cs (128) : {
+IntList.cs (129) : //TODO #6 : Return an enumerator using "yield return" for each of the values in this list
+IntList.cs (136) : }
+IntList.cs (137) : }
+IntList.cs (138) : }
+ArrayList.cs (1) : using System;
+ArrayList.cs (3) : namespace Lists
+ArrayList.cs (4) : {
+ArrayList.cs (5) : public class ArrayList<T> : IList<T>
+ArrayList.cs (6) : {
+ArrayList.cs (7) : T[] Values = new T[10];
+ArrayList.cs (8) : int NumElements = 0;
+ArrayList.cs (12) : public ArrayList(int n = 10)
+ArrayList.cs (13) : {
+ArrayList.cs (14) : Values = new T[n];
+ArrayList.cs (15) : Clear();
+ArrayList.cs (16) : }
+ArrayList.cs (17) : public override string ToString()
+ArrayList.cs (18) : {
+ArrayList.cs (20) : string output = "[";
+ArrayList.cs (22) : for (int i = 0; i < Count(); i++)
+ArrayList.cs (23) : output += Values[i].ToString() + ",";
+ArrayList.cs (24) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+ArrayList.cs (26) : return output;
+ArrayList.cs (28) : }
+ArrayList.cs (30) : public int Count()
+ArrayList.cs (31) : {
+ArrayList.cs (32) : //TODO #6: return the number of elements on the list
+ArrayList.cs (34) : return 0;
+ArrayList.cs (36) : }
+ArrayList.cs (38) : public T Get(int index)
+ArrayList.cs (39) : {
+ArrayList.cs (40) : //TODO #7: return the element on the index-th position. O if the position is out of bounds
+ArrayList.cs (42) : return default(T);
+ArrayList.cs (44) : }
+ArrayList.cs (46) : public void Add(T value)
+ArrayList.cs (47) : {
+ArrayList.cs (48) : //TODO #8: add a new integer to the end of the list.
+ArrayList.cs (49) : //[After #11 -> If there is no place, resize (double the size) and add]
+ArrayList.cs (51) : }
+ArrayList.cs (55) : public T Remove(int index)
+ArrayList.cs (56) : {
+ArrayList.cs (57) : //TODO #9: remove the element on the index-th position. Do nothing if position is out of bounds
+ArrayList.cs (58) : //Return the removed item, -1 if the position is incorrect
+ArrayList.cs (60) : return default(T);
+ArrayList.cs (62) : }
+ArrayList.cs (64) : public void Clear()
+ArrayList.cs (65) : {
+ArrayList.cs (66) : //TODO #10: remove all the elements on the list
+ArrayList.cs (68) : }
+ArrayList.cs (70) : private void Resize(int newSize)
+ArrayList.cs (71) : {
+ArrayList.cs (72) : //TODO #11: return the element on the index-th position. O if the position is out of bounds
+ArrayList.cs (73) : //Once done, finish #8
+ArrayList.cs (75) : }
+ArrayList.cs (76) : public System.Collections.IEnumerator GetEnumerator()
+ArrayList.cs (77) : {
+ArrayList.cs (78) : //TODO #12 : Return an enumerator using "yield return" for each of the values in this list
+ArrayList.cs (80) : yield return null;
+ArrayList.cs (82) : }
+ArrayList.cs (83) : }
+ArrayList.cs (84) : }
+IList.cs (1) : ﻿using System;
+IList.cs (2) : using System.Collections;
+IList.cs (4) : using System.Linq;
+IList.cs (5) : using System.Text;
+IList.cs (6) : using System.Threading.Tasks;
+IList.cs (8) : namespace Lists
+IList.cs (9) : {
+IList.cs (10) : public interface IList<T> : IEnumerable
+IList.cs (11) : {
+IList.cs (12) : int Count();
+IList.cs (14) : T Get(int index);
+IList.cs (16) : void Add(T value);
+IList.cs (18) : T Remove(int index);
+IList.cs (20) : void Clear();
+IList.cs (21) : }
+IList.cs (22) : }
+List.cs (1) : using Lists;
+List.cs (2) : using System.Collections;
+List.cs (4) : public class ListNode<T>
+List.cs (5) : {
+List.cs (6) : public T Value;
+List.cs (7) : public ListNode<T> Next = null;
+List.cs (11) : public ListNode(T value)
+List.cs (12) : {
+List.cs (13) : Value = value;
+List.cs (14) : }
+List.cs (16) : public override string ToString()
+List.cs (17) : {
+List.cs (18) : return Value.ToString();
+List.cs (19) : }
+List.cs (20) : }
+List.cs (22) : public class List<T> : IList<T>
+List.cs (23) : {
+List.cs (24) : ListNode<T> First = null;
+List.cs (25) : ListNode<T> Last = null;
+List.cs (26) : int m_numItems = 0;
+List.cs (28) : public override string ToString()
+List.cs (29) : {
+List.cs (30) : ListNode<T> node = First;
+List.cs (31) : string output = "[";
+List.cs (33) : while (node != null)
+List.cs (34) : {
+List.cs (35) : output += node.ToString() + ",";
+List.cs (36) : node = node.Next;
+List.cs (37) : }
+List.cs (38) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+List.cs (40) : return output;
+List.cs (41) : }
+List.cs (43) : public int Count()
+List.cs (44) : {
+List.cs (45) : //TODO #1: return the number of elements on the list
+List.cs (47) : return 0;
+List.cs (49) : }
+List.cs (51) : public T Get(int index)
+List.cs (52) : {
+List.cs (53) : //TODO #2: return the element on the index-th position. O if the position is out of bounds
+List.cs (55) : return default(T);
+List.cs (57) : }
+List.cs (59) : public void Add(T value)
+List.cs (60) : {
+List.cs (61) : //TODO #3: add a new integer to the end of the list
+List.cs (63) : }
+List.cs (65) : public T Remove(int index)
+List.cs (66) : {
+List.cs (67) : //TODO #4: remove the element on the index-th position. Do nothing if position is out of bounds
+List.cs (69) : return default(T);
+List.cs (71) : }
+List.cs (73) : public void Clear()
+List.cs (74) : {
+List.cs (75) : //TODO #5: remove all the elements on the list
+List.cs (77) : }
+List.cs (79) : public IEnumerator GetEnumerator()
+List.cs (80) : {
+List.cs (81) : //TODO #6 : Return an enumerator using "yield return" for each of the values in this list
+List.cs (83) : yield return null;
+List.cs (85) : }
+List.cs (86) : }
+IPushPop.cs (2) : namespace Lists
+IPushPop.cs (3) : {
+IPushPop.cs (4) : public interface IPushPop<T>
+IPushPop.cs (5) : {
+IPushPop.cs (6) : int Count();
+IPushPop.cs (7) : void Clear();
+IPushPop.cs (8) : void Push(T value);
+IPushPop.cs (9) : T Pop();
+IPushPop.cs (10) : }
+IPushPop.cs (11) : }
+Queue.cs (1) : namespace Lists
+Queue.cs (2) : {
+Queue.cs (4) : public class Queue<T> : IPushPop<T>
+Queue.cs (5) : {
+Queue.cs (8) : public override string ToString()
+Queue.cs (9) : {
+Queue.cs (11) : return null;
+Queue.cs (13) : }
+Queue.cs (15) : public int Count()
+Queue.cs (16) : {
+Queue.cs (18) : return 0;
+Queue.cs (20) : }
+Queue.cs (22) : public void Clear()
+Queue.cs (23) : {
+Queue.cs (25) : }
+Queue.cs (27) : public void Push(T value)
+Queue.cs (28) : {
+Queue.cs (30) : }
+Queue.cs (32) : public T Pop()
+Queue.cs (33) : {
+Queue.cs (35) : return default(T);
+Queue.cs (37) : }
+Queue.cs (38) : }
+Queue.cs (39) : }
+Stack.cs (2) : namespace Lists
+Stack.cs (3) : {
+Stack.cs (4) : public class Stack<T> : IPushPop<T>
+Stack.cs (5) : {
+Stack.cs (8) : public override string ToString()
+Stack.cs (9) : {
+Stack.cs (11) : return null;
+Stack.cs (13) : }
+Stack.cs (15) : public int Count()
+Stack.cs (16) : {
+Stack.cs (18) : return 0;
+Stack.cs (20) : }
+Stack.cs (22) : public void Clear()
+Stack.cs (23) : {
+Stack.cs (25) : }
+Stack.cs (27) : public void Push(T value)
+Stack.cs (28) : {
+Stack.cs (30) : }
+Stack.cs (32) : public T Pop()
+Stack.cs (33) : {
+Stack.cs (35) : return default(T);
+Stack.cs (37) : }
+Stack.cs (38) : }
+Stack.cs (39) : }
+IntTests.cs (2) : using System;
+IntTests.cs (3) : using System.Diagnostics;
+IntTests.cs (5) : namespace Lists
+IntTests.cs (6) : {
+IntTests.cs (7) : public class IntTests
+IntTests.cs (8) : {
+IntTests.cs (9) : public static bool IntListTest(IIntList myList)
+IntTests.cs (10) : {
+IntTests.cs (12) : int[] initialValues = new int[5];
+IntTests.cs (13) : initialValues[0] = 3;
+IntTests.cs (14) : initialValues[1] = 6;
+IntTests.cs (15) : initialValues[2] = 2;
+IntTests.cs (16) : initialValues[3] = 9;
+IntTests.cs (17) : initialValues[4] = -3;
+IntTests.cs (19) : for (int i = 0; i < initialValues.Length; i++)
+IntTests.cs (20) : myList.Add(initialValues[i]);
+IntTests.cs (22) : Console.WriteLine();
+IntTests.cs (24) : Console.WriteLine("1. Running tests");
+IntTests.cs (25) : Console.Write("1.1. Testing Add/Count()...");
+IntTests.cs (26) : if (myList.Count() != 5)
+IntTests.cs (27) : {
+IntTests.cs (28) : Console.WriteLine($"ERROR. Count returned {myList.Count()} instead of 5");
+IntTests.cs (29) : return false;
+IntTests.cs (30) : }
+IntTests.cs (31) : Console.WriteLine($"PASSED.");
+IntTests.cs (33) : Console.Write("1.2. Testing Get()...");
+IntTests.cs (34) : for (int i = 0; i < initialValues.Length; i++)
+IntTests.cs (35) : {
+IntTests.cs (36) : if (myList.Get(i) != initialValues[i])
+IntTests.cs (37) : {
+IntTests.cs (38) : Console.WriteLine($"ERROR. Get({i}) returned {myList.Get(i)} instead of {initialValues[i]}");
+IntTests.cs (39) : return false;
+IntTests.cs (40) : }
+IntTests.cs (42) : }
+IntTests.cs (43) : Console.WriteLine($"PASSED.");
+IntTests.cs (45) : Console.Write("1.3. Testing Remove()...");
+IntTests.cs (46) : myList.Remove(4);
+IntTests.cs (47) : if (myList.Count() != 4 && myList.Get(3) == initialValues[3])
+IntTests.cs (48) : {
+IntTests.cs (49) : Console.WriteLine($"ERROR. Removing the last element didn't work");
+IntTests.cs (50) : return false;
+IntTests.cs (51) : }
+IntTests.cs (52) : myList.Remove(0);
+IntTests.cs (53) : if (myList.Count() != 3 || myList.Get(0) != initialValues[1])
+IntTests.cs (54) : {
+IntTests.cs (55) : Console.WriteLine($"ERROR. Removing the first element didn't work");
+IntTests.cs (56) : return false;
+IntTests.cs (57) : }
+IntTests.cs (58) : myList.Remove(0);
+IntTests.cs (59) : if (myList.Count() != 2 || myList.Get(0) != initialValues[2])
+IntTests.cs (60) : {
+IntTests.cs (61) : Console.WriteLine($"ERROR. Removing the first element TWICE didn't work");
+IntTests.cs (62) : return false;
+IntTests.cs (63) : }
+IntTests.cs (67) : Console.WriteLine($"PASSED");
+IntTests.cs (69) : Console.Write("1.4. Testing Clear()...");
+IntTests.cs (70) : myList.Clear();
+IntTests.cs (71) : if (myList.Count() != 0)
+IntTests.cs (72) : {
+IntTests.cs (73) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after Clear() instead of 0");
+IntTests.cs (74) : return false;
+IntTests.cs (75) : }
+IntTests.cs (76) : Console.WriteLine($"PASSED");
+IntTests.cs (78) : int size = 10;
+IntTests.cs (79) : int maxSize = 10000;
+IntTests.cs (80) : Console.WriteLine($"\n2. Measuring speed");
+IntTests.cs (81) : Stopwatch stopwatch = new Stopwatch();
+IntTests.cs (82) : int numMaxDecimalDigits = 5;
+IntTests.cs (83) : while (size <= maxSize)
+IntTests.cs (84) : {
+IntTests.cs (85) : //Add numbers from 0 to size
+IntTests.cs (86) : Console.Write($"n={size} => ");
+IntTests.cs (87) : stopwatch.Start();
+IntTests.cs (88) : for (int i = 0; i < size; i++)
+IntTests.cs (89) : myList.Add(i);
+IntTests.cs (90) : stopwatch.Stop();
+IntTests.cs (91) : Console.Write($"{Utils.ToString(stopwatch.Elapsed.TotalSeconds, numMaxDecimalDigits)}s (Add) ");
+IntTests.cs (93) : //Count
+IntTests.cs (94) : stopwatch.Start();
+IntTests.cs (95) : myList.Count();
+IntTests.cs (96) : stopwatch.Stop();
+IntTests.cs (97) : Console.Write($", {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numMaxDecimalDigits)}s (Count)");
+IntTests.cs (99) : //Add again n elements
+IntTests.cs (100) : for (int i = 0; i < size; i++)
+IntTests.cs (101) : myList.Add(i);
+IntTests.cs (103) : //Remove first element
+IntTests.cs (104) : stopwatch.Start();
+IntTests.cs (105) : for (int i = 0; i < size; i++)
+IntTests.cs (106) : myList.Remove(0);
+IntTests.cs (107) : stopwatch.Stop();
+IntTests.cs (108) : Console.Write($", {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numMaxDecimalDigits)}s (Remove 1st)");
+IntTests.cs (110) : //Add again n elements
+IntTests.cs (111) : for (int i = 0; i < size; i++)
+IntTests.cs (112) : myList.Add(i);
+IntTests.cs (114) : //Remove last element
+IntTests.cs (115) : stopwatch.Start();
+IntTests.cs (116) : for (int i = 0; i < size; i++)
+IntTests.cs (117) : myList.Remove(myList.Count() - 1);
+IntTests.cs (118) : stopwatch.Stop();
+IntTests.cs (119) : Console.WriteLine($", {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numMaxDecimalDigits)}s (Remove last)");
+IntTests.cs (121) : size *= 10;
+IntTests.cs (122) : }
+IntTests.cs (123) : return true;
+IntTests.cs (124) : }
+IntTests.cs (126) : public static bool ListTest(IList<int> myList)
+IntTests.cs (127) : {
+IntTests.cs (129) : int[] initialValues = new int[5];
+IntTests.cs (130) : initialValues[0] = 3;
+IntTests.cs (131) : initialValues[1] = 6;
+IntTests.cs (132) : initialValues[2] = 2;
+IntTests.cs (133) : initialValues[3] = 9;
+IntTests.cs (134) : initialValues[4] = -3;
+IntTests.cs (136) : Console.WriteLine();
+IntTests.cs (138) : Console.WriteLine("1. Running tests");
+IntTests.cs (139) : Console.Write("1.1. Testing Add/Count()...");
+IntTests.cs (141) : for (int i = 0; i < initialValues.Length; i++)
+IntTests.cs (142) : myList.Add(initialValues[i]);
+IntTests.cs (145) : if (myList.Count() != 5)
+IntTests.cs (146) : {
+IntTests.cs (147) : Console.WriteLine($"ERROR. Count returned {myList.Count()} instead of 5");
+IntTests.cs (148) : return false;
+IntTests.cs (149) : }
+IntTests.cs (150) : Console.WriteLine($"PASSED.");
+IntTests.cs (152) : Console.Write("1.2. Testing Get()...");
+IntTests.cs (153) : for (int i = 0; i < initialValues.Length; i++)
+IntTests.cs (154) : {
+IntTests.cs (155) : if (myList.Get(i) != initialValues[i])
+IntTests.cs (156) : {
+IntTests.cs (157) : Console.WriteLine($"ERROR. Get({i}) returned {myList.Get(i)} instead of {initialValues[i]}");
+IntTests.cs (158) : return false;
+IntTests.cs (159) : }
+IntTests.cs (161) : }
+IntTests.cs (162) : Console.WriteLine($"PASSED.");
+IntTests.cs (164) : Console.Write("1.3. Testing Remove()...");
+IntTests.cs (165) : myList.Remove(4);
+IntTests.cs (166) : if (myList.Count() != 4)
+IntTests.cs (167) : {
+IntTests.cs (168) : Console.WriteLine($"ERROR. Removing the last element didn't work");
+IntTests.cs (169) : return false;
+IntTests.cs (170) : }
+IntTests.cs (171) : myList.Remove(0);
+IntTests.cs (172) : if (myList.Count() != 3 || myList.Get(0) != initialValues[1])
+IntTests.cs (173) : {
+IntTests.cs (174) : Console.WriteLine($"ERROR. Removing the first element didn't work");
+IntTests.cs (175) : return false;
+IntTests.cs (176) : }
+IntTests.cs (177) : myList.Remove(0);
+IntTests.cs (178) : if (myList.Count() != 2 || myList.Get(0) != initialValues[2])
+IntTests.cs (179) : {
+IntTests.cs (180) : Console.WriteLine($"ERROR. Removing the first element TWICE didn't work");
+IntTests.cs (181) : return false;
+IntTests.cs (182) : }
+IntTests.cs (184) : Console.WriteLine($"PASSED");
+IntTests.cs (186) : Console.Write("1.4. Testing Clear()...");
+IntTests.cs (187) : myList.Clear();
+IntTests.cs (188) : if (myList.Count() != 0)
+IntTests.cs (189) : {
+IntTests.cs (190) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after Clear() instead of 0");
+IntTests.cs (191) : return false;
+IntTests.cs (192) : }
+IntTests.cs (193) : Console.WriteLine($"PASSED");
+IntTests.cs (195) : Console.Write("1.4. Testing Add/Get/Remove()...");
+IntTests.cs (196) : myList.Clear();
+IntTests.cs (197) : myList.Add(initialValues[0]);
+IntTests.cs (198) : if (myList.Count() != 1)
+IntTests.cs (199) : {
+IntTests.cs (200) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after Add() instead of 1");
+IntTests.cs (201) : return false;
+IntTests.cs (202) : }
+IntTests.cs (203) : if (myList.Get(0) != initialValues[0])
+IntTests.cs (204) : {
+IntTests.cs (205) : Console.WriteLine($"ERROR. Get(0) failed after adding one element");
+IntTests.cs (206) : return false;
+IntTests.cs (207) : }
+IntTests.cs (208) : myList.Add(initialValues[1]);
+IntTests.cs (209) : if (myList.Count() != 2)
+IntTests.cs (210) : {
+IntTests.cs (211) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after second Add() instead of 2");
+IntTests.cs (212) : return false;
+IntTests.cs (213) : }
+IntTests.cs (214) : if (myList.Get(0) != initialValues[0])
+IntTests.cs (215) : {
+IntTests.cs (216) : Console.WriteLine($"ERROR. Get(0) failed after adding two elements");
+IntTests.cs (217) : return false;
+IntTests.cs (218) : }
+IntTests.cs (219) : if (myList.Get(1) != initialValues[1])
+IntTests.cs (220) : {
+IntTests.cs (221) : Console.WriteLine($"ERROR. Get(1) failed after adding two elements");
+IntTests.cs (222) : return false;
+IntTests.cs (223) : }
+IntTests.cs (224) : myList.Remove(0);
+IntTests.cs (225) : if (myList.Count() != 1)
+IntTests.cs (226) : {
+IntTests.cs (227) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after adding two elements and removing one");
+IntTests.cs (228) : return false;
+IntTests.cs (229) : }
+IntTests.cs (230) : if (myList.Get(0) != initialValues[1])
+IntTests.cs (231) : {
+IntTests.cs (232) : Console.WriteLine($"ERROR. Get(0) failed after adding two elements and removing the first");
+IntTests.cs (233) : return false;
+IntTests.cs (234) : }
+IntTests.cs (235) : myList.Add(initialValues[2]);
+IntTests.cs (236) : if (myList.Count() != 2)
+IntTests.cs (237) : {
+IntTests.cs (238) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after adding two elements, removing one, and adding a third");
+IntTests.cs (239) : return false;
+IntTests.cs (240) : }
+IntTests.cs (241) : if (myList.Get(0) != initialValues[1])
+IntTests.cs (242) : {
+IntTests.cs (243) : Console.WriteLine($"ERROR. Get(0) failed after adding two elements and removing one");
+IntTests.cs (244) : return false;
+IntTests.cs (245) : }
+IntTests.cs (246) : if (myList.Get(1) != initialValues[2])
+IntTests.cs (247) : {
+IntTests.cs (248) : Console.WriteLine($"ERROR. Get(1) failed after adding two elements and removing one");
+IntTests.cs (249) : return false;
+IntTests.cs (250) : }
+IntTests.cs (251) : Console.WriteLine($"PASSED");
+IntTests.cs (254) : return true;
+IntTests.cs (255) : }
+IntTests.cs (258) : public static bool ListEnumeratorTest(IIntList myList)
+IntTests.cs (259) : {
+IntTests.cs (261) : int[] initialValues = new int[5];
+IntTests.cs (262) : initialValues[0] = 3;
+IntTests.cs (263) : initialValues[1] = 6;
+IntTests.cs (264) : initialValues[2] = 2;
+IntTests.cs (265) : initialValues[3] = 9;
+IntTests.cs (266) : initialValues[4] = -3;
+IntTests.cs (268) : for (int i = 0; i < initialValues.Length; i++)
+IntTests.cs (269) : myList.Add(initialValues[i]);
+IntTests.cs (271) : foreach (int i in myList)
+IntTests.cs (272) : Console.WriteLine(i);
+IntTests.cs (274) : return true;
+IntTests.cs (275) : }
+IntTests.cs (277) : public static bool ListEnumeratorTest(IList<int> myList)
+IntTests.cs (278) : {
+IntTests.cs (279) : for (int i = 0; i < 10; i++)
+IntTests.cs (280) : myList.Add(i);
+IntTests.cs (282) : foreach (int i in myList)
+IntTests.cs (283) : Console.WriteLine(i);
+IntTests.cs (285) : return true;
+IntTests.cs (286) : }
+IntTests.cs (288) : const int NumSamples = 100000;
+IntTests.cs (289) : public static bool MeasurePerformance<T>(IList<T> list, T[] initialValues)
+IntTests.cs (290) : {
+IntTests.cs (291) : int numDigits = 3;
+IntTests.cs (292) : int timeoutSecs = 1;
+IntTests.cs (293) : Console.WriteLine($"\n# Measuring performance (n={NumSamples})");
+IntTests.cs (295) : Stopwatch stopwatch = new Stopwatch();
+IntTests.cs (296) : stopwatch.Reset();
+IntTests.cs (297) : stopwatch.Start();
+IntTests.cs (298) : System.Threading.Tasks.Task timeoutTask = System.Threading.Tasks.Task.Delay(timeoutSecs * 1000);
+IntTests.cs (299) : System.Threading.Tasks.Task testTask = System.Threading.Tasks.Task.Factory.StartNew(
+IntTests.cs (300) : () =>
+IntTests.cs (301) : {
+IntTests.cs (302) : //Add
+IntTests.cs (303) : for (int i = 0; i < NumSamples; i++)
+IntTests.cs (304) : list.Add(initialValues[i % initialValues.Length]);
+IntTests.cs (305) : });
+IntTests.cs (307) : var winner = System.Threading.Tasks.Task.WhenAny(testTask, timeoutTask).Result;
+IntTests.cs (308) : if (testTask == winner)
+IntTests.cs (309) : {
+IntTests.cs (310) : Console.WriteLine($"'Add' Ok.  (n={NumSamples}) -> {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numDigits)}");
+IntTests.cs (311) : }
+IntTests.cs (312) : else
+IntTests.cs (313) : {
+IntTests.cs (314) : Console.WriteLine($"Error. 'Add' timed out (> {timeoutSecs}s)");
+IntTests.cs (315) : return false;
+IntTests.cs (316) : }
+IntTests.cs (318) : //Remove first/last
+IntTests.cs (319) : stopwatch.Reset();
+IntTests.cs (320) : stopwatch.Start();
+IntTests.cs (321) : timeoutTask = System.Threading.Tasks.Task.Delay(timeoutSecs * 1000);
+IntTests.cs (322) : testTask = System.Threading.Tasks.Task.Factory.StartNew(
+IntTests.cs (323) : () =>
+IntTests.cs (324) : {
+IntTests.cs (325) : for (int i = 0; i < NumSamples; i++)
+IntTests.cs (326) : {
+IntTests.cs (327) : if (i % 2 == 0)
+IntTests.cs (328) : list.Remove(0);
+IntTests.cs (329) : else
+IntTests.cs (330) : list.Remove(list.Count() - 1);
+IntTests.cs (331) : }
+IntTests.cs (332) : });
+IntTests.cs (333) : winner = System.Threading.Tasks.Task.WhenAny(testTask, timeoutTask).Result;
+IntTests.cs (334) : double t = stopwatch.Elapsed.TotalSeconds;
+IntTests.cs (335) : if (testTask.IsCompleted)
+IntTests.cs (336) : {
+IntTests.cs (337) : Console.WriteLine($"'Remove' Ok. (n={NumSamples}) -> {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numDigits)} s");
+IntTests.cs (338) : return true;
+IntTests.cs (339) : }
+IntTests.cs (340) : else
+IntTests.cs (341) : {
+IntTests.cs (342) : Console.WriteLine($"Error. 'Remove' timed out (> {timeoutSecs}s)");
+IntTests.cs (343) : return false;
+IntTests.cs (344) : }
+IntTests.cs (346) : }
+IntTests.cs (347) : }
+IntTests.cs (348) : }
+ListTests.cs (2) : using System;
+ListTests.cs (3) : using System.Diagnostics;
+ListTests.cs (5) : namespace Lists
+ListTests.cs (6) : {
+ListTests.cs (7) : public class ListTests
+ListTests.cs (8) : {
+ListTests.cs (9) : public static bool IntListTest(IIntList myList)
+ListTests.cs (10) : {
+ListTests.cs (12) : int[] initialValues = new int[5];
+ListTests.cs (13) : initialValues[0] = 3;
+ListTests.cs (14) : initialValues[1] = 6;
+ListTests.cs (15) : initialValues[2] = 2;
+ListTests.cs (16) : initialValues[3] = 9;
+ListTests.cs (17) : initialValues[4] = -3;
+ListTests.cs (19) : for (int i = 0; i < initialValues.Length; i++)
+ListTests.cs (20) : myList.Add(initialValues[i]);
+ListTests.cs (22) : Console.WriteLine();
+ListTests.cs (24) : Console.WriteLine("1. Running tests");
+ListTests.cs (25) : Console.Write("1.1. Testing Add/Count()...");
+ListTests.cs (26) : if (myList.Count() != 5)
+ListTests.cs (27) : {
+ListTests.cs (28) : Console.WriteLine($"ERROR. Count returned {myList.Count()} instead of 5");
+ListTests.cs (29) : return false;
+ListTests.cs (30) : }
+ListTests.cs (31) : Console.WriteLine($"PASSED.");
+ListTests.cs (33) : Console.Write("1.2. Testing Get()...");
+ListTests.cs (34) : for (int i = 0; i < initialValues.Length; i++)
+ListTests.cs (35) : {
+ListTests.cs (36) : if (myList.Get(i) != initialValues[i])
+ListTests.cs (37) : {
+ListTests.cs (38) : Console.WriteLine($"ERROR. Get({i}) returned {myList.Get(i)} instead of {initialValues[i]}");
+ListTests.cs (39) : return false;
+ListTests.cs (40) : }
+ListTests.cs (42) : }
+ListTests.cs (43) : Console.WriteLine($"PASSED.");
+ListTests.cs (45) : Console.Write("1.3. Testing Remove()...");
+ListTests.cs (46) : myList.Remove(4);
+ListTests.cs (47) : if (myList.Count() != 4 && myList.Get(3) == initialValues[3])
+ListTests.cs (48) : {
+ListTests.cs (49) : Console.WriteLine($"ERROR. Removing the last element didn't work");
+ListTests.cs (50) : return false;
+ListTests.cs (51) : }
+ListTests.cs (52) : myList.Remove(0);
+ListTests.cs (53) : if (myList.Count() != 3 || myList.Get(0) != initialValues[1])
+ListTests.cs (54) : {
+ListTests.cs (55) : Console.WriteLine($"ERROR. Removing the first element didn't work");
+ListTests.cs (56) : return false;
+ListTests.cs (57) : }
+ListTests.cs (58) : myList.Remove(0);
+ListTests.cs (59) : if (myList.Count() != 2 || myList.Get(0) != initialValues[2])
+ListTests.cs (60) : {
+ListTests.cs (61) : Console.WriteLine($"ERROR. Removing the first element TWICE didn't work");
+ListTests.cs (62) : return false;
+ListTests.cs (63) : }
+ListTests.cs (67) : Console.WriteLine($"PASSED");
+ListTests.cs (69) : Console.Write("1.4. Testing Clear()...");
+ListTests.cs (70) : myList.Clear();
+ListTests.cs (71) : if (myList.Count() != 0)
+ListTests.cs (72) : {
+ListTests.cs (73) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after Clear() instead of 0");
+ListTests.cs (74) : return false;
+ListTests.cs (75) : }
+ListTests.cs (76) : Console.WriteLine($"PASSED");
+ListTests.cs (78) : int size = 10;
+ListTests.cs (79) : int maxSize = 10000;
+ListTests.cs (80) : Console.WriteLine($"\n2. Measuring speed");
+ListTests.cs (81) : Stopwatch stopwatch = new Stopwatch();
+ListTests.cs (82) : int numMaxDecimalDigits = 5;
+ListTests.cs (83) : while (size <= maxSize)
+ListTests.cs (84) : {
+ListTests.cs (85) : //Add numbers from 0 to size
+ListTests.cs (86) : Console.Write($"n={size} => ");
+ListTests.cs (87) : stopwatch.Start();
+ListTests.cs (88) : for (int i = 0; i < size; i++)
+ListTests.cs (89) : myList.Add(i);
+ListTests.cs (90) : stopwatch.Stop();
+ListTests.cs (91) : Console.Write($"{Utils.ToString(stopwatch.Elapsed.TotalSeconds, numMaxDecimalDigits)}s (Add) ");
+ListTests.cs (93) : //Count
+ListTests.cs (94) : stopwatch.Start();
+ListTests.cs (95) : myList.Count();
+ListTests.cs (96) : stopwatch.Stop();
+ListTests.cs (97) : Console.Write($", {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numMaxDecimalDigits)}s (Count)");
+ListTests.cs (99) : //Add again n elements
+ListTests.cs (100) : for (int i = 0; i < size; i++)
+ListTests.cs (101) : myList.Add(i);
+ListTests.cs (103) : //Remove first element
+ListTests.cs (104) : stopwatch.Start();
+ListTests.cs (105) : for (int i = 0; i < size; i++)
+ListTests.cs (106) : myList.Remove(0);
+ListTests.cs (107) : stopwatch.Stop();
+ListTests.cs (108) : Console.Write($", {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numMaxDecimalDigits)}s (Remove 1st)");
+ListTests.cs (110) : //Add again n elements
+ListTests.cs (111) : for (int i = 0; i < size; i++)
+ListTests.cs (112) : myList.Add(i);
+ListTests.cs (114) : //Remove last element
+ListTests.cs (115) : stopwatch.Start();
+ListTests.cs (116) : for (int i = 0; i < size; i++)
+ListTests.cs (117) : myList.Remove(myList.Count() - 1);
+ListTests.cs (118) : stopwatch.Stop();
+ListTests.cs (119) : Console.WriteLine($", {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numMaxDecimalDigits)}s (Remove last)");
+ListTests.cs (121) : size *= 10;
+ListTests.cs (122) : }
+ListTests.cs (123) : return true;
+ListTests.cs (124) : }
+ListTests.cs (126) : public static bool ListTest(IList<int> myList)
+ListTests.cs (127) : {
+ListTests.cs (129) : int[] initialValues = new int[5];
+ListTests.cs (130) : initialValues[0] = 3;
+ListTests.cs (131) : initialValues[1] = 6;
+ListTests.cs (132) : initialValues[2] = 2;
+ListTests.cs (133) : initialValues[3] = 9;
+ListTests.cs (134) : initialValues[4] = -3;
+ListTests.cs (136) : Console.WriteLine();
+ListTests.cs (138) : Console.WriteLine("1. Running tests");
+ListTests.cs (139) : Console.Write("1.1. Testing Add/Count()...");
+ListTests.cs (141) : for (int i = 0; i < initialValues.Length; i++)
+ListTests.cs (142) : myList.Add(initialValues[i]);
+ListTests.cs (145) : if (myList.Count() != 5)
+ListTests.cs (146) : {
+ListTests.cs (147) : Console.WriteLine($"ERROR. Count returned {myList.Count()} instead of 5");
+ListTests.cs (148) : return false;
+ListTests.cs (149) : }
+ListTests.cs (150) : Console.WriteLine($"PASSED.");
+ListTests.cs (152) : Console.Write("1.2. Testing Get()...");
+ListTests.cs (153) : for (int i = 0; i < initialValues.Length; i++)
+ListTests.cs (154) : {
+ListTests.cs (155) : if (myList.Get(i) != initialValues[i])
+ListTests.cs (156) : {
+ListTests.cs (157) : Console.WriteLine($"ERROR. Get({i}) returned {myList.Get(i)} instead of {initialValues[i]}");
+ListTests.cs (158) : return false;
+ListTests.cs (159) : }
+ListTests.cs (161) : }
+ListTests.cs (162) : Console.WriteLine($"PASSED.");
+ListTests.cs (164) : Console.Write("1.3. Testing Remove()...");
+ListTests.cs (165) : myList.Remove(4);
+ListTests.cs (166) : if (myList.Count() != 4)
+ListTests.cs (167) : {
+ListTests.cs (168) : Console.WriteLine($"ERROR. Removing the last element didn't work");
+ListTests.cs (169) : return false;
+ListTests.cs (170) : }
+ListTests.cs (171) : myList.Remove(0);
+ListTests.cs (172) : if (myList.Count() != 3 || myList.Get(0) != initialValues[1])
+ListTests.cs (173) : {
+ListTests.cs (174) : Console.WriteLine($"ERROR. Removing the first element didn't work");
+ListTests.cs (175) : return false;
+ListTests.cs (176) : }
+ListTests.cs (177) : myList.Remove(0);
+ListTests.cs (178) : if (myList.Count() != 2 || myList.Get(0) != initialValues[2])
+ListTests.cs (179) : {
+ListTests.cs (180) : Console.WriteLine($"ERROR. Removing the first element TWICE didn't work");
+ListTests.cs (181) : return false;
+ListTests.cs (182) : }
+ListTests.cs (184) : Console.WriteLine($"PASSED");
+ListTests.cs (186) : Console.Write("1.4. Testing Clear()...");
+ListTests.cs (187) : myList.Clear();
+ListTests.cs (188) : if (myList.Count() != 0)
+ListTests.cs (189) : {
+ListTests.cs (190) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after Clear() instead of 0");
+ListTests.cs (191) : return false;
+ListTests.cs (192) : }
+ListTests.cs (193) : Console.WriteLine($"PASSED");
+ListTests.cs (195) : Console.Write("1.4. Testing Add/Get/Remove()...");
+ListTests.cs (196) : myList.Clear();
+ListTests.cs (197) : myList.Add(initialValues[0]);
+ListTests.cs (198) : if (myList.Count() != 1)
+ListTests.cs (199) : {
+ListTests.cs (200) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after Add() instead of 1");
+ListTests.cs (201) : return false;
+ListTests.cs (202) : }
+ListTests.cs (203) : if (myList.Get(0) != initialValues[0])
+ListTests.cs (204) : {
+ListTests.cs (205) : Console.WriteLine($"ERROR. Get(0) failed after adding one element");
+ListTests.cs (206) : return false;
+ListTests.cs (207) : }
+ListTests.cs (208) : myList.Add(initialValues[1]);
+ListTests.cs (209) : if (myList.Count() != 2)
+ListTests.cs (210) : {
+ListTests.cs (211) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after second Add() instead of 2");
+ListTests.cs (212) : return false;
+ListTests.cs (213) : }
+ListTests.cs (214) : if (myList.Get(0) != initialValues[0])
+ListTests.cs (215) : {
+ListTests.cs (216) : Console.WriteLine($"ERROR. Get(0) failed after adding two elements");
+ListTests.cs (217) : return false;
+ListTests.cs (218) : }
+ListTests.cs (219) : if (myList.Get(1) != initialValues[1])
+ListTests.cs (220) : {
+ListTests.cs (221) : Console.WriteLine($"ERROR. Get(1) failed after adding two elements");
+ListTests.cs (222) : return false;
+ListTests.cs (223) : }
+ListTests.cs (224) : myList.Remove(0);
+ListTests.cs (225) : if (myList.Count() != 1)
+ListTests.cs (226) : {
+ListTests.cs (227) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after adding two elements and removing one");
+ListTests.cs (228) : return false;
+ListTests.cs (229) : }
+ListTests.cs (230) : if (myList.Get(0) != initialValues[1])
+ListTests.cs (231) : {
+ListTests.cs (232) : Console.WriteLine($"ERROR. Get(0) failed after adding two elements and removing the first");
+ListTests.cs (233) : return false;
+ListTests.cs (234) : }
+ListTests.cs (235) : myList.Add(initialValues[2]);
+ListTests.cs (236) : if (myList.Count() != 2)
+ListTests.cs (237) : {
+ListTests.cs (238) : Console.WriteLine($"ERROR. {myList.Count()} elements in the list after adding two elements, removing one, and adding a third");
+ListTests.cs (239) : return false;
+ListTests.cs (240) : }
+ListTests.cs (241) : if (myList.Get(0) != initialValues[1])
+ListTests.cs (242) : {
+ListTests.cs (243) : Console.WriteLine($"ERROR. Get(0) failed after adding two elements and removing one");
+ListTests.cs (244) : return false;
+ListTests.cs (245) : }
+ListTests.cs (246) : if (myList.Get(1) != initialValues[2])
+ListTests.cs (247) : {
+ListTests.cs (248) : Console.WriteLine($"ERROR. Get(1) failed after adding two elements and removing one");
+ListTests.cs (249) : return false;
+ListTests.cs (250) : }
+ListTests.cs (251) : Console.WriteLine($"PASSED");
+ListTests.cs (254) : return true;
+ListTests.cs (255) : }
+ListTests.cs (258) : public static bool ListEnumeratorTest(IIntList myList)
+ListTests.cs (259) : {
+ListTests.cs (261) : int[] initialValues = new int[5];
+ListTests.cs (262) : initialValues[0] = 3;
+ListTests.cs (263) : initialValues[1] = 6;
+ListTests.cs (264) : initialValues[2] = 2;
+ListTests.cs (265) : initialValues[3] = 9;
+ListTests.cs (266) : initialValues[4] = -3;
+ListTests.cs (268) : for (int i = 0; i < initialValues.Length; i++)
+ListTests.cs (269) : myList.Add(initialValues[i]);
+ListTests.cs (271) : foreach (int i in myList)
+ListTests.cs (272) : Console.WriteLine(i);
+ListTests.cs (274) : return true;
+ListTests.cs (275) : }
+ListTests.cs (277) : public static bool ListEnumeratorTest(IList<int> myList)
+ListTests.cs (278) : {
+ListTests.cs (279) : for (int i = 0; i < 10; i++)
+ListTests.cs (280) : myList.Add(i);
+ListTests.cs (282) : foreach (int i in myList)
+ListTests.cs (283) : Console.WriteLine(i);
+ListTests.cs (285) : return true;
+ListTests.cs (286) : }
+ListTests.cs (288) : const int NumSamples = 100000;
+ListTests.cs (289) : public static bool MeasurePerformance<T>(IList<T> list, T[] initialValues)
+ListTests.cs (290) : {
+ListTests.cs (291) : int numDigits = 3;
+ListTests.cs (292) : int timeoutSecs = 1;
+ListTests.cs (293) : Console.WriteLine($"\n# Measuring performance (n={NumSamples})");
+ListTests.cs (295) : Stopwatch stopwatch = new Stopwatch();
+ListTests.cs (296) : stopwatch.Reset();
+ListTests.cs (297) : stopwatch.Start();
+ListTests.cs (298) : System.Threading.Tasks.Task timeoutTask = System.Threading.Tasks.Task.Delay(timeoutSecs * 1000);
+ListTests.cs (299) : System.Threading.Tasks.Task<bool> testTask = System.Threading.Tasks.Task.Factory.StartNew(
+ListTests.cs (300) : () =>
+ListTests.cs (301) : {
+ListTests.cs (302) : try
+ListTests.cs (303) : {
+ListTests.cs (304) : //Add
+ListTests.cs (305) : for (int i = 0; i < NumSamples; i++)
+ListTests.cs (306) : list.Add(initialValues[i % initialValues.Length]);
+ListTests.cs (307) : if (list.Count() != NumSamples)
+ListTests.cs (308) : return false;
+ListTests.cs (309) : return true;
+ListTests.cs (310) : }
+ListTests.cs (311) : catch
+ListTests.cs (312) : {
+ListTests.cs (313) : return false;
+ListTests.cs (314) : }
+ListTests.cs (315) : });
+ListTests.cs (317) : var winner = System.Threading.Tasks.Task.WhenAny(testTask, timeoutTask).Result;
+ListTests.cs (318) : if (testTask.IsCompleted && testTask.Result == true)
+ListTests.cs (319) : {
+ListTests.cs (320) : Console.WriteLine($"'Add' Ok. (n={NumSamples}) -> {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numDigits)}");
+ListTests.cs (321) : }
+ListTests.cs (322) : else if (testTask.IsCompleted)
+ListTests.cs (323) : {
+ListTests.cs (324) : Console.WriteLine($"Error. 'Add' failed");
+ListTests.cs (325) : return false;
+ListTests.cs (326) : }
+ListTests.cs (327) : else
+ListTests.cs (328) : {
+ListTests.cs (329) : Console.WriteLine($"Error. 'Add' timed out (> {timeoutSecs}s)");
+ListTests.cs (330) : return false;
+ListTests.cs (331) : }
+ListTests.cs (333) : //Remove first/last
+ListTests.cs (334) : stopwatch.Reset();
+ListTests.cs (335) : stopwatch.Start();
+ListTests.cs (336) : timeoutTask = System.Threading.Tasks.Task.Delay(timeoutSecs * 1000);
+ListTests.cs (337) : testTask = System.Threading.Tasks.Task.Factory.StartNew(
+ListTests.cs (338) : () =>
+ListTests.cs (339) : {
+ListTests.cs (340) : if (list.Count() != NumSamples)
+ListTests.cs (341) : return false;
+ListTests.cs (342) : for (int i = 0; i < NumSamples; i++)
+ListTests.cs (343) : {
+ListTests.cs (344) : if (i % 2 == 0)
+ListTests.cs (345) : list.Remove(0);
+ListTests.cs (346) : else
+ListTests.cs (347) : list.Remove(list.Count() - 1);
+ListTests.cs (348) : }
+ListTests.cs (349) : if (list.Count() != 0)
+ListTests.cs (350) : return false;
+ListTests.cs (351) : return true;
+ListTests.cs (352) : });
+ListTests.cs (353) : winner = System.Threading.Tasks.Task.WhenAny(testTask, timeoutTask).Result;
+ListTests.cs (354) : double t = stopwatch.Elapsed.TotalSeconds;
+ListTests.cs (355) : if (testTask.IsCompleted && testTask.Result == true)
+ListTests.cs (356) : {
+ListTests.cs (357) : Console.WriteLine($"'Remove' Ok. (n={NumSamples}) -> {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numDigits)} s");
+ListTests.cs (358) : return true;
+ListTests.cs (359) : }
+ListTests.cs (360) : else if (testTask.IsCompleted)
+ListTests.cs (361) : {
+ListTests.cs (362) : Console.WriteLine($"Error. 'Remove' failed");
+ListTests.cs (363) : return false;
+ListTests.cs (364) : }
+ListTests.cs (365) : else
+ListTests.cs (366) : {
+ListTests.cs (367) : Console.WriteLine($"Error. 'Remove' timed out (> {timeoutSecs}s)");
+ListTests.cs (368) : return false;
+ListTests.cs (369) : }
+ListTests.cs (371) : }
+ListTests.cs (372) : }
+ListTests.cs (373) : }
+StackAndQueuesTests.cs (1) : using System;
+StackAndQueuesTests.cs (2) : using System.Diagnostics;
+StackAndQueuesTests.cs (4) : namespace Lists
+StackAndQueuesTests.cs (5) : {
+StackAndQueuesTests.cs (6) : public class StackAndQueuesTests
+StackAndQueuesTests.cs (7) : {
+StackAndQueuesTests.cs (8) : const int NumSamples = 100000;
+StackAndQueuesTests.cs (10) : public static bool Test<T>(IPushPop<T> pushPop, T[] initialValues, bool isQueue = false)
+StackAndQueuesTests.cs (11) : {
+StackAndQueuesTests.cs (12) : Console.WriteLine("# Running tests");
+StackAndQueuesTests.cs (13) : Console.Write("Testing Push()/Count()...");
+StackAndQueuesTests.cs (14) : for (int i = 0; i < initialValues.Length; i++)
+StackAndQueuesTests.cs (15) : {
+StackAndQueuesTests.cs (16) : pushPop.Push(initialValues[i]);
+StackAndQueuesTests.cs (18) : if (pushPop.Count() != i + 1)
+StackAndQueuesTests.cs (19) : {
+StackAndQueuesTests.cs (20) : Console.WriteLine($"ERROR. Count() returned {pushPop.Count()} instead of {i + 1}");
+StackAndQueuesTests.cs (21) : return false;
+StackAndQueuesTests.cs (22) : }
+StackAndQueuesTests.cs (23) : }
+StackAndQueuesTests.cs (24) : Console.WriteLine($"OK.");
+StackAndQueuesTests.cs (26) : Console.Write("Testing Clear()...");
+StackAndQueuesTests.cs (27) : pushPop.Clear();
+StackAndQueuesTests.cs (28) : if (pushPop.Count() != 0)
+StackAndQueuesTests.cs (29) : {
+StackAndQueuesTests.cs (30) : Console.WriteLine($"ERROR. Count returned {pushPop.Count()} instead of 0 after Clear()");
+StackAndQueuesTests.cs (31) : return false;
+StackAndQueuesTests.cs (32) : }
+StackAndQueuesTests.cs (33) : Console.WriteLine($"OK.");
+StackAndQueuesTests.cs (35) : Console.Write("Testing Push()/Pop()...");
+StackAndQueuesTests.cs (36) : for (int i = 0; i < initialValues.Length; i++)
+StackAndQueuesTests.cs (37) : pushPop.Push(initialValues[i]);
+StackAndQueuesTests.cs (39) : for (int i = 0; i < initialValues.Length; i++)
+StackAndQueuesTests.cs (40) : {
+StackAndQueuesTests.cs (41) : T value = pushPop.Pop();
+StackAndQueuesTests.cs (43) : if (!isQueue && !value.Equals(initialValues[initialValues.Length - i - 1])
+StackAndQueuesTests.cs (44) : || isQueue && !value.Equals(initialValues[i])
+StackAndQueuesTests.cs (45) : )
+StackAndQueuesTests.cs (46) : {
+StackAndQueuesTests.cs (47) : Console.WriteLine($"ERROR. Pop() returned {value} instead of {initialValues[initialValues.Length - i - 1]}");
+StackAndQueuesTests.cs (48) : return false;
+StackAndQueuesTests.cs (49) : }
+StackAndQueuesTests.cs (50) : }
+StackAndQueuesTests.cs (51) : Console.WriteLine($"OK.");
+StackAndQueuesTests.cs (52) : return true;
+StackAndQueuesTests.cs (53) : }
+StackAndQueuesTests.cs (54) : public static bool MeasurePerformance<T>(IPushPop<T> pushPop, T[] initialValues)
+StackAndQueuesTests.cs (55) : {
+StackAndQueuesTests.cs (56) : int numDigits = 3;
+StackAndQueuesTests.cs (57) : int timeoutSecs = 1;
+StackAndQueuesTests.cs (58) : Console.WriteLine($"\n# Measuring performance (n={NumSamples})");
+StackAndQueuesTests.cs (60) : Stopwatch stopwatch = Stopwatch.StartNew();
+StackAndQueuesTests.cs (61) : System.Threading.Tasks.Task timeoutTask = System.Threading.Tasks.Task.Delay(timeoutSecs * 1000);
+StackAndQueuesTests.cs (62) : System.Threading.Tasks.Task<bool> testTask = System.Threading.Tasks.Task.Factory.StartNew(
+StackAndQueuesTests.cs (63) : () =>
+StackAndQueuesTests.cs (64) : {
+StackAndQueuesTests.cs (65) : try
+StackAndQueuesTests.cs (66) : {
+StackAndQueuesTests.cs (67) : //Push
+StackAndQueuesTests.cs (68) : for (int i = 0; i < NumSamples; i++)
+StackAndQueuesTests.cs (69) : pushPop.Push(initialValues[i % initialValues.Length]);
+StackAndQueuesTests.cs (70) : if (pushPop.Count() != NumSamples)
+StackAndQueuesTests.cs (71) : return false;
+StackAndQueuesTests.cs (72) : }
+StackAndQueuesTests.cs (73) : catch
+StackAndQueuesTests.cs (74) : {
+StackAndQueuesTests.cs (75) : return false;
+StackAndQueuesTests.cs (76) : }
+StackAndQueuesTests.cs (77) : return true;
+StackAndQueuesTests.cs (78) : });
+StackAndQueuesTests.cs (80) : var winner = System.Threading.Tasks.Task.WhenAny(testTask, timeoutTask).Result;
+StackAndQueuesTests.cs (81) : if (testTask.IsCompleted && testTask.Result)
+StackAndQueuesTests.cs (82) : {
+StackAndQueuesTests.cs (83) : Console.WriteLine($"'Push' Ok. (n={NumSamples}) -> {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numDigits)}");
+StackAndQueuesTests.cs (84) : }
+StackAndQueuesTests.cs (85) : else if (testTask.IsCompleted)
+StackAndQueuesTests.cs (86) : {
+StackAndQueuesTests.cs (87) : Console.WriteLine($"Error. 'Push' failed");
+StackAndQueuesTests.cs (88) : return false;
+StackAndQueuesTests.cs (89) : }
+StackAndQueuesTests.cs (90) : else if (testTask.IsCompleted)
+StackAndQueuesTests.cs (91) : {
+StackAndQueuesTests.cs (92) : Console.WriteLine($"Error. 'Push' timed out (> {timeoutSecs}s)");
+StackAndQueuesTests.cs (93) : return false;
+StackAndQueuesTests.cs (94) : }
+StackAndQueuesTests.cs (95) : //Remove first element
+StackAndQueuesTests.cs (96) : stopwatch = Stopwatch.StartNew();
+StackAndQueuesTests.cs (97) : timeoutTask = System.Threading.Tasks.Task.Delay(timeoutSecs * 1000);
+StackAndQueuesTests.cs (98) : testTask = System.Threading.Tasks.Task.Factory.StartNew(
+StackAndQueuesTests.cs (99) : () =>
+StackAndQueuesTests.cs (100) : {
+StackAndQueuesTests.cs (101) : try
+StackAndQueuesTests.cs (102) : {
+StackAndQueuesTests.cs (103) : if (pushPop.Count() != NumSamples)
+StackAndQueuesTests.cs (104) : return false;
+StackAndQueuesTests.cs (105) : for (int i = 0; i < NumSamples; i++)
+StackAndQueuesTests.cs (106) : pushPop.Pop();
+StackAndQueuesTests.cs (107) : if (pushPop.Count() != 0)
+StackAndQueuesTests.cs (108) : return false;
+StackAndQueuesTests.cs (109) : }
+StackAndQueuesTests.cs (110) : catch
+StackAndQueuesTests.cs (111) : {
+StackAndQueuesTests.cs (112) : return false;
+StackAndQueuesTests.cs (113) : }
+StackAndQueuesTests.cs (114) : return true;
+StackAndQueuesTests.cs (115) : });
+StackAndQueuesTests.cs (116) : winner = System.Threading.Tasks.Task.WhenAny(testTask, timeoutTask).Result;
+StackAndQueuesTests.cs (117) : if (testTask.IsCompleted && testTask.Result)
+StackAndQueuesTests.cs (118) : {
+StackAndQueuesTests.cs (119) : Console.WriteLine($"'Pop' Ok. (n={NumSamples}) -> {Utils.ToString(stopwatch.Elapsed.TotalSeconds, numDigits)}");
+StackAndQueuesTests.cs (120) : }
+StackAndQueuesTests.cs (121) : else if (testTask.IsCompleted)
+StackAndQueuesTests.cs (122) : {
+StackAndQueuesTests.cs (123) : Console.WriteLine($"Error. 'Pop' failed");
+StackAndQueuesTests.cs (124) : return false;
+StackAndQueuesTests.cs (125) : }
+StackAndQueuesTests.cs (126) : else if (testTask.IsCompleted)
+StackAndQueuesTests.cs (127) : {
+StackAndQueuesTests.cs (128) : Console.WriteLine($"Error. 'Pop' timed out (> {timeoutSecs}s)");
+StackAndQueuesTests.cs (129) : return false;
+StackAndQueuesTests.cs (130) : }
+StackAndQueuesTests.cs (131) : return true;
+StackAndQueuesTests.cs (132) : }
+StackAndQueuesTests.cs (133) : }
+StackAndQueuesTests.cs (134) : }
