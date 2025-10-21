@@ -115,51 +115,101 @@ ArrayList.cs (38) : return NumElements;
 ArrayList.cs (46) : if (NumElements <= index || index<0)
 ArrayList.cs (47) : {
 ArrayList.cs (49) : }
-ArrayList.cs (50) : return Values[index+FirstIndex];
-ArrayList.cs (58) : if (NumElements+FirstIndex == Values.Length)
-ArrayList.cs (59) : {
-ArrayList.cs (60) : Resize(Values.Length * 2);
-ArrayList.cs (61) : }
-ArrayList.cs (62) : Values[NumElements+FirstIndex] = value;
-ArrayList.cs (63) : NumElements++;
-ArrayList.cs (64) : LastIndex++;
-ArrayList.cs (75) : if (NumElements <= index || index < 0)
-ArrayList.cs (76) : {
-ArrayList.cs (78) : }
-ArrayList.cs (79) : else
-ArrayList.cs (80) : {
-ArrayList.cs (81) : T removed = Values[index+FirstIndex];
-ArrayList.cs (82) : NumElements--;
-ArrayList.cs (83) : if (index == 0)
-ArrayList.cs (84) : {
-ArrayList.cs (85) : FirstIndex++;
-ArrayList.cs (86) : }
-ArrayList.cs (87) : else if (index == NumElements - 1)
-ArrayList.cs (88) : {
-ArrayList.cs (89) : LastIndex--;
-ArrayList.cs (90) : }
-ArrayList.cs (91) : else
-ArrayList.cs (92) : {
-ArrayList.cs (93) : for (int i = index + FirstIndex; i < NumElements; i++)
-ArrayList.cs (94) : {
-ArrayList.cs (95) : Values[i] = Values[i + 1];
-ArrayList.cs (96) : }
-ArrayList.cs (97) : }
-ArrayList.cs (98) : return removed;
-ArrayList.cs (100) : }
-ArrayList.cs (107) : NumElements = 0;
-ArrayList.cs (108) : FirstIndex = 0;
-ArrayList.cs (109) : LastIndex = 0;
-ArrayList.cs (117) : T[] newValues = new T[newSize];
-ArrayList.cs (118) : for (int i=0;i<NumElements;i++)
+ArrayList.cs (50) : if (FirstIndex >= LastIndex && index>(Values.Length-1 - FirstIndex))
+ArrayList.cs (51) : {
+ArrayList.cs (52) : return Values[index - (Values.Length-1 - FirstIndex)-1];
+ArrayList.cs (53) : }
+ArrayList.cs (54) : return Values[index + FirstIndex];
+ArrayList.cs (62) : if (NumElements == Values.Length)
+ArrayList.cs (63) : {
+ArrayList.cs (64) : Resize(Values.Length * 2);
+ArrayList.cs (65) : }
+ArrayList.cs (66) : if (LastIndex >= Values.Length - 1)
+ArrayList.cs (67) : {
+ArrayList.cs (68) : LastIndex = 0;
+ArrayList.cs (69) : Values[LastIndex] = value;
+ArrayList.cs (70) : }
+ArrayList.cs (71) : else
+ArrayList.cs (72) : {
+ArrayList.cs (73) : Values[LastIndex] = value;
+ArrayList.cs (74) : LastIndex++;
+ArrayList.cs (75) : }
+ArrayList.cs (76) : NumElements++;
+ArrayList.cs (88) : if (NumElements <= index || index < 0)
+ArrayList.cs (89) : {
+ArrayList.cs (91) : }
+ArrayList.cs (92) : else
+ArrayList.cs (93) : {
+ArrayList.cs (94) : T removed = Get(index);
+ArrayList.cs (95) : NumElements--;
+ArrayList.cs (96) : if (index == 0)
+ArrayList.cs (97) : {
+ArrayList.cs (98) : FirstIndex++;
+ArrayList.cs (99) : if (FirstIndex >= Values.Length - 1)
+ArrayList.cs (100) : {
+ArrayList.cs (101) : FirstIndex = 0;
+ArrayList.cs (102) : }
+ArrayList.cs (103) : }
+ArrayList.cs (104) : else if (index == NumElements)
+ArrayList.cs (105) : {
+ArrayList.cs (106) : LastIndex--;
+ArrayList.cs (107) : if (LastIndex <= 0)
+ArrayList.cs (108) : {
+ArrayList.cs (109) : LastIndex = Values.Length - 1;
+ArrayList.cs (110) : }
+ArrayList.cs (111) : }
+ArrayList.cs (112) : else
+ArrayList.cs (113) : {
+ArrayList.cs (114) : if (FirstIndex >= LastIndex)
+ArrayList.cs (115) : {
+ArrayList.cs (116) : if (index < Values.Length - 1 - FirstIndex)
+ArrayList.cs (117) : {
+ArrayList.cs (118) : for (int i = index + FirstIndex; i < Values.Length - 1; i++)
 ArrayList.cs (119) : {
-ArrayList.cs (120) : newValues[i] = Values[i+FirstIndex];
+ArrayList.cs (120) : Values[i] = Values[i + 1];
 ArrayList.cs (121) : }
-ArrayList.cs (122) : Values = newValues;
-ArrayList.cs (128) : for (int i = 0; i < NumElements; i++)
+ArrayList.cs (122) : Values[Values.Length - 1] = Values[0];
+ArrayList.cs (123) : for (int i = 0; i < LastIndex - 1; i++)
+ArrayList.cs (124) : {
+ArrayList.cs (125) : Values[i] = Values[i + 1];
+ArrayList.cs (126) : }
+ArrayList.cs (127) : }
+ArrayList.cs (128) : else
 ArrayList.cs (129) : {
-ArrayList.cs (130) : yield return Get(i);
-ArrayList.cs (131) : }
+ArrayList.cs (130) : for (int i = index - (Values.Length - 1 - FirstIndex); i < LastIndex - 1; i++)
+ArrayList.cs (131) : {
+ArrayList.cs (132) : Values[i] = Values[i + 1];
+ArrayList.cs (133) : }
+ArrayList.cs (134) : }
+ArrayList.cs (136) : }
+ArrayList.cs (137) : else
+ArrayList.cs (138) : {
+ArrayList.cs (139) : for (int i = index + FirstIndex; i < NumElements; i++)
+ArrayList.cs (140) : {
+ArrayList.cs (141) : Values[i] = Values[i + 1];
+ArrayList.cs (142) : }
+ArrayList.cs (143) : }
+ArrayList.cs (144) : LastIndex--;
+ArrayList.cs (145) : }
+ArrayList.cs (146) : return removed;
+ArrayList.cs (148) : }
+ArrayList.cs (155) : NumElements = 0;
+ArrayList.cs (156) : FirstIndex = 0;
+ArrayList.cs (157) : LastIndex = 0;
+ArrayList.cs (165) : T[] newValues = new T[newSize];
+ArrayList.cs (166) : for (int i=0;i<NumElements-FirstIndex;i++)
+ArrayList.cs (167) : {
+ArrayList.cs (168) : newValues[i] = Values[i+FirstIndex];
+ArrayList.cs (169) : }
+ArrayList.cs (170) : for (int i = NumElements - FirstIndex; i < NumElements; i++)
+ArrayList.cs (171) : {
+ArrayList.cs (172) : newValues[i] = Values[i - NumElements - FirstIndex];
+ArrayList.cs (173) : }
+ArrayList.cs (174) : Values = newValues;
+ArrayList.cs (180) : for (int i = 0; i < NumElements; i++)
+ArrayList.cs (181) : {
+ArrayList.cs (182) : yield return Get(i);
+ArrayList.cs (183) : }
 List.cs (8) : public int NumElements = 0;
 List.cs (28) : int NumElements = 0;
 List.cs (48) : return NumElements;
