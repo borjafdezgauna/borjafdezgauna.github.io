@@ -71,17 +71,17 @@ IntList.cs (167) : for (int i = 0; i < ImBlueDaBaDiDaBaDa; i++)
 ArrayList.cs (10) : int FirstIndex = 0;
 ArrayList.cs (25) : for (int i = FirstIndex; i < Count(); i++)
 ArrayList.cs (36) : return NumElements;
-ArrayList.cs (44) : if (index >= FirstIndex && index < Values.Length)
-ArrayList.cs (46) : return Values[index];
-ArrayList.cs (54) : if (NumElements == Values.Length)
+ArrayList.cs (44) : if (index >= 0 && index < NumElements)
+ArrayList.cs (46) : return Values[index + FirstIndex];
+ArrayList.cs (54) : if (NumElements == Values.Length - FirstIndex)
 ArrayList.cs (55) : {
 ArrayList.cs (56) : Resize(Values.Length * 2);
 ArrayList.cs (57) : }
-ArrayList.cs (58) : Values[NumElements] = value;
+ArrayList.cs (58) : Values[NumElements + FirstIndex] = value;
 ArrayList.cs (59) : NumElements++;
-ArrayList.cs (71) : if (index < FirstIndex || index > NumElements - 1)
+ArrayList.cs (71) : if (index < 0 || index > NumElements - 1)
 ArrayList.cs (75) : T devolver = Values[index + FirstIndex];
-ArrayList.cs (76) : if (index == FirstIndex)
+ArrayList.cs (76) : if (index == 0)
 ArrayList.cs (78) : FirstIndex++;
 ArrayList.cs (80) : else
 ArrayList.cs (81) : {
@@ -103,7 +103,7 @@ ArrayList.cs (116) : for (int i = FirstIndex; i < Values.Length; i++)
 ArrayList.cs (117) : {
 ArrayList.cs (118) : yield return Values[i];
 ArrayList.cs (119) : }
-List.cs (8) : public ListNode<T> Previous = null;
+List.cs (8) : public ListNode<T>  Anterior = null;
 List.cs (48) : return m_numItems;
 List.cs (55) : int position = 0;
 List.cs (56) : ListNode<T> node = First;
@@ -124,45 +124,46 @@ List.cs (78) : First = newNode;
 List.cs (82) : else if (First.Next != null)
 List.cs (83) : {
 List.cs (84) : nodeLast.Next = newNode;
-List.cs (85) : newNode.Previous = Last;
+List.cs (85) : newNode.Anterior = Last;
 List.cs (87) : }
 List.cs (88) : else
 List.cs (89) : {
 List.cs (90) : First.Next = newNode;
-List.cs (91) : newNode.Previous = First;
+List.cs (91) : newNode.Anterior = First;
 List.cs (92) : }
 List.cs (93) : m_numItems++;
 List.cs (94) : Last = newNode;
 List.cs (95) : }
 List.cs (100) : if (index == 0)
 List.cs (101) : {
-List.cs (102) : if (First != null)
-List.cs (103) : {
-List.cs (104) : First = First.Next;
-List.cs (106) : First.Previous = null;
-List.cs (107) : m_numItems--;
-List.cs (109) : return First.Value;
-List.cs (110) : }
-List.cs (111) : return default(T);
-List.cs (113) : }
-List.cs (114) : if (index == Count() - 1)
-List.cs (115) : {
-List.cs (117) : T lastElement = Last.Value;
-List.cs (118) : ListNode<T> previo= Last.Previous;
-List.cs (119) : previo.Next = null;
-List.cs (120) : Last = previo;
-List.cs (121) : m_numItems--;
-List.cs (123) : return lastElement;
-List.cs (125) : }
-List.cs (126) : else if (index > 0 && index < Count() - 1)
-List.cs (127) : {
-List.cs (128) : ListNode<T> node = First;
-List.cs (129) : for (int i = 0; i < index; i++)
-List.cs (130) : {
-List.cs (131) : node = node.Next;
-List.cs (132) : }
-List.cs (133) : T devolver = node.Next.Value;
-List.cs (134) : node.Next = node.Next.Next;
+List.cs (102) : T firstValue = First.Value;
+List.cs (103) : First = First.Next;
+List.cs (104) : if (First != null)
+List.cs (105) : {
+List.cs (106) : First.Anterior = null;
+List.cs (108) : }
+List.cs (109) : m_numItems--;
+List.cs (110) : return firstValue;
+List.cs (112) : }
+List.cs (113) : if (index == Count() - 1)
+List.cs (114) : {
+List.cs (116) : T lastElement = Last.Value;
+List.cs (117) : ListNode<T> previo= Last.Anterior;
+List.cs (118) : previo.Next = null;
+List.cs (119) : Last = previo;
+List.cs (120) : m_numItems--;
+List.cs (122) : return lastElement;
+List.cs (124) : }
+List.cs (125) : else if (index > 0 && index < Count() - 1)
+List.cs (126) : {
+List.cs (127) : ListNode<T> node = First;
+List.cs (128) : for (int i = 0; i < index -1; i++)
+List.cs (129) : {
+List.cs (130) : node = node.Next;
+List.cs (131) : }
+List.cs (132) : T devolver = node.Next.Value;
+List.cs (133) : node.Next = node.Next.Next;
+List.cs (134) : node.Next.Anterior = node;
 List.cs (135) : m_numItems--;
 List.cs (136) : return devolver;
 List.cs (137) : }
