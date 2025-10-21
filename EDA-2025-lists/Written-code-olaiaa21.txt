@@ -101,97 +101,150 @@ IntList.cs (152) : {
 IntList.cs (153) : yield return node.Value;
 IntList.cs (154) : node = node.Next;
 IntList.cs (155) : }
-ArrayList.cs (34) : return NumElements;
-ArrayList.cs (42) : if (index < 0 || index >= Count())
-ArrayList.cs (43) : {
-ArrayList.cs (45) : }
-ArrayList.cs (46) : return Values[index];
-ArrayList.cs (55) : if (NumElements >= Values.Length)
-ArrayList.cs (56) : {
-ArrayList.cs (57) : Resize(Values.Length * 2);
-ArrayList.cs (58) : }
-ArrayList.cs (59) : Values[NumElements] = value;
-ArrayList.cs (60) : NumElements++;
-ArrayList.cs (71) : if (index < 0 || index >= Count())
-ArrayList.cs (72) : {
-ArrayList.cs (74) : }
-ArrayList.cs (76) : T value = Values[index];
-ArrayList.cs (77) : for (int i = index; i < NumElements - 1; i++)
+ArrayList.cs (9) : int firstIndex = 0;
+ArrayList.cs (10) : int lastIndex = -1;
+ArrayList.cs (36) : return NumElements;
+ArrayList.cs (44) : if (index < 0 || index >= Count())
+ArrayList.cs (45) : {
+ArrayList.cs (47) : }
+ArrayList.cs (48) : //comportamiento circular
+ArrayList.cs (49) : int realIndex = (firstIndex + index) % Values.Length;
+ArrayList.cs (50) : return Values[realIndex];
+ArrayList.cs (59) : if (NumElements == Values.Length)
+ArrayList.cs (60) : {
+ArrayList.cs (61) : Resize(Values.Length * 2);
+ArrayList.cs (62) : }
+ArrayList.cs (63) : lastIndex = (firstIndex + NumElements) % Values.Length;
+ArrayList.cs (64) : Values[lastIndex] = value;
+ArrayList.cs (65) : NumElements++;
+ArrayList.cs (76) : //si está fuera de rango
+ArrayList.cs (77) : if (index < 0 || index >= Count())
 ArrayList.cs (78) : {
-ArrayList.cs (79) : Values[i] = Values[i + 1];
 ArrayList.cs (80) : }
-ArrayList.cs (81) : NumElements--;
-ArrayList.cs (82) : return value;
-ArrayList.cs (90) : NumElements = 0;
-ArrayList.cs (98) : T[] newValues = new T[newSize];
-ArrayList.cs (99) : for (int i = 0; i < NumElements; i++)
-ArrayList.cs (100) : {
-ArrayList.cs (101) : newValues[i] = Values[i];
-ArrayList.cs (102) : }
-ArrayList.cs (103) : Values = newValues;
-ArrayList.cs (110) : for (int i = 0; i < NumElements; i++)
-ArrayList.cs (111) : {
-ArrayList.cs (112) : yield return Values[i];
-ArrayList.cs (113) : }
-List.cs (47) : return m_numItems;
-List.cs (55) : if(index < 0 || index >= Count())
-List.cs (56) : {
-List.cs (58) : }
-List.cs (60) : ListNode<T> node = First;
-List.cs (61) : int i= 0;
-List.cs (62) : while(i < index)
-List.cs (63) : {
-List.cs (64) : node = node.Next;
-List.cs (65) : i++;
-List.cs (66) : }
-List.cs (68) : return node.Value;
-List.cs (75) : ListNode<T> node = new ListNode<T>(value);
-List.cs (76) : if (First == null)
-List.cs (77) : {
-List.cs (78) : First = node;
-List.cs (79) : }
-List.cs (80) : else
-List.cs (81) : {
-List.cs (82) : Last.Next = node;
-List.cs (83) : }
-List.cs (84) : Last = node;
-List.cs (86) : m_numItems++;
-List.cs (93) : //si estamos fuera de los rangos
-List.cs (94) : if(index < 0 || index >= Count())
-List.cs (95) : {
-List.cs (97) : }
-List.cs (99) : //Si el elemento a eliminar es el primero
-List.cs (100) : if (index == 0)
-List.cs (101) : {
-List.cs (102) : T value1 = First.Value;
-List.cs (103) : First = First.Next;
-List.cs (104) : m_numItems--;
-List.cs (105) : return value1;
-List.cs (107) : }
-List.cs (108) : else
-List.cs (109) : {
-List.cs (111) : //Para eliminiar un elemento que esta en medio o es el final
-List.cs (112) : ListNode<T> node = First;
-List.cs (113) : int i = 0;
-List.cs (114) : while (i < index - 1)
-List.cs (115) : {
-List.cs (116) : node = node.Next;
-List.cs (117) : i++;
-List.cs (118) : }
-List.cs (119) : T value2 = node.Next.Value;
-List.cs (120) : node.Next = node.Next.Next;
-List.cs (121) : m_numItems--;
-List.cs (122) : return value2;
-List.cs (124) : }
-List.cs (131) : First = null;
-List.cs (132) : Last = null;
-List.cs (133) : m_numItems = 0;
-List.cs (141) : ListNode<T> node = First;
-List.cs (142) : while (node != null)
-List.cs (143) : {
-List.cs (144) : yield return node.Value;
-List.cs (145) : node = node.Next;
-List.cs (146) : }
+ArrayList.cs (82) : //averiguar el índice real teniendo en cuenta la circularidad
+ArrayList.cs (83) : int realIndex = (firstIndex + index) % Values.Length;
+ArrayList.cs (84) : T removed = Values[realIndex];
+ArrayList.cs (85) : //si el index es 0, avanzo firstIndex
+ArrayList.cs (86) : if (index == 0)
+ArrayList.cs (87) : {
+ArrayList.cs (88) : firstIndex = (firstIndex + 1) % Values.Length;
+ArrayList.cs (89) : NumElements--;
+ArrayList.cs (90) : return removed;
+ArrayList.cs (91) : }
+ArrayList.cs (93) : // si el index es el último, retrocedo lastIndex
+ArrayList.cs (94) : if (index == Count() - 1)
+ArrayList.cs (95) : {
+ArrayList.cs (96) : //actua para lista circular
+ArrayList.cs (97) : lastIndex = (lastIndex - 1 + Values.Length) % Values.Length;
+ArrayList.cs (98) : NumElements--;
+ArrayList.cs (99) : return removed;
+ArrayList.cs (100) : }
+ArrayList.cs (102) : //si queremos eliminar un elemento intermedio, movemos los elementos a la izquierda
+ArrayList.cs (103) : for (int i = index; i < NumElements - 1; i++)
+ArrayList.cs (104) : {
+ArrayList.cs (105) : Values[(firstIndex + i) % Values.Length] = Values[(firstIndex + i + 1) % Values.Length];
+ArrayList.cs (106) : }
+ArrayList.cs (108) : NumElements--;
+ArrayList.cs (109) : lastIndex = (firstIndex + NumElements - 1) % Values.Length;
+ArrayList.cs (110) : return removed;
+ArrayList.cs (118) : NumElements = 0;
+ArrayList.cs (119) : firstIndex = 0;
+ArrayList.cs (120) : lastIndex = -1;
+ArrayList.cs (128) : T[] newValues = new T[newSize];
+ArrayList.cs (129) : for (int i = 0; i < NumElements; i++)
+ArrayList.cs (130) : {
+ArrayList.cs (131) : newValues[i] = Values[i];
+ArrayList.cs (132) : }
+ArrayList.cs (133) : Values = newValues;
+ArrayList.cs (134) : firstIndex = 0;
+ArrayList.cs (135) : lastIndex = NumElements - 1;
+ArrayList.cs (142) : for (int i = 0; i < NumElements; i++)
+ArrayList.cs (143) : {
+ArrayList.cs (144) : yield return Values[i];
+ArrayList.cs (145) : }
+List.cs (8) : public ListNode<T> Previous = null;
+List.cs (48) : return m_numItems;
+List.cs (56) : if(index < 0 || index >= Count())
+List.cs (57) : {
+List.cs (59) : }
+List.cs (61) : ListNode<T> node = First;
+List.cs (62) : int i= 0;
+List.cs (63) : while(i < index)
+List.cs (64) : {
+List.cs (65) : node = node.Next;
+List.cs (66) : i++;
+List.cs (67) : }
+List.cs (69) : return node.Value;
+List.cs (76) : ListNode<T> node = new ListNode<T>(value);
+List.cs (77) : if (First == null)
+List.cs (78) : {
+List.cs (79) : First = node;
+List.cs (80) : }
+List.cs (81) : else
+List.cs (82) : {
+List.cs (83) : Last.Next = node;
+List.cs (84) : node.Previous = Last;
+List.cs (85) : }
+List.cs (86) : Last = node;
+List.cs (88) : m_numItems++;
+List.cs (95) : //si estamos fuera de los rangos
+List.cs (96) : if(index < 0 || index >= Count())
+List.cs (97) : {
+List.cs (99) : }
+List.cs (101) : //Si el elemento a eliminar es el primero
+List.cs (102) : if (index == 0)
+List.cs (103) : {
+List.cs (104) : T value1 = First.Value;
+List.cs (105) : First = First.Next;
+List.cs (106) : if (First != null)
+List.cs (107) : {
+List.cs (108) : First.Previous = null;
+List.cs (109) : }
+List.cs (110) : else
+List.cs (111) : {
+List.cs (112) : Last = null;
+List.cs (113) : }
+List.cs (114) : m_numItems--;
+List.cs (115) : return value1;
+List.cs (117) : }
+List.cs (118) : //Si el elemento a eliminar es el último
+List.cs (119) : if (index == Count() - 1)
+List.cs (120) : {
+List.cs (121) : T value2 = Last.Value;
+List.cs (122) : Last = Last.Previous;
+List.cs (123) : if (Last != null)
+List.cs (124) : {
+List.cs (125) : Last.Next = null;
+List.cs (126) : }
+List.cs (127) : else
+List.cs (128) : {
+List.cs (129) : First = null;
+List.cs (130) : }
+List.cs (131) : m_numItems--;
+List.cs (132) : return value2;
+List.cs (133) : }
+List.cs (134) : //Si el elemento a eliminar está en medio
+List.cs (135) : ListNode<T> node = First;
+List.cs (136) : int i = 0;
+List.cs (137) : while (i < index)
+List.cs (138) : {
+List.cs (139) : node = node.Next;
+List.cs (140) : i++;
+List.cs (141) : }
+List.cs (142) : T value = node.Value; //guerdamos el valor de lo que queremos eliminar para devolverlo al final
+List.cs (143) : node.Previous.Next = node.Next; //hacemos que le nodo anterior sea el siguiente del nodo actual
+List.cs (144) : node.Next.Previous = node.Previous; //hacemos que el nodo siguiente sea el anterior del nodo actual
+List.cs (145) : m_numItems--;
+List.cs (146) : return value;
+List.cs (153) : First = null;
+List.cs (154) : Last = null;
+List.cs (155) : m_numItems = 0;
+List.cs (163) : ListNode<T> node = First;
+List.cs (164) : while (node != null)
+List.cs (165) : {
+List.cs (166) : yield return node.Value;
+List.cs (167) : node = node.Next;
+List.cs (168) : }
 Queue.cs (1) : using System;
 Queue.cs (2) : using System.ComponentModel;
 Queue.cs (11) : List<T> list = new List<T>();
