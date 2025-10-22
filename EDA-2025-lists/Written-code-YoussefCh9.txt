@@ -114,111 +114,143 @@ IntList.cs (148) : {
 IntList.cs (150) : yield return nextnode.Value;
 IntList.cs (151) : nextnode = nextnode.Next;
 IntList.cs (152) : }
-ArrayList.cs (34) : return NumElements;
-ArrayList.cs (41) : if (index < 0 || index >= NumElements)
-ArrayList.cs (42) : {
-ArrayList.cs (44) : }
-ArrayList.cs (45) : else
-ArrayList.cs (46) : {
-ArrayList.cs (47) : return Values[index];
-ArrayList.cs (48) : }
-ArrayList.cs (57) : if (Values.Length == NumElements)
-ArrayList.cs (58) : {
-ArrayList.cs (59) : Resize(Values.Length * 2);
-ArrayList.cs (60) : }
-ArrayList.cs (61) : Values[NumElements] = value;
-ArrayList.cs (62) : NumElements++;
-ArrayList.cs (74) : if (index < 0 || index >= NumElements)
-ArrayList.cs (75) : {
-ArrayList.cs (77) : }
-ArrayList.cs (78) : else
-ArrayList.cs (79) : {
-ArrayList.cs (80) : T value = Values[index];
-ArrayList.cs (81) : for (int i = index; i <= NumElements - 1; i++)
-ArrayList.cs (82) : {
-ArrayList.cs (83) : Values[i] = Values[i + 1];
-ArrayList.cs (84) : }
-ArrayList.cs (85) : NumElements--;
-ArrayList.cs (86) : return value;
-ArrayList.cs (87) : }
-ArrayList.cs (94) : NumElements = 0;
-ArrayList.cs (102) : T[] newS = new T[newSize];
-ArrayList.cs (103) : for (int i = 0; i < NumElements; i++)
-ArrayList.cs (104) : {
-ArrayList.cs (105) : newS[i] = Values[i];
-ArrayList.cs (106) : }
-ArrayList.cs (107) : Values = newS;
-ArrayList.cs (113) : int i = 0;
-ArrayList.cs (114) : while (i == NumElements - 1)
-ArrayList.cs (115) : {
-ArrayList.cs (116) : i++;
-ArrayList.cs (117) : }
-ArrayList.cs (118) : yield return Values[i];
-List.cs (47) : return m_numItems;
-List.cs (54) : if (index < 0 || index >= m_numItems)
-List.cs (55) : {
-List.cs (57) : }
-List.cs (58) : else
-List.cs (59) : {
-List.cs (60) : ListNode<T> f = First;
-List.cs (61) : int i = 0;
-List.cs (62) : while (i < index)
-List.cs (63) : {
-List.cs (64) : f = f.Next;
-List.cs (65) : i++;
-List.cs (66) : }
-List.cs (67) : return f.Value;
-List.cs (68) : }
-List.cs (75) : ListNode<T> lvalue = new ListNode<T>(value);
-List.cs (77) : if (First == null)
-List.cs (78) : {
-List.cs (79) : First = lvalue;
-List.cs (80) : Last = lvalue;
-List.cs (81) : m_numItems++;
-List.cs (82) : }
-List.cs (83) : else
-List.cs (84) : {
-List.cs (85) : Last.Next = lvalue;
-List.cs (86) : Last = lvalue;
-List.cs (87) : m_numItems++;
-List.cs (88) : }
-List.cs (96) : if (index == 0)
-List.cs (97) : {
-List.cs (98) : ListNode<T> f = First;
-List.cs (99) : First = First.Next;
-List.cs (100) : m_numItems--;
-List.cs (101) : return f.Value;
-List.cs (102) : }
-List.cs (103) : else if (index < m_numItems)
-List.cs (104) : {
-List.cs (105) : int i = 0;
-List.cs (106) : ListNode<T> value = First;
-List.cs (108) : while (i < index - 1)
-List.cs (109) : {
-List.cs (110) : value = value.Next;
-List.cs (111) : i++;
-List.cs (112) : }
-List.cs (114) : value.Next = value.Next.Next;
-List.cs (116) : if (index == m_numItems - 1)
-List.cs (117) : {
-List.cs (118) : Last = value;
-List.cs (119) : }
-List.cs (120) : m_numItems--;
-List.cs (121) : return value.Value;
-List.cs (123) : }
-List.cs (124) : else
-List.cs (125) : {
-List.cs (127) : }
-List.cs (134) : m_numItems = 0;
-List.cs (135) : First = null;
-List.cs (136) : Last = null;
-List.cs (143) : ListNode<T> value = First;
-List.cs (144) : while (value!=null)
-List.cs (145) : {
-List.cs (146) : yield return value.Value;
-List.cs (147) : value=value.Next;
-List.cs (148) : }
+ArrayList.cs (9) : int first = 0;
+ArrayList.cs (35) : return NumElements;
+ArrayList.cs (43) : if (index < 0 || index >= NumElements)
+ArrayList.cs (44) : {
+ArrayList.cs (46) : }
+ArrayList.cs (47) : else
+ArrayList.cs (48) : {
+ArrayList.cs (49) : return Values[index+first];// if we deleted the n of the position 0 now our position 0 is gonna be 1
+ArrayList.cs (52) : }
+ArrayList.cs (58) : if (Values.Length == NumElements+first)//+first because we should know how many space left we have
+ArrayList.cs (59) : {
+ArrayList.cs (60) : Resize(Values.Length * 2);
+ArrayList.cs (61) : }
+ArrayList.cs (62) : Values[NumElements+first] = value;//we add value in the last position so we should know if we had deleted any n
+ArrayList.cs (63) : NumElements++;
+ArrayList.cs (74) : T remoVal = Values[index + first];
+ArrayList.cs (75) : //remove the position we needed, if we have remove 2 n,
+ArrayList.cs (76) : // then if index=2 ---- [remove][remove][7][6][9][0]---> 2 removes= 2 first
+ArrayList.cs (77) : //       0       1     2  3  4  5
+ArrayList.cs (78) : // the index we have to deleted will be the index+ first= 2+2=4 so we will deleted 4.position=9
+ArrayList.cs (79) : if (index < 0 || index >= NumElements)
+ArrayList.cs (80) : {
+ArrayList.cs (82) : }
+ArrayList.cs (84) : else if (index == 0)
+ArrayList.cs (85) : {
+ArrayList.cs (86) : first++;
+ArrayList.cs (87) : NumElements--;
+ArrayList.cs (89) : }
+ArrayList.cs (90) : else
+ArrayList.cs (91) : {
+ArrayList.cs (92) : for (int i = index + first; i <=NumElements + first - 1; i++)
+ArrayList.cs (93) : {
+ArrayList.cs (94) : Values[i] = Values[i + 1];
+ArrayList.cs (95) : }
+ArrayList.cs (96) : NumElements--;
+ArrayList.cs (97) : }
+ArrayList.cs (98) : return remoVal;
+ArrayList.cs (106) : NumElements = 0;
+ArrayList.cs (107) : first = 0;
+ArrayList.cs (115) : T[] newS = new T[newSize];
+ArrayList.cs (116) : for (int i = first; i < NumElements; i++)
+ArrayList.cs (117) : {
+ArrayList.cs (118) : newS[i] = Values[i + first];
+ArrayList.cs (119) : }
+ArrayList.cs (120) : Values = newS;
+ArrayList.cs (121) : first = 0;
+ArrayList.cs (127) : int i = 0;
+ArrayList.cs (128) : while (i == NumElements - 1)
+ArrayList.cs (129) : {
+ArrayList.cs (130) : i++;
+ArrayList.cs (131) : }
+ArrayList.cs (132) : yield return Values[i + first];
+List.cs (8) : public ListNode<T> Previous = null;
+List.cs (48) : return m_numItems;
+List.cs (55) : if (index < 0 || index >= m_numItems)
+List.cs (56) : {
+List.cs (58) : }
+List.cs (59) : else
+List.cs (60) : {
+List.cs (61) : ListNode<T> f = First;
+List.cs (62) : int i = 0;
+List.cs (63) : while (i < index)
+List.cs (64) : {
+List.cs (65) : f = f.Next;
+List.cs (66) : i++;
+List.cs (67) : }
+List.cs (68) : return f.Value;
+List.cs (69) : }
+List.cs (76) : ListNode<T> lvalue = new ListNode<T>(value);
+List.cs (78) : if (First == null)
+List.cs (79) : {
+List.cs (80) : First = lvalue;
+List.cs (81) : Last = lvalue;
+List.cs (82) : m_numItems++;
+List.cs (84) : }
+List.cs (85) : else
+List.cs (86) : {
+List.cs (87) : Last.Next = lvalue;
+List.cs (88) : Last = lvalue;
+List.cs (89) : m_numItems++;
+List.cs (91) : }
+List.cs (100) : if (index == 0)
+List.cs (101) : {
+List.cs (102) : ListNode<T> f = First;
+List.cs (103) : First = First.Next;
+List.cs (104) : m_numItems--;
+List.cs (105) : return f.Value;
+List.cs (106) : }
+List.cs (107) : else if (index < m_numItems)
+List.cs (108) : {
+List.cs (109) : ListNode<T> value = First;
+List.cs (111) : value.Previous = value.Next.Next;
+List.cs (113) : if (index == m_numItems - 1)
+List.cs (114) : {
+List.cs (115) : Last = value;
+List.cs (116) : }
+List.cs (117) : m_numItems--;
+List.cs (118) : return value.Value;
+List.cs (120) : }
+List.cs (121) : else
+List.cs (122) : {
+List.cs (124) : }
+List.cs (131) : m_numItems = 0;
+List.cs (132) : First = null;
+List.cs (133) : Last = null;
+List.cs (140) : ListNode<T> value = First;
+List.cs (141) : while (value!=null)
+List.cs (142) : {
+List.cs (143) : yield return value.Value;
+List.cs (144) : value=value.Next;
+List.cs (145) : }
 Queue.cs (26) : public void Push(T value)//ADD value
 Queue.cs (31) : public T Pop()//remove the first one
-Stack.cs (26) : public void Push(T value)//ADD VALUE
-Stack.cs (31) : public T Pop()//remove the last one
+Stack.cs (5) : public ListNode<T> list1 = null;
+Stack.cs (6) : public ListNode<T> Next = null;
+Stack.cs (7) : public ListNode<T> Previous = null;
+Stack.cs (8) : ListNode<T> First = null;
+Stack.cs (9) : ListNode<T> Last = null;
+Stack.cs (10) : int numElements = 0;
+Stack.cs (21) : return numElements++;
+Stack.cs (27) : First = null;
+Stack.cs (28) : Last = null;
+Stack.cs (29) : numElements = 0;
+Stack.cs (32) : public void Push(T value)//ADD VALUE
+Stack.cs (37) : public T Pop()//remove the last one
+Stack.cs (39) : T dato = Last.Value;
+Stack.cs (40) : if (numElements == 0 || Last == null)
+Stack.cs (41) : {
+Stack.cs (43) : }
+Stack.cs (44) : else if (First == Last)
+Stack.cs (45) : {
+Stack.cs (46) : First = null;
+Stack.cs (47) : Last = null;
+Stack.cs (48) : numElements--;
+Stack.cs (49) : }
+Stack.cs (50) : else
+Stack.cs (51) : {
+Stack.cs (52) : numElements--;
+Stack.cs (53) : }
+Stack.cs (54) : return dato;

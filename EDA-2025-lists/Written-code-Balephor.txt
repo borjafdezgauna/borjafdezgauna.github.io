@@ -126,57 +126,113 @@ IntList.cs (181) : yield return node.Value;
 IntList.cs (182) : node = node.Next;
 IntList.cs (183) : }
 List.cs (3) : using System.Data;
-List.cs (4) : using System.Runtime.InteropServices;
-List.cs (5) : using System.Xml;
-List.cs (49) : return m_numItems;
-List.cs (57) : ListNode<T> Node = First;
-List.cs (58) : //Si esta vacio
-List.cs (59) : if (First == null)
-List.cs (60) : {
-List.cs (61) : return default(T);
-List.cs (62) : }
-List.cs (63) : //si hay que devolver First
-List.cs (64) : //si hay que devolver Last
-List.cs (65) : //si hay que devolver algo que no sea First o Last
-List.cs (74) : //Guardamos value en newNode
-List.cs (75) : ListNode<T> newNode = new ListNode<T>(value);
-List.cs (77) : //Si esta vacio
-List.cs (78) : if (First == null)
-List.cs (79) : {
-List.cs (80) : First = newNode;
-List.cs (81) : Last = newNode;
-List.cs (82) : }
-List.cs (83) : //si hay un First
-List.cs (84) : else
-List.cs (85) : {
-List.cs (86) : Last.Next = newNode;
-List.cs (87) : }
-List.cs (88) : m_numItems++;
-List.cs (97) : if (First == null)
-List.cs (98) : {
-List.cs (99) : return default(T);
-List.cs (100) : }
-List.cs (102) : ListNode<T> Node = First;
-List.cs (103) : T removedVariable = default(T);
-List.cs (105) : if (index == 0)
-List.cs (106) : {
-List.cs (107) : removedVariable = Node.Value;
-List.cs (108) : First = Node.Next;
-List.cs (109) : if (First == null) Last = null;
-List.cs (110) : m_numItems--;
-List.cs (111) : return removedVariable;
-List.cs (112) : }
-List.cs (114) : int i = 0;
-List.cs (115) : while (Node != null && i < index - 1)
-List.cs (116) : {
-List.cs (117) : Node = Node.Next;
-List.cs (118) : i++;
-List.cs (119) : }
-List.cs (121) : if (Node == null || Node.Next == null)
-List.cs (122) : {
-List.cs (124) : }
-List.cs (126) : removedVariable = Node.Next.Value;
-List.cs (127) : Node.Next = Node.Next.Next;
-List.cs (128) : if (Node.Next == null) Last = Node;
-List.cs (129) : m_numItems--;
-List.cs (130) : return removedVariable;
+List.cs (4) : using System.Globalization;
+List.cs (5) : using System.Reflection;
+List.cs (6) : using System.Runtime.InteropServices;
+List.cs (7) : using System.Xml;
+List.cs (51) : return m_numItems;
+List.cs (59) : ListNode<T> node = First;
+List.cs (61) : if (First == null || index < 0 || index >= m_numItems)
+List.cs (62) : {
+List.cs (63) : return default(T);
+List.cs (64) : }
+List.cs (66) : for (int i = 0; i < m_numItems; i++)
+List.cs (67) : {
+List.cs (68) : if (i == index)
+List.cs (69) : {
+List.cs (70) : return node.Value;
+List.cs (71) : }
+List.cs (72) : node = node.Next;
+List.cs (73) : }
+List.cs (85) : //Guardamos value en newNode
+List.cs (86) : ListNode<T> newNode = new ListNode<T>(value);
+List.cs (88) : //Si esta vacio
+List.cs (89) : if (First == null)
+List.cs (90) : {
+List.cs (91) : First = newNode;
+List.cs (92) : Last = newNode;
+List.cs (93) : }
+List.cs (94) : //si hay un First
+List.cs (95) : else
+List.cs (96) : {
+List.cs (97) : Last.Next = newNode;
+List.cs (98) : Last = newNode;
+List.cs (99) : }
+List.cs (100) : m_numItems++;
+List.cs (109) : //Si esta vacio o index esta "out of bounds"
+List.cs (110) : if (First == null || index < 0 || index >= m_numItems)
+List.cs (111) : {
+List.cs (112) : return default(T);
+List.cs (113) : }
+List.cs (115) : ListNode<T> node = First;
+List.cs (116) : T removedVariable = default(T);
+List.cs (118) : //Si se quiere eleminar el primer nodo
+List.cs (119) : if (index == 0)
+List.cs (120) : {
+List.cs (121) : // Y es el unico
+List.cs (122) : if (First == Last)
+List.cs (123) : {
+List.cs (124) : removedVariable = node.Value;
+List.cs (125) : First = null;
+List.cs (126) : Last = null;
+List.cs (127) : m_numItems--;
+List.cs (128) : return removedVariable;
+List.cs (129) : }
+List.cs (130) : //No es el Unico
+List.cs (131) : removedVariable = node.Value;
+List.cs (132) : First = node.Next;
+List.cs (133) : m_numItems--;
+List.cs (134) : return removedVariable;
+List.cs (135) : }
+List.cs (136) : //Si se quiere eleminar el ultimo nodo
+List.cs (137) : if (index == m_numItems - 1)
+List.cs (138) : {
+List.cs (139) : for (int i = 0; i < m_numItems; i++)
+List.cs (140) : {
+List.cs (141) : if (node.Next.Next == null)
+List.cs (142) : {
+List.cs (143) : removedVariable = node.Next.Value;
+List.cs (144) : Last = node;
+List.cs (145) : m_numItems--;
+List.cs (146) : return removedVariable;
+List.cs (147) : }
+List.cs (148) : node = node.Next;
+List.cs (149) : }
+List.cs (150) : }
+List.cs (152) : //Si eleminamos una que no es no la primera ni la ultima
+List.cs (153) : for(int i = 0; i<m_numItems;i++)
+List.cs (154) : {
+List.cs (155) : if(i == index-1)
+List.cs (156) : {
+List.cs (157) : removedVariable = node.Next.Value;
+List.cs (158) : node.Next = node.Next.Next;
+List.cs (159) : m_numItems--;
+List.cs (160) : return removedVariable;
+List.cs (161) : }
+List.cs (162) : }
+List.cs (164) : return default(T);
+List.cs (166) : /*
+List.cs (168) : int i = 0;
+List.cs (169) : while (node != null && i < index - 1)
+List.cs (170) : {
+List.cs (171) : node = node.Next;
+List.cs (172) : i++;
+List.cs (173) : }
+List.cs (175) : if (node == null || node.Next == null)
+List.cs (176) : {
+List.cs (178) : }
+List.cs (180) : removedVariable = node.Next.Value;
+List.cs (181) : node.Next = node.Next.Next;
+List.cs (182) : if (node.Next == null) Last = node;
+List.cs (183) : m_numItems--;
+List.cs (184) : return removedVariable;
+List.cs (185) : */
+List.cs (191) : m_numItems = 0;
+List.cs (192) : First = null;
+List.cs (193) : Last = null;
+List.cs (200) : ListNode<T> node = First;
+List.cs (201) : while (node != null)
+List.cs (202) : {
+List.cs (203) : yield return node.Value;
+List.cs (204) : node = node.Next;
+List.cs (205) : }
