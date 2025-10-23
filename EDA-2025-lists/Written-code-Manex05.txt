@@ -96,77 +96,100 @@ ArrayList.cs (123) : foreach (T i in Values)
 ArrayList.cs (124) : {
 ArrayList.cs (125) : yield return i;
 ArrayList.cs (126) : }
-List.cs (3) : using System.Runtime.InteropServices;
-List.cs (48) : return m_numItems;
-List.cs (55) : if (index < 0)
-List.cs (56) : {
-List.cs (57) : return default(T);
-List.cs (58) : }
-List.cs (60) : ListNode<T> current = First;
-List.cs (61) : int count = 0;
-List.cs (63) : while (current != null)
-List.cs (64) : {
-List.cs (65) : if (count == index)
-List.cs (66) : {
-List.cs (67) : return current.Value;
-List.cs (68) : }
-List.cs (69) : current = current.Next;
-List.cs (70) : count++;
+List.cs (3) : using System.Collections.Concurrent;
+List.cs (4) : using System.Diagnostics.Contracts;
+List.cs (5) : using System.Runtime.InteropServices;
+List.cs (11) : public ListNode<T> Previus = null;
+List.cs (51) : return m_numItems;
+List.cs (58) : if (index < 0 || index >= m_numItems)
+List.cs (59) : {
+List.cs (60) : return default(T);
+List.cs (61) : }
+List.cs (63) : ListNode<T> current = First;
+List.cs (64) : int count = 0;
+List.cs (66) : while (current != null)
+List.cs (67) : {
+List.cs (68) : if (count == index)
+List.cs (69) : {
+List.cs (70) : return current.Value;
 List.cs (71) : }
-List.cs (81) : ListNode<T> newNode = new ListNode<T>(value);
-List.cs (83) : if (First == null)
-List.cs (84) : {
-List.cs (85) : First = newNode;
-List.cs (86) : Last = newNode;
-List.cs (87) : }
-List.cs (88) : else
-List.cs (89) : {
-List.cs (90) : Last.Next = newNode;
-List.cs (91) : Last = newNode;
-List.cs (92) : }
-List.cs (94) : m_numItems++;
-List.cs (101) : if (index < 0 || index >= m_numItems)
-List.cs (102) : {
-List.cs (104) : }
-List.cs (106) : T value = Get(index);
-List.cs (108) : if (index == 0)
-List.cs (109) : {
-List.cs (110) : First = First.Next;
-List.cs (112) : if (First == null)
+List.cs (72) : current = current.Next;
+List.cs (73) : count++;
+List.cs (74) : }
+List.cs (83) : ListNode<T> newNode = new ListNode<T>(value);
+List.cs (85) : if (First == null)
+List.cs (86) : {
+List.cs (87) : First = newNode;
+List.cs (88) : Last = newNode;
+List.cs (89) : }
+List.cs (90) : else
+List.cs (91) : {
+List.cs (92) : Last.Next = newNode;
+List.cs (93) : newNode.Previus = Last;
+List.cs (94) : Last = newNode;
+List.cs (95) : }
+List.cs (97) : m_numItems++;
+List.cs (104) : if (index < 0 || index >= m_numItems)
+List.cs (105) : {
+List.cs (107) : }
+List.cs (109) : ListNode<T> current;
+List.cs (110) : int count;
+List.cs (112) : if (index < m_numItems / 2)
 List.cs (113) : {
-List.cs (114) : Last = null;
-List.cs (115) : }
-List.cs (116) : m_numItems--;
-List.cs (117) : return value;
-List.cs (118) : }
-List.cs (120) : ListNode<T> previus = First;
-List.cs (121) : for(int i = 0; i < index - 1; i++)
-List.cs (122) : {
-List.cs (123) : previus = previus.Next;
-List.cs (124) : }
-List.cs (126) : ListNode<T> nodeToEliminated = previus.Next;
-List.cs (127) : previus.Next = nodeToEliminated.Next;
-List.cs (129) : if (nodeToEliminated == Last)
-List.cs (130) : {
-List.cs (131) : Last = previus;
-List.cs (132) : }
-List.cs (134) : m_numItems--;
-List.cs (136) : return value;
-List.cs (143) : First = null;
-List.cs (144) : Last = null;
-List.cs (145) : m_numItems = 0;
-List.cs (151) : ListNode<T> current = First;
-List.cs (153) : while(current != null)
-List.cs (154) : {
-List.cs (155) : yield return current.Value;
-List.cs (156) : current = current.Next;
-List.cs (157) : }
+List.cs (114) : current = First;
+List.cs (115) : count = 0;
+List.cs (116) : while (count < index)
+List.cs (117) : {
+List.cs (118) : current = current.Next;
+List.cs (119) : count++;
+List.cs (120) : }
+List.cs (121) : }
+List.cs (122) : else
+List.cs (123) : {
+List.cs (124) : current = Last;
+List.cs (125) : count = m_numItems - 1;
+List.cs (126) : while (count > index)
+List.cs (127) : {
+List.cs (128) : current = current.Previus;
+List.cs (129) : count--;
+List.cs (130) : }
+List.cs (131) : }
+List.cs (133) : T value = current.Value;
+List.cs (135) : if (current.Previus != null)
+List.cs (136) : {
+List.cs (137) : current.Previus.Next = current.Next;
+List.cs (138) : }
+List.cs (139) : else
+List.cs (140) : {
+List.cs (141) : First = current.Next;
+List.cs (142) : }
+List.cs (144) : if (current.Next != null)
+List.cs (145) : {
+List.cs (146) : current.Next.Previus = current.Previus;
+List.cs (147) : }
+List.cs (148) : else
+List.cs (149) : {
+List.cs (150) : Last = current.Previus;
+List.cs (151) : }
+List.cs (153) : m_numItems--;
+List.cs (154) : return value;
+List.cs (161) : First = null;
+List.cs (162) : Last = null;
+List.cs (163) : m_numItems = 0;
+List.cs (169) : ListNode<T> current = First;
+List.cs (171) : while(current != null)
+List.cs (172) : {
+List.cs (173) : yield return current.Value;
+List.cs (174) : current = current.Next;
+List.cs (175) : }
 Queue.cs (6) : List<T> list = new List<T>();
+Queue.cs (11) : return list.ToString();
 Queue.cs (18) : return list.Count();
 Queue.cs (24) : list.Clear();
 Queue.cs (29) : list.Add(value);
 Queue.cs (34) : return list.Remove(0);
 Stack.cs (6) : ArrayList<T> array = new ArrayList<T>();
+Stack.cs (10) : return array.ToString();
 Stack.cs (17) : return array.Count();
 Stack.cs (23) : array.Clear();
 Stack.cs (28) : array.Add(value);
