@@ -144,7 +144,7 @@ ArrayList.cs (87) : NumElements--;
 ArrayList.cs (89) : }
 ArrayList.cs (90) : else
 ArrayList.cs (91) : {
-ArrayList.cs (92) : for (int i = index + first; i <=NumElements + first - 1; i++)
+ArrayList.cs (92) : for (int i = index + first; i <NumElements + first; i++)
 ArrayList.cs (93) : {
 ArrayList.cs (94) : Values[i] = Values[i + 1];
 ArrayList.cs (95) : }
@@ -167,6 +167,8 @@ ArrayList.cs (130) : i++;
 ArrayList.cs (131) : }
 ArrayList.cs (132) : yield return Values[i + first];
 List.cs (8) : public ListNode<T> Previous = null;
+List.cs (25) : public ListNode<T> First = null;
+List.cs (26) : public ListNode<T> Last = null;
 List.cs (48) : return m_numItems;
 List.cs (55) : if (index < 0 || index >= m_numItems)
 List.cs (56) : {
@@ -199,58 +201,83 @@ List.cs (100) : if (index == 0)
 List.cs (101) : {
 List.cs (102) : ListNode<T> f = First;
 List.cs (103) : First = First.Next;
-List.cs (104) : m_numItems--;
-List.cs (105) : return f.Value;
-List.cs (106) : }
-List.cs (107) : else if (index < m_numItems)
-List.cs (108) : {
-List.cs (109) : ListNode<T> value = First;
-List.cs (111) : value.Previous = value.Next.Next;
-List.cs (113) : if (index == m_numItems - 1)
-List.cs (114) : {
-List.cs (115) : Last = value;
+List.cs (104) : if (First != null)
+List.cs (105) : {
+List.cs (106) : First.Previous = null;
+List.cs (107) : }
+List.cs (108) : else
+List.cs (109) : {
+List.cs (110) : Last = null;
+List.cs (111) : }
+List.cs (113) : m_numItems--;
+List.cs (115) : return f.Value;
 List.cs (116) : }
-List.cs (117) : m_numItems--;
-List.cs (118) : return value.Value;
-List.cs (120) : }
-List.cs (121) : else
-List.cs (122) : {
-List.cs (124) : }
-List.cs (131) : m_numItems = 0;
-List.cs (132) : First = null;
-List.cs (133) : Last = null;
-List.cs (140) : ListNode<T> value = First;
-List.cs (141) : while (value!=null)
-List.cs (142) : {
-List.cs (143) : yield return value.Value;
-List.cs (144) : value=value.Next;
-List.cs (145) : }
+List.cs (117) : else if (index < m_numItems)
+List.cs (118) : {
+List.cs (119) : ListNode<T> value = First;
+List.cs (120) : if (index == m_numItems - 1)
+List.cs (121) : {
+List.cs (122) : Last = value.Previous;
+List.cs (123) : }
+List.cs (124) : else
+List.cs (125) : {
+List.cs (126) : for (int i = 0; i < index; i++)
+List.cs (127) : {
+List.cs (128) : value = value.Next;
+List.cs (130) : }
+List.cs (131) : value.Previous.Next = value.Next.Next;
+List.cs (132) : }
+List.cs (133) : m_numItems--;
+List.cs (134) : return value.Value;
+List.cs (136) : }
+List.cs (137) : else
+List.cs (138) : {
+List.cs (140) : }
+List.cs (147) : m_numItems = 0;
+List.cs (148) : First = null;
+List.cs (149) : Last = null;
+List.cs (156) : ListNode<T> value = First;
+List.cs (157) : while (value!=null)
+List.cs (158) : {
+List.cs (159) : yield return value.Value;
+List.cs (160) : value=value.Next;
+List.cs (161) : }
+Queue.cs (6) : IList<T> values = new List<T>();
+Queue.cs (11) : return values.ToString();
+Queue.cs (17) : return values.Count();
+Queue.cs (23) : values.Clear();
 Queue.cs (26) : public void Push(T value)//ADD value
+Queue.cs (28) : values.Add(value);
 Queue.cs (31) : public T Pop()//remove the first one
-Stack.cs (5) : public ListNode<T> list1 = null;
-Stack.cs (6) : public ListNode<T> Next = null;
-Stack.cs (7) : public ListNode<T> Previous = null;
-Stack.cs (8) : ListNode<T> First = null;
-Stack.cs (9) : ListNode<T> Last = null;
-Stack.cs (10) : int numElements = 0;
-Stack.cs (21) : return numElements++;
-Stack.cs (27) : First = null;
-Stack.cs (28) : Last = null;
-Stack.cs (29) : numElements = 0;
-Stack.cs (32) : public void Push(T value)//ADD VALUE
-Stack.cs (37) : public T Pop()//remove the last one
-Stack.cs (39) : T dato = Last.Value;
-Stack.cs (40) : if (numElements == 0 || Last == null)
+Queue.cs (33) : if (values.Count() == 0)
+Queue.cs (34) : {
+Queue.cs (36) : }
+Queue.cs (37) : else
+Queue.cs (38) : {
+Queue.cs (40) : T deleted = values.Get(0);
+Queue.cs (41) : values.Remove(0);
+Queue.cs (42) : return deleted;
+Queue.cs (43) : }
+Stack.cs (5) : IList<T> values = new List<T>();
+Stack.cs (10) : return values.ToString();
+Stack.cs (16) : return values.Count();
+Stack.cs (21) : values.Clear();
+Stack.cs (24) : public void Push(T value)//ADD VALUE
+Stack.cs (26) : // we have to do a new list to add the new value and then the values of the new list
+Stack.cs (27) : //because in stacks we add in the initial gap instead of the final one
+Stack.cs (28) : // 1234 if we have to add 5---> 51234 is going to be so 5 in the new array + the other
+Stack.cs (29) : values.Add(value);
+Stack.cs (31) : }
+Stack.cs (34) : public T Pop()
+Stack.cs (35) : {
+Stack.cs (36) : if (values.Count() == 0)
+Stack.cs (37) : {
+Stack.cs (38) : return default(T);
+Stack.cs (39) : }
+Stack.cs (40) : else
 Stack.cs (41) : {
-Stack.cs (43) : }
-Stack.cs (44) : else if (First == Last)
-Stack.cs (45) : {
-Stack.cs (46) : First = null;
-Stack.cs (47) : Last = null;
-Stack.cs (48) : numElements--;
-Stack.cs (49) : }
-Stack.cs (50) : else
-Stack.cs (51) : {
-Stack.cs (52) : numElements--;
-Stack.cs (53) : }
-Stack.cs (54) : return dato;
+Stack.cs (42) : int last = values.Count() - 1;
+Stack.cs (43) : T deleted = values.Get(last);
+Stack.cs (44) : values.Remove(last);
+Stack.cs (45) : return deleted;
+Stack.cs (46) : }
