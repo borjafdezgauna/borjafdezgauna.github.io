@@ -22,21 +22,17 @@ IntArrayList.cs (76) : }
 IntArrayList.cs (77) : Values[Count()] = 0;
 IntArrayList.cs (78) : NumElements = NumElements - 1;
 IntArrayList.cs (79) : return memoRemove;
-IntArrayList.cs (86) : for (int i = 0; i < Count(); i++)
-IntArrayList.cs (87) : {
-IntArrayList.cs (88) : Remove(i);
-IntArrayList.cs (89) : }
-IntArrayList.cs (90) : NumElements = 0;
-IntArrayList.cs (95) : int[] newArrayList = new int[newSize];
-IntArrayList.cs (96) : for (int i = 0; i < NumElements; i++)
-IntArrayList.cs (97) : {
-IntArrayList.cs (98) : newArrayList[i] = Values[i];
-IntArrayList.cs (99) : }
-IntArrayList.cs (100) : Values = newArrayList;
-IntArrayList.cs (106) : for (int i = 0; i < NumElements; i++)
-IntArrayList.cs (107) : {
-IntArrayList.cs (108) : yield return Values[i];
-IntArrayList.cs (109) : }
+IntArrayList.cs (86) : NumElements = 0;
+IntArrayList.cs (91) : int[] newArrayList = new int[newSize];
+IntArrayList.cs (92) : for (int i = 0; i < NumElements; i++)
+IntArrayList.cs (93) : {
+IntArrayList.cs (94) : newArrayList[i] = Values[i];
+IntArrayList.cs (95) : }
+IntArrayList.cs (96) : Values = newArrayList;
+IntArrayList.cs (102) : for (int i = 0; i < NumElements; i++)
+IntArrayList.cs (103) : {
+IntArrayList.cs (104) : yield return Values[i];
+IntArrayList.cs (105) : }
 IntList.cs (43) : IntListNode node = First;
 IntList.cs (44) : int i = 0;
 IntList.cs (45) : while (node != null)
@@ -122,53 +118,84 @@ ArrayList.cs (75) : }
 ArrayList.cs (76) : Values[Count()] = default(T);
 ArrayList.cs (77) : NumElements = NumElements - 1;
 ArrayList.cs (78) : return memoRemove;
-ArrayList.cs (85) : for (int i = 0; i < Count(); i++)
-ArrayList.cs (86) : {
-ArrayList.cs (87) : Remove(i);
-ArrayList.cs (88) : }
-ArrayList.cs (89) : NumElements = 0;
-ArrayList.cs (96) : T[] newArrayList = new T[newSize];
-ArrayList.cs (97) : for (int i = 0; i < NumElements; i++)
-ArrayList.cs (98) : {
-ArrayList.cs (99) : newArrayList[i] = Values[i];
-ArrayList.cs (100) : }
-ArrayList.cs (101) : Values = newArrayList;
-ArrayList.cs (106) : for (int i = 0; i < NumElements; i++)
-ArrayList.cs (107) : {
-ArrayList.cs (108) : yield return Values[i];
-ArrayList.cs (109) : }
+ArrayList.cs (85) : NumElements = 0;
+ArrayList.cs (92) : T[] newArrayList = new T[newSize];
+ArrayList.cs (93) : for (int i = 0; i < NumElements; i++)
+ArrayList.cs (94) : {
+ArrayList.cs (95) : newArrayList[i] = Values[i];
+ArrayList.cs (96) : }
+ArrayList.cs (97) : Values = newArrayList;
+ArrayList.cs (102) : for (int i = 0; i < NumElements; i++)
+ArrayList.cs (103) : {
+ArrayList.cs (104) : yield return Values[i];
+ArrayList.cs (105) : }
 List.cs (47) : return m_numItems;
 List.cs (55) : ListNode<T> node = First;
-List.cs (56) : int i = 0;
-List.cs (57) : if (index < 0)
-List.cs (58) : {
-List.cs (60) : }
-List.cs (61) : while (node != null && i < index)
-List.cs (62) : {
-List.cs (63) : node = node.Next;
-List.cs (64) : i++;
+List.cs (56) : if (index < 0 || index >= m_numItems)
+List.cs (57) : {
+List.cs (59) : }
+List.cs (60) : for (int i = 0; i < index; i++)
+List.cs (61) : {
+List.cs (62) : if(node == null)
+List.cs (63) : {
+List.cs (64) : return default(T);
 List.cs (65) : }
-List.cs (66) : if (node == null)
-List.cs (67) : {
-List.cs (68) : return default(T);
-List.cs (69) : }
-List.cs (70) : return node.Value;
-List.cs (77) : ListNode<T> addNode = new ListNode<T>(value);
-List.cs (78) : ListNode<T> node = First;
-List.cs (79) : if (First == null)
-List.cs (80) : {
-List.cs (81) : First = addNode;
-List.cs (82) : return;
-List.cs (83) : }
-List.cs (84) : while (node.Next != null)
-List.cs (85) : {
-List.cs (86) : node = node.Next;
-List.cs (87) : }
-List.cs (88) : node.Next = addNode;
-List.cs (100) : First = null;
-List.cs (106) : ListNode<T> node = First;
-List.cs (107) : while (node != null)
-List.cs (108) : {
-List.cs (109) : yield return node.Value;
-List.cs (110) : node = node.Next;
-List.cs (111) : }
+List.cs (66) : node = node.Next;
+List.cs (67) : }
+List.cs (68) : return node.Value;
+List.cs (75) : ListNode<T> addNode = new ListNode<T>(value);
+List.cs (76) : if (First == null)
+List.cs (77) : {
+List.cs (78) : First = addNode;
+List.cs (79) : Last = addNode;
+List.cs (80) : }
+List.cs (81) : else
+List.cs (82) : {
+List.cs (83) : Last.Next = addNode;
+List.cs (84) : Last = addNode;
+List.cs (85) : }
+List.cs (86) : m_numItems++;
+List.cs (93) : if (index < 0 || index >= m_numItems)
+List.cs (94) : {
+List.cs (96) : }
+List.cs (98) : ListNode<T> prev = null;
+List.cs (99) : ListNode<T> node = First;
+List.cs (100) : for (int i = 0; i < index; i++)
+List.cs (101) : {
+List.cs (102) : prev = node;
+List.cs (103) : node = node.Next;
+List.cs (104) : }
+List.cs (106) : T remove = node.Value;
+List.cs (108) : if (prev == null)
+List.cs (109) : {
+List.cs (110) : First = node.Next;
+List.cs (111) : if (First == null) Last = null;
+List.cs (112) : }
+List.cs (113) : else
+List.cs (114) : {
+List.cs (115) : prev.Next = node.Next;
+List.cs (116) : if (prev.Next == null) Last = prev;
+List.cs (117) : }
+List.cs (119) : m_numItems--;
+List.cs (120) : return remove;
+List.cs (127) : First = null;
+List.cs (128) : m_numItems = 0;
+List.cs (134) : ListNode<T> node = First;
+List.cs (135) : while (node != null)
+List.cs (136) : {
+List.cs (137) : yield return node.Value;
+List.cs (138) : node = node.Next;
+List.cs (139) : }
+Queue.cs (7) : private List<T> lista = new List<T>();
+Queue.cs (11) : return lista.ToString();
+Queue.cs (18) : return lista.Count();
+Queue.cs (23) : lista.Clear();
+Queue.cs (28) : lista.Add(value);
+Queue.cs (34) : return lista.Remove(0);
+Stack.cs (2) : using System.ComponentModel;
+Stack.cs (9) : private List<T> lista = new List<T>();
+Stack.cs (13) : return lista.ToString();
+Stack.cs (20) : return lista.Count();
+Stack.cs (25) : lista.Clear();
+Stack.cs (30) : lista.Add(value);
+Stack.cs (35) : return lista.Remove(Count() - 1);
