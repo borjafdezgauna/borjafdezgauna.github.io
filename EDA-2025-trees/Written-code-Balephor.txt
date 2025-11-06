@@ -1,0 +1,254 @@
+List.cs (1) : using Lists;
+List.cs (2) : using System.Collections;
+List.cs (3) : using System.Data;
+List.cs (4) : using System.Globalization;
+List.cs (5) : using System.Reflection;
+List.cs (6) : using System.Runtime.InteropServices;
+List.cs (7) : using System.Xml;
+List.cs (9) : public class ListNode<T>
+List.cs (10) : {
+List.cs (11) : public T Value;
+List.cs (12) : public ListNode<T> Next = null;
+List.cs (14) : public ListNode<T> Previous = null;
+List.cs (18) : public ListNode(T value)
+List.cs (19) : {
+List.cs (20) : Value = value;
+List.cs (21) : }
+List.cs (23) : public override string ToString()
+List.cs (24) : {
+List.cs (25) : return Value.ToString();
+List.cs (26) : }
+List.cs (27) : }
+List.cs (29) : public class List<T> : IList<T>
+List.cs (30) : {
+List.cs (31) : ListNode<T> First = null;
+List.cs (32) : ListNode<T> Last = null;
+List.cs (33) : int m_numItems = 0;
+List.cs (35) : public override string ToString()
+List.cs (36) : {
+List.cs (37) : ListNode<T> node = First;
+List.cs (38) : string output = "[";
+List.cs (40) : while (node != null)
+List.cs (41) : {
+List.cs (42) : output += node.ToString() + ",";
+List.cs (43) : node = node.Next;
+List.cs (44) : }
+List.cs (45) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+List.cs (47) : return output;
+List.cs (48) : }
+List.cs (50) : public int Count()
+List.cs (51) : {
+List.cs (52) : //TODO #1: return the number of elements on the list
+List.cs (53) : return m_numItems;
+List.cs (55) : }
+List.cs (57) : public T Get(int index)
+List.cs (58) : {
+List.cs (59) : //TODO #2: return the element on the index-th position. O if the position is out of bounds
+List.cs (61) : ListNode<T> node = First;
+List.cs (63) : if (First == null || index < 0 || index >= m_numItems)
+List.cs (64) : {
+List.cs (65) : return default(T);
+List.cs (66) : }
+List.cs (68) : for (int i = 0; i < m_numItems; i++)
+List.cs (69) : {
+List.cs (70) : if (i == index)
+List.cs (71) : {
+List.cs (72) : return node.Value;
+List.cs (73) : }
+List.cs (74) : node = node.Next;
+List.cs (75) : }
+List.cs (77) : return default(T);
+List.cs (81) : }
+List.cs (83) : public void Add(T value)
+List.cs (84) : {
+List.cs (85) : //TODO #3: add a new integer to the end of the list
+List.cs (87) : //Guardamos value en newNode
+List.cs (88) : ListNode<T> newNode = new ListNode<T>(value);
+List.cs (90) : //Si esta vacio
+List.cs (91) : if (First == null)
+List.cs (92) : {
+List.cs (93) : First = newNode;
+List.cs (94) : Last = newNode;
+List.cs (95) : }
+List.cs (96) : //si hay un First
+List.cs (97) : else
+List.cs (98) : {
+List.cs (99) : newNode.Previous = Last;
+List.cs (100) : Last.Next = newNode;
+List.cs (101) : Last = newNode;
+List.cs (102) : }
+List.cs (103) : m_numItems++;
+List.cs (106) : }
+List.cs (108) : public T Remove(int index)
+List.cs (109) : {
+List.cs (110) : //TODO #4: remove the element on the index-th position. Do nothing if position is out of bounds
+List.cs (112) : //Si esta vacio o index esta "out of bounds"
+List.cs (113) : if (index < 0 || index >= m_numItems)
+List.cs (114) : {
+List.cs (115) : return default(T);
+List.cs (116) : }
+List.cs (118) : ListNode<T> node = First;
+List.cs (121) : //Si se quiere eleminar el primer nodo
+List.cs (122) : if (index == 0)
+List.cs (123) : {
+List.cs (124) : T removedValue = node.Value;
+List.cs (125) : First = node.Next;
+List.cs (127) : if (First != null)
+List.cs (128) : First.Previous = null;
+List.cs (129) : else
+List.cs (130) : Last = null; // la lista quedó vacía
+List.cs (132) : m_numItems--;
+List.cs (133) : return removedValue;
+List.cs (134) : }
+List.cs (136) : // Movernos hasta el nodo a eliminar
+List.cs (137) : for (int i = 0; i < index; i++)
+List.cs (138) : {
+List.cs (139) : node = node.Next;
+List.cs (140) : }
+List.cs (141) : T valueToRemove = node.Value;
+List.cs (143) : // Caso 2: eliminar último
+List.cs (144) : if (node == Last)
+List.cs (145) : {
+List.cs (146) : Last = node.Previous;
+List.cs (147) : Last.Next = null;
+List.cs (148) : }
+List.cs (149) : else
+List.cs (150) : {
+List.cs (151) : // Caso 3: eliminar nodo del medio
+List.cs (152) : node.Previous.Next = node.Next;
+List.cs (153) : node.Next.Previous = node.Previous;
+List.cs (154) : }
+List.cs (156) : m_numItems--;
+List.cs (157) : return valueToRemove;
+List.cs (158) : }
+List.cs (160) : /*for (int i = 0; i < m_numItems; i++)
+List.cs (161) : {
+List.cs (163) : if (i == index - 1)
+List.cs (164) : {
+List.cs (165) : removedVariable = node.Next.Value;
+List.cs (166) : node.Next = node.Next.Next;
+List.cs (167) : m_numItems--;
+List.cs (168) : return removedVariable;
+List.cs (169) : }
+List.cs (170) : }
+List.cs (172) : */
+List.cs (174) : /*
+List.cs (176) : int i = 0;
+List.cs (177) : while (node != null && i < index - 1)
+List.cs (178) : {
+List.cs (179) : node = node.Next;
+List.cs (180) : i++;
+List.cs (181) : }
+List.cs (183) : if (node == null || node.Next == null)
+List.cs (184) : {
+List.cs (185) : return default(T);
+List.cs (186) : }
+List.cs (188) : removedVariable = node.Next.Value;
+List.cs (189) : node.Next = node.Next.Next;
+List.cs (190) : if (node.Next == null) Last = node;
+List.cs (191) : m_numItems--;
+List.cs (192) : return removedVariable;
+List.cs (193) : */
+List.cs (196) : public void Clear()
+List.cs (197) : {
+List.cs (198) : //TODO #5: remove all the elements on the list
+List.cs (199) : m_numItems = 0;
+List.cs (200) : First = null;
+List.cs (201) : Last = null;
+List.cs (203) : }
+List.cs (205) : public IEnumerator GetEnumerator()
+List.cs (206) : {
+List.cs (207) : //TODO #6 : Return an enumerator using "yield return" for each of the values in this list
+List.cs (208) : ListNode<T> node = First;
+List.cs (209) : while (node != null)
+List.cs (210) : {
+List.cs (211) : yield return node.Value;
+List.cs (212) : node = node.Next;
+List.cs (213) : }
+List.cs (215) : }
+List.cs (217) : public int getLastIndex()
+List.cs (218) : {
+List.cs (219) : return m_numItems - 1;
+List.cs (220) : }
+List.cs (221) : }
+TreeNode.cs (3) : using System.ComponentModel.DataAnnotations;
+TreeNode.cs (4) : using System.Globalization;
+TreeNode.cs (5) : using System.Reflection.Metadata.Ecma335;
+TreeNode.cs (14) : private List<TreeNode<T>> Children;
+TreeNode.cs (23) : Value = value;
+TreeNode.cs (24) : Children = new List<TreeNode<T>>();
+TreeNode.cs (32) : string output = null;
+TreeNode.cs (33) : string leftSpace = null;
+TreeNode.cs (34) : for (int i = 0; i < depth; i++) leftSpace += " ";
+TreeNode.cs (35) : if (leftSpace != null) leftSpace += "->";
+TreeNode.cs (37) : output += $"{leftSpace}[{Value}]\n";
+TreeNode.cs (39) : for (int childIndex = 0; childIndex < Children.Count(); childIndex++)
+TreeNode.cs (40) : {
+TreeNode.cs (41) : TreeNode<T> child = Children.Get(childIndex);
+TreeNode.cs (42) : output += child.ToString(depth + 1, childIndex);
+TreeNode.cs (43) : }
+TreeNode.cs (44) : return output;
+TreeNode.cs (50) : TreeNode<T> node = new TreeNode<T>(value);
+TreeNode.cs (51) : Children.Add(node);
+TreeNode.cs (52) : return node;
+TreeNode.cs (59) : int cont = 1;
+TreeNode.cs (60) : foreach (TreeNode<T> Child in Children)
+TreeNode.cs (61) : {
+TreeNode.cs (62) : cont += Child.Count();
+TreeNode.cs (63) : }
+TreeNode.cs (64) : return cont;
+TreeNode.cs (72) : //Si no hay hijos
+TreeNode.cs (73) : if (Children.Count() == 0)
+TreeNode.cs (74) : {
+TreeNode.cs (76) : }
+TreeNode.cs (78) : //Si hay Hijos
+TreeNode.cs (79) : int maxChildHeight = 0;
+TreeNode.cs (80) : foreach (TreeNode<T> Child in Children)
+TreeNode.cs (81) : {
+TreeNode.cs (82) : int childHeight = Child.Height();
+TreeNode.cs (83) : if(childHeight > maxChildHeight)
+TreeNode.cs (84) : {
+TreeNode.cs (85) : maxChildHeight = childHeight;
+TreeNode.cs (86) : }
+TreeNode.cs (87) : }
+TreeNode.cs (88) : return 1 + maxChildHeight;
+TreeNode.cs (98) : //Creamos un bucle for de tal manera que asignamos a "child" cada hijo distinto del Nodo del que se invoca el metodo, cambiando de hijo por iteración
+TreeNode.cs (99) : for (int i = 0; i<Children.Count(); i++)
+TreeNode.cs (100) : {
+TreeNode.cs (101) : //por cada i se pasa al siguiente hijo
+TreeNode.cs (102) : TreeNode<T> child = Children.Get(i);
+TreeNode.cs (104) : //
+TreeNode.cs (105) : if(child == null)
+TreeNode.cs (106) : {
+TreeNode.cs (107) : continue;
+TreeNode.cs (108) : }
+TreeNode.cs (110) : //si alguno de los hijos del Nodo tiene el valor que se quire eliminar, lo eleminamos
+TreeNode.cs (111) : if (child.Value.Equals(value))
+TreeNode.cs (112) : {
+TreeNode.cs (113) : Children.Remove(i);
+TreeNode.cs (114) : i--;
+TreeNode.cs (115) : }
+TreeNode.cs (116) : //si el hijo no tiene el valor que buscamos, llamamos de manera recursiva al metodo Remove() de TreeNode<T> pero con los hijos de los hijos.
+TreeNode.cs (117) : else
+TreeNode.cs (118) : {
+TreeNode.cs (119) : child.Remove(value);
+TreeNode.cs (120) : }
+TreeNode.cs (121) : }
+TreeNode.cs (127) : if (Value.Equals(value))
+TreeNode.cs (128) : {
+TreeNode.cs (129) : return this;
+TreeNode.cs (130) : }
+TreeNode.cs (132) : for (int i = 0; i < Children.Count(); i++)
+TreeNode.cs (133) : {
+TreeNode.cs (134) : //por cada i se pasa al siguiente hijo
+TreeNode.cs (135) : TreeNode<T> child = Children.Get(i);
+TreeNode.cs (137) : if (child == null)
+TreeNode.cs (138) : {
+TreeNode.cs (139) : continue;
+TreeNode.cs (140) : }
+TreeNode.cs (142) : TreeNode<T> found = child.Find(value);
+TreeNode.cs (144) : if (found != null)
+TreeNode.cs (145) : {
+TreeNode.cs (146) : return found;
+TreeNode.cs (147) : }
+TreeNode.cs (148) : }
