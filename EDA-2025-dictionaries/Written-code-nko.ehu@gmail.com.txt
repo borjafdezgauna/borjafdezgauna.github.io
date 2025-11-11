@@ -1,0 +1,324 @@
+BinaryTree.cs (2) : using System;
+BinaryTree.cs (3) : namespace BinaryTrees
+BinaryTree.cs (4) : {
+BinaryTree.cs (6) : public class BinaryTree<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTree.cs (7) : {
+BinaryTree.cs (8) : public BinaryTreeNode<TKey, TValue> RootNode;
+BinaryTree.cs (10) : public override string ToString()
+BinaryTree.cs (11) : {
+BinaryTree.cs (12) : if (RootNode == null)
+BinaryTree.cs (13) : return null;
+BinaryTree.cs (14) : else return RootNode.ToString(0);
+BinaryTree.cs (15) : }
+BinaryTree.cs (17) : public int Count()
+BinaryTree.cs (18) : {
+BinaryTree.cs (19) : if (RootNode == null)
+BinaryTree.cs (20) : return 0;
+BinaryTree.cs (21) : return RootNode.Count();
+BinaryTree.cs (22) : }
+BinaryTree.cs (24) : public int Height()
+BinaryTree.cs (25) : {
+BinaryTree.cs (26) : if (RootNode == null)
+BinaryTree.cs (27) : return 0;
+BinaryTree.cs (28) : return RootNode.Height();
+BinaryTree.cs (29) : }
+BinaryTree.cs (31) : public TValue Get(TKey key)
+BinaryTree.cs (32) : {
+BinaryTree.cs (33) : if (RootNode == null)
+BinaryTree.cs (34) : throw new Exception("Empty tree");
+BinaryTree.cs (35) : else
+BinaryTree.cs (36) : {
+BinaryTree.cs (37) : return RootNode.Get(key);
+BinaryTree.cs (38) : }
+BinaryTree.cs (39) : }
+BinaryTree.cs (41) : public void Add(TKey key, TValue value)
+BinaryTree.cs (42) : {
+BinaryTree.cs (43) : BinaryTreeNode<TKey, TValue> newNode = new BinaryTreeNode<TKey, TValue>(key, value);
+BinaryTree.cs (44) : if (RootNode == null)
+BinaryTree.cs (45) : RootNode = newNode;
+BinaryTree.cs (46) : else
+BinaryTree.cs (47) : RootNode.Add(newNode);
+BinaryTree.cs (48) : }
+BinaryTree.cs (50) : public void Remove(TKey key)
+BinaryTree.cs (51) : {
+BinaryTree.cs (52) : if (RootNode != null)
+BinaryTree.cs (53) : RootNode = RootNode.Remove(key);
+BinaryTree.cs (54) : }
+BinaryTree.cs (56) : public TKey[] Keys()
+BinaryTree.cs (57) : {
+BinaryTree.cs (58) : if (RootNode == null)
+BinaryTree.cs (59) : return null;
+BinaryTree.cs (60) : int count = RootNode.Count();
+BinaryTree.cs (61) : TKey[] keys = new TKey[count];
+BinaryTree.cs (62) : RootNode.KeysToArray(keys, 0);
+BinaryTree.cs (63) : return keys;
+BinaryTree.cs (64) : }
+BinaryTree.cs (66) : public TValue[] Values()
+BinaryTree.cs (67) : {
+BinaryTree.cs (68) : if (RootNode == null)
+BinaryTree.cs (69) : return null;
+BinaryTree.cs (70) : int count = RootNode.Count();
+BinaryTree.cs (71) : TValue[] values = new TValue[count];
+BinaryTree.cs (72) : RootNode.ValuesToArray(values, 0);
+BinaryTree.cs (73) : return values;
+BinaryTree.cs (74) : }
+BinaryTree.cs (76) : private BinaryTreeNode<TKey, TValue> AddBalanced(TKey[] keys, TValue[] values, int start, int end)
+BinaryTree.cs (77) : {
+BinaryTree.cs (78) : if (start <= end && keys != null && values != null)
+BinaryTree.cs (79) : {
+BinaryTree.cs (80) : int middle = start+((end - start) / 2);
+BinaryTree.cs (81) : BinaryTreeNode<TKey, TValue> center = new BinaryTreeNode<TKey, TValue>(keys[middle], values[middle]);
+BinaryTree.cs (82) : center.LeftChild = AddBalanced(keys, values, start, middle - 1);
+BinaryTree.cs (83) : center.RightChild = AddBalanced(keys, values, middle + 1, end);
+BinaryTree.cs (84) : return center;
+BinaryTree.cs (85) : }
+BinaryTree.cs (86) : //TODO #7:  Given an array of keys and an array of values, this method must:
+BinaryTree.cs (87) : //          - Create a new tree node with the key/values in the center of the [start,end] section of the arrays
+BinaryTree.cs (88) : //          - Recursive call to AddBalanced with the elements on the left of center [start,center-1]. Add the result to the new node as LeftNode
+BinaryTree.cs (89) : //          - Recursive call to AddBalanced with the elements on the right of center [center+1,end]. Add the result to the new node as RightNode
+BinaryTree.cs (91) : return null;
+BinaryTree.cs (93) : }
+BinaryTree.cs (95) : public void Balance()
+BinaryTree.cs (96) : {
+BinaryTree.cs (97) : if (RootNode == null)
+BinaryTree.cs (98) : return;
+BinaryTree.cs (99) : TKey[] keys = Keys();
+BinaryTree.cs (100) : TValue[] values = Values();
+BinaryTree.cs (102) : RootNode = AddBalanced(keys, values, 0, keys.Length - 1);
+BinaryTree.cs (103) : }
+BinaryTree.cs (104) : }
+BinaryTree.cs (105) : }
+BinaryTreeDictionary.cs (3) : using BinaryTrees;
+BinaryTreeDictionary.cs (14) : public BinaryTree<TKey,TValue> binaryTrees;
+BinaryTreeDictionary.cs (19) : binaryTrees = new BinaryTree<TKey,TValue> ();
+BinaryTreeDictionary.cs (25) : return binaryTrees.ToString();
+BinaryTreeDictionary.cs (34) : return binaryTrees.Count();
+BinaryTreeDictionary.cs (41) : if(binaryTrees.RootNode!=null)
+BinaryTreeDictionary.cs (42) : return binaryTrees.Get(key);
+BinaryTreeDictionary.cs (43) : return default;
+BinaryTreeDictionary.cs (49) : binaryTrees.Add(key, value);
+BinaryTreeDictionary.cs (56) : binaryTrees.Remove(key);
+BinaryTreeDictionary.cs (63) : TKey[] keys = binaryTrees.Keys();
+BinaryTreeDictionary.cs (64) : if (keys!= null)
+BinaryTreeDictionary.cs (65) : return keys;
+BinaryTreeDictionary.cs (66) : return new TKey[0];
+BinaryTreeDictionary.cs (74) : TValue[] values = binaryTrees.Values();
+BinaryTreeDictionary.cs (75) : if (values!= null)
+BinaryTreeDictionary.cs (76) : return values;
+BinaryTreeDictionary.cs (77) : return new TValue[0];
+BinaryTreeNode.cs (2) : using System;
+BinaryTreeNode.cs (3) : using System.ComponentModel.Design;
+BinaryTreeNode.cs (4) : using System.Diagnostics.Tracing;
+BinaryTreeNode.cs (5) : using System.Xml;
+BinaryTreeNode.cs (6) : namespace BinaryTrees
+BinaryTreeNode.cs (7) : {
+BinaryTreeNode.cs (8) : public class BinaryTreeNode<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTreeNode.cs (9) : {
+BinaryTreeNode.cs (10) : public TKey Key;
+BinaryTreeNode.cs (11) : public TValue Value;
+BinaryTreeNode.cs (12) : public BinaryTreeNode<TKey, TValue> LeftChild;
+BinaryTreeNode.cs (13) : public BinaryTreeNode<TKey, TValue> RightChild;
+BinaryTreeNode.cs (15) : public BinaryTreeNode(TKey key, TValue value)
+BinaryTreeNode.cs (16) : {
+BinaryTreeNode.cs (17) : //TODO #1: Initialize member variables/attributes
+BinaryTreeNode.cs (18) : this.Key = key;
+BinaryTreeNode.cs (19) : this.Value = value;
+BinaryTreeNode.cs (20) : LeftChild = null;
+BinaryTreeNode.cs (21) : RightChild = null;
+BinaryTreeNode.cs (23) : }
+BinaryTreeNode.cs (25) : public string ToString(int depth)
+BinaryTreeNode.cs (26) : {
+BinaryTreeNode.cs (27) : string output = null;
+BinaryTreeNode.cs (29) : string leftSpace = null;
+BinaryTreeNode.cs (30) : for (int i = 0; i < depth; i++) leftSpace += " ";
+BinaryTreeNode.cs (31) : if (leftSpace != null) leftSpace += "->";
+BinaryTreeNode.cs (33) : if (Value != null)
+BinaryTreeNode.cs (34) : output += $"{leftSpace}[{Key.ToString()}-{Value.ToString()}]\n";
+BinaryTreeNode.cs (36) : if (LeftChild != null)
+BinaryTreeNode.cs (37) : output += $"{LeftChild?.ToString(depth + 1)}";
+BinaryTreeNode.cs (39) : if (RightChild != null)
+BinaryTreeNode.cs (40) : output += $"{RightChild?.ToString(depth + 1)}";
+BinaryTreeNode.cs (42) : return output;
+BinaryTreeNode.cs (43) : }
+BinaryTreeNode.cs (45) : public bool Add(BinaryTreeNode<TKey, TValue> node)
+BinaryTreeNode.cs (46) : {
+BinaryTreeNode.cs (47) : if (Key.CompareTo(node.Key) < 0)
+BinaryTreeNode.cs (48) : {
+BinaryTreeNode.cs (49) : if (this.LeftChild == null)
+BinaryTreeNode.cs (50) : {
+BinaryTreeNode.cs (51) : LeftChild = node;
+BinaryTreeNode.cs (52) : return true;
+BinaryTreeNode.cs (53) : }
+BinaryTreeNode.cs (54) : else
+BinaryTreeNode.cs (55) : LeftChild.Add(node);
+BinaryTreeNode.cs (57) : }
+BinaryTreeNode.cs (58) : else if (Key.CompareTo(node.Key) > 0)
+BinaryTreeNode.cs (59) : {
+BinaryTreeNode.cs (60) : if (this.RightChild == null)
+BinaryTreeNode.cs (61) : {
+BinaryTreeNode.cs (62) : RightChild = node;
+BinaryTreeNode.cs (63) : return true;
+BinaryTreeNode.cs (64) : }
+BinaryTreeNode.cs (65) : else
+BinaryTreeNode.cs (66) : RightChild.Add(node);
+BinaryTreeNode.cs (67) : return false;
+BinaryTreeNode.cs (69) : }
+BinaryTreeNode.cs (70) : else
+BinaryTreeNode.cs (71) : {
+BinaryTreeNode.cs (72) : this.Value = node.Value;
+BinaryTreeNode.cs (73) : }
+BinaryTreeNode.cs (74) : return false;
+BinaryTreeNode.cs (75) : //TODO #2: Add the new node following the order:
+BinaryTreeNode.cs (76) : //          -If the current node (this) has a higher key that the new node (use CompareTo()), the new node should be on this node's left.
+BinaryTreeNode.cs (77) : //              a) If the left child is null, the added node should be this node's left node side
+BinaryTreeNode.cs (78) : //              b) Else, we should ask the LeftChild to add it recursively
+BinaryTreeNode.cs (79) : //          -If the current node has a lower key that the new node (use CompareTo()), the new node should be on this node's right side.
+BinaryTreeNode.cs (80) : //          -If the current node and the new node have the same key, just update this node's value with the new node's value
+BinaryTreeNode.cs (82) : }
+BinaryTreeNode.cs (84) : public int Count()
+BinaryTreeNode.cs (85) : {
+BinaryTreeNode.cs (86) : int count = 1;
+BinaryTreeNode.cs (87) : if (this != null)
+BinaryTreeNode.cs (88) : {
+BinaryTreeNode.cs (89) : if (LeftChild != null)
+BinaryTreeNode.cs (90) : {
+BinaryTreeNode.cs (91) : count += LeftChild.Count();
+BinaryTreeNode.cs (92) : }
+BinaryTreeNode.cs (93) : if (RightChild != null)
+BinaryTreeNode.cs (94) : {
+BinaryTreeNode.cs (95) : count += RightChild.Count();
+BinaryTreeNode.cs (96) : }
+BinaryTreeNode.cs (98) : //TODO #3: Return the total number of elements in this tree
+BinaryTreeNode.cs (100) : return count;
+BinaryTreeNode.cs (101) : }
+BinaryTreeNode.cs (102) : return 0;
+BinaryTreeNode.cs (104) : }
+BinaryTreeNode.cs (106) : public int Height()
+BinaryTreeNode.cs (107) : {
+BinaryTreeNode.cs (108) : //TODO #4: Return the height of this tree
+BinaryTreeNode.cs (109) : if (this != null)
+BinaryTreeNode.cs (110) : {
+BinaryTreeNode.cs (111) : int max = 0;
+BinaryTreeNode.cs (112) : if (LeftChild != null)
+BinaryTreeNode.cs (113) : {
+BinaryTreeNode.cs (114) : int height = LeftChild.Height();
+BinaryTreeNode.cs (115) : if (max -1< height)
+BinaryTreeNode.cs (116) : max = height+1;
+BinaryTreeNode.cs (117) : }
+BinaryTreeNode.cs (118) : if (RightChild != null)
+BinaryTreeNode.cs (119) : {
+BinaryTreeNode.cs (120) : int height = RightChild.Height();
+BinaryTreeNode.cs (121) : if (max -1< height)
+BinaryTreeNode.cs (122) : max = height+1;
+BinaryTreeNode.cs (123) : }
+BinaryTreeNode.cs (125) : return max;
+BinaryTreeNode.cs (127) : }
+BinaryTreeNode.cs (128) : return -1;
+BinaryTreeNode.cs (130) : }
+BinaryTreeNode.cs (132) : public TValue Get(TKey key)
+BinaryTreeNode.cs (133) : {
+BinaryTreeNode.cs (135) : if (Key.CompareTo(key) < 0)
+BinaryTreeNode.cs (136) : {
+BinaryTreeNode.cs (138) : if (LeftChild == null)
+BinaryTreeNode.cs (139) : return default;
+BinaryTreeNode.cs (140) : else
+BinaryTreeNode.cs (141) : {
+BinaryTreeNode.cs (142) : return LeftChild.Get(key);
+BinaryTreeNode.cs (143) : }
+BinaryTreeNode.cs (144) : }
+BinaryTreeNode.cs (145) : else if (Key.CompareTo(key) > 0)
+BinaryTreeNode.cs (146) : {
+BinaryTreeNode.cs (148) : if (RightChild == null)
+BinaryTreeNode.cs (149) : return default;
+BinaryTreeNode.cs (150) : else
+BinaryTreeNode.cs (151) : {
+BinaryTreeNode.cs (152) : return RightChild.Get(key);
+BinaryTreeNode.cs (153) : }
+BinaryTreeNode.cs (154) : }
+BinaryTreeNode.cs (155) : else
+BinaryTreeNode.cs (156) : {
+BinaryTreeNode.cs (157) : return this.Value;
+BinaryTreeNode.cs (158) : }
+BinaryTreeNode.cs (159) : //TODO #5: Find the node that has this key:
+BinaryTreeNode.cs (160) : //          -If the current node (this) has a higher key that the new node (use CompareTo()), the key we are searching for should be on this node's left side.
+BinaryTreeNode.cs (161) : //              a) If the left child is null, return null. We haven't found it
+BinaryTreeNode.cs (162) : //              b) Else, we should ask the LeftChild to find the node recursively. It must be below LeftChild
+BinaryTreeNode.cs (163) : //          -If the current node has a lower key that the new node (use CompareTo()), the key should be on this node's right side.
+BinaryTreeNode.cs (164) : //          -If the current node and the new node have the same key, just return this node's value. We found it
+BinaryTreeNode.cs (166) : }
+BinaryTreeNode.cs (170) : public BinaryTreeNode<TKey, TValue> Remove(TKey key)
+BinaryTreeNode.cs (171) : {
+BinaryTreeNode.cs (173) : if (Key.CompareTo(key) == 0)
+BinaryTreeNode.cs (174) : {
+BinaryTreeNode.cs (175) : if (RightChild == null && LeftChild == null)
+BinaryTreeNode.cs (176) : return null;
+BinaryTreeNode.cs (177) : else if (RightChild != null && LeftChild == null)
+BinaryTreeNode.cs (178) : {
+BinaryTreeNode.cs (179) : return RightChild;
+BinaryTreeNode.cs (180) : }
+BinaryTreeNode.cs (181) : else if (LeftChild != null && RightChild == null)
+BinaryTreeNode.cs (182) : return LeftChild;
+BinaryTreeNode.cs (183) : else
+BinaryTreeNode.cs (184) : {
+BinaryTreeNode.cs (186) : LeftChild.Add(RightChild);
+BinaryTreeNode.cs (188) : return LeftChild;
+BinaryTreeNode.cs (189) : }
+BinaryTreeNode.cs (190) : }
+BinaryTreeNode.cs (191) : else if (Key.CompareTo(key) > 0)
+BinaryTreeNode.cs (192) : {
+BinaryTreeNode.cs (193) : if (RightChild != null)
+BinaryTreeNode.cs (194) : RightChild = RightChild.Remove(key);
+BinaryTreeNode.cs (197) : }
+BinaryTreeNode.cs (198) : else if (Key.CompareTo(key) < 0)
+BinaryTreeNode.cs (199) : {
+BinaryTreeNode.cs (200) : if (LeftChild != null)
+BinaryTreeNode.cs (201) : LeftChild = LeftChild.Remove(key);
+BinaryTreeNode.cs (202) : }
+BinaryTreeNode.cs (204) : return this;
+BinaryTreeNode.cs (207) : //TODO #6: Remove the node that has this key. The parent may need to update one of its children,
+BinaryTreeNode.cs (208) : //so this method returns the node with which this node needs to be replaced. If this node isn't the
+BinaryTreeNode.cs (209) : //one we are looking for, we will return this, so that the parent node can replace LeftChild/RightChild
+BinaryTreeNode.cs (210) : //with the same node it had.
+BinaryTreeNode.cs (213) : }
+BinaryTreeNode.cs (215) : public int KeysToArray(TKey[] keys, int index)
+BinaryTreeNode.cs (216) : {
+BinaryTreeNode.cs (217) : if (LeftChild != null)
+BinaryTreeNode.cs (218) : index = LeftChild.KeysToArray(keys, index);
+BinaryTreeNode.cs (219) : keys[index] = Key;
+BinaryTreeNode.cs (220) : index++;
+BinaryTreeNode.cs (221) : if (RightChild != null)
+BinaryTreeNode.cs (222) : index = RightChild.KeysToArray(keys, index);
+BinaryTreeNode.cs (223) : return index;
+BinaryTreeNode.cs (224) : }
+BinaryTreeNode.cs (226) : public int ValuesToArray(TValue[] values, int index)
+BinaryTreeNode.cs (227) : {
+BinaryTreeNode.cs (228) : if (LeftChild != null)
+BinaryTreeNode.cs (229) : index = LeftChild.ValuesToArray(values, index);
+BinaryTreeNode.cs (230) : values[index] = Value;
+BinaryTreeNode.cs (231) : index++;
+BinaryTreeNode.cs (232) : if (RightChild != null)
+BinaryTreeNode.cs (233) : index = RightChild.ValuesToArray(values, index);
+BinaryTreeNode.cs (234) : return index;
+BinaryTreeNode.cs (235) : }
+BinaryTreeNode.cs (236) : }
+BinaryTreeNode.cs (237) : }
+main.cs (1) : using System;
+main.cs (2) : using System.Diagnostics;
+main.cs (3) : using BinaryTrees;
+main.cs (5) : class MainClass
+main.cs (6) : {
+main.cs (7) : public static void Main(string[] args)
+main.cs (8) : {
+main.cs (9) : bool success = Tests.TestBinaryTree(Console.WriteLine, Console.WriteLine);
+main.cs (10) : if (!success)
+main.cs (11) : return;
+main.cs (13) : Stopwatch stopwatch = Stopwatch.StartNew();
+main.cs (14) : success = Tests.MeasureBinaryTreeSpeed(Console.WriteLine, Console.WriteLine);
+main.cs (15) : if (!success)
+main.cs (16) : {
+main.cs (17) : Console.WriteLine("An error was detected during the speed measurement. Probably something wrong with Add/Get");
+main.cs (18) : return;
+main.cs (19) : }
+main.cs (20) : Console.WriteLine($"All tests passed. Time: {stopwatch.Elapsed.TotalSeconds}s");
+main.cs (21) : }
+main.cs (22) : }
