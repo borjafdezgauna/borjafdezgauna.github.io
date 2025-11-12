@@ -1,9 +1,16 @@
 BinaryTree.cs (3) : using System.Security.Cryptography;
 BinaryTree.cs (83) : int center = (end - start) / 2;
 BinaryTree.cs (84) : BinaryTreeNode<TKey, TValue> newNode = new BinaryTreeNode<TKey, TValue>(keys[center], values[center]);
-BinaryTree.cs (85) : newNode.LeftChild= AddBalanced(keys, values, start, center - 1);
-BinaryTree.cs (86) : newNode.LeftChild= AddBalanced(keys, values, center + 1, end);
-BinaryTree.cs (87) : return newNode;
+BinaryTree.cs (85) : if (center < 0 || center > newNode.Count())
+BinaryTree.cs (86) : {
+BinaryTree.cs (87) : return null;
+BinaryTree.cs (88) : }
+BinaryTree.cs (89) : else
+BinaryTree.cs (90) : {
+BinaryTree.cs (91) : newNode.LeftChild = AddBalanced(keys, values, start, center - 1);
+BinaryTree.cs (92) : newNode.RightChild= AddBalanced(keys, values, center + 1, end);
+BinaryTree.cs (93) : return newNode;
+BinaryTree.cs (94) : }
 BinaryTreeNode.cs (3) : using System.Formats.Asn1;
 BinaryTreeNode.cs (16) : Key = key;
 BinaryTreeNode.cs (17) : Value = value;
@@ -103,36 +110,52 @@ BinaryTreeNode.cs (167) : else
 BinaryTreeNode.cs (168) : {
 BinaryTreeNode.cs (169) : return this.Value;
 BinaryTreeNode.cs (170) : }
-BinaryTreeNode.cs (182) : if (this.Key.CompareTo(key) == 0)
-BinaryTreeNode.cs (183) : {
-BinaryTreeNode.cs (184) : if (RightChild == null && LeftChild == null)
-BinaryTreeNode.cs (185) : {
-BinaryTreeNode.cs (186) : return null;
-BinaryTreeNode.cs (187) : }
-BinaryTreeNode.cs (188) : else if (RightChild != null && LeftChild == null)
-BinaryTreeNode.cs (189) : {
-BinaryTreeNode.cs (190) : return RightChild;
-BinaryTreeNode.cs (191) : }
-BinaryTreeNode.cs (192) : else if (RightChild == null && LeftChild != null)
-BinaryTreeNode.cs (193) : {
-BinaryTreeNode.cs (194) : return LeftChild;
-BinaryTreeNode.cs (195) : }
-BinaryTreeNode.cs (196) : else
-BinaryTreeNode.cs (197) : {
-BinaryTreeNode.cs (198) : LeftChild.Add(RightChild);
-BinaryTreeNode.cs (199) : return LeftChild;
-BinaryTreeNode.cs (200) : }
+BinaryTreeNode.cs (182) : int value = this.Key.CompareTo(key);
+BinaryTreeNode.cs (184) : if (value == 0){
+BinaryTreeNode.cs (185) : if (RightChild == null && LeftChild == null)
+BinaryTreeNode.cs (186) : {
+BinaryTreeNode.cs (187) : return null;
+BinaryTreeNode.cs (188) : }
+BinaryTreeNode.cs (189) : else if (LeftChild == null)
+BinaryTreeNode.cs (190) : {
+BinaryTreeNode.cs (191) : return RightChild;
+BinaryTreeNode.cs (192) : }
+BinaryTreeNode.cs (193) : else if (RightChild == null)
+BinaryTreeNode.cs (194) : {
+BinaryTreeNode.cs (195) : return LeftChild;
+BinaryTreeNode.cs (196) : }
+BinaryTreeNode.cs (197) : else
+BinaryTreeNode.cs (198) : {
+BinaryTreeNode.cs (199) : RightChild.Add(LeftChild);
+BinaryTreeNode.cs (200) : return RightChild;
 BinaryTreeNode.cs (201) : }
-BinaryTreeNode.cs (202) : else if (this.Key.CompareTo(key) < 0)
-BinaryTreeNode.cs (203) : {
-BinaryTreeNode.cs (204) : RightChild.Remove(key);
-BinaryTreeNode.cs (205) : }
-BinaryTreeNode.cs (206) : else if (this.Key.CompareTo(key) > 0)
-BinaryTreeNode.cs (207) : {
-BinaryTreeNode.cs (208) : LeftChild.Remove(key);
-BinaryTreeNode.cs (209) : }
-BinaryTreeNode.cs (210) : return this;
-BinaryTreeNode.cs (211) : }
+BinaryTreeNode.cs (202) : }
+BinaryTreeNode.cs (203) : else if (value < 0)
+BinaryTreeNode.cs (204) : {
+BinaryTreeNode.cs (205) : if (RightChild == null)
+BinaryTreeNode.cs (206) : {
+BinaryTreeNode.cs (207) : return this;
+BinaryTreeNode.cs (208) : }
+BinaryTreeNode.cs (209) : else
+BinaryTreeNode.cs (210) : {
+BinaryTreeNode.cs (211) : RightChild = RightChild.Remove(key);
+BinaryTreeNode.cs (212) : return this;
+BinaryTreeNode.cs (213) : }
+BinaryTreeNode.cs (215) : }
+BinaryTreeNode.cs (216) : else if (value > 0)
+BinaryTreeNode.cs (217) : {
+BinaryTreeNode.cs (218) : if (LeftChild == null)
+BinaryTreeNode.cs (219) : {
+BinaryTreeNode.cs (220) : return this;
+BinaryTreeNode.cs (221) : }
+BinaryTreeNode.cs (222) : else
+BinaryTreeNode.cs (223) : {
+BinaryTreeNode.cs (224) : LeftChild = LeftChild.Remove(key);
+BinaryTreeNode.cs (225) : return this;
+BinaryTreeNode.cs (226) : }
+BinaryTreeNode.cs (227) : }
+BinaryTreeNode.cs (228) : return this;
+BinaryTreeNode.cs (231) : }
 TreeNode.cs (3) : using System.Runtime.CompilerServices;
 TreeNode.cs (20) : Children = new List<TreeNode<T>>();
 TreeNode.cs (56) : int contador = 1;
