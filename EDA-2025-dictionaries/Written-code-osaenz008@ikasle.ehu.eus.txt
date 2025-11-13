@@ -1,0 +1,314 @@
+DictionaryReaderWriter.cs (26) : TKey[] keys = dictionary.Keys();
+DictionaryReaderWriter.cs (27) : foreach (TKey k in keys)
+DictionaryReaderWriter.cs (28) : {
+DictionaryReaderWriter.cs (29) : TValue v = dictionary.Get(k);
+DictionaryReaderWriter.cs (30) : String strK = keyToString(k);
+DictionaryReaderWriter.cs (31) : String strV = valueToString(v);
+DictionaryReaderWriter.cs (32) : writer.WriteLine(strK);
+DictionaryReaderWriter.cs (33) : writer.WriteLine(strV);
+DictionaryReaderWriter.cs (34) : }
+DictionaryReaderWriter.cs (51) : String strK;
+DictionaryReaderWriter.cs (52) : String strV;
+DictionaryReaderWriter.cs (53) : while ((strK = reader.ReadLine()) != null)
+DictionaryReaderWriter.cs (54) : {
+DictionaryReaderWriter.cs (55) : strV = reader.ReadLine();
+DictionaryReaderWriter.cs (56) : dictionary.Add(stringToKey(strK), valueToKey(strV));
+DictionaryReaderWriter.cs (57) : }
+HashTableDictionary.cs (4) : using System.Collections.Generic;
+HashTableDictionary.cs (5) : using System.ComponentModel;
+HashTableDictionary.cs (6) : using System.ComponentModel.DataAnnotations;
+HashTableDictionary.cs (7) : using System.Globalization;
+HashTableDictionary.cs (9) : public class HashTableDictionary<TKey, TValue> : Common.IDictionary<TKey, TValue>
+HashTableDictionary.cs (16) : private GenericList<HashTableDictionaryItem<TKey, TValue>>[] Entries;
+HashTableDictionary.cs (21) : Entries = new GenericList<HashTableDictionaryItem<TKey, TValue>>[DefaultNumEntries];
+HashTableDictionary.cs (27) : Entries = new GenericList<HashTableDictionaryItem<TKey, TValue>>[numEntries];
+HashTableDictionary.cs (36) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (37) : {
+HashTableDictionary.cs (38) : if (Entries[i] != null)
+HashTableDictionary.cs (39) : {
+HashTableDictionary.cs (40) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (41) : {
+HashTableDictionary.cs (42) : HashTableDictionaryItem<TKey, TValue> entry = Entries[i].Get(j);
+HashTableDictionary.cs (43) : output += entry.ToString();
+HashTableDictionary.cs (44) : }
+HashTableDictionary.cs (45) : }
+HashTableDictionary.cs (46) : }
+HashTableDictionary.cs (55) : return NumElements;
+HashTableDictionary.cs (63) : int k = key.GetHashCode() % Entries.Length;
+HashTableDictionary.cs (64) : return k;
+HashTableDictionary.cs (73) : int i = PositionOf(key);
+HashTableDictionary.cs (74) : int j = 0;
+HashTableDictionary.cs (75) : bool found = false;
+HashTableDictionary.cs (76) : while (j < Entries[i].Count() && !found)
+HashTableDictionary.cs (77) : {
+HashTableDictionary.cs (78) : var k = Entries[i].Get(j);
+HashTableDictionary.cs (79) : if (k.Key.Equals(key))
+HashTableDictionary.cs (80) : {
+HashTableDictionary.cs (81) : found = true;
+HashTableDictionary.cs (82) : }
+HashTableDictionary.cs (83) : else
+HashTableDictionary.cs (84) : {
+HashTableDictionary.cs (85) : j++;
+HashTableDictionary.cs (86) : }
+HashTableDictionary.cs (87) : }
+HashTableDictionary.cs (88) : if (found == true)
+HashTableDictionary.cs (89) : {
+HashTableDictionary.cs (90) : return Entries[i].Get(j).Value;
+HashTableDictionary.cs (91) : }
+HashTableDictionary.cs (92) : else
+HashTableDictionary.cs (93) : {
+HashTableDictionary.cs (96) : }
+HashTableDictionary.cs (103) : int i = PositionOf(key);
+HashTableDictionary.cs (104) : if (i >= 0 && i < Entries.Length)
+HashTableDictionary.cs (105) : {
+HashTableDictionary.cs (106) : GenericList<HashTableDictionaryItem<TKey, TValue>> list = Entries[i];
+HashTableDictionary.cs (107) : if (list == null)
+HashTableDictionary.cs (108) : {
+HashTableDictionary.cs (109) : Entries[i] = new GenericList<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (110) : Entries[i].Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (111) : NumElements++;
+HashTableDictionary.cs (112) : }
+HashTableDictionary.cs (113) : else
+HashTableDictionary.cs (114) : {
+HashTableDictionary.cs (115) : bool found = false;
+HashTableDictionary.cs (116) : int j = 0;
+HashTableDictionary.cs (117) : while (j < list.Count() && !found)
+HashTableDictionary.cs (118) : {
+HashTableDictionary.cs (119) : if (list.Get(j).Key.Equals(key))
+HashTableDictionary.cs (120) : {
+HashTableDictionary.cs (121) : found = true;
+HashTableDictionary.cs (122) : list.Get(j).Value = value;
+HashTableDictionary.cs (123) : }
+HashTableDictionary.cs (124) : else
+HashTableDictionary.cs (125) : {
+HashTableDictionary.cs (126) : j++;
+HashTableDictionary.cs (127) : }
+HashTableDictionary.cs (128) : }
+HashTableDictionary.cs (129) : if (found == false)
+HashTableDictionary.cs (130) : {
+HashTableDictionary.cs (131) : list.Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (132) : NumElements++;
+HashTableDictionary.cs (133) : }
+HashTableDictionary.cs (134) : }
+HashTableDictionary.cs (135) : }
+HashTableDictionary.cs (143) : int i = PositionOf(key);
+HashTableDictionary.cs (144) : if (i >= 0 && i < Entries.Length)
+HashTableDictionary.cs (145) : {
+HashTableDictionary.cs (146) : GenericList<HashTableDictionaryItem<TKey, TValue>> list = Entries[i];
+HashTableDictionary.cs (147) : if (list != null)
+HashTableDictionary.cs (148) : {
+HashTableDictionary.cs (149) : bool found = false;
+HashTableDictionary.cs (150) : int j = 0;
+HashTableDictionary.cs (151) : while (j < list.Count() && !found)
+HashTableDictionary.cs (152) : {
+HashTableDictionary.cs (153) : if (list.Get(j).Key.Equals(key))
+HashTableDictionary.cs (154) : {
+HashTableDictionary.cs (155) : found = true;
+HashTableDictionary.cs (156) : }
+HashTableDictionary.cs (157) : else
+HashTableDictionary.cs (158) : {
+HashTableDictionary.cs (159) : j++;
+HashTableDictionary.cs (160) : }
+HashTableDictionary.cs (161) : }
+HashTableDictionary.cs (162) : if (found)
+HashTableDictionary.cs (163) : {
+HashTableDictionary.cs (164) : list.Remove(j);
+HashTableDictionary.cs (165) : NumElements--;
+HashTableDictionary.cs (166) : }
+HashTableDictionary.cs (167) : }
+HashTableDictionary.cs (168) : }
+HashTableDictionary.cs (175) : int k = Entries.Length;
+HashTableDictionary.cs (176) : int add = 0;
+HashTableDictionary.cs (177) : for (int i = 0; i < k; i++)
+HashTableDictionary.cs (178) : {
+HashTableDictionary.cs (179) : if (Entries[i] != null)
+HashTableDictionary.cs (180) : {
+HashTableDictionary.cs (181) : add = add + Entries[i].Count();
+HashTableDictionary.cs (182) : }
+HashTableDictionary.cs (183) : }
+HashTableDictionary.cs (184) : TKey[] keys = new TKey[add];
+HashTableDictionary.cs (185) : int z = 0;
+HashTableDictionary.cs (186) : for (int i = 0; i < k; i++)
+HashTableDictionary.cs (187) : {
+HashTableDictionary.cs (188) : if (Entries[i] != null)
+HashTableDictionary.cs (189) : {
+HashTableDictionary.cs (190) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (191) : {
+HashTableDictionary.cs (192) : keys[z] = Entries[i].Get(j).Key;
+HashTableDictionary.cs (193) : z++;
+HashTableDictionary.cs (194) : }
+HashTableDictionary.cs (195) : }
+HashTableDictionary.cs (196) : }
+HashTableDictionary.cs (197) : return keys;
+HashTableDictionary.cs (204) : int k = Entries.Length;
+HashTableDictionary.cs (205) : int add = 0;
+HashTableDictionary.cs (206) : for (int i = 0; i < k; i++)
+HashTableDictionary.cs (207) : {
+HashTableDictionary.cs (208) : if (Entries[i] != null)
+HashTableDictionary.cs (209) : {
+HashTableDictionary.cs (210) : add = add + Entries[i].Count();
+HashTableDictionary.cs (211) : }
+HashTableDictionary.cs (212) : }
+HashTableDictionary.cs (213) : TValue[] values = new TValue[add];
+HashTableDictionary.cs (214) : int z = 0;
+HashTableDictionary.cs (215) : for (int i = 0; i < k; i++)
+HashTableDictionary.cs (216) : {
+HashTableDictionary.cs (217) : if (Entries[i] != null)
+HashTableDictionary.cs (218) : {
+HashTableDictionary.cs (219) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (220) : {
+HashTableDictionary.cs (221) : values[z] = Entries[i].Get(j).Value;
+HashTableDictionary.cs (222) : z++;
+HashTableDictionary.cs (223) : }
+HashTableDictionary.cs (224) : }
+HashTableDictionary.cs (225) : }
+HashTableDictionary.cs (226) : return values;
+IList.cs (1) : ﻿using System;
+IList.cs (2) : using System.Collections;
+IList.cs (4) : using System.Linq;
+IList.cs (5) : using System.Text;
+IList.cs (6) : using System.Threading.Tasks;
+IList.cs (9) : public interface IGenericList<T> : IEnumerable
+IList.cs (10) : {
+IList.cs (11) : int Count();
+IList.cs (13) : T Get(int index);
+IList.cs (15) : void Add(T value);
+IList.cs (17) : T Remove(int index);
+IList.cs (19) : void Clear();
+IList.cs (20) : }
+List.cs (2) : using System.Collections;
+List.cs (4) : public class GenericListNode<T>
+List.cs (5) : {
+List.cs (6) : public T Value;
+List.cs (7) : public GenericListNode<T> Next = null;
+List.cs (9) : public GenericListNode<T> Previous = null;
+List.cs (11) : public GenericListNode(T value)
+List.cs (12) : {
+List.cs (13) : Value = value;
+List.cs (14) : }
+List.cs (16) : public override string ToString()
+List.cs (17) : {
+List.cs (18) : return Value.ToString();
+List.cs (19) : }
+List.cs (20) : }
+List.cs (22) : public class GenericList<T> : IGenericList<T>
+List.cs (23) : {
+List.cs (24) : GenericListNode<T> First = null;
+List.cs (25) : GenericListNode<T> Last = null;
+List.cs (26) : int m_numItems = 0;
+List.cs (28) : public override string ToString()
+List.cs (29) : {
+List.cs (30) : GenericListNode<T> node = First;
+List.cs (31) : string output = "[";
+List.cs (33) : while (node != null)
+List.cs (34) : {
+List.cs (35) : output += node.ToString() + ",";
+List.cs (36) : node = node.Next;
+List.cs (37) : }
+List.cs (38) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+List.cs (40) : return output;
+List.cs (41) : }
+List.cs (43) : public int Count()
+List.cs (44) : {
+List.cs (45) : //TODO #1: return the number of elements on the list
+List.cs (47) : return m_numItems;
+List.cs (49) : }
+List.cs (51) : public T Get(int index)
+List.cs (52) : {
+List.cs (53) : //TODO #2: return the element on the index-th position. O if the position is out of bounds
+List.cs (54) : if (index < 0 || index >= m_numItems)
+List.cs (55) : {
+List.cs (56) : return default(T);
+List.cs (57) : }
+List.cs (58) : else
+List.cs (59) : {
+List.cs (60) : int i = 0;
+List.cs (61) : GenericListNode<T> aux = First;
+List.cs (62) : while (i < index)
+List.cs (63) : {
+List.cs (64) : aux = aux.Next;
+List.cs (65) : i++;
+List.cs (66) : }
+List.cs (67) : return aux.Value;
+List.cs (68) : }
+List.cs (69) : }
+List.cs (71) : public void Add(T value)
+List.cs (72) : {
+List.cs (73) : //TODO #3: add a new integer to the end of the list
+List.cs (75) : GenericListNode<T> newnode = new GenericListNode<T>(value);
+List.cs (76) : if (First == null)
+List.cs (77) : {
+List.cs (78) : First = newnode;
+List.cs (79) : Last = newnode;
+List.cs (80) : }
+List.cs (81) : else
+List.cs (82) : {
+List.cs (83) : Last.Next = newnode;
+List.cs (84) : newnode.Previous = Last;
+List.cs (85) : Last = newnode;
+List.cs (86) : }
+List.cs (87) : m_numItems++;
+List.cs (88) : }
+List.cs (90) : public T Remove(int index)
+List.cs (91) : {
+List.cs (92) : //TODO #4: remove the element on the index-th position. Do nothing if position is out of bounds
+List.cs (93) : if (index < 0 || index >= m_numItems)
+List.cs (94) : {
+List.cs (95) : return default(T);
+List.cs (96) : }
+List.cs (98) : GenericListNode<T> nodeToRemove;
+List.cs (99) : if (index < m_numItems / 2)
+List.cs (100) : {
+List.cs (101) : nodeToRemove = First;
+List.cs (102) : for (int i = 0; i < index; i++)
+List.cs (103) : {
+List.cs (104) : nodeToRemove = nodeToRemove.Next;
+List.cs (105) : }
+List.cs (106) : }
+List.cs (107) : else
+List.cs (108) : {
+List.cs (109) : nodeToRemove = Last;
+List.cs (110) : for (int i = m_numItems - 1; i > index; i--)
+List.cs (111) : {
+List.cs (112) : nodeToRemove = nodeToRemove.Previous;
+List.cs (113) : }
+List.cs (114) : }
+List.cs (115) : T data = nodeToRemove.Value;
+List.cs (116) : if (nodeToRemove.Previous != null)
+List.cs (117) : {
+List.cs (118) : nodeToRemove.Previous.Next = nodeToRemove.Next;
+List.cs (119) : }
+List.cs (120) : else
+List.cs (121) : {
+List.cs (122) : First = nodeToRemove.Next;
+List.cs (123) : }
+List.cs (125) : if (nodeToRemove.Next != null)
+List.cs (126) : {
+List.cs (127) : nodeToRemove.Next.Previous = nodeToRemove.Previous;
+List.cs (128) : }
+List.cs (129) : else
+List.cs (130) : {
+List.cs (131) : Last = nodeToRemove.Previous;
+List.cs (132) : }
+List.cs (134) : m_numItems--;
+List.cs (135) : return data;
+List.cs (136) : }
+List.cs (138) : public void Clear()
+List.cs (139) : {
+List.cs (140) : //TODO #5: remove all the elements on the list
+List.cs (141) : m_numItems = 0;
+List.cs (142) : First = null;
+List.cs (143) : Last = null;
+List.cs (144) : }
+List.cs (146) : public IEnumerator GetEnumerator()
+List.cs (147) : {
+List.cs (148) : //TODO #6 : Return an enumerator using "yield return" for each of the values in this list
+List.cs (150) : GenericListNode<T> aux = First;
+List.cs (151) : while (aux != null)
+List.cs (152) : {
+List.cs (153) : T data = aux.Value;
+List.cs (154) : aux = aux.Next;
+List.cs (155) : yield return data;
+List.cs (156) : }
+List.cs (158) : }
+List.cs (159) : }
