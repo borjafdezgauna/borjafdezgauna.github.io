@@ -1,0 +1,293 @@
+BinaryTreeDictionary.cs (3) : using System;
+BinaryTreeDictionary.cs (4) : using System.Xml;
+BinaryTreeDictionary.cs (5) : namespace BinaryTrees;
+BinaryTreeDictionary.cs (12) : public class BinaryTree<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTreeDictionary.cs (13) : {
+BinaryTreeDictionary.cs (14) : public BinaryTreeNode<TKey, TValue> RootNode;
+BinaryTreeDictionary.cs (16) : public override string ToString()
+BinaryTreeDictionary.cs (17) : {
+BinaryTreeDictionary.cs (18) : if (RootNode == null)
+BinaryTreeDictionary.cs (19) : return null;
+BinaryTreeDictionary.cs (20) : else return RootNode.ToString(0);
+BinaryTreeDictionary.cs (21) : }
+BinaryTreeDictionary.cs (23) : public int Count()
+BinaryTreeDictionary.cs (24) : {
+BinaryTreeDictionary.cs (25) : if (RootNode == null)
+BinaryTreeDictionary.cs (26) : return 0;
+BinaryTreeDictionary.cs (27) : return RootNode.Count();
+BinaryTreeDictionary.cs (28) : }
+BinaryTreeDictionary.cs (30) : public int Height()
+BinaryTreeDictionary.cs (31) : {
+BinaryTreeDictionary.cs (32) : if (RootNode == null)
+BinaryTreeDictionary.cs (33) : return 0;
+BinaryTreeDictionary.cs (34) : return RootNode.Height();
+BinaryTreeDictionary.cs (35) : }
+BinaryTreeDictionary.cs (37) : public TValue Get(TKey key)
+BinaryTreeDictionary.cs (38) : {
+BinaryTreeDictionary.cs (39) : if (RootNode == null)
+BinaryTreeDictionary.cs (40) : throw new Exception("Empty tree");
+BinaryTreeDictionary.cs (41) : else
+BinaryTreeDictionary.cs (42) : {
+BinaryTreeDictionary.cs (43) : return RootNode.Get(key);
+BinaryTreeDictionary.cs (44) : }
+BinaryTreeDictionary.cs (45) : }
+BinaryTreeDictionary.cs (47) : public void Add(TKey key, TValue value)
+BinaryTreeDictionary.cs (48) : {
+BinaryTreeDictionary.cs (49) : BinaryTreeNode<TKey, TValue> newNode = new BinaryTreeNode<TKey, TValue>(key, value);
+BinaryTreeDictionary.cs (50) : if (RootNode == null)
+BinaryTreeDictionary.cs (51) : RootNode = newNode;
+BinaryTreeDictionary.cs (52) : else
+BinaryTreeDictionary.cs (53) : RootNode.Add(newNode);
+BinaryTreeDictionary.cs (54) : }
+BinaryTreeDictionary.cs (56) : public void Remove(TKey key)
+BinaryTreeDictionary.cs (57) : {
+BinaryTreeDictionary.cs (58) : if (RootNode != null)
+BinaryTreeDictionary.cs (59) : RootNode = RootNode.Remove(key);
+BinaryTreeDictionary.cs (60) : }
+BinaryTreeDictionary.cs (62) : public TKey[] Keys()
+BinaryTreeDictionary.cs (63) : {
+BinaryTreeDictionary.cs (64) : if (RootNode == null)
+BinaryTreeDictionary.cs (65) : return null;
+BinaryTreeDictionary.cs (66) : int count = RootNode.Count();
+BinaryTreeDictionary.cs (67) : TKey[] keys = new TKey[count];
+BinaryTreeDictionary.cs (68) : RootNode.KeysToArray(keys, 0);
+BinaryTreeDictionary.cs (69) : return keys;
+BinaryTreeDictionary.cs (70) : }
+BinaryTreeDictionary.cs (72) : public TValue[] Values()
+BinaryTreeDictionary.cs (73) : {
+BinaryTreeDictionary.cs (74) : if (RootNode == null)
+BinaryTreeDictionary.cs (75) : return null;
+BinaryTreeDictionary.cs (76) : int count = RootNode.Count();
+BinaryTreeDictionary.cs (77) : TValue[] values = new TValue[count];
+BinaryTreeDictionary.cs (78) : RootNode.ValuesToArray(values, 0);
+BinaryTreeDictionary.cs (79) : return values;
+BinaryTreeDictionary.cs (80) : }
+BinaryTreeDictionary.cs (82) : private BinaryTreeNode<TKey, TValue> AddBalanced(TKey[] keys, TValue[] values, int start, int end)
+BinaryTreeDictionary.cs (83) : {
+BinaryTreeDictionary.cs (84) : if (end < start)
+BinaryTreeDictionary.cs (85) : {
+BinaryTreeDictionary.cs (86) : return null;
+BinaryTreeDictionary.cs (87) : }
+BinaryTreeDictionary.cs (88) : int center = (start + end) / 2;
+BinaryTreeDictionary.cs (89) : BinaryTreeNode<TKey, TValue> node = new BinaryTreeNode<TKey, TValue>(keys[center], values[center]);
+BinaryTreeDictionary.cs (90) : node.RightChild = AddBalanced(keys, values, center + 1, end);
+BinaryTreeDictionary.cs (91) : node.LeftChild = AddBalanced(keys, values, start, center - 1);
+BinaryTreeDictionary.cs (92) : return node;
+BinaryTreeDictionary.cs (93) : }
+BinaryTreeDictionary.cs (95) : public void Balance()
+BinaryTreeDictionary.cs (96) : {
+BinaryTreeDictionary.cs (97) : if (RootNode == null)
+BinaryTreeDictionary.cs (98) : return;
+BinaryTreeDictionary.cs (99) : TKey[] keys = Keys();
+BinaryTreeDictionary.cs (100) : TValue[] values = Values();
+BinaryTreeDictionary.cs (102) : RootNode = AddBalanced(keys, values, 0, keys.Length - 1);
+BinaryTreeDictionary.cs (103) : }
+BinaryTreeDictionary.cs (104) : }
+BinaryTreeDictionary.cs (106) : public class BinaryTreeNode<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTreeDictionary.cs (107) : {
+BinaryTreeDictionary.cs (108) : public TKey Key;
+BinaryTreeDictionary.cs (109) : public TValue Value;
+BinaryTreeDictionary.cs (110) : public BinaryTreeNode<TKey, TValue> LeftChild;
+BinaryTreeDictionary.cs (111) : public BinaryTreeNode<TKey, TValue> RightChild;
+BinaryTreeDictionary.cs (113) : public BinaryTreeNode(TKey key, TValue value)
+BinaryTreeDictionary.cs (114) : {
+BinaryTreeDictionary.cs (116) : this.Key = key;
+BinaryTreeDictionary.cs (117) : this.Value = value;
+BinaryTreeDictionary.cs (119) : }
+BinaryTreeDictionary.cs (120) : public string ToString(int depth)
+BinaryTreeDictionary.cs (121) : {
+BinaryTreeDictionary.cs (122) : string output = null;
+BinaryTreeDictionary.cs (124) : string leftSpace = null;
+BinaryTreeDictionary.cs (125) : for (int i = 0; i < depth; i++) leftSpace += " ";
+BinaryTreeDictionary.cs (126) : if (leftSpace != null) leftSpace += "->";
+BinaryTreeDictionary.cs (128) : if (Value != null)
+BinaryTreeDictionary.cs (129) : output += $"{leftSpace}[{Key.ToString()}-{Value.ToString()}]\n";
+BinaryTreeDictionary.cs (131) : if (LeftChild != null)
+BinaryTreeDictionary.cs (132) : output += $"{LeftChild?.ToString(depth + 1)}";
+BinaryTreeDictionary.cs (134) : if (RightChild != null)
+BinaryTreeDictionary.cs (135) : output += $"{RightChild?.ToString(depth + 1)}";
+BinaryTreeDictionary.cs (137) : return output;
+BinaryTreeDictionary.cs (138) : }
+BinaryTreeDictionary.cs (140) : public void Add(BinaryTreeNode<TKey, TValue> node)
+BinaryTreeDictionary.cs (141) : {
+BinaryTreeDictionary.cs (143) : int comparacion = this.Key.CompareTo(node.Key);
+BinaryTreeDictionary.cs (145) : if (comparacion > 0)
+BinaryTreeDictionary.cs (146) : {
+BinaryTreeDictionary.cs (147) : if (LeftChild == null)
+BinaryTreeDictionary.cs (148) : {
+BinaryTreeDictionary.cs (149) : LeftChild = node;
+BinaryTreeDictionary.cs (150) : }
+BinaryTreeDictionary.cs (151) : else
+BinaryTreeDictionary.cs (152) : {
+BinaryTreeDictionary.cs (153) : LeftChild.Add(node);
+BinaryTreeDictionary.cs (154) : }
+BinaryTreeDictionary.cs (155) : }
+BinaryTreeDictionary.cs (157) : else if (comparacion < 0)
+BinaryTreeDictionary.cs (158) : {
+BinaryTreeDictionary.cs (159) : if (RightChild == null)
+BinaryTreeDictionary.cs (160) : {
+BinaryTreeDictionary.cs (161) : RightChild = node;
+BinaryTreeDictionary.cs (162) : }
+BinaryTreeDictionary.cs (163) : else
+BinaryTreeDictionary.cs (164) : {
+BinaryTreeDictionary.cs (165) : RightChild.Add(node);
+BinaryTreeDictionary.cs (166) : }
+BinaryTreeDictionary.cs (167) : }
+BinaryTreeDictionary.cs (168) : else if (comparacion == 0)
+BinaryTreeDictionary.cs (169) : {
+BinaryTreeDictionary.cs (170) : this.Value = node.Value;
+BinaryTreeDictionary.cs (172) : }
+BinaryTreeDictionary.cs (175) : }
+BinaryTreeDictionary.cs (177) : public int Count()
+BinaryTreeDictionary.cs (178) : {
+BinaryTreeDictionary.cs (180) : int contador = 1;
+BinaryTreeDictionary.cs (181) : if (LeftChild != null) {
+BinaryTreeDictionary.cs (182) : contador = contador + LeftChild.Count();
+BinaryTreeDictionary.cs (183) : }
+BinaryTreeDictionary.cs (184) : if (RightChild != null) {
+BinaryTreeDictionary.cs (185) : contador = contador + RightChild.Count();
+BinaryTreeDictionary.cs (186) : }
+BinaryTreeDictionary.cs (187) : return contador;
+BinaryTreeDictionary.cs (189) : }
+BinaryTreeDictionary.cs (191) : public int Height()
+BinaryTreeDictionary.cs (192) : {
+BinaryTreeDictionary.cs (194) : int contadorLeft = 0;
+BinaryTreeDictionary.cs (195) : int contadorRight = 0;
+BinaryTreeDictionary.cs (197) : if (LeftChild == null && RightChild == null)
+BinaryTreeDictionary.cs (198) : {
+BinaryTreeDictionary.cs (199) : return 0;
+BinaryTreeDictionary.cs (200) : }
+BinaryTreeDictionary.cs (202) : if (LeftChild != null)
+BinaryTreeDictionary.cs (203) : {
+BinaryTreeDictionary.cs (204) : contadorLeft = contadorLeft + LeftChild.Height();
+BinaryTreeDictionary.cs (205) : }
+BinaryTreeDictionary.cs (206) : if (RightChild != null)
+BinaryTreeDictionary.cs (207) : {
+BinaryTreeDictionary.cs (208) : contadorRight = contadorRight + RightChild.Height();
+BinaryTreeDictionary.cs (209) : }
+BinaryTreeDictionary.cs (210) : if (contadorRight > contadorLeft)
+BinaryTreeDictionary.cs (211) : {
+BinaryTreeDictionary.cs (212) : return contadorRight + 1;
+BinaryTreeDictionary.cs (213) : }
+BinaryTreeDictionary.cs (214) : else
+BinaryTreeDictionary.cs (215) : {
+BinaryTreeDictionary.cs (216) : return contadorLeft + 1;
+BinaryTreeDictionary.cs (217) : }
+BinaryTreeDictionary.cs (221) : }
+BinaryTreeDictionary.cs (223) : public TValue Get(TKey key)
+BinaryTreeDictionary.cs (224) : {
+BinaryTreeDictionary.cs (226) : int comparacion = this.Key.CompareTo(key);
+BinaryTreeDictionary.cs (228) : if (comparacion == 0)
+BinaryTreeDictionary.cs (229) : {
+BinaryTreeDictionary.cs (230) : return this.Value;
+BinaryTreeDictionary.cs (231) : }
+BinaryTreeDictionary.cs (232) : else if (comparacion > 0)
+BinaryTreeDictionary.cs (233) : {
+BinaryTreeDictionary.cs (234) : if (LeftChild == null)
+BinaryTreeDictionary.cs (235) : {
+BinaryTreeDictionary.cs (236) : return default;
+BinaryTreeDictionary.cs (237) : }
+BinaryTreeDictionary.cs (238) : else
+BinaryTreeDictionary.cs (239) : {
+BinaryTreeDictionary.cs (240) : return LeftChild.Get(key);
+BinaryTreeDictionary.cs (241) : }
+BinaryTreeDictionary.cs (242) : }
+BinaryTreeDictionary.cs (243) : else
+BinaryTreeDictionary.cs (244) : {
+BinaryTreeDictionary.cs (245) : if (RightChild == null)
+BinaryTreeDictionary.cs (246) : {
+BinaryTreeDictionary.cs (247) : return default;
+BinaryTreeDictionary.cs (249) : }
+BinaryTreeDictionary.cs (250) : return RightChild.Get(key);
+BinaryTreeDictionary.cs (251) : }
+BinaryTreeDictionary.cs (252) : }
+BinaryTreeDictionary.cs (256) : public BinaryTreeNode<TKey, TValue> Remove(TKey key)
+BinaryTreeDictionary.cs (257) : {
+BinaryTreeDictionary.cs (258) : int comparacion = this.Key.CompareTo(key);
+BinaryTreeDictionary.cs (260) : if (comparacion == 0)
+BinaryTreeDictionary.cs (261) : {
+BinaryTreeDictionary.cs (262) : if (RightChild == null && LeftChild == null)
+BinaryTreeDictionary.cs (263) : {
+BinaryTreeDictionary.cs (264) : return null;
+BinaryTreeDictionary.cs (265) : }
+BinaryTreeDictionary.cs (266) : else if (RightChild == null && LeftChild != null)
+BinaryTreeDictionary.cs (267) : {
+BinaryTreeDictionary.cs (268) : return LeftChild;
+BinaryTreeDictionary.cs (269) : }
+BinaryTreeDictionary.cs (270) : else if (RightChild != null && LeftChild == null)
+BinaryTreeDictionary.cs (271) : {
+BinaryTreeDictionary.cs (272) : return RightChild;
+BinaryTreeDictionary.cs (273) : }
+BinaryTreeDictionary.cs (274) : else
+BinaryTreeDictionary.cs (275) : {
+BinaryTreeDictionary.cs (276) : LeftChild.Add(RightChild);
+BinaryTreeDictionary.cs (277) : return LeftChild;
+BinaryTreeDictionary.cs (278) : }
+BinaryTreeDictionary.cs (280) : }
+BinaryTreeDictionary.cs (281) : else if (comparacion > 0)
+BinaryTreeDictionary.cs (282) : {
+BinaryTreeDictionary.cs (283) : if (LeftChild == null)
+BinaryTreeDictionary.cs (284) : {
+BinaryTreeDictionary.cs (285) : return this;
+BinaryTreeDictionary.cs (286) : }
+BinaryTreeDictionary.cs (287) : else
+BinaryTreeDictionary.cs (288) : {
+BinaryTreeDictionary.cs (289) : LeftChild = LeftChild.Remove(key);
+BinaryTreeDictionary.cs (290) : return this;
+BinaryTreeDictionary.cs (291) : }
+BinaryTreeDictionary.cs (292) : }
+BinaryTreeDictionary.cs (293) : else
+BinaryTreeDictionary.cs (294) : {
+BinaryTreeDictionary.cs (295) : if (RightChild == null)
+BinaryTreeDictionary.cs (296) : {
+BinaryTreeDictionary.cs (297) : return this;
+BinaryTreeDictionary.cs (299) : }
+BinaryTreeDictionary.cs (300) : RightChild = RightChild.Remove(key);
+BinaryTreeDictionary.cs (301) : return this;
+BinaryTreeDictionary.cs (302) : }
+BinaryTreeDictionary.cs (303) : }
+BinaryTreeDictionary.cs (305) : public int KeysToArray(TKey[] keys, int index)
+BinaryTreeDictionary.cs (306) : {
+BinaryTreeDictionary.cs (307) : if (LeftChild != null)
+BinaryTreeDictionary.cs (308) : index = LeftChild.KeysToArray(keys, index);
+BinaryTreeDictionary.cs (309) : keys[index] = Key;
+BinaryTreeDictionary.cs (310) : index++;
+BinaryTreeDictionary.cs (311) : if (RightChild != null)
+BinaryTreeDictionary.cs (312) : index = RightChild.KeysToArray(keys, index);
+BinaryTreeDictionary.cs (313) : return index;
+BinaryTreeDictionary.cs (314) : }
+BinaryTreeDictionary.cs (316) : public int ValuesToArray(TValue[] values, int index)
+BinaryTreeDictionary.cs (317) : {
+BinaryTreeDictionary.cs (318) : if (LeftChild != null)
+BinaryTreeDictionary.cs (319) : index = LeftChild.ValuesToArray(values, index);
+BinaryTreeDictionary.cs (320) : values[index] = Value;
+BinaryTreeDictionary.cs (321) : index++;
+BinaryTreeDictionary.cs (322) : if (RightChild != null)
+BinaryTreeDictionary.cs (323) : index = RightChild.ValuesToArray(values, index);
+BinaryTreeDictionary.cs (324) : return index;
+BinaryTreeDictionary.cs (325) : }
+BinaryTreeDictionary.cs (326) : }
+BinaryTreeDictionary.cs (339) : public BinaryTreeNode<TKey, TValue> RootNode;
+BinaryTreeDictionary.cs (345) : if (RootNode == null)
+BinaryTreeDictionary.cs (347) : else return RootNode.ToString(0);
+DictionaryReaderWriter.cs (2) : using System.Collections.Generic;
+DictionaryReaderWriter.cs (27) : TextWriter writer = File.CreateText(filename);
+DictionaryReaderWriter.cs (28) : Array llaves = new Array[dictionary.Count()];
+DictionaryReaderWriter.cs (29) : llaves = dictionary.Keys();
+DictionaryReaderWriter.cs (31) : foreach (KeyValuePair<TKey, TValue> pair in llaves)
+DictionaryReaderWriter.cs (32) : {
+DictionaryReaderWriter.cs (34) : String llaveEnString = keyToString(pair.Key);
+DictionaryReaderWriter.cs (35) : String valueEnString = valueToString(pair.Value);
+DictionaryReaderWriter.cs (38) : writer.WriteLine(llaveEnString);
+DictionaryReaderWriter.cs (39) : writer.WriteLine(valueEnString);
+DictionaryReaderWriter.cs (40) : }
+DictionaryReaderWriter.cs (57) : TextReader reader = File.OpenText(filename);
+DictionaryReaderWriter.cs (59) : Array llaves = new Array[dictionary.Count()];
+DictionaryReaderWriter.cs (60) : llaves = dictionary.Keys();
+DictionaryReaderWriter.cs (62) : while (
+DictionaryReaderWriter.cs (63) : {
+DictionaryReaderWriter.cs (65) : String llaveLeida = stringToKey(pair.Key);
+DictionaryReaderWriter.cs (66) : String valorLeido = valueToKey(pair.Value);
+DictionaryReaderWriter.cs (69) : reader.ReadLine(llaveLeida);
+DictionaryReaderWriter.cs (70) : reader.ReadLine(valorLeido);
+DictionaryReaderWriter.cs (71) : }
