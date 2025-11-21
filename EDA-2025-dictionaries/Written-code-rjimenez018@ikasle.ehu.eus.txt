@@ -1,19 +1,339 @@
-DictionaryReaderWriter.cs (27) : TKey[] claves = dictionary.Keys();
-DictionaryReaderWriter.cs (29) : foreach (TKey Llaves in claves) {
-DictionaryReaderWriter.cs (31) : TValue Valores = dictionary.Get(Llaves);
-DictionaryReaderWriter.cs (33) : writer.WriteLine(EncodeString(keyToString(Llaves)));
-DictionaryReaderWriter.cs (34) : writer.WriteLine(EncodeString (valueToString(Valores)));
-DictionaryReaderWriter.cs (35) : }
-DictionaryReaderWriter.cs (54) : TKey llaves;
-DictionaryReaderWriter.cs (55) : TValue Valores;
-DictionaryReaderWriter.cs (57) : while (reader.ReadLine() != null)
+BinaryTree.cs (2) : using System;
+BinaryTree.cs (5) : public class BinaryTree<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTree.cs (6) : {
+BinaryTree.cs (7) : public BinaryTreeNode<TKey, TValue> RootNode;
+BinaryTree.cs (9) : public override string ToString()
+BinaryTree.cs (10) : {
+BinaryTree.cs (11) : if (RootNode == null)
+BinaryTree.cs (12) : return null;
+BinaryTree.cs (13) : else return RootNode.ToString(0);
+BinaryTree.cs (14) : }
+BinaryTree.cs (16) : public int Count()
+BinaryTree.cs (17) : {
+BinaryTree.cs (18) : if (RootNode == null)
+BinaryTree.cs (19) : return 0;
+BinaryTree.cs (20) : return RootNode.Count();
+BinaryTree.cs (21) : }
+BinaryTree.cs (23) : public int Height()
+BinaryTree.cs (24) : {
+BinaryTree.cs (25) : if (RootNode == null)
+BinaryTree.cs (26) : return 0;
+BinaryTree.cs (27) : return RootNode.Height();
+BinaryTree.cs (28) : }
+BinaryTree.cs (30) : public TValue Get(TKey key)
+BinaryTree.cs (31) : {
+BinaryTree.cs (32) : if (RootNode == null)
+BinaryTree.cs (33) : throw new Exception("Empty tree");
+BinaryTree.cs (34) : else
+BinaryTree.cs (35) : {
+BinaryTree.cs (36) : return RootNode.Get(key);
+BinaryTree.cs (37) : }
+BinaryTree.cs (38) : }
+BinaryTree.cs (40) : public void Add(TKey key, TValue value)
+BinaryTree.cs (41) : {
+BinaryTree.cs (42) : BinaryTreeNode<TKey, TValue> newNode = new BinaryTreeNode<TKey, TValue>(key, value);
+BinaryTree.cs (43) : if (RootNode == null)
+BinaryTree.cs (44) : RootNode = newNode;
+BinaryTree.cs (45) : else
+BinaryTree.cs (46) : RootNode.Add(newNode);
+BinaryTree.cs (47) : }
+BinaryTree.cs (49) : public void Remove(TKey key)
+BinaryTree.cs (50) : {
+BinaryTree.cs (51) : if (RootNode != null)
+BinaryTree.cs (52) : RootNode = RootNode.Remove(key);
+BinaryTree.cs (53) : }
+BinaryTree.cs (55) : public TKey[] Keys()
+BinaryTree.cs (56) : {
+BinaryTree.cs (57) : if (RootNode == null)
+BinaryTree.cs (58) : return null;
+BinaryTree.cs (59) : int count = RootNode.Count();
+BinaryTree.cs (60) : TKey[] keys = new TKey[count];
+BinaryTree.cs (61) : RootNode.KeysToArray(keys, 0);
+BinaryTree.cs (62) : return keys;
+BinaryTree.cs (63) : }
+BinaryTree.cs (65) : public TValue[] Values()
+BinaryTree.cs (66) : {
+BinaryTree.cs (67) : if (RootNode == null)
+BinaryTree.cs (68) : return null;
+BinaryTree.cs (69) : int count = RootNode.Count();
+BinaryTree.cs (70) : TValue[] values = new TValue[count];
+BinaryTree.cs (71) : RootNode.ValuesToArray(values, 0);
+BinaryTree.cs (72) : return values;
+BinaryTree.cs (73) : }
+BinaryTree.cs (75) : private BinaryTreeNode<TKey, TValue> AddBalanced(TKey[] keys, TValue[] values, int start, int end)
+BinaryTree.cs (76) : {
+BinaryTree.cs (77) : //TODO #7:  Given an array of keys and an array of values, this method must:
+BinaryTree.cs (78) : //          - Create a new tree node with the key/values in the center of the [start,end] section of the arrays
+BinaryTree.cs (79) : //          - Recursive call to AddBalanced with the elements on the left of center [start,center-1]. Add the result to the new node as LeftNode
+BinaryTree.cs (80) : //          - Recursive call to AddBalanced with the elements on the right of center [center+1,end]. Add the result to the new node as RightNode
+BinaryTree.cs (82) : if (start <= end)
+BinaryTree.cs (83) : {
+BinaryTree.cs (84) : int mitad = start + (end - start) / 2;
+BinaryTree.cs (86) : BinaryTreeNode<TKey, TValue> node = new BinaryTreeNode<TKey, TValue>(keys[mitad], values[mitad]);
+BinaryTree.cs (87) : node.LeftChild = AddBalanced(keys, values, start, mitad - 1);
+BinaryTree.cs (88) : node.RightChild = AddBalanced(keys, values, mitad + 1, end);
+BinaryTree.cs (90) : return node;
+BinaryTree.cs (91) : }
+BinaryTree.cs (92) : else
+BinaryTree.cs (93) : {
+BinaryTree.cs (94) : return null;
+BinaryTree.cs (95) : }
+BinaryTree.cs (96) : }
+BinaryTree.cs (98) : public void Balance()
+BinaryTree.cs (99) : {
+BinaryTree.cs (100) : if (RootNode == null)
+BinaryTree.cs (101) : return;
+BinaryTree.cs (102) : TKey[] keys = Keys();
+BinaryTree.cs (103) : TValue[] values = Values();
+BinaryTree.cs (105) : RootNode = AddBalanced(keys, values, 0, keys.Length - 1);
+BinaryTree.cs (106) : }
+BinaryTree.cs (107) : }
+BinaryTreeDictionary.cs (7) : public BinaryTree<TKey, TValue> Tree;
+BinaryTreeDictionary.cs (8) : public BinaryTreeDictionary()
+BinaryTreeDictionary.cs (10) : //TODO #2: Initialize anything that needs initialization
+BinaryTreeDictionary.cs (12) : Tree = new BinaryTree<TKey, TValue>();
+BinaryTreeDictionary.cs (16) : public override string ToString()
+BinaryTreeDictionary.cs (18) : //TODO #3: Use the implementation of BinaryTree
+BinaryTreeDictionary.cs (20) : return Tree.ToString();
+BinaryTreeDictionary.cs (26) : //TODO #4
+BinaryTreeDictionary.cs (28) : return Tree.Count();
+BinaryTreeDictionary.cs (34) : //TODO #5
+BinaryTreeDictionary.cs (36) : if (Tree != null && Tree.RootNode != null)
+BinaryTreeDictionary.cs (39) : return Tree.Get(key);
+BinaryTreeDictionary.cs (48) : public void Add(TKey key, TValue value)
+BinaryTreeDictionary.cs (50) : //TODO #6
+BinaryTreeDictionary.cs (52) : if (Tree != null)
+BinaryTreeDictionary.cs (54) : Tree.Add(key, value);
+BinaryTreeDictionary.cs (59) : public void Remove(TKey key)
+BinaryTreeDictionary.cs (61) : //TODO #6: Remove the item with this key.
+BinaryTreeDictionary.cs (63) : if (Tree != null && Tree.RootNode != null)
+BinaryTreeDictionary.cs (65) : Tree.Remove(key);
+BinaryTreeDictionary.cs (70) : public TKey[] Keys()
+BinaryTreeDictionary.cs (72) : //TODO #7: Return an array with all the keys in the dictionary. The length of the array needs to be equal
+BinaryTreeDictionary.cs (73) : //to the number of elements in the dictionary
+BinaryTreeDictionary.cs (75) : if ( Tree.Count() == 0)
+BinaryTreeDictionary.cs (77) : return [];
+BinaryTreeDictionary.cs (81) : return Tree.Keys();
+BinaryTreeDictionary.cs (86) : public TValue[] Values()
+BinaryTreeDictionary.cs (88) : //TODO #8: Return an array with all the values in the dictionary.
+BinaryTreeDictionary.cs (89) : //The length of the array needs to be equal
+BinaryTreeDictionary.cs (90) : //to the number of elements in the dictionary
+BinaryTreeDictionary.cs (92) : if ( Tree.Count() == 0)
+BinaryTreeDictionary.cs (94) : return [];
+BinaryTreeDictionary.cs (97) : else
+BinaryTreeDictionary.cs (99) : return Tree.Values();
+BinaryTreeNode.cs (2) : using System;
+BinaryTreeNode.cs (4) : public class BinaryTreeNode<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTreeNode.cs (5) : {
+BinaryTreeNode.cs (6) : public TKey Key;
+BinaryTreeNode.cs (7) : public TValue Value;
+BinaryTreeNode.cs (8) : public BinaryTreeNode<TKey, TValue> LeftChild;
+BinaryTreeNode.cs (9) : public BinaryTreeNode<TKey, TValue> RightChild;
+BinaryTreeNode.cs (11) : public BinaryTreeNode(TKey key, TValue value)
+BinaryTreeNode.cs (12) : {
+BinaryTreeNode.cs (13) : //TODO #1: Initialize member variables/attributes
+BinaryTreeNode.cs (14) : Key = key;
+BinaryTreeNode.cs (15) : Value = value;
+BinaryTreeNode.cs (16) : LeftChild = null;
+BinaryTreeNode.cs (17) : RightChild = null;
+BinaryTreeNode.cs (18) : }
+BinaryTreeNode.cs (20) : public string ToString(int depth)
+BinaryTreeNode.cs (21) : {
+BinaryTreeNode.cs (22) : string output = null;
+BinaryTreeNode.cs (24) : string leftSpace = null;
+BinaryTreeNode.cs (25) : for (int i = 0; i < depth; i++) leftSpace += " ";
+BinaryTreeNode.cs (26) : if (leftSpace != null) leftSpace += "->";
+BinaryTreeNode.cs (28) : if (Value != null)
+BinaryTreeNode.cs (29) : output += $"{leftSpace}[{Key.ToString()}-{Value.ToString()}]\n";
+BinaryTreeNode.cs (31) : if (LeftChild != null)
+BinaryTreeNode.cs (32) : output += $"{LeftChild?.ToString(depth + 1)}";
+BinaryTreeNode.cs (34) : if (RightChild != null)
+BinaryTreeNode.cs (35) : output += $"{RightChild?.ToString(depth + 1)}";
+BinaryTreeNode.cs (37) : return output;
+BinaryTreeNode.cs (38) : }
+BinaryTreeNode.cs (40) : public void Add(BinaryTreeNode<TKey, TValue> node)
+BinaryTreeNode.cs (41) : {
+BinaryTreeNode.cs (42) : //TODO #2: Add the new node following the order:
+BinaryTreeNode.cs (43) : //          -If the current node (this) has a higher key that the new node (use CompareTo()), the new node should be on this node's left.
+BinaryTreeNode.cs (44) : //              a) If the left child is null, the added node should be this node's left node side
+BinaryTreeNode.cs (45) : //              b) Else, we should ask the LeftChild to add it recursively
+BinaryTreeNode.cs (46) : //          -If the current node has a lower key that the new node (use CompareTo()), the new node should be on this node's right side.
+BinaryTreeNode.cs (47) : //          -If the current node and the new node have the same key, just update this node's value with the new node's value
+BinaryTreeNode.cs (50) : if (this.Key.CompareTo(node.Key) == 0)
+BinaryTreeNode.cs (51) : {
+BinaryTreeNode.cs (52) : Value = node.Value;
+BinaryTreeNode.cs (53) : }
+BinaryTreeNode.cs (54) : else if (this.Key.CompareTo(node.Key) > 0)
+BinaryTreeNode.cs (55) : {
+BinaryTreeNode.cs (56) : if (LeftChild == null)
+BinaryTreeNode.cs (57) : {
+BinaryTreeNode.cs (58) : LeftChild = node;
+BinaryTreeNode.cs (59) : }
+BinaryTreeNode.cs (60) : else
+BinaryTreeNode.cs (61) : {
+BinaryTreeNode.cs (62) : LeftChild.Add(node);
+BinaryTreeNode.cs (63) : }
+BinaryTreeNode.cs (64) : }
+BinaryTreeNode.cs (65) : else if (this.Key.CompareTo(node.Key) < 0 )
+BinaryTreeNode.cs (66) : {
+BinaryTreeNode.cs (67) : if (RightChild == null)
+BinaryTreeNode.cs (68) : {
+BinaryTreeNode.cs (69) : RightChild = node;
+BinaryTreeNode.cs (70) : }
+BinaryTreeNode.cs (71) : else
+BinaryTreeNode.cs (72) : {
+BinaryTreeNode.cs (73) : RightChild.Add(node);
+BinaryTreeNode.cs (74) : }
+BinaryTreeNode.cs (76) : }
+BinaryTreeNode.cs (78) : }
+BinaryTreeNode.cs (80) : public int Count()
+BinaryTreeNode.cs (81) : {
+BinaryTreeNode.cs (82) : //TODO #3: Return the total number of elements in this tree
+BinaryTreeNode.cs (84) : if (LeftChild != null && RightChild != null)
+BinaryTreeNode.cs (85) : {
+BinaryTreeNode.cs (86) : return 1 + LeftChild.Count() + RightChild.Count();
+BinaryTreeNode.cs (87) : }
+BinaryTreeNode.cs (88) : else if (LeftChild != null)
+BinaryTreeNode.cs (89) : {
+BinaryTreeNode.cs (90) : return 1 + LeftChild.Count();
+BinaryTreeNode.cs (91) : }
+BinaryTreeNode.cs (92) : else if (RightChild != null )
+BinaryTreeNode.cs (93) : {
+BinaryTreeNode.cs (94) : return 1 + RightChild.Count();
+BinaryTreeNode.cs (95) : }
+BinaryTreeNode.cs (96) : else
+BinaryTreeNode.cs (97) : {
+BinaryTreeNode.cs (98) : return 1;
+BinaryTreeNode.cs (99) : }
+BinaryTreeNode.cs (100) : }
+BinaryTreeNode.cs (102) : public int Height()
+BinaryTreeNode.cs (103) : {
+BinaryTreeNode.cs (104) : //TODO #4: Return the height of this tree
+BinaryTreeNode.cs (106) : if (LeftChild != null && RightChild != null)
+BinaryTreeNode.cs (107) : {
+BinaryTreeNode.cs (108) : return 1 + Math.Max(LeftChild.Height(),RightChild.Height()) ;
+BinaryTreeNode.cs (109) : }
+BinaryTreeNode.cs (110) : else if (LeftChild != null)
+BinaryTreeNode.cs (111) : {
+BinaryTreeNode.cs (112) : return 1 + Math.Max(LeftChild.Height() ,0);
+BinaryTreeNode.cs (113) : }
+BinaryTreeNode.cs (114) : else if (RightChild != null)
+BinaryTreeNode.cs (115) : {
+BinaryTreeNode.cs (116) : return 1 + Math.Max( RightChild.Height() ,0);
+BinaryTreeNode.cs (117) : }
+BinaryTreeNode.cs (118) : else
+BinaryTreeNode.cs (119) : {
+BinaryTreeNode.cs (120) : return 0;
+BinaryTreeNode.cs (121) : }
+BinaryTreeNode.cs (122) : }
+BinaryTreeNode.cs (124) : public TValue Get(TKey key)
+BinaryTreeNode.cs (125) : {
+BinaryTreeNode.cs (126) : //TODO #5: Find the node that has this key:
+BinaryTreeNode.cs (127) : //          -If the current node (this) has a higher key that the new node (use CompareTo()), the key we are searching for should be on this node's left side.
+BinaryTreeNode.cs (128) : //              a) If the left child is null, return null. We haven't found it
+BinaryTreeNode.cs (129) : //              b) Else, we should ask the LeftChild to find the node recursively. It must be below LeftChild
+BinaryTreeNode.cs (130) : //          -If the current node has a lower key that the new node (use CompareTo()), the key should be on this node's right side.
+BinaryTreeNode.cs (131) : //          -If the current node and the new node have the same key, just return this node's value. We found it
+BinaryTreeNode.cs (133) : if (Key.CompareTo(key) == 0)
+BinaryTreeNode.cs (134) : {
+BinaryTreeNode.cs (135) : return Value;
+BinaryTreeNode.cs (136) : }
+BinaryTreeNode.cs (137) : else if (Key.CompareTo(key) > 0 && LeftChild != null)
+BinaryTreeNode.cs (138) : {
+BinaryTreeNode.cs (139) : return LeftChild.Get(key);
+BinaryTreeNode.cs (140) : }
+BinaryTreeNode.cs (141) : else if (Key.CompareTo(key) < 0 && RightChild != null)
+BinaryTreeNode.cs (142) : {
+BinaryTreeNode.cs (143) : return RightChild.Get(key);
+BinaryTreeNode.cs (144) : }
+BinaryTreeNode.cs (145) : else
+BinaryTreeNode.cs (146) : {
+BinaryTreeNode.cs (147) : return default(TValue);
+BinaryTreeNode.cs (148) : }
+BinaryTreeNode.cs (149) : }
+BinaryTreeNode.cs (153) : public BinaryTreeNode<TKey, TValue> Remove(TKey key)
+BinaryTreeNode.cs (154) : {
+BinaryTreeNode.cs (155) : //TODO #6: Remove the node that has this key. The parent may need to update one of its children,
+BinaryTreeNode.cs (156) : //so this method returns the node with which this node needs to be replaced. If this node isn't the
+BinaryTreeNode.cs (157) : //one we are looking for, we will return this, so that the parent node can replace LeftChild/RightChild
+BinaryTreeNode.cs (158) : //with the same node it had.
+BinaryTreeNode.cs (160) : if (key.CompareTo(Key) == 0)
+BinaryTreeNode.cs (161) : {
+BinaryTreeNode.cs (162) : if (RightChild == null && LeftChild == null)
+BinaryTreeNode.cs (163) : {
+BinaryTreeNode.cs (164) : return null;
+BinaryTreeNode.cs (165) : }
+BinaryTreeNode.cs (166) : if (LeftChild == null && RightChild != null)
+BinaryTreeNode.cs (167) : {
+BinaryTreeNode.cs (168) : return RightChild;
+BinaryTreeNode.cs (169) : }
+BinaryTreeNode.cs (170) : else if (RightChild == null && LeftChild != null)
+BinaryTreeNode.cs (171) : {
+BinaryTreeNode.cs (172) : return LeftChild;
+BinaryTreeNode.cs (173) : }
+BinaryTreeNode.cs (175) : else
+BinaryTreeNode.cs (176) : {
+BinaryTreeNode.cs (177) : LeftChild.Add(RightChild);
+BinaryTreeNode.cs (178) : return LeftChild;
+BinaryTreeNode.cs (179) : }
+BinaryTreeNode.cs (181) : }
+BinaryTreeNode.cs (182) : else if (key.CompareTo(Key) < 0 && LeftChild != null)
+BinaryTreeNode.cs (183) : {
+BinaryTreeNode.cs (184) : LeftChild = LeftChild.Remove(key);
+BinaryTreeNode.cs (185) : }
+BinaryTreeNode.cs (186) : else if (key.CompareTo(Key) > 0 && RightChild != null)
+BinaryTreeNode.cs (187) : {
+BinaryTreeNode.cs (188) : RightChild = RightChild.Remove(key);
+BinaryTreeNode.cs (189) : }
+BinaryTreeNode.cs (191) : return this;
+BinaryTreeNode.cs (193) : }
+BinaryTreeNode.cs (195) : public int KeysToArray(TKey[] keys, int index)
+BinaryTreeNode.cs (196) : {
+BinaryTreeNode.cs (197) : if (LeftChild != null)
+BinaryTreeNode.cs (198) : index = LeftChild.KeysToArray(keys, index);
+BinaryTreeNode.cs (199) : keys[index] = Key;
+BinaryTreeNode.cs (200) : index++;
+BinaryTreeNode.cs (201) : if (RightChild != null)
+BinaryTreeNode.cs (202) : index = RightChild.KeysToArray(keys, index);
+BinaryTreeNode.cs (203) : return index;
+BinaryTreeNode.cs (204) : }
+BinaryTreeNode.cs (206) : public int ValuesToArray(TValue[] values, int index)
+BinaryTreeNode.cs (207) : {
+BinaryTreeNode.cs (208) : if (LeftChild != null)
+BinaryTreeNode.cs (209) : index = LeftChild.ValuesToArray(values, index);
+BinaryTreeNode.cs (210) : values[index] = Value;
+BinaryTreeNode.cs (211) : index++;
+BinaryTreeNode.cs (212) : if (RightChild != null)
+BinaryTreeNode.cs (213) : index = RightChild.ValuesToArray(values, index);
+BinaryTreeNode.cs (214) : return index;
+BinaryTreeNode.cs (215) : }
+BinaryTreeNode.cs (216) : }
+DictionaryReaderWriter.cs (26) : TKey[] claves = dictionary.Keys();
+DictionaryReaderWriter.cs (28) : foreach (TKey key in claves)
+DictionaryReaderWriter.cs (29) : {
+DictionaryReaderWriter.cs (30) : TValue value = dictionary.Get(key);
+DictionaryReaderWriter.cs (31) : writer.WriteLine(EncodeString( keyToString(key) ));
+DictionaryReaderWriter.cs (32) : writer.WriteLine( EncodeString (valueToString(value) ));
+DictionaryReaderWriter.cs (33) : }
+DictionaryReaderWriter.cs (47) : //TODO #2: Read the keys and values one by one and add them to the given dictionary
+DictionaryReaderWriter.cs (48) : //Use the same format as the Write() above
+DictionaryReaderWriter.cs (49) : //Once a key is read from the file,
+DictionaryReaderWriter.cs (50) : //it needs to be converted to string using stringToKey(line).
+DictionaryReaderWriter.cs (51) : //For the value, valueToKey(line)
+DictionaryReaderWriter.cs (53) : String linea;
+DictionaryReaderWriter.cs (54) : TKey key;
+DictionaryReaderWriter.cs (55) : TValue value;
+DictionaryReaderWriter.cs (57) : while ((linea = reader.ReadLine()) != null)
 DictionaryReaderWriter.cs (58) : {
-DictionaryReaderWriter.cs (59) : llaves = stringToKey(DecodeString(reader.ReadLine()));
-DictionaryReaderWriter.cs (61) : Valores = valueToKey(DecodeString(reader.ReadLine()));
-DictionaryReaderWriter.cs (63) : dictionary.Add(llaves,Valores);
-DictionaryReaderWriter.cs (64) : }
+DictionaryReaderWriter.cs (59) : key = stringToKey(DecodeString(linea));
+DictionaryReaderWriter.cs (61) : linea = reader.ReadLine();
+DictionaryReaderWriter.cs (63) : value = valueToKey(DecodeString(linea));
+DictionaryReaderWriter.cs (65) : dictionary.Add(key, value);
+DictionaryReaderWriter.cs (66) : }
+HashTableDictionary.cs (4) : using System.Drawing;
 HashTableDictionary.cs (12) : List<HashTableDictionaryItem<TKey,TValue>> []Entries;
-HashTableDictionary.cs (23) : Entries = new List<HashTableDictionaryItem<TKey, TValue>> [DefaultNumEntries];
+HashTableDictionary.cs (17) : Entries = new List<HashTableDictionaryItem<TKey, TValue>> [DefaultNumEntries];
+HashTableDictionary.cs (23) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[numEntries];
 HashTableDictionary.cs (32) : for (int i = 0; i < Entries.Length; i++)
 HashTableDictionary.cs (33) : {
 HashTableDictionary.cs (34) : if (Entries[i] != null)
@@ -26,136 +346,136 @@ HashTableDictionary.cs (40) : }
 HashTableDictionary.cs (41) : }
 HashTableDictionary.cs (42) : }
 HashTableDictionary.cs (52) : return NumElements;
-HashTableDictionary.cs (61) : return key.GetHashCode() % Entries.Length;
-HashTableDictionary.cs (69) : int posicion = PositionOf(key);
-HashTableDictionary.cs (70) : int contador = 0;
-HashTableDictionary.cs (71) : bool encontrado = false;
-HashTableDictionary.cs (73) : while ( contador < Entries[posicion].Count() && !encontrado )
-HashTableDictionary.cs (74) : {
-HashTableDictionary.cs (75) : if( Entries[posicion].Get(contador).Key.Equals(key) )
-HashTableDictionary.cs (76) : {
-HashTableDictionary.cs (77) : encontrado = true;
-HashTableDictionary.cs (78) : }
-HashTableDictionary.cs (79) : else
-HashTableDictionary.cs (80) : {
-HashTableDictionary.cs (81) : contador++;
-HashTableDictionary.cs (82) : }
+HashTableDictionary.cs (62) : return key.GetHashCode() % Entries.Length;
+HashTableDictionary.cs (70) : int posicion = PositionOf(key);
+HashTableDictionary.cs (71) : int contador = 0;
+HashTableDictionary.cs (72) : bool encontrado = false;
+HashTableDictionary.cs (74) : while ( contador < Entries[posicion].Count() && !encontrado )
+HashTableDictionary.cs (75) : {
+HashTableDictionary.cs (76) : if( Entries[posicion].Get(contador).Key.Equals(key) )
+HashTableDictionary.cs (77) : {
+HashTableDictionary.cs (78) : encontrado = true;
+HashTableDictionary.cs (79) : }
+HashTableDictionary.cs (80) : else
+HashTableDictionary.cs (81) : {
+HashTableDictionary.cs (82) : contador++;
 HashTableDictionary.cs (83) : }
-HashTableDictionary.cs (84) : if (encontrado)
-HashTableDictionary.cs (85) : {
-HashTableDictionary.cs (86) : return Entries[posicion].Get(contador).Value;
-HashTableDictionary.cs (87) : }
-HashTableDictionary.cs (88) : else
-HashTableDictionary.cs (89) : {
-HashTableDictionary.cs (93) : }
-HashTableDictionary.cs (100) : int posicion = PositionOf(key);
-HashTableDictionary.cs (102) : if (posicion >= 0 && posicion < Entries.Length)
-HashTableDictionary.cs (103) : {
-HashTableDictionary.cs (104) : List<HashTableDictionaryItem<TKey, TValue>> lista = Entries[posicion];
-HashTableDictionary.cs (106) : if (lista == null)
-HashTableDictionary.cs (107) : {
-HashTableDictionary.cs (108) : Entries[posicion] = new List<HashTableDictionaryItem<TKey, TValue>>();
-HashTableDictionary.cs (109) : Entries[posicion].Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
-HashTableDictionary.cs (110) : NumElements++;
-HashTableDictionary.cs (111) : }
-HashTableDictionary.cs (112) : else
-HashTableDictionary.cs (113) : {
-HashTableDictionary.cs (114) : bool encontrado = false;
-HashTableDictionary.cs (115) : int contador =  0;
-HashTableDictionary.cs (116) : while (contador < lista.Count() && !encontrado)
-HashTableDictionary.cs (117) : {
-HashTableDictionary.cs (118) : if (lista.Get(contador).Key.Equals(key))
-HashTableDictionary.cs (119) : {
-HashTableDictionary.cs (120) : encontrado = true;
-HashTableDictionary.cs (121) : }
-HashTableDictionary.cs (122) : else
-HashTableDictionary.cs (123) : {
-HashTableDictionary.cs (124) : contador++;
-HashTableDictionary.cs (125) : }
+HashTableDictionary.cs (84) : }
+HashTableDictionary.cs (85) : if (encontrado)
+HashTableDictionary.cs (86) : {
+HashTableDictionary.cs (87) : return Entries[posicion].Get(contador).Value;
+HashTableDictionary.cs (88) : }
+HashTableDictionary.cs (89) : else
+HashTableDictionary.cs (90) : {
+HashTableDictionary.cs (94) : }
+HashTableDictionary.cs (101) : int posicion = PositionOf(key);
+HashTableDictionary.cs (103) : if (posicion >= 0 && posicion < Entries.Length)
+HashTableDictionary.cs (104) : {
+HashTableDictionary.cs (105) : List<HashTableDictionaryItem<TKey, TValue>> lista = Entries[posicion];
+HashTableDictionary.cs (107) : if (lista == null)
+HashTableDictionary.cs (108) : {
+HashTableDictionary.cs (109) : Entries[posicion] = new List<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (110) : Entries[posicion].Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (111) : NumElements++;
+HashTableDictionary.cs (112) : }
+HashTableDictionary.cs (113) : else
+HashTableDictionary.cs (114) : {
+HashTableDictionary.cs (115) : bool encontrado = false;
+HashTableDictionary.cs (116) : int contador =  0;
+HashTableDictionary.cs (117) : while (contador < lista.Count() && !encontrado)
+HashTableDictionary.cs (118) : {
+HashTableDictionary.cs (119) : if (lista.Get(contador).Key.Equals(key))
+HashTableDictionary.cs (120) : {
+HashTableDictionary.cs (121) : encontrado = true;
+HashTableDictionary.cs (122) : }
+HashTableDictionary.cs (123) : else
+HashTableDictionary.cs (124) : {
+HashTableDictionary.cs (125) : contador++;
 HashTableDictionary.cs (126) : }
-HashTableDictionary.cs (129) : if (!encontrado)
-HashTableDictionary.cs (130) : {
-HashTableDictionary.cs (131) : lista.Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
-HashTableDictionary.cs (132) : NumElements++;
-HashTableDictionary.cs (133) : }
-HashTableDictionary.cs (134) : else
-HashTableDictionary.cs (135) : {
-HashTableDictionary.cs (136) : lista.Get(contador).Value = value;
-HashTableDictionary.cs (137) : }
+HashTableDictionary.cs (127) : }
+HashTableDictionary.cs (130) : if (!encontrado)
+HashTableDictionary.cs (131) : {
+HashTableDictionary.cs (132) : lista.Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (133) : NumElements++;
+HashTableDictionary.cs (134) : }
+HashTableDictionary.cs (135) : else
+HashTableDictionary.cs (136) : {
+HashTableDictionary.cs (137) : lista.Get(contador).Value = value;
 HashTableDictionary.cs (138) : }
 HashTableDictionary.cs (139) : }
-HashTableDictionary.cs (148) : int posicion = PositionOf(key);
-HashTableDictionary.cs (150) : if (posicion >= 0 && posicion < Entries.Length)
-HashTableDictionary.cs (151) : {
-HashTableDictionary.cs (152) : List<HashTableDictionaryItem<TKey, TValue>> lista = Entries[posicion];
-HashTableDictionary.cs (153) : if (lista != null)
-HashTableDictionary.cs (154) : {
-HashTableDictionary.cs (155) : bool encontrado = false;
-HashTableDictionary.cs (156) : int contador = 0;
-HashTableDictionary.cs (157) : while (contador < lista.Count() && !encontrado)
-HashTableDictionary.cs (158) : {
-HashTableDictionary.cs (159) : if (lista.Get(contador).Key.Equals(key))
-HashTableDictionary.cs (160) : {
-HashTableDictionary.cs (161) : encontrado = true;
-HashTableDictionary.cs (162) : }
-HashTableDictionary.cs (163) : else
-HashTableDictionary.cs (164) : {
-HashTableDictionary.cs (165) : contador++;
-HashTableDictionary.cs (166) : }
+HashTableDictionary.cs (140) : }
+HashTableDictionary.cs (149) : int posicion = PositionOf(key);
+HashTableDictionary.cs (151) : if (posicion >= 0 && posicion < Entries.Length)
+HashTableDictionary.cs (152) : {
+HashTableDictionary.cs (153) : List<HashTableDictionaryItem<TKey, TValue>> lista = Entries[posicion];
+HashTableDictionary.cs (154) : if (lista != null)
+HashTableDictionary.cs (155) : {
+HashTableDictionary.cs (156) : bool encontrado = false;
+HashTableDictionary.cs (157) : int contador = 0;
+HashTableDictionary.cs (158) : while (contador < lista.Count() && !encontrado)
+HashTableDictionary.cs (159) : {
+HashTableDictionary.cs (160) : if (lista.Get(contador).Key.Equals(key))
+HashTableDictionary.cs (161) : {
+HashTableDictionary.cs (162) : encontrado = true;
+HashTableDictionary.cs (163) : }
+HashTableDictionary.cs (164) : else
+HashTableDictionary.cs (165) : {
+HashTableDictionary.cs (166) : contador++;
 HashTableDictionary.cs (167) : }
-HashTableDictionary.cs (168) : if (encontrado)
-HashTableDictionary.cs (169) : {
-HashTableDictionary.cs (170) : lista.Remove(contador);
-HashTableDictionary.cs (171) : NumElements--;
-HashTableDictionary.cs (172) : }
+HashTableDictionary.cs (168) : }
+HashTableDictionary.cs (169) : if (encontrado)
+HashTableDictionary.cs (170) : {
+HashTableDictionary.cs (171) : lista.Remove(contador);
+HashTableDictionary.cs (172) : NumElements--;
 HashTableDictionary.cs (173) : }
 HashTableDictionary.cs (174) : }
-HashTableDictionary.cs (182) : int tamaño = Entries.Length;
-HashTableDictionary.cs (183) : int contador = 0;
-HashTableDictionary.cs (185) : for( int i = 0;i < tamaño; i++ )
-HashTableDictionary.cs (186) : {
-HashTableDictionary.cs (187) : if (Entries[i] != null )
-HashTableDictionary.cs (188) : {
-HashTableDictionary.cs (189) : contador = contador +  Entries[i].Count();
-HashTableDictionary.cs (190) : }
+HashTableDictionary.cs (175) : }
+HashTableDictionary.cs (183) : int tamaño = Entries.Length;
+HashTableDictionary.cs (184) : int contador = 0;
+HashTableDictionary.cs (186) : for( int i = 0;i < tamaño; i++ )
+HashTableDictionary.cs (187) : {
+HashTableDictionary.cs (188) : if (Entries[i] != null )
+HashTableDictionary.cs (189) : {
+HashTableDictionary.cs (190) : contador = contador +  Entries[i].Count();
 HashTableDictionary.cs (191) : }
-HashTableDictionary.cs (193) : TKey[] llaves = new TKey[contador];
-HashTableDictionary.cs (194) : int k = 0;
-HashTableDictionary.cs (196) : for (int i = 0; i < tamaño; i++)
-HashTableDictionary.cs (197) : {
-HashTableDictionary.cs (198) : if (Entries[i] != null)
-HashTableDictionary.cs (199) : {
-HashTableDictionary.cs (200) : for (int j = 0; j < Entries[i].Count(); j++ )
-HashTableDictionary.cs (201) : {
-HashTableDictionary.cs (202) : llaves[k] = Entries[i].Get(j).Key;
-HashTableDictionary.cs (203) : k++;
-HashTableDictionary.cs (204) : }
+HashTableDictionary.cs (192) : }
+HashTableDictionary.cs (194) : TKey[] llaves = new TKey[contador];
+HashTableDictionary.cs (195) : int k = 0;
+HashTableDictionary.cs (197) : for (int i = 0; i < tamaño; i++)
+HashTableDictionary.cs (198) : {
+HashTableDictionary.cs (199) : if (Entries[i] != null)
+HashTableDictionary.cs (200) : {
+HashTableDictionary.cs (201) : for (int j = 0; j < Entries[i].Count(); j++ )
+HashTableDictionary.cs (202) : {
+HashTableDictionary.cs (203) : llaves[k] = Entries[i].Get(j).Key;
+HashTableDictionary.cs (204) : k++;
 HashTableDictionary.cs (205) : }
 HashTableDictionary.cs (206) : }
-HashTableDictionary.cs (207) : return llaves;
-HashTableDictionary.cs (215) : int tamaño = Entries.Length;
-HashTableDictionary.cs (216) : int contador = 0;
-HashTableDictionary.cs (218) : for( int i = 0;i < tamaño; i++ )
-HashTableDictionary.cs (219) : {
-HashTableDictionary.cs (220) : if (Entries[i] != null )
-HashTableDictionary.cs (221) : {
-HashTableDictionary.cs (222) : contador = contador +  Entries[i].Count();
-HashTableDictionary.cs (223) : }
+HashTableDictionary.cs (207) : }
+HashTableDictionary.cs (208) : return llaves;
+HashTableDictionary.cs (216) : int tamaño = Entries.Length;
+HashTableDictionary.cs (217) : int contador = 0;
+HashTableDictionary.cs (219) : for( int i = 0;i < tamaño; i++ )
+HashTableDictionary.cs (220) : {
+HashTableDictionary.cs (221) : if (Entries[i] != null )
+HashTableDictionary.cs (222) : {
+HashTableDictionary.cs (223) : contador = contador +  Entries[i].Count();
 HashTableDictionary.cs (224) : }
-HashTableDictionary.cs (226) : TValue[] Valores = new TValue[contador];
-HashTableDictionary.cs (227) : int k = 0;
-HashTableDictionary.cs (229) : for (int i = 0; i < tamaño; i++)
-HashTableDictionary.cs (230) : {
-HashTableDictionary.cs (231) : if (Entries[i] != null)
-HashTableDictionary.cs (232) : {
-HashTableDictionary.cs (233) : for (int j = 0; j < Entries[i].Count(); j++ )
-HashTableDictionary.cs (234) : {
-HashTableDictionary.cs (235) : Valores[k] = Entries[i].Get(j).Value;
-HashTableDictionary.cs (236) : k++;
-HashTableDictionary.cs (237) : }
+HashTableDictionary.cs (225) : }
+HashTableDictionary.cs (227) : TValue[] Valores = new TValue[contador];
+HashTableDictionary.cs (228) : int k = 0;
+HashTableDictionary.cs (230) : for (int i = 0; i < tamaño; i++)
+HashTableDictionary.cs (231) : {
+HashTableDictionary.cs (232) : if (Entries[i] != null)
+HashTableDictionary.cs (233) : {
+HashTableDictionary.cs (234) : for (int j = 0; j < Entries[i].Count(); j++ )
+HashTableDictionary.cs (235) : {
+HashTableDictionary.cs (236) : Valores[k] = Entries[i].Get(j).Value;
+HashTableDictionary.cs (237) : k++;
 HashTableDictionary.cs (238) : }
 HashTableDictionary.cs (239) : }
-HashTableDictionary.cs (240) : return Valores;
+HashTableDictionary.cs (240) : }
+HashTableDictionary.cs (241) : return Valores;
 IList.cs (1) : ﻿using System;
 IList.cs (2) : using System.Collections;
 IList.cs (4) : using System.Linq;
