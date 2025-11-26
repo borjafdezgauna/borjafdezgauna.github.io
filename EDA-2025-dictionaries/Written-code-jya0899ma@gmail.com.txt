@@ -443,3 +443,88 @@ HashTableDictionary.cs (13) : private List<HashTableDictionaryItem<TKey, TValue>
 HashTableDictionary.cs (19) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[DefaultNumEntries];
 HashTableDictionary.cs (26) : if (numEntries <= 0) numEntries = DefaultNumEntries;
 HashTableDictionary.cs (27) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[numEntries];
+HashTableDictionary.cs (37) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (38) : {
+HashTableDictionary.cs (39) : if (Entries[i] != null)
+HashTableDictionary.cs (40) : {
+HashTableDictionary.cs (41) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (42) : {
+HashTableDictionary.cs (43) : HashTableDictionaryItem<TKey, TValue> entry = Entries[i].Get(j);
+HashTableDictionary.cs (44) : output += entry.ToString();
+HashTableDictionary.cs (45) : }
+HashTableDictionary.cs (46) : }
+HashTableDictionary.cs (47) : }
+HashTableDictionary.cs (56) : return NumElements;
+HashTableDictionary.cs (67) : int h = key == null ? 0 : key.GetHashCode();
+HashTableDictionary.cs (68) : if (h == int.MinValue) h = 0;    // evitar overflow de Abs
+HashTableDictionary.cs (69) : int pos = Math.Abs(h) % Entries.Length;
+HashTableDictionary.cs (70) : return pos;
+HashTableDictionary.cs (79) : int pos = PositionOf(key);
+HashTableDictionary.cs (80) : var bucket = Entries[pos];
+HashTableDictionary.cs (81) : if (bucket == null) return default(TValue);
+HashTableDictionary.cs (83) : for (int i = 0; i < bucket.Count(); i++)
+HashTableDictionary.cs (84) : {
+HashTableDictionary.cs (85) : var item = bucket.Get(i);
+HashTableDictionary.cs (86) : if (Equals(item.Key, key))
+HashTableDictionary.cs (87) : return item.Value;
+HashTableDictionary.cs (88) : }
+HashTableDictionary.cs (97) : int pos = PositionOf(key);
+HashTableDictionary.cs (98) : var bucket = Entries[pos];
+HashTableDictionary.cs (99) : if (bucket == null)
+HashTableDictionary.cs (100) : {
+HashTableDictionary.cs (101) : bucket = new List<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (102) : Entries[pos] = bucket;
+HashTableDictionary.cs (103) : }
+HashTableDictionary.cs (105) : // ¿existe ya? -> update
+HashTableDictionary.cs (106) : for (int i = 0; i < bucket.Count(); i++)
+HashTableDictionary.cs (107) : {
+HashTableDictionary.cs (108) : var item = bucket.Get(i);
+HashTableDictionary.cs (109) : if (Equals(item.Key, key))
+HashTableDictionary.cs (110) : {
+HashTableDictionary.cs (111) : // actualizar valor
+HashTableDictionary.cs (112) : bucket.Remove(i);
+HashTableDictionary.cs (113) : bucket.Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (114) : return;
+HashTableDictionary.cs (115) : }
+HashTableDictionary.cs (116) : }
+HashTableDictionary.cs (118) : // no existía -> añadir
+HashTableDictionary.cs (119) : bucket.Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (120) : NumElements++;
+HashTableDictionary.cs (129) : int pos = PositionOf(key);
+HashTableDictionary.cs (130) : var bucket = Entries[pos];
+HashTableDictionary.cs (131) : if (bucket == null) return;
+HashTableDictionary.cs (133) : for (int i = 0; i < bucket.Count(); i++)
+HashTableDictionary.cs (134) : {
+HashTableDictionary.cs (135) : var item = bucket.Get(i);
+HashTableDictionary.cs (136) : if (Equals(item.Key, key))
+HashTableDictionary.cs (137) : {
+HashTableDictionary.cs (138) : bucket.Remove(i);
+HashTableDictionary.cs (139) : NumElements--;
+HashTableDictionary.cs (140) : // (opcional) si se queda vacío, podemos dejar la lista vacía
+HashTableDictionary.cs (141) : return;
+HashTableDictionary.cs (142) : }
+HashTableDictionary.cs (143) : }
+HashTableDictionary.cs (152) : TKey[] keys = new TKey[NumElements];
+HashTableDictionary.cs (153) : int k = 0;
+HashTableDictionary.cs (154) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (155) : {
+HashTableDictionary.cs (156) : var bucket = Entries[i];
+HashTableDictionary.cs (157) : if (bucket == null) continue;
+HashTableDictionary.cs (159) : for (int j = 0; j < bucket.Count(); j++)
+HashTableDictionary.cs (160) : {
+HashTableDictionary.cs (161) : keys[k++] = bucket.Get(j).Key;
+HashTableDictionary.cs (162) : }
+HashTableDictionary.cs (163) : }
+HashTableDictionary.cs (164) : return keys;
+HashTableDictionary.cs (173) : TValue[] values = new TValue[NumElements];
+HashTableDictionary.cs (174) : int k = 0;
+HashTableDictionary.cs (175) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (176) : {
+HashTableDictionary.cs (177) : var bucket = Entries[i];
+HashTableDictionary.cs (178) : if (bucket == null) continue;
+HashTableDictionary.cs (180) : for (int j = 0; j < bucket.Count(); j++)
+HashTableDictionary.cs (181) : {
+HashTableDictionary.cs (182) : values[k++] = bucket.Get(j).Value;
+HashTableDictionary.cs (183) : }
+HashTableDictionary.cs (184) : }
+HashTableDictionary.cs (185) : return values;
