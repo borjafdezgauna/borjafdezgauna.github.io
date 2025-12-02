@@ -182,7 +182,7 @@ HashTableDictionary.cs (54) : public int PositionOf(TKey key)
 HashTableDictionary.cs (55) : {
 HashTableDictionary.cs (56) : //TODO #5:  Calculate in which entry should this key be stored and return it (use key.GetHashCode() to calculate the hash function of the key)
 HashTableDictionary.cs (57) : //          Note:  GetHashCode() returns very large integer numbers, but we need to map this value to the range [0, Entries.Length-1]
-HashTableDictionary.cs (58) : int k = key.GetHashCode() % Entries.Length;
+HashTableDictionary.cs (58) : int k = Math.Abs(key.GetHashCode() % Entries.Length);
 HashTableDictionary.cs (59) : return k;
 HashTableDictionary.cs (60) : }
 HashTableDictionary.cs (62) : public TValue Get(TKey key)
@@ -190,155 +190,159 @@ HashTableDictionary.cs (63) : {
 HashTableDictionary.cs (64) : //TODO #5:  Using PositionOf, calculate where this key should be in the array of entries and, then,
 HashTableDictionary.cs (65) : //          find the item with this key on the list, and return its value
 HashTableDictionary.cs (66) : int i = PositionOf(key);
-HashTableDictionary.cs (68) : int j = 0;
-HashTableDictionary.cs (69) : bool enc = false;
-HashTableDictionary.cs (70) : while (j < Entries[i].Count() && !enc)
-HashTableDictionary.cs (71) : {
-HashTableDictionary.cs (72) : if (Entries[i].Get(j).Key.Equals(key))
-HashTableDictionary.cs (73) : {
-HashTableDictionary.cs (74) : enc = true;
-HashTableDictionary.cs (75) : }
-HashTableDictionary.cs (76) : else
-HashTableDictionary.cs (77) : {
-HashTableDictionary.cs (78) : j++;
-HashTableDictionary.cs (79) : }
+HashTableDictionary.cs (68) : if(Entries[i] == null)
+HashTableDictionary.cs (69) : {
+HashTableDictionary.cs (70) : return default(TValue);
+HashTableDictionary.cs (71) : }
+HashTableDictionary.cs (73) : int j = 0;
+HashTableDictionary.cs (74) : bool enc = false;
+HashTableDictionary.cs (75) : while (j < Entries[i].Count() && !enc)
+HashTableDictionary.cs (76) : {
+HashTableDictionary.cs (77) : if (Entries[i].Get(j).Key.Equals(key))
+HashTableDictionary.cs (78) : {
+HashTableDictionary.cs (79) : enc = true;
 HashTableDictionary.cs (80) : }
-HashTableDictionary.cs (82) : if (enc)
-HashTableDictionary.cs (83) : return Entries[i].Get(j).Value;
-HashTableDictionary.cs (84) : else
-HashTableDictionary.cs (85) : return default(TValue);
-HashTableDictionary.cs (86) : }
-HashTableDictionary.cs (88) : public void Add(TKey key, TValue value)
-HashTableDictionary.cs (89) : {
-HashTableDictionary.cs (90) : //TODO #5:  Using PositionOf, calculate where this key should be in the array of entries. Then, look for the item on the list.
-HashTableDictionary.cs (91) : //          - If the item is not found, add a new item to the list with the given key/value
-HashTableDictionary.cs (92) : //          - If the item is found, just update its value
-HashTableDictionary.cs (94) : int posicion = PositionOf(key);
-HashTableDictionary.cs (96) : if (posicion >= 0 && posicion < Entries.Length)
-HashTableDictionary.cs (97) : {
-HashTableDictionary.cs (98) : GenericList<HashTableDictionaryItem<TKey, TValue>> lista = Entries[posicion];
-HashTableDictionary.cs (100) : if (lista == null)
-HashTableDictionary.cs (101) : {
-HashTableDictionary.cs (102) : Entries[posicion] = new GenericList<HashTableDictionaryItem<TKey, TValue>>();
-HashTableDictionary.cs (103) : Entries[posicion].Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
-HashTableDictionary.cs (104) : NumElements++;
-HashTableDictionary.cs (105) : }
-HashTableDictionary.cs (106) : else
-HashTableDictionary.cs (107) : {
-HashTableDictionary.cs (108) : bool enct = false;
-HashTableDictionary.cs (109) : int i = 0;
-HashTableDictionary.cs (110) : while (i < lista.Count() && !enct)
-HashTableDictionary.cs (111) : {
-HashTableDictionary.cs (112) : if (lista.Get(i).Key.Equals(key))
-HashTableDictionary.cs (113) : {
-HashTableDictionary.cs (114) : enct = true;
-HashTableDictionary.cs (115) : }
-HashTableDictionary.cs (116) : else
-HashTableDictionary.cs (117) : {
-HashTableDictionary.cs (118) : i++;
-HashTableDictionary.cs (119) : }
+HashTableDictionary.cs (81) : else
+HashTableDictionary.cs (82) : {
+HashTableDictionary.cs (83) : j++;
+HashTableDictionary.cs (84) : }
+HashTableDictionary.cs (85) : }
+HashTableDictionary.cs (87) : if (enc)
+HashTableDictionary.cs (88) : return Entries[i].Get(j).Value;
+HashTableDictionary.cs (89) : else
+HashTableDictionary.cs (90) : return default(TValue);
+HashTableDictionary.cs (91) : }
+HashTableDictionary.cs (93) : public void Add(TKey key, TValue value)
+HashTableDictionary.cs (94) : {
+HashTableDictionary.cs (95) : //TODO #5:  Using PositionOf, calculate where this key should be in the array of entries. Then, look for the item on the list.
+HashTableDictionary.cs (96) : //          - If the item is not found, add a new item to the list with the given key/value
+HashTableDictionary.cs (97) : //          - If the item is found, just update its value
+HashTableDictionary.cs (99) : int posicion = PositionOf(key);
+HashTableDictionary.cs (101) : if (posicion >= 0 && posicion < Entries.Length)
+HashTableDictionary.cs (102) : {
+HashTableDictionary.cs (103) : GenericList<HashTableDictionaryItem<TKey, TValue>> lista = Entries[posicion];
+HashTableDictionary.cs (105) : if (lista == null)
+HashTableDictionary.cs (106) : {
+HashTableDictionary.cs (107) : Entries[posicion] = new GenericList<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (108) : Entries[posicion].Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (109) : NumElements++;
+HashTableDictionary.cs (110) : }
+HashTableDictionary.cs (111) : else
+HashTableDictionary.cs (112) : {
+HashTableDictionary.cs (113) : bool enct = false;
+HashTableDictionary.cs (114) : int i = 0;
+HashTableDictionary.cs (115) : while (i < lista.Count() && !enct)
+HashTableDictionary.cs (116) : {
+HashTableDictionary.cs (117) : if (lista.Get(i).Key.Equals(key))
+HashTableDictionary.cs (118) : {
+HashTableDictionary.cs (119) : enct = true;
 HashTableDictionary.cs (120) : }
-HashTableDictionary.cs (122) : if (!enct)
-HashTableDictionary.cs (123) : {
-HashTableDictionary.cs (124) : lista.Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
-HashTableDictionary.cs (125) : NumElements++;
-HashTableDictionary.cs (126) : }
-HashTableDictionary.cs (127) : else
+HashTableDictionary.cs (121) : else
+HashTableDictionary.cs (122) : {
+HashTableDictionary.cs (123) : i++;
+HashTableDictionary.cs (124) : }
+HashTableDictionary.cs (125) : }
+HashTableDictionary.cs (127) : if (!enct)
 HashTableDictionary.cs (128) : {
-HashTableDictionary.cs (129) : lista.Get(i).Value = value;
-HashTableDictionary.cs (130) : }
+HashTableDictionary.cs (129) : lista.Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (130) : NumElements++;
 HashTableDictionary.cs (131) : }
-HashTableDictionary.cs (132) : }
-HashTableDictionary.cs (133) : }
-HashTableDictionary.cs (135) : public void Remove(TKey key)
-HashTableDictionary.cs (136) : {
-HashTableDictionary.cs (137) : //TODO #6: Using Position, calculate where this key should be in the array of entries. Then, look for the item on the list.
-HashTableDictionary.cs (138) : //         - If the item is not found, do nothing
-HashTableDictionary.cs (139) : //         - If the item is found, remove it from the list and return
-HashTableDictionary.cs (140) : int posicion = PositionOf(key);
-HashTableDictionary.cs (142) : if (posicion >= 0 && posicion < Entries.Length)
-HashTableDictionary.cs (143) : {
-HashTableDictionary.cs (144) : GenericList<HashTableDictionaryItem<TKey, TValue>> lista = Entries[posicion];
-HashTableDictionary.cs (146) : if (lista != null)
-HashTableDictionary.cs (147) : {
-HashTableDictionary.cs (148) : bool enct = false;
-HashTableDictionary.cs (149) : int i = 0;
-HashTableDictionary.cs (150) : while (i < lista.Count() && !enct)
-HashTableDictionary.cs (151) : {
-HashTableDictionary.cs (152) : if (lista.Get(i).Key.Equals(key))
-HashTableDictionary.cs (153) : {
-HashTableDictionary.cs (154) : enct = true;
-HashTableDictionary.cs (155) : }
-HashTableDictionary.cs (156) : else
-HashTableDictionary.cs (157) : {
-HashTableDictionary.cs (158) : i++;
-HashTableDictionary.cs (159) : }
+HashTableDictionary.cs (132) : else
+HashTableDictionary.cs (133) : {
+HashTableDictionary.cs (134) : lista.Get(i).Value = value;
+HashTableDictionary.cs (135) : }
+HashTableDictionary.cs (136) : }
+HashTableDictionary.cs (137) : }
+HashTableDictionary.cs (138) : }
+HashTableDictionary.cs (140) : public void Remove(TKey key)
+HashTableDictionary.cs (141) : {
+HashTableDictionary.cs (142) : //TODO #6: Using Position, calculate where this key should be in the array of entries. Then, look for the item on the list.
+HashTableDictionary.cs (143) : //         - If the item is not found, do nothing
+HashTableDictionary.cs (144) : //         - If the item is found, remove it from the list and return
+HashTableDictionary.cs (145) : int posicion = PositionOf(key);
+HashTableDictionary.cs (147) : if (posicion >= 0 && posicion < Entries.Length)
+HashTableDictionary.cs (148) : {
+HashTableDictionary.cs (149) : GenericList<HashTableDictionaryItem<TKey, TValue>> lista = Entries[posicion];
+HashTableDictionary.cs (151) : if (lista != null)
+HashTableDictionary.cs (152) : {
+HashTableDictionary.cs (153) : bool enct = false;
+HashTableDictionary.cs (154) : int i = 0;
+HashTableDictionary.cs (155) : while (i < lista.Count() && !enct)
+HashTableDictionary.cs (156) : {
+HashTableDictionary.cs (157) : if (lista.Get(i).Key.Equals(key))
+HashTableDictionary.cs (158) : {
+HashTableDictionary.cs (159) : enct = true;
 HashTableDictionary.cs (160) : }
-HashTableDictionary.cs (161) : if (enct)
+HashTableDictionary.cs (161) : else
 HashTableDictionary.cs (162) : {
-HashTableDictionary.cs (163) : lista.Remove(i);
-HashTableDictionary.cs (164) : NumElements--;
+HashTableDictionary.cs (163) : i++;
+HashTableDictionary.cs (164) : }
 HashTableDictionary.cs (165) : }
-HashTableDictionary.cs (166) : }
-HashTableDictionary.cs (167) : }
-HashTableDictionary.cs (168) : }
-HashTableDictionary.cs (170) : public TKey[] Keys()
-HashTableDictionary.cs (171) : {
-HashTableDictionary.cs (172) : //TODO #8: Return all the keys (not necessarily ordered) in an array
-HashTableDictionary.cs (173) : //         If there is no element, it should return an empty array (size=0)
-HashTableDictionary.cs (175) : int tam = Entries.Length;
-HashTableDictionary.cs (177) : int sum = 0;
-HashTableDictionary.cs (178) : for (int i = 0; i < tam; i++)
-HashTableDictionary.cs (179) : {
-HashTableDictionary.cs (180) : if (Entries[i] != null)
-HashTableDictionary.cs (181) : {
-HashTableDictionary.cs (182) : sum = sum + Entries[i].Count();
-HashTableDictionary.cs (183) : }
-HashTableDictionary.cs (184) : }
-HashTableDictionary.cs (186) : TKey[] claves = new TKey[sum];
-HashTableDictionary.cs (188) : int k = 0;
-HashTableDictionary.cs (189) : for (int i = 0; i < tam; i++)
-HashTableDictionary.cs (190) : {
-HashTableDictionary.cs (191) : if (Entries[i] != null)
-HashTableDictionary.cs (192) : {
-HashTableDictionary.cs (193) : for (int j = 0; j < Entries[i].Count(); j++)
-HashTableDictionary.cs (194) : {
-HashTableDictionary.cs (195) : claves[k] = Entries[i].Get(j).Key;
-HashTableDictionary.cs (196) : k++;
-HashTableDictionary.cs (197) : }
-HashTableDictionary.cs (198) : }
-HashTableDictionary.cs (199) : }
-HashTableDictionary.cs (201) : return claves;
+HashTableDictionary.cs (166) : if (enct)
+HashTableDictionary.cs (167) : {
+HashTableDictionary.cs (168) : lista.Remove(i);
+HashTableDictionary.cs (169) : NumElements--;
+HashTableDictionary.cs (170) : }
+HashTableDictionary.cs (171) : }
+HashTableDictionary.cs (172) : }
+HashTableDictionary.cs (173) : }
+HashTableDictionary.cs (175) : public TKey[] Keys()
+HashTableDictionary.cs (176) : {
+HashTableDictionary.cs (177) : //TODO #8: Return all the keys (not necessarily ordered) in an array
+HashTableDictionary.cs (178) : //         If there is no element, it should return an empty array (size=0)
+HashTableDictionary.cs (180) : int tam = Entries.Length;
+HashTableDictionary.cs (182) : int sum = 0;
+HashTableDictionary.cs (183) : for (int i = 0; i < tam; i++)
+HashTableDictionary.cs (184) : {
+HashTableDictionary.cs (185) : if (Entries[i] != null)
+HashTableDictionary.cs (186) : {
+HashTableDictionary.cs (187) : sum = sum + Entries[i].Count();
+HashTableDictionary.cs (188) : }
+HashTableDictionary.cs (189) : }
+HashTableDictionary.cs (191) : TKey[] claves = new TKey[sum];
+HashTableDictionary.cs (193) : int k = 0;
+HashTableDictionary.cs (194) : for (int i = 0; i < tam; i++)
+HashTableDictionary.cs (195) : {
+HashTableDictionary.cs (196) : if (Entries[i] != null)
+HashTableDictionary.cs (197) : {
+HashTableDictionary.cs (198) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (199) : {
+HashTableDictionary.cs (200) : claves[k] = Entries[i].Get(j).Key;
+HashTableDictionary.cs (201) : k++;
 HashTableDictionary.cs (202) : }
-HashTableDictionary.cs (204) : public TValue[] Values()
-HashTableDictionary.cs (205) : {
-HashTableDictionary.cs (206) : //TODO #9: Return all the values (in the same order as the keys) in an array
-HashTableDictionary.cs (207) : //         If there is no element, it should return an empty array (size=0)
-HashTableDictionary.cs (209) : int tam = Entries.Length;
-HashTableDictionary.cs (210) : int sum = 0;
-HashTableDictionary.cs (211) : for (int i = 0; i < tam; i++)
-HashTableDictionary.cs (212) : {
-HashTableDictionary.cs (213) : if (Entries[i] != null)
-HashTableDictionary.cs (214) : {
-HashTableDictionary.cs (215) : sum = sum + Entries[i].Count();
-HashTableDictionary.cs (216) : }
-HashTableDictionary.cs (217) : }
-HashTableDictionary.cs (219) : TValue[] claves = new TValue[sum];
-HashTableDictionary.cs (221) : int k = 0;
-HashTableDictionary.cs (222) : for (int i = 0; i < tam; i++)
-HashTableDictionary.cs (223) : {
-HashTableDictionary.cs (224) : if (Entries[i] != null)
-HashTableDictionary.cs (225) : {
-HashTableDictionary.cs (226) : for (int j = 0; j < Entries[i].Count(); j++)
-HashTableDictionary.cs (227) : {
-HashTableDictionary.cs (228) : claves[k] = Entries[i].Get(j).Value;
-HashTableDictionary.cs (229) : k++;
-HashTableDictionary.cs (230) : }
-HashTableDictionary.cs (231) : }
-HashTableDictionary.cs (232) : }
-HashTableDictionary.cs (233) : return claves;
-HashTableDictionary.cs (234) : }
+HashTableDictionary.cs (203) : }
+HashTableDictionary.cs (204) : }
+HashTableDictionary.cs (206) : return claves;
+HashTableDictionary.cs (207) : }
+HashTableDictionary.cs (209) : public TValue[] Values()
+HashTableDictionary.cs (210) : {
+HashTableDictionary.cs (211) : //TODO #9: Return all the values (in the same order as the keys) in an array
+HashTableDictionary.cs (212) : //         If there is no element, it should return an empty array (size=0)
+HashTableDictionary.cs (214) : int tam = Entries.Length;
+HashTableDictionary.cs (215) : int sum = 0;
+HashTableDictionary.cs (216) : for (int i = 0; i < tam; i++)
+HashTableDictionary.cs (217) : {
+HashTableDictionary.cs (218) : if (Entries[i] != null)
+HashTableDictionary.cs (219) : {
+HashTableDictionary.cs (220) : sum = sum + Entries[i].Count();
+HashTableDictionary.cs (221) : }
+HashTableDictionary.cs (222) : }
+HashTableDictionary.cs (224) : TValue[] claves = new TValue[sum];
+HashTableDictionary.cs (226) : int k = 0;
+HashTableDictionary.cs (227) : for (int i = 0; i < tam; i++)
+HashTableDictionary.cs (228) : {
+HashTableDictionary.cs (229) : if (Entries[i] != null)
+HashTableDictionary.cs (230) : {
+HashTableDictionary.cs (231) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (232) : {
+HashTableDictionary.cs (233) : claves[k] = Entries[i].Get(j).Value;
+HashTableDictionary.cs (234) : k++;
 HashTableDictionary.cs (235) : }
+HashTableDictionary.cs (236) : }
+HashTableDictionary.cs (237) : }
+HashTableDictionary.cs (238) : return claves;
+HashTableDictionary.cs (239) : }
+HashTableDictionary.cs (240) : }
 HashTableDictionaryItem.cs (1) : public class HashTableDictionaryItem<TKey, TValue>
 HashTableDictionaryItem.cs (2) : {
 HashTableDictionaryItem.cs (3) : public TKey Key;
@@ -370,24 +374,51 @@ IGenericList.cs (14) : void Add(T value);
 IGenericList.cs (16) : void Remove(int index);
 IGenericList.cs (18) : void Clear();
 IGenericList.cs (19) : }
-UnDirectedGraph.cs (3) : public class UndirectedGraph<TElement, TWeight>
-UnDirectedGraph.cs (4) : where TElement : IComparable<TElement>
-UnDirectedGraph.cs (9) : protected HashTableDictionary<Vertex<TElement, TWeight>, TWeight> Vertices =
-UnDirectedGraph.cs (10) : new HashTableDictionary<Vertex<TElement, TWeight>, TWeight>();
-UnDirectedGraph.cs (17) : foreach (Vertex<TElement, TWeight> Vertice in Vertices.Keys())
-UnDirectedGraph.cs (18) : {
-UnDirectedGraph.cs (19) : output += Vertices.Get(Vertice).ToString() + "\n";
-UnDirectedGraph.cs (20) : }
-UnDirectedGraph.cs (29) : int i = 0;
-UnDirectedGraph.cs (30) : TElement[] result = new TElement[Vertices.Count()];
-UnDirectedGraph.cs (31) : foreach (Vertex<TElement, TWeight> Vertice in Vertices.Keys())
-UnDirectedGraph.cs (32) : {
-UnDirectedGraph.cs (33) : result[i] = Vertice.Element;
-UnDirectedGraph.cs (34) : i++;
-UnDirectedGraph.cs (35) : }
-UnDirectedGraph.cs (36) : return result;
-UnDirectedGraph.cs (43) : Vertices.Add(new Vertex<TElement, TWeight>(element) ,default);
-UnDirectedGraph.cs (49) : // Vertices.Get(new Vertex<TElement, TWeight> );
+UnDirectedGraph.cs (2) : using System.Net.Http.Headers;
+UnDirectedGraph.cs (4) : public class UndirectedGraph<TElement, TWeight>
+UnDirectedGraph.cs (5) : where TElement : IComparable<TElement>
+UnDirectedGraph.cs (10) : protected HashTableDictionary<TElement, Vertex<TElement, TWeight>> Vertices =
+UnDirectedGraph.cs (11) : new HashTableDictionary<TElement, Vertex<TElement, TWeight>>();
+UnDirectedGraph.cs (18) : foreach (TElement Vertice in Vertices.Keys())
+UnDirectedGraph.cs (19) : {
+UnDirectedGraph.cs (20) : output += Vertices.Get(Vertice).ToString() + "\n";
+UnDirectedGraph.cs (21) : }
+UnDirectedGraph.cs (30) : int i = 0;
+UnDirectedGraph.cs (31) : TElement[] result = new TElement[Vertices.Count()];
+UnDirectedGraph.cs (32) : foreach (TElement Vertice in Vertices.Keys())
+UnDirectedGraph.cs (33) : {
+UnDirectedGraph.cs (34) : result[i] = Vertice;
+UnDirectedGraph.cs (35) : i++;
+UnDirectedGraph.cs (36) : }
+UnDirectedGraph.cs (37) : return result;
+UnDirectedGraph.cs (44) : Vertices.Add(element, new Vertex<TElement, TWeight>(element));
+UnDirectedGraph.cs (51) : Vertices.Get(source).AddEdge(destination, weight);
+UnDirectedGraph.cs (53) : Vertices.Add( destination, new Vertex<TElement, TWeight>(destination));
+UnDirectedGraph.cs (54) : Vertices.Get(destination).AddEdge(source, weight );
+UnDirectedGraph.cs (62) : return Vertices.Count();
+UnDirectedGraph.cs (68) : int cont = 0;
+UnDirectedGraph.cs (69) : foreach (Vertex<TElement, TWeight> Vertice in Vertices.Values())
+UnDirectedGraph.cs (70) : {
+UnDirectedGraph.cs (71) : cont += Vertice.EdgeCount();
+UnDirectedGraph.cs (72) : }
+UnDirectedGraph.cs (73) : return cont;
+UnDirectedGraph.cs (80) : return Vertices.Get(source).GetEdgeWeight(destination);
+UnDirectedGraph.cs (86) : if(Vertices.Get(source) != null)
+UnDirectedGraph.cs (87) : {
+UnDirectedGraph.cs (88) : Vertices.Get(source).RemoveEdge(destination);
+UnDirectedGraph.cs (89) : }
+UnDirectedGraph.cs (90) : if(Vertices.Get(destination) != null)
+UnDirectedGraph.cs (91) : {
+UnDirectedGraph.cs (92) : Vertices.Get(destination).RemoveEdge(source);
+UnDirectedGraph.cs (93) : }
+UnDirectedGraph.cs (99) : //Vertices.Get()
+UnDirectedGraph.cs (100) : Vertices.Remove(element);
+UnDirectedGraph.cs (102) : foreach(TElement key in Vertices.Keys())
+UnDirectedGraph.cs (103) : {
+UnDirectedGraph.cs (104) : RemoveEdge(key, element);
+UnDirectedGraph.cs (105) : }
+UnDirectedGraph.cs (112) : // las aristas de este vertice
+UnDirectedGraph.cs (113) : return Vertices.Get(element);
 Vertex.cs (2) : using System.Collections;
 Vertex.cs (3) : using System.Collections.Generic;
 Vertex.cs (4) : using System.Formats.Asn1;

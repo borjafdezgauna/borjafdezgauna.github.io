@@ -1,0 +1,425 @@
+DirectedGraph.cs (9) : Vertex<TElement, TWeight> sourceVertex = GetVertex(sourceKey);
+DirectedGraph.cs (10) : sourceVertex.AddEdge(destinationKey, weight);
+DirectedGraph.cs (17) : Vertex<TElement, TWeight> eliminatedVertex = GetVertex(element);
+DirectedGraph.cs (20) : TElement[] connectedEddges = eliminatedVertex.ConnectedElements();
+DirectedGraph.cs (22) : for(int i = 0; i < connectedEddges.Length; i++)
+DirectedGraph.cs (23) : {
+DirectedGraph.cs (24) : eliminatedVertex.RemoveEdge(connectedEddges[i]);
+DirectedGraph.cs (25) : }
+DirectedGraph.cs (27) : foreach(Vertex<TElement, TWeight> vertex in Vertices.Values())
+DirectedGraph.cs (28) : {
+DirectedGraph.cs (29) : vertex.RemoveEdge(element);
+DirectedGraph.cs (30) : }
+DirectedGraph.cs (32) : Vertices.Remove(element);
+DirectedGraph.cs (38) : Vertex<TElement, TWeight> sourceVertex = GetVertex(sourceKey);
+DirectedGraph.cs (40) : sourceVertex.RemoveEdge(destKey);
+HashTableDictionary.cs (2) : using Common;
+HashTableDictionary.cs (3) : using System;
+HashTableDictionary.cs (4) : using System.Collections;
+HashTableDictionary.cs (5) : using System.ComponentModel.DataAnnotations;
+HashTableDictionary.cs (6) : using System.Dynamic;
+HashTableDictionary.cs (8) : public class HashTableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+HashTableDictionary.cs (9) : {
+HashTableDictionary.cs (10) : int DefaultNumEntries = 10000;
+HashTableDictionary.cs (11) : int NumElements = 0;
+HashTableDictionary.cs (12) : //TODO #1: Copy your implementation of List to the project HashTableDictionary and use it to declare Entries: an array of lists of HashTableDictionaryItem<TKey,TValue>
+HashTableDictionary.cs (13) : //[USE List and HashTableDictionaryItem HERE] [] Entries;
+HashTableDictionary.cs (14) : List<HashTableDictionaryItem<TKey, TValue>>[] Entries;
+HashTableDictionary.cs (17) : public HashTableDictionary()
+HashTableDictionary.cs (18) : {
+HashTableDictionary.cs (19) : //TODO #2: Initialize Entries with an array of size DefaultNumEntries
+HashTableDictionary.cs (20) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[DefaultNumEntries];
+HashTableDictionary.cs (21) : }
+HashTableDictionary.cs (23) : public HashTableDictionary(int numEntries)
+HashTableDictionary.cs (24) : {
+HashTableDictionary.cs (25) : //TODO #2: Initialize Entries with a specific number of entries (numEntries)
+HashTableDictionary.cs (26) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[numEntries];
+HashTableDictionary.cs (27) : }
+HashTableDictionary.cs (29) : public override string ToString()
+HashTableDictionary.cs (30) : {
+HashTableDictionary.cs (31) : string output = null;
+HashTableDictionary.cs (33) : //TODO #3: Uncomment the code below
+HashTableDictionary.cs (35) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (36) : {
+HashTableDictionary.cs (37) : if (Entries[i] != null)
+HashTableDictionary.cs (38) : {
+HashTableDictionary.cs (39) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (40) : {
+HashTableDictionary.cs (41) : HashTableDictionaryItem<TKey, TValue> entry = Entries[i].Get(j);
+HashTableDictionary.cs (42) : output += entry.ToString();
+HashTableDictionary.cs (43) : }
+HashTableDictionary.cs (44) : }
+HashTableDictionary.cs (45) : }
+HashTableDictionary.cs (48) : return output;
+HashTableDictionary.cs (49) : }
+HashTableDictionary.cs (51) : public int Count()
+HashTableDictionary.cs (52) : {
+HashTableDictionary.cs (53) : //TODO #4: Return the number of elements (NumElements: make sure this member variable/attribute is updated when the number of elements changes)
+HashTableDictionary.cs (55) : return NumElements;
+HashTableDictionary.cs (57) : }
+HashTableDictionary.cs (59) : public int PositionOf(TKey key)
+HashTableDictionary.cs (60) : {
+HashTableDictionary.cs (61) : //TODO #5:  Calculate in which entry should this key be stored and return it (use key.GetHashCode() to calculate the hash function of the key)
+HashTableDictionary.cs (62) : //          Note:  GetHashCode() returns very large integer numbers, but we need to map this value to the range [0, Entries.Length-1]
+HashTableDictionary.cs (64) : int maxRange = Entries.Length;
+HashTableDictionary.cs (66) : int auxPosition = key.GetHashCode();
+HashTableDictionary.cs (68) : int finalPosition = auxPosition % maxRange;
+HashTableDictionary.cs (70) : if(finalPosition < 0)
+HashTableDictionary.cs (71) : {
+HashTableDictionary.cs (72) : finalPosition = finalPosition + maxRange;
+HashTableDictionary.cs (73) : }
+HashTableDictionary.cs (75) : return finalPosition;
+HashTableDictionary.cs (76) : }
+HashTableDictionary.cs (78) : public TValue Get(TKey key)
+HashTableDictionary.cs (79) : {
+HashTableDictionary.cs (80) : //TODO #5:  Using PositionOf, calculate where this key should be in the array of entries and, then,
+HashTableDictionary.cs (81) : //          find the item with this key on the list, and return its value
+HashTableDictionary.cs (83) : int position = PositionOf(key);
+HashTableDictionary.cs (84) : List<HashTableDictionaryItem<TKey, TValue>> lists = Entries[position];
+HashTableDictionary.cs (86) : if(lists != null)
+HashTableDictionary.cs (87) : {
+HashTableDictionary.cs (88) : for(int i = 0; i < lists.Count(); i++)
+HashTableDictionary.cs (89) : {
+HashTableDictionary.cs (90) : var item = lists.Get(i);
+HashTableDictionary.cs (91) : if(item.Key.Equals(key))
+HashTableDictionary.cs (92) : {
+HashTableDictionary.cs (93) : return item.Value;
+HashTableDictionary.cs (94) : }
+HashTableDictionary.cs (95) : }
+HashTableDictionary.cs (96) : }
+HashTableDictionary.cs (98) : return default(TValue);
+HashTableDictionary.cs (99) : }
+HashTableDictionary.cs (101) : public void Add(TKey key, TValue value)
+HashTableDictionary.cs (102) : {
+HashTableDictionary.cs (103) : //TODO #5:  Using PositionOf, calculate where this key should be in the array of entries. Then, look for the item on the list.
+HashTableDictionary.cs (104) : //          - If the item is not found, add a new item to the list with the given key/value
+HashTableDictionary.cs (105) : //          - If the item is found, just update its value
+HashTableDictionary.cs (108) : int position = PositionOf(key);
+HashTableDictionary.cs (109) : List<HashTableDictionaryItem<TKey, TValue>> lists = Entries[position];
+HashTableDictionary.cs (111) : if(lists != null)
+HashTableDictionary.cs (112) : {
+HashTableDictionary.cs (113) : for(int i = 0; i < lists.Count(); i++)
+HashTableDictionary.cs (114) : {
+HashTableDictionary.cs (115) : var item = lists.Get(i);
+HashTableDictionary.cs (116) : if(item.Key.Equals(key))
+HashTableDictionary.cs (117) : {
+HashTableDictionary.cs (118) : item.Value = value;
+HashTableDictionary.cs (119) : return;
+HashTableDictionary.cs (120) : }
+HashTableDictionary.cs (121) : }
+HashTableDictionary.cs (122) : }
+HashTableDictionary.cs (123) : else
+HashTableDictionary.cs (124) : {
+HashTableDictionary.cs (125) : lists = new List<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (126) : Entries[position] = lists;
+HashTableDictionary.cs (127) : }
+HashTableDictionary.cs (129) : HashTableDictionaryItem<TKey, TValue> newItem = new HashTableDictionaryItem<TKey, TValue>(key, value);
+HashTableDictionary.cs (130) : lists.Add(newItem);
+HashTableDictionary.cs (131) : NumElements++;
+HashTableDictionary.cs (132) : }
+HashTableDictionary.cs (134) : public void Remove(TKey key)
+HashTableDictionary.cs (135) : {
+HashTableDictionary.cs (136) : //TODO #6: Using Position, calculate where this key should be in the array of entries. Then, look for the item on the list.
+HashTableDictionary.cs (137) : //         - If the item is not found, do nothing
+HashTableDictionary.cs (138) : //         - If the item is found, remove it from the list and return
+HashTableDictionary.cs (140) : int position = PositionOf(key);
+HashTableDictionary.cs (141) : List<HashTableDictionaryItem<TKey, TValue>> lists = Entries[position];
+HashTableDictionary.cs (143) : if(lists != null)
+HashTableDictionary.cs (144) : {
+HashTableDictionary.cs (145) : for(int i = lists.Count() - 1; i >= 0; i--)
+HashTableDictionary.cs (146) : {
+HashTableDictionary.cs (147) : var item = lists.Get(i);
+HashTableDictionary.cs (148) : if(item != null && item.Key.Equals(key))
+HashTableDictionary.cs (149) : {
+HashTableDictionary.cs (150) : lists.Remove(i);
+HashTableDictionary.cs (151) : NumElements--;
+HashTableDictionary.cs (152) : return;
+HashTableDictionary.cs (153) : }
+HashTableDictionary.cs (154) : }
+HashTableDictionary.cs (155) : }
+HashTableDictionary.cs (156) : }
+HashTableDictionary.cs (158) : public TKey[] Keys()
+HashTableDictionary.cs (159) : {
+HashTableDictionary.cs (160) : //TODO #8: Return all the keys (not necessarily ordered) in an array
+HashTableDictionary.cs (161) : //         If there is no element, it should return an empty array (size=0)
+HashTableDictionary.cs (164) : TKey[] keysArray;
+HashTableDictionary.cs (165) : int index = 0;
+HashTableDictionary.cs (167) : if(Entries == null)
+HashTableDictionary.cs (168) : {
+HashTableDictionary.cs (169) : keysArray = new TKey[0];
+HashTableDictionary.cs (170) : }
+HashTableDictionary.cs (171) : else
+HashTableDictionary.cs (172) : {
+HashTableDictionary.cs (173) : keysArray = new TKey[NumElements];
+HashTableDictionary.cs (174) : for(int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (175) : {
+HashTableDictionary.cs (176) : List<HashTableDictionaryItem<TKey, TValue>> lists = Entries[i];
+HashTableDictionary.cs (177) : if(lists != null)
+HashTableDictionary.cs (178) : {
+HashTableDictionary.cs (179) : for(int j = 0; j < lists.Count(); j++)
+HashTableDictionary.cs (180) : {
+HashTableDictionary.cs (181) : keysArray[index] = lists.Get(j).Key;
+HashTableDictionary.cs (182) : index++;
+HashTableDictionary.cs (183) : }
+HashTableDictionary.cs (184) : }
+HashTableDictionary.cs (185) : }
+HashTableDictionary.cs (186) : }
+HashTableDictionary.cs (187) : return keysArray;
+HashTableDictionary.cs (188) : }
+HashTableDictionary.cs (190) : public TValue[] Values()
+HashTableDictionary.cs (191) : {
+HashTableDictionary.cs (192) : //TODO #9: Return all the values (in the same order as the keys) in an array
+HashTableDictionary.cs (193) : //         If there is no element, it should return an empty array (size=0)
+HashTableDictionary.cs (195) : TValue[] valuesArray;
+HashTableDictionary.cs (196) : int index = 0;
+HashTableDictionary.cs (198) : if(Entries == null)
+HashTableDictionary.cs (199) : {
+HashTableDictionary.cs (200) : valuesArray = new TValue[0];
+HashTableDictionary.cs (201) : }
+HashTableDictionary.cs (202) : else
+HashTableDictionary.cs (203) : {
+HashTableDictionary.cs (204) : valuesArray = new TValue[NumElements];
+HashTableDictionary.cs (205) : for(int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (206) : {
+HashTableDictionary.cs (207) : List<HashTableDictionaryItem<TKey, TValue>> lists = Entries[i];
+HashTableDictionary.cs (208) : if(lists != null)
+HashTableDictionary.cs (209) : {
+HashTableDictionary.cs (210) : for(int j = 0; j < lists.Count(); j++)
+HashTableDictionary.cs (211) : {
+HashTableDictionary.cs (212) : valuesArray[index] = lists.Get(j).Value;
+HashTableDictionary.cs (213) : index++;
+HashTableDictionary.cs (214) : }
+HashTableDictionary.cs (215) : }
+HashTableDictionary.cs (216) : }
+HashTableDictionary.cs (217) : }
+HashTableDictionary.cs (218) : return valuesArray;
+HashTableDictionary.cs (220) : }
+HashTableDictionary.cs (221) : }
+HashTableDictionaryItem.cs (1) : public class HashTableDictionaryItem<TKey, TValue>
+HashTableDictionaryItem.cs (2) : {
+HashTableDictionaryItem.cs (3) : public TKey Key;
+HashTableDictionaryItem.cs (4) : public TValue Value;
+HashTableDictionaryItem.cs (6) : public HashTableDictionaryItem(TKey key, TValue value)
+HashTableDictionaryItem.cs (7) : {
+HashTableDictionaryItem.cs (8) : Key = key;
+HashTableDictionaryItem.cs (9) : Value = value;
+HashTableDictionaryItem.cs (10) : }
+HashTableDictionaryItem.cs (12) : public override string ToString()
+HashTableDictionaryItem.cs (13) : {
+HashTableDictionaryItem.cs (14) : if (!Key.Equals(default(TKey)))
+HashTableDictionaryItem.cs (15) : return $"[{Key}->{Value}]\n";
+HashTableDictionaryItem.cs (16) : else
+HashTableDictionaryItem.cs (17) : return null;
+HashTableDictionaryItem.cs (18) : }
+HashTableDictionaryItem.cs (19) : }
+IList.cs (1) : using System;
+IList.cs (2) : using System.Collections;
+IList.cs (4) : using System.Linq;
+IList.cs (5) : using System.Text;
+IList.cs (6) : using System.Threading.Tasks;
+IList.cs (8) : namespace Lists
+IList.cs (9) : {
+IList.cs (10) : public interface IList<T> : IEnumerable
+IList.cs (11) : {
+IList.cs (12) : int Count();
+IList.cs (14) : T Get(int index);
+IList.cs (16) : void Add(T value);
+IList.cs (18) : T Remove(int index);
+IList.cs (20) : void Clear();
+IList.cs (21) : }
+IList.cs (22) : }
+List.cs (1) : using Lists;
+List.cs (2) : using System.Collections;
+List.cs (3) : using System.Collections.Concurrent;
+List.cs (4) : using System.Diagnostics.Contracts;
+List.cs (5) : using System.Runtime.InteropServices;
+List.cs (7) : public class ListNode<T>
+List.cs (8) : {
+List.cs (9) : public T Value;
+List.cs (10) : public ListNode<T> Next = null;
+List.cs (11) : public ListNode<T> Previus = null;
+List.cs (15) : public ListNode(T value)
+List.cs (16) : {
+List.cs (17) : Value = value;
+List.cs (18) : }
+List.cs (20) : public override string ToString()
+List.cs (21) : {
+List.cs (22) : return Value.ToString();
+List.cs (23) : }
+List.cs (24) : }
+List.cs (26) : public class List<T> : IList<T>
+List.cs (27) : {
+List.cs (28) : ListNode<T> First = null;
+List.cs (29) : ListNode<T> Last = null;
+List.cs (30) : int m_numItems = 0;
+List.cs (32) : public override string ToString()
+List.cs (33) : {
+List.cs (34) : ListNode<T> node = First;
+List.cs (35) : string output = "[";
+List.cs (37) : while (node != null)
+List.cs (38) : {
+List.cs (39) : output += node.ToString() + ",";
+List.cs (40) : node = node.Next;
+List.cs (41) : }
+List.cs (42) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+List.cs (44) : return output;
+List.cs (45) : }
+List.cs (47) : public int Count()
+List.cs (48) : {
+List.cs (49) : //TODO #1: return the number of elements on the list
+List.cs (51) : return m_numItems;
+List.cs (52) : }
+List.cs (54) : public T Get(int index)
+List.cs (55) : {
+List.cs (56) : //TODO #2: return the element on the index-th position. O if the position is out of bounds
+List.cs (58) : if (index < 0 || index >= m_numItems)
+List.cs (59) : {
+List.cs (60) : return default(T);
+List.cs (61) : }
+List.cs (63) : ListNode<T> current = First;
+List.cs (64) : int count = 0;
+List.cs (66) : while (current != null)
+List.cs (67) : {
+List.cs (68) : if (count == index)
+List.cs (69) : {
+List.cs (70) : return current.Value;
+List.cs (71) : }
+List.cs (72) : current = current.Next;
+List.cs (73) : count++;
+List.cs (74) : }
+List.cs (76) : return default(T);
+List.cs (77) : }
+List.cs (79) : public void Add(T value)
+List.cs (80) : {
+List.cs (81) : //TODO #3: add a new integer to the end of the list
+List.cs (83) : ListNode<T> newNode = new ListNode<T>(value);
+List.cs (85) : if (First == null)
+List.cs (86) : {
+List.cs (87) : First = newNode;
+List.cs (88) : Last = newNode;
+List.cs (89) : }
+List.cs (90) : else
+List.cs (91) : {
+List.cs (92) : Last.Next = newNode;
+List.cs (93) : newNode.Previus = Last;
+List.cs (94) : Last = newNode;
+List.cs (95) : }
+List.cs (97) : m_numItems++;
+List.cs (98) : }
+List.cs (100) : public T Remove(int index)
+List.cs (101) : {
+List.cs (102) : //TODO #4: remove the element on the index-th position. Do nothing if position is out of bounds
+List.cs (104) : if (index < 0 || index >= m_numItems)
+List.cs (105) : {
+List.cs (106) : return default(T);
+List.cs (107) : }
+List.cs (109) : ListNode<T> current;
+List.cs (110) : int count;
+List.cs (112) : if (index < m_numItems / 2)
+List.cs (113) : {
+List.cs (114) : current = First;
+List.cs (115) : count = 0;
+List.cs (116) : while (count < index)
+List.cs (117) : {
+List.cs (118) : current = current.Next;
+List.cs (119) : count++;
+List.cs (120) : }
+List.cs (121) : }
+List.cs (122) : else
+List.cs (123) : {
+List.cs (124) : current = Last;
+List.cs (125) : count = m_numItems - 1;
+List.cs (126) : while (count > index)
+List.cs (127) : {
+List.cs (128) : current = current.Previus;
+List.cs (129) : count--;
+List.cs (130) : }
+List.cs (131) : }
+List.cs (133) : T value = current.Value;
+List.cs (135) : if (current.Previus != null)
+List.cs (136) : {
+List.cs (137) : current.Previus.Next = current.Next;
+List.cs (138) : }
+List.cs (139) : else
+List.cs (140) : {
+List.cs (141) : First = current.Next;
+List.cs (142) : }
+List.cs (144) : if (current.Next != null)
+List.cs (145) : {
+List.cs (146) : current.Next.Previus = current.Previus;
+List.cs (147) : }
+List.cs (148) : else
+List.cs (149) : {
+List.cs (150) : Last = current.Previus;
+List.cs (151) : }
+List.cs (153) : m_numItems--;
+List.cs (154) : return value;
+List.cs (155) : }
+List.cs (157) : public void Clear()
+List.cs (158) : {
+List.cs (159) : //TODO #5: remove all the elements on the list
+List.cs (161) : First = null;
+List.cs (162) : Last = null;
+List.cs (163) : m_numItems = 0;
+List.cs (164) : }
+List.cs (166) : public IEnumerator GetEnumerator()
+List.cs (167) : {
+List.cs (168) : //TODO #6 : Return an enumerator using "yield return" for each of the values in this list
+List.cs (169) : ListNode<T> current = First;
+List.cs (171) : while(current != null)
+List.cs (172) : {
+List.cs (173) : yield return current.Value;
+List.cs (174) : current = current.Next;
+List.cs (175) : }
+List.cs (176) : }
+List.cs (177) : }
+UnDirectedGraph.cs (11) : protected HashTableDictionary<TElement, Vertex<TElement, TWeight>> Vertices = new HashTableDictionary<TElement, Vertex<TElement, TWeight>>();
+UnDirectedGraph.cs (15) : string output = "";
+UnDirectedGraph.cs (16) : foreach(Vertex<TElement, TWeight> vertex in Vertices.Values())
+UnDirectedGraph.cs (17) : {
+UnDirectedGraph.cs (18) : output += vertex.ToString();
+UnDirectedGraph.cs (19) : }
+UnDirectedGraph.cs (28) : return Vertices.Keys();
+UnDirectedGraph.cs (35) : Vertex<TElement, TWeight> newVertex = new Vertex<TElement, TWeight>(element);
+UnDirectedGraph.cs (36) : Vertices.Add(element, newVertex);
+UnDirectedGraph.cs (42) : Vertex<TElement, TWeight> sourceVertex = GetVertex(source);
+UnDirectedGraph.cs (43) : Vertex<TElement, TWeight> destinationVertex = GetVertex(destination);
+UnDirectedGraph.cs (45) : sourceVertex.AddEdge(destination, weight);
+UnDirectedGraph.cs (46) : destinationVertex.AddEdge(source, weight);
+UnDirectedGraph.cs (54) : return Vertices.Count();
+UnDirectedGraph.cs (61) : int count = 0;
+UnDirectedGraph.cs (62) : for(int i = 0; i < Vertices.Values().Length; i++)
+UnDirectedGraph.cs (63) : {
+UnDirectedGraph.cs (64) : count += Vertices.Values()[i].EdgeCount();
+UnDirectedGraph.cs (65) : }
+UnDirectedGraph.cs (66) : return count;
+UnDirectedGraph.cs (74) : Vertex<TElement, TWeight> sourceVertex = GetVertex(source);
+UnDirectedGraph.cs (76) : return sourceVertex.GetEdgeWeight(destination);
+UnDirectedGraph.cs (83) : Vertex<TElement, TWeight> sourceVertex = GetVertex(source);
+UnDirectedGraph.cs (84) : Vertex<TElement, TWeight> destinationVertex = GetVertex(destination);
+UnDirectedGraph.cs (86) : sourceVertex.RemoveEdge(destination);
+UnDirectedGraph.cs (87) : destinationVertex.RemoveEdge(source);
+UnDirectedGraph.cs (94) : Vertex<TElement, TWeight> eliminatedVertex = GetVertex(element);
+UnDirectedGraph.cs (97) : TElement[] connectedEddges = eliminatedVertex.ConnectedElements();
+UnDirectedGraph.cs (99) : for(int i = 0; i < connectedEddges.Length; i++)
+UnDirectedGraph.cs (100) : {
+UnDirectedGraph.cs (101) : RemoveEdge(connectedEddges[i], element);
+UnDirectedGraph.cs (102) : }
+UnDirectedGraph.cs (103) : Vertices.Remove(element);
+UnDirectedGraph.cs (110) : return Vertices.Get(element);
+Vertex.cs (2) : using System.Net.Http.Headers;
+Vertex.cs (3) : using System.Xml.Schema;
+Vertex.cs (9) : HashTableDictionary<TElement, TWeight> edges;
+Vertex.cs (14) : Element = element;
+Vertex.cs (15) : edges = new HashTableDictionary<TElement, TWeight>();
+Vertex.cs (22) : return edges.Keys();
+Vertex.cs (29) : edges.Add(targetElement, weight);
+Vertex.cs (36) : return edges.Count();
+Vertex.cs (43) : edges.Remove(targetElement);
+Vertex.cs (50) : return edges.Get(targetElement);
+Vertex.cs (62) : string output = "";
+Vertex.cs (63) : foreach(var target in edges.Keys())
+Vertex.cs (64) : {
+Vertex.cs (65) : var weight = edges.Get(target);
+Vertex.cs (66) : output += $"{Element}->{weight}->{target}\n";
+Vertex.cs (67) : }
