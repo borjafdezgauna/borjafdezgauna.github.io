@@ -13,6 +13,62 @@ DirectedGraph.cs (30) : }
 DirectedGraph.cs (32) : Vertices.Remove(element);
 DirectedGraph.cs (38) : Vertex<TElement, TWeight> sourceVertex = GetVertex(sourceKey);
 DirectedGraph.cs (40) : sourceVertex.RemoveEdge(destKey);
+GraphReaderWriter.cs (2) : using System.Globalization;
+GraphReaderWriter.cs (4) : using System.Runtime.CompilerServices;
+GraphReaderWriter.cs (14) : return str.Replace("\n", "[NEW_LINE]");
+GraphReaderWriter.cs (21) : return str.Replace("[NEW_LINE]", "\n");
+GraphReaderWriter.cs (33) : TKey[] keys = graph.Elements();
+GraphReaderWriter.cs (35) : for(int i = 0; i < keys.Length; i++)
+GraphReaderWriter.cs (36) : {
+GraphReaderWriter.cs (37) : writer.WriteLine(EncodeString(keyToString(keys[i])));
+GraphReaderWriter.cs (38) : }
+GraphReaderWriter.cs (40) : writer.WriteLine();
+GraphReaderWriter.cs (42) : for(int i = 0; i < keys.Length; i++)
+GraphReaderWriter.cs (43) : {
+GraphReaderWriter.cs (44) : Vertex<TKey, TWeight> vertex = graph.GetVertex(keys[i]);
+GraphReaderWriter.cs (45) : TKey[] connected = vertex.ConnectedElements();
+GraphReaderWriter.cs (47) : for(int j = 0; j < connected.Length; j++)
+GraphReaderWriter.cs (48) : {
+GraphReaderWriter.cs (49) : bool writeEdge = true;
+GraphReaderWriter.cs (50) : if(!(graph is DirectedGraph<TKey, TWeight>))
+GraphReaderWriter.cs (51) : {
+GraphReaderWriter.cs (52) : writeEdge = keys[i].CompareTo(connected[j]) < 0;
+GraphReaderWriter.cs (53) : }
+GraphReaderWriter.cs (55) : if(writeEdge)
+GraphReaderWriter.cs (56) : {
+GraphReaderWriter.cs (57) : TWeight weight = vertex.GetEdgeWeight(connected[j]);
+GraphReaderWriter.cs (58) : writer.WriteLine($"{EncodeString(keyToString(keys[i]))}->{weightToString(weight)}->{EncodeString(keyToString(connected[j]))}");
+GraphReaderWriter.cs (59) : }
+GraphReaderWriter.cs (60) : }
+GraphReaderWriter.cs (61) : }
+GraphReaderWriter.cs (79) : String line;
+GraphReaderWriter.cs (80) : bool readingEdeges = false;
+GraphReaderWriter.cs (85) : while((line = reader.ReadLine()) != null)
+GraphReaderWriter.cs (86) : {
+GraphReaderWriter.cs (87) : line = DecodeString(line);
+GraphReaderWriter.cs (89) : if(line == "")
+GraphReaderWriter.cs (90) : {
+GraphReaderWriter.cs (91) : readingEdeges = true;
+GraphReaderWriter.cs (92) : continue;
+GraphReaderWriter.cs (93) : }
+GraphReaderWriter.cs (95) : if(readingEdeges == false)
+GraphReaderWriter.cs (96) : {
+GraphReaderWriter.cs (97) : TKey key = stringToKey(line);
+GraphReaderWriter.cs (98) : graph.AddVertex(key);
+GraphReaderWriter.cs (99) : }
+GraphReaderWriter.cs (100) : else
+GraphReaderWriter.cs (101) : {
+GraphReaderWriter.cs (102) : string[] parts = line.Split("->");
+GraphReaderWriter.cs (103) : if(parts.Length != 3)
+GraphReaderWriter.cs (104) : {
+GraphReaderWriter.cs (105) : continue;
+GraphReaderWriter.cs (106) : }
+GraphReaderWriter.cs (108) : TKey source = stringToKey(DecodeString(parts[0]));
+GraphReaderWriter.cs (109) : TWeight weight = stringToWeight(parts[1]);
+GraphReaderWriter.cs (110) : TKey destination = stringToKey(DecodeString(parts[2]));
+GraphReaderWriter.cs (112) : graph.AddEdge(source, destination, weight);
+GraphReaderWriter.cs (113) : }
+GraphReaderWriter.cs (114) : }
 HashTableDictionary.cs (2) : using Common;
 HashTableDictionary.cs (3) : using System;
 HashTableDictionary.cs (4) : using System.Collections;
