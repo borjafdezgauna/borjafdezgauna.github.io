@@ -1,3 +1,87 @@
+BinaryGraphReaderWriter.cs (28) : bool isDirected = graph is DirectedGraph<TKey, TWeight>; //Comprobamos si el grafo es dirigido o no
+BinaryGraphReaderWriter.cs (30) : //Escribir el número de vértices
+BinaryGraphReaderWriter.cs (31) : TKey[] vertices = graph.Elements();//Devuelve todas las claves de los vértices del grafo
+BinaryGraphReaderWriter.cs (32) : writer.Write(vertices.Length);//Guardamos el número de vértices
+BinaryGraphReaderWriter.cs (34) : //Escribir las claves de los vértices
+BinaryGraphReaderWriter.cs (35) : for (int i = 0; i < vertices.Length; i++)
+BinaryGraphReaderWriter.cs (36) : {
+BinaryGraphReaderWriter.cs (37) : byte[] keyBytes = keyToByteArray(vertices[i]); //Convertimos la clave del vértice a un array de bytes
+BinaryGraphReaderWriter.cs (38) : writer.Write(keyBytes.Length); //Escribimos el número de bytes que tiene la clave
+BinaryGraphReaderWriter.cs (39) : writer.Write(keyBytes); //Escribimos la clave del vértice
+BinaryGraphReaderWriter.cs (40) : }
+BinaryGraphReaderWriter.cs (42) : //Escribir el número de aristas (Solo una vez cada arista en un grafo no dirigido)
+BinaryGraphReaderWriter.cs (43) : int edgeCount = 0;
+BinaryGraphReaderWriter.cs (44) : for (int i = 0; i < vertices.Length; i++)
+BinaryGraphReaderWriter.cs (45) : {
+BinaryGraphReaderWriter.cs (46) : Vertex<TKey, TWeight> v = graph.GetVertex(vertices[i]);
+BinaryGraphReaderWriter.cs (47) : TKey[] connected = v.ConnectedElements();
+BinaryGraphReaderWriter.cs (49) : for (int j = 0; j < v.ConnectedElements().Length; j++)
+BinaryGraphReaderWriter.cs (50) : {
+BinaryGraphReaderWriter.cs (51) : //solo contamos la arista si la clave del vértice origen es menor que la del destino, para no duplicarlas
+BinaryGraphReaderWriter.cs (52) : if (isDirected || vertices[i].CompareTo(v.ConnectedElements()[j]) < 0)
+BinaryGraphReaderWriter.cs (53) : {
+BinaryGraphReaderWriter.cs (54) : edgeCount++;
+BinaryGraphReaderWriter.cs (55) : }
+BinaryGraphReaderWriter.cs (56) : }
+BinaryGraphReaderWriter.cs (57) : }
+BinaryGraphReaderWriter.cs (58) : writer.Write(edgeCount);
+BinaryGraphReaderWriter.cs (60) : //Escribir las aristas
+BinaryGraphReaderWriter.cs (61) : for (int i = 0; i < vertices.Length; i++)
+BinaryGraphReaderWriter.cs (62) : {
+BinaryGraphReaderWriter.cs (63) : Vertex<TKey, TWeight> v = graph.GetVertex(vertices[i]);
+BinaryGraphReaderWriter.cs (64) : TKey[] connected = v.ConnectedElements();
+BinaryGraphReaderWriter.cs (66) : for (int j = 0; j < connected.Length; j++)
+BinaryGraphReaderWriter.cs (67) : {
+BinaryGraphReaderWriter.cs (68) : //Para evitar escribir dos veces la misma arista en un grafo no dirigido
+BinaryGraphReaderWriter.cs (69) : if (isDirected || vertices[i].CompareTo(connected[j]) < 0)
+BinaryGraphReaderWriter.cs (70) : {
+BinaryGraphReaderWriter.cs (71) : //Obtener el peso de la arista
+BinaryGraphReaderWriter.cs (72) : TWeight weight = v.GetEdgeWeight(connected[j]);
+BinaryGraphReaderWriter.cs (74) : //Escribir la clave del vértice origen
+BinaryGraphReaderWriter.cs (75) : byte[] sourceKeyBytes = keyToByteArray(vertices[i]);
+BinaryGraphReaderWriter.cs (76) : writer.Write(sourceKeyBytes.Length);
+BinaryGraphReaderWriter.cs (77) : writer.Write(sourceKeyBytes);
+BinaryGraphReaderWriter.cs (79) : //Escribir el peso de la arista
+BinaryGraphReaderWriter.cs (80) : byte[] weightBytes = weightToByteArray(weight);
+BinaryGraphReaderWriter.cs (81) : writer.Write(weightBytes.Length);
+BinaryGraphReaderWriter.cs (82) : writer.Write(weightBytes);
+BinaryGraphReaderWriter.cs (84) : //Escribir la clave del vértice destino
+BinaryGraphReaderWriter.cs (85) : byte[] destKeyBytes = keyToByteArray(connected[j]);
+BinaryGraphReaderWriter.cs (86) : writer.Write(destKeyBytes.Length);
+BinaryGraphReaderWriter.cs (87) : writer.Write(destKeyBytes);
+BinaryGraphReaderWriter.cs (88) : }
+BinaryGraphReaderWriter.cs (89) : }
+BinaryGraphReaderWriter.cs (90) : }
+BinaryGraphReaderWriter.cs (119) : //Leer el número de vértices
+BinaryGraphReaderWriter.cs (120) : int vertexCount = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (122) : //Leer las claves de los vértices
+BinaryGraphReaderWriter.cs (123) : for (int i = 0; i < vertexCount; i++)
+BinaryGraphReaderWriter.cs (124) : {
+BinaryGraphReaderWriter.cs (125) : int keyLength = reader.ReadInt32(); //Leemos el número de bytes que tiene la clave
+BinaryGraphReaderWriter.cs (126) : byte[] keyBytes = reader.ReadBytes(keyLength); //Leemos los bytes de la clave
+BinaryGraphReaderWriter.cs (127) : TKey key = keyFromByteArray(keyBytes); //Convertimos el array de bytes a la clave del vértice
+BinaryGraphReaderWriter.cs (128) : graph.AddVertex(key); //Añadimos el vértice al grafo
+BinaryGraphReaderWriter.cs (129) : }
+BinaryGraphReaderWriter.cs (131) : //Leer el número de aristas
+BinaryGraphReaderWriter.cs (132) : int edgeCount = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (134) : //Leer las aristas
+BinaryGraphReaderWriter.cs (135) : for (int i = 0; i < edgeCount; i++)
+BinaryGraphReaderWriter.cs (136) : {
+BinaryGraphReaderWriter.cs (137) : //Leer la clave del vértice origen
+BinaryGraphReaderWriter.cs (138) : int sourceKeyLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (139) : byte[] sourceKeyBytes = reader.ReadBytes(sourceKeyLength);
+BinaryGraphReaderWriter.cs (140) : TKey sourceKey = keyFromByteArray(sourceKeyBytes);
+BinaryGraphReaderWriter.cs (142) : //Leer el peso de la arista
+BinaryGraphReaderWriter.cs (143) : int weightLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (144) : byte[] weightBytes = reader.ReadBytes(weightLength);
+BinaryGraphReaderWriter.cs (145) : TWeight weight = weightFromByteArray(weightBytes);
+BinaryGraphReaderWriter.cs (147) : //Leer la clave del vértice destino
+BinaryGraphReaderWriter.cs (148) : int destKeyLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (149) : byte[] destKeyBytes = reader.ReadBytes(destKeyLength);
+BinaryGraphReaderWriter.cs (150) : TKey destKey = keyFromByteArray(destKeyBytes);
+BinaryGraphReaderWriter.cs (152) : //Añadir la arista al grafo
+BinaryGraphReaderWriter.cs (153) : graph.AddEdge(sourceKey, destKey, weight);
+BinaryGraphReaderWriter.cs (154) : }
 DirectedGraph.cs (9) : Vertex<TElement, TWeight> sourceVertex = Vertices.Get(sourceKey);
 DirectedGraph.cs (10) : sourceVertex.AddEdge(destinationKey, weight);
 DirectedGraph.cs (18) : Vertex<TElement, TWeight> vertexToRemove = Vertices.Get(element);
@@ -17,6 +101,117 @@ DirectedGraph.cs (31) : //Finalmente, eliminar el vértice del grafo
 DirectedGraph.cs (32) : Vertices.Remove(element);
 DirectedGraph.cs (39) : Vertex<TElement, TWeight> sourceVertex = Vertices.Get(sourceKey);
 DirectedGraph.cs (40) : sourceVertex.RemoveEdge(destKey);
+DistanceCalculator.cs (2) : using System.Runtime.CompilerServices;
+DistanceCalculator.cs (10) : private IDictionary<string, IDictionary<string, double>> graph;
+DistanceCalculator.cs (12) : private bool isUndirected;
+DistanceCalculator.cs (18) : this.isUndirected = isUndirected;
+DistanceCalculator.cs (19) : graph = new HashTableDictionary<string, IDictionary<string, double>>();
+DistanceCalculator.cs (28) : if (graph.Get(city) == null)
+DistanceCalculator.cs (29) : {
+DistanceCalculator.cs (30) : graph.Add(city, new HashTableDictionary<string, double>());
+DistanceCalculator.cs (31) : }
+DistanceCalculator.cs (39) : graph.Get(fromCity).Add(toCity, distance);
+DistanceCalculator.cs (40) : if (isUndirected)
+DistanceCalculator.cs (41) : {
+DistanceCalculator.cs (42) : graph.Get(toCity).Add(fromCity, distance);
+DistanceCalculator.cs (43) : }
+DistanceCalculator.cs (52) : string nextCity = null;
+DistanceCalculator.cs (53) : double minDistance = double.MaxValue;
+DistanceCalculator.cs (54) : foreach (var candidate in nextCityCandidates.Keys())
+DistanceCalculator.cs (55) : {
+DistanceCalculator.cs (56) : if (!visited.Get(candidate) && nextCityCandidates.Get(candidate) < minDistance)
+DistanceCalculator.cs (57) : {
+DistanceCalculator.cs (58) : minDistance = nextCityCandidates.Get(candidate);;
+DistanceCalculator.cs (59) : nextCity = candidate;
+DistanceCalculator.cs (60) : }
+DistanceCalculator.cs (61) : }
+DistanceCalculator.cs (62) : return nextCity;
+DistanceCalculator.cs (73) : IDictionary<string, double> neighbours = graph.Get(currentCity);
+DistanceCalculator.cs (74) : foreach (var n in neighbours.Keys())
+DistanceCalculator.cs (75) : {
+DistanceCalculator.cs (76) : if (visited.Get(n) == false)
+DistanceCalculator.cs (77) : {
+DistanceCalculator.cs (78) : double newDistance = distanceToCity.Get(currentCity) + neighbours.Get(n);
+DistanceCalculator.cs (79) : double oldDistance = distanceToCity.Get(n);
+DistanceCalculator.cs (81) : if (oldDistance > newDistance || oldDistance == 0 )
+DistanceCalculator.cs (82) : {
+DistanceCalculator.cs (83) : nextCityCandidates.Add(n, newDistance);
+DistanceCalculator.cs (84) : distanceToCity.Add(n, newDistance);
+DistanceCalculator.cs (85) : }
+DistanceCalculator.cs (86) : }
+DistanceCalculator.cs (87) : }
+DistanceCalculator.cs (100) : //Diccionario de ciudad que calcula la distancia a cada ciudad
+DistanceCalculator.cs (101) : IDictionary<string, double> distanceToCity = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (102) : //Diccionario de ciudades visitadas
+DistanceCalculator.cs (103) : IDictionary<string, bool> visited = new HashTableDictionary<string, bool>();
+DistanceCalculator.cs (104) : //Diccionario de candidatos a la siguiente ciudad
+DistanceCalculator.cs (105) : IDictionary<string, double> nextCityCandidates = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (106) : //Ciudad actual
+DistanceCalculator.cs (107) : string currentCity = fromCity;
+DistanceCalculator.cs (108) : //La ciudad origen empieza con distancia 0 ni candidatos ni visitada
+DistanceCalculator.cs (109) : distanceToCity.Add(fromCity, 0);
+DistanceCalculator.cs (110) : nextCityCandidates.Add(fromCity, 0);
+DistanceCalculator.cs (111) : visited.Add(fromCity, false);
+DistanceCalculator.cs (113) : while (currentCity != null)
+DistanceCalculator.cs (114) : {
+DistanceCalculator.cs (115) : //Marcamos la ciudad actual como visitada
+DistanceCalculator.cs (116) : visited.Add(currentCity, true);
+DistanceCalculator.cs (117) : //Comprobamos los vecinos de la ciudad actual
+DistanceCalculator.cs (118) : CheckNeighbours(distanceToCity, visited, nextCityCandidates, currentCity);
+DistanceCalculator.cs (119) : nextCityCandidates.Remove(currentCity);
+DistanceCalculator.cs (120) : //Elegimos la siguiente ciudad
+DistanceCalculator.cs (121) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
+DistanceCalculator.cs (122) : }
+DistanceCalculator.cs (123) : return distanceToCity;
+GraphReaderWriter.cs (11) : for (int i = 0; i < str.Length; i++)
+GraphReaderWriter.cs (12) : {
+GraphReaderWriter.cs (13) : if (str[i] == '\n')
+GraphReaderWriter.cs (14) : {
+GraphReaderWriter.cs (15) : str = str.Replace("\n", "[NEW_LINE]");
+GraphReaderWriter.cs (16) : }
+GraphReaderWriter.cs (17) : }
+GraphReaderWriter.cs (25) : for (int i = 0; i < str.Length; i++)
+GraphReaderWriter.cs (26) : {
+GraphReaderWriter.cs (27) : if (str.Contains("[NEW_LINE]"))
+GraphReaderWriter.cs (28) : {
+GraphReaderWriter.cs (29) : str = str.Replace("[NEW_LINE]", "\n");
+GraphReaderWriter.cs (30) : }
+GraphReaderWriter.cs (31) : }
+GraphReaderWriter.cs (44) : TKey[] vertices = graph.Elements();
+GraphReaderWriter.cs (45) : for (int i = 0; i < vertices.Length; i++)
+GraphReaderWriter.cs (46) : {
+GraphReaderWriter.cs (47) : writer.WriteLine(EncodeString(keyToString(vertices[i])));
+GraphReaderWriter.cs (48) : }
+GraphReaderWriter.cs (49) : writer.WriteLine();
+GraphReaderWriter.cs (50) : for (int i = 0; i < vertices.Length; i++)
+GraphReaderWriter.cs (51) : {
+GraphReaderWriter.cs (52) : Vertex<TKey, TWeight> v = graph.GetVertex(vertices[i]);
+GraphReaderWriter.cs (53) : TKey[] connected = v.ConnectedElements();
+GraphReaderWriter.cs (54) : for (int j = 0; j < connected.Length; j++)
+GraphReaderWriter.cs (55) : {
+GraphReaderWriter.cs (57) : TWeight weight = v.GetEdgeWeight(connected[j]);
+GraphReaderWriter.cs (58) : writer.WriteLine(EncodeString(keyToString(vertices[i]) + "->" + weightToString(weight) + "->" + keyToString(connected[j])));
+GraphReaderWriter.cs (59) : }
+GraphReaderWriter.cs (60) : }
+GraphReaderWriter.cs (81) : string line = reader.ReadLine();
+GraphReaderWriter.cs (82) : while (line != null && line != "")
+GraphReaderWriter.cs (83) : {
+GraphReaderWriter.cs (84) : graph.AddVertex(stringToKey(DecodeString(line)));
+GraphReaderWriter.cs (85) : line = reader.ReadLine();
+GraphReaderWriter.cs (86) : }
+GraphReaderWriter.cs (87) : line = reader.ReadLine();
+GraphReaderWriter.cs (88) : while (line != null)
+GraphReaderWriter.cs (89) : {
+GraphReaderWriter.cs (90) : if (line != "")
+GraphReaderWriter.cs (91) : {
+GraphReaderWriter.cs (92) : string[] partes = DecodeString(line).Split(new string[] { "->" }, StringSplitOptions.None);
+GraphReaderWriter.cs (93) : TKey keyA = stringToKey(partes[0]);
+GraphReaderWriter.cs (94) : TWeight weight = stringToWeight(partes[1]);
+GraphReaderWriter.cs (95) : TKey keyB = stringToKey(partes[2]);
+GraphReaderWriter.cs (96) : graph.AddEdge(keyA, keyB, weight);
+GraphReaderWriter.cs (97) : }
+GraphReaderWriter.cs (98) : line = reader.ReadLine();
+GraphReaderWriter.cs (99) : }
 HashTableDictionary.cs (1) : using System;
 HashTableDictionary.cs (2) : using System.Collections;
 HashTableDictionary.cs (3) : using Common;
