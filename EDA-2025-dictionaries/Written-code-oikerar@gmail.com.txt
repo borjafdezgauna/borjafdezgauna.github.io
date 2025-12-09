@@ -400,6 +400,7 @@ DictionaryReaderWriter.cs (66) : valores[i] = valueToKey(leido);
 DictionaryReaderWriter.cs (67) : }
 DictionaryReaderWriter.cs (68) : i++;
 DictionaryReaderWriter.cs (69) : }
+TimeoutHandler.cs (39) : Task timeoutTask = Task.Delay(timeoutSecs * 100000000);
 HashTableDictionary.cs (5) : using System.Net.Sockets;
 HashTableDictionary.cs (9) : {   int DefaultNumEntries = 10000;
 HashTableDictionary.cs (14) : List<HashTableDictionaryItem<TKey, TValue>>[] Entries;
@@ -415,49 +416,63 @@ HashTableDictionary.cs (66) : }
 HashTableDictionary.cs (67) : return count;
 HashTableDictionary.cs (72) : //TODO #5:  Calculate in which entry should this key be stored and return it (use key.GetHashCode() to calculate the hash function of the key)
 HashTableDictionary.cs (74) : int hash = key.GetHashCode();
-HashTableDictionary.cs (75) : if (hash > Entries.Length - 1)
+HashTableDictionary.cs (75) : if (hash < 0)
 HashTableDictionary.cs (76) : {
-HashTableDictionary.cs (77) : hash = hash % Entries.Length;
+HashTableDictionary.cs (77) : hash = 0 - hash;
 HashTableDictionary.cs (78) : }
-HashTableDictionary.cs (79) : return hash;
-HashTableDictionary.cs (84) : //TODO #5:  Using PositionOf, calculate where this key should be in the array of entries and, then,
-HashTableDictionary.cs (86) : int donde = PositionOf(key);
-HashTableDictionary.cs (87) : if (Entries[donde] != null)
-HashTableDictionary.cs (88) : {
-HashTableDictionary.cs (89) : for (int i = 0; i < Entries[donde].Count(); i++)
-HashTableDictionary.cs (91) : if (Entries[donde].Get(i).Equals(key))
+HashTableDictionary.cs (79) : if (hash > Entries.Length - 1)
+HashTableDictionary.cs (80) : {
+HashTableDictionary.cs (81) : hash = hash % Entries.Length;
+HashTableDictionary.cs (82) : }
+HashTableDictionary.cs (83) : return hash;
+HashTableDictionary.cs (88) : //TODO #5:  Using PositionOf, calculate where this key should be in the array of entries and, then,
+HashTableDictionary.cs (90) : int donde = PositionOf(key);
+HashTableDictionary.cs (91) : if (Entries[donde] != null)
 HashTableDictionary.cs (92) : {
-HashTableDictionary.cs (93) : return Entries[donde].Get(i).Value;
-HashTableDictionary.cs (94) : }
-HashTableDictionary.cs (95) : }
-HashTableDictionary.cs (98) : return default;
-HashTableDictionary.cs (106) : int donde = PositionOf(key);
-HashTableDictionary.cs (107) : HashTableDictionaryItem<TKey, TValue> Addme = new HashTableDictionaryItem<TKey, TValue>(key, value);
-HashTableDictionary.cs (108) : if (Entries[donde] == null)
-HashTableDictionary.cs (109) : {
-HashTableDictionary.cs (110) : Entries[donde] = new List<HashTableDictionaryItem<TKey, TValue>>();
-HashTableDictionary.cs (111) : NumElements++;
-HashTableDictionary.cs (112) : }
-HashTableDictionary.cs (113) : Entries[donde].Add(Addme);
-HashTableDictionary.cs (120) : //         - If the item is found, remove it from the list
-HashTableDictionary.cs (121) : int donde = PositionOf(key);
-HashTableDictionary.cs (122) : if (Entries[donde] != null)
-HashTableDictionary.cs (123) : {
-HashTableDictionary.cs (124) : Entries[donde] = null;
-HashTableDictionary.cs (125) : NumElements--;
-HashTableDictionary.cs (126) : }
-HashTableDictionary.cs (134) : TKey[] llaves = [];
-HashTableDictionary.cs (135) : for (int i = 0; i < NumElements; i++)
-HashTableDictionary.cs (136) : {
-HashTableDictionary.cs (137) : llaves[i] = Entries[i].Get(i).Key;
-HashTableDictionary.cs (138) : }
-HashTableDictionary.cs (139) : return llaves;
-HashTableDictionary.cs (147) : TValue[] valores = [];
-HashTableDictionary.cs (148) : for (int i = 0; i < NumElements; i++)
-HashTableDictionary.cs (149) : {
-HashTableDictionary.cs (150) : valores[i] = Entries[i].Get(i).Value;
-HashTableDictionary.cs (151) : }
-HashTableDictionary.cs (152) : return valores;
+HashTableDictionary.cs (93) : int longitudLista = Entries[donde].Count();
+HashTableDictionary.cs (94) : for (int i = 0; i <= longitudLista; i++)
+HashTableDictionary.cs (96) : HashTableDictionaryItem<TKey, TValue> test = Entries[donde].Get(i);
+HashTableDictionary.cs (97) : if (test.Key.Equals(key))
+HashTableDictionary.cs (98) : {
+HashTableDictionary.cs (99) : return Entries[donde].Get(i).Value;
+HashTableDictionary.cs (100) : }
+HashTableDictionary.cs (102) : }
+HashTableDictionary.cs (105) : return default;
+HashTableDictionary.cs (113) : int donde = PositionOf(key);
+HashTableDictionary.cs (114) : HashTableDictionaryItem<TKey, TValue> Addme = new HashTableDictionaryItem<TKey, TValue>(key, value);
+HashTableDictionary.cs (115) : if (Entries[donde] == null)
+HashTableDictionary.cs (116) : {
+HashTableDictionary.cs (117) : Entries[donde] = new List<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (118) : NumElements++;
+HashTableDictionary.cs (119) : }
+HashTableDictionary.cs (120) : if (Entries[donde] != null)
+HashTableDictionary.cs (121) : {
+HashTableDictionary.cs (122) : Entries[donde].Clear();
+HashTableDictionary.cs (123) : }
+HashTableDictionary.cs (124) : Entries[donde].Add(Addme);
+HashTableDictionary.cs (131) : //         - If the item is found, remove it from the list
+HashTableDictionary.cs (132) : int donde = PositionOf(key);
+HashTableDictionary.cs (133) : if (Entries[donde] != null)
+HashTableDictionary.cs (134) : {
+HashTableDictionary.cs (135) : Entries[donde] = null;
+HashTableDictionary.cs (136) : NumElements--;
+HashTableDictionary.cs (137) : }
+HashTableDictionary.cs (145) : int NumElements = Entries.Count();
+HashTableDictionary.cs (146) : TKey[] llaves = [default];
+HashTableDictionary.cs (147) : for (int i = 0; i < NumElements; i++)
+HashTableDictionary.cs (148) : {
+HashTableDictionary.cs (149) : if (Entries[i].Get(0) != null)
+HashTableDictionary.cs (150) : {
+HashTableDictionary.cs (151) : llaves[i] = Entries[i].Get(0).Key;
+HashTableDictionary.cs (152) : }
+HashTableDictionary.cs (153) : }
+HashTableDictionary.cs (154) : return llaves;
+HashTableDictionary.cs (162) : TValue[] valores = [];
+HashTableDictionary.cs (163) : for (int i = 0; i < NumElements; i++)
+HashTableDictionary.cs (164) : {
+HashTableDictionary.cs (165) : valores[i] = Entries[i].Get(i).Value;
+HashTableDictionary.cs (166) : }
+HashTableDictionary.cs (167) : return valores;
 IList.cs (1) : using System;
 IList.cs (2) : using System.Collections;
 IList.cs (4) : using System.Linq;
