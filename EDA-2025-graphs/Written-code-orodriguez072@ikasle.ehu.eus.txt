@@ -127,42 +127,59 @@ DistanceCalculator.cs (60) : }
 DistanceCalculator.cs (61) : }
 DistanceCalculator.cs (62) : return nextCity;
 DistanceCalculator.cs (73) : IDictionary<string, double> neighbours = graph.Get(currentCity);
-DistanceCalculator.cs (74) : foreach (var n in neighbours.Keys())
-DistanceCalculator.cs (75) : {
-DistanceCalculator.cs (76) : if (visited.Get(n) == false)
-DistanceCalculator.cs (77) : {
-DistanceCalculator.cs (78) : double newDistance = distanceToCity.Get(currentCity) + neighbours.Get(n);
-DistanceCalculator.cs (79) : double oldDistance = distanceToCity.Get(n);
-DistanceCalculator.cs (81) : if (oldDistance > newDistance || oldDistance == 0 )
-DistanceCalculator.cs (82) : {
-DistanceCalculator.cs (83) : nextCityCandidates.Add(n, newDistance);
+DistanceCalculator.cs (74) : double currentDistance = distanceToCity.Get(currentCity);
+DistanceCalculator.cs (75) : foreach (var n in neighbours.Keys())
+DistanceCalculator.cs (76) : {
+DistanceCalculator.cs (77) : if (!visited.Get(n))
+DistanceCalculator.cs (78) : {
+DistanceCalculator.cs (79) : double newDistance = currentDistance + neighbours.Get(n);
+DistanceCalculator.cs (80) : double oldDistance = distanceToCity.Get(n);
+DistanceCalculator.cs (82) : if (newDistance < oldDistance)
+DistanceCalculator.cs (83) : {
 DistanceCalculator.cs (84) : distanceToCity.Add(n, newDistance);
-DistanceCalculator.cs (85) : }
+DistanceCalculator.cs (85) : nextCityCandidates.Add(n, newDistance);
 DistanceCalculator.cs (86) : }
 DistanceCalculator.cs (87) : }
-DistanceCalculator.cs (100) : //Diccionario de ciudad que calcula la distancia a cada ciudad
-DistanceCalculator.cs (101) : IDictionary<string, double> distanceToCity = new HashTableDictionary<string, double>();
-DistanceCalculator.cs (102) : //Diccionario de ciudades visitadas
-DistanceCalculator.cs (103) : IDictionary<string, bool> visited = new HashTableDictionary<string, bool>();
-DistanceCalculator.cs (104) : //Diccionario de candidatos a la siguiente ciudad
-DistanceCalculator.cs (105) : IDictionary<string, double> nextCityCandidates = new HashTableDictionary<string, double>();
-DistanceCalculator.cs (106) : //Ciudad actual
-DistanceCalculator.cs (107) : string currentCity = fromCity;
-DistanceCalculator.cs (108) : //La ciudad origen empieza con distancia 0 ni candidatos ni visitada
-DistanceCalculator.cs (109) : distanceToCity.Add(fromCity, 0);
-DistanceCalculator.cs (110) : nextCityCandidates.Add(fromCity, 0);
-DistanceCalculator.cs (111) : visited.Add(fromCity, false);
-DistanceCalculator.cs (113) : while (currentCity != null)
-DistanceCalculator.cs (114) : {
-DistanceCalculator.cs (115) : //Marcamos la ciudad actual como visitada
-DistanceCalculator.cs (116) : visited.Add(currentCity, true);
-DistanceCalculator.cs (117) : //Comprobamos los vecinos de la ciudad actual
-DistanceCalculator.cs (118) : CheckNeighbours(distanceToCity, visited, nextCityCandidates, currentCity);
-DistanceCalculator.cs (119) : nextCityCandidates.Remove(currentCity);
-DistanceCalculator.cs (120) : //Elegimos la siguiente ciudad
-DistanceCalculator.cs (121) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
-DistanceCalculator.cs (122) : }
-DistanceCalculator.cs (123) : return distanceToCity;
+DistanceCalculator.cs (88) : }
+DistanceCalculator.cs (101) : //Diccionario de ciudad que calcula la distancia a cada ciudad
+DistanceCalculator.cs (102) : IDictionary<string, double> distanceToCity = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (103) : //Diccionario de ciudades visitadas
+DistanceCalculator.cs (104) : IDictionary<string, bool> visited = new HashTableDictionary<string, bool>();
+DistanceCalculator.cs (105) : //Diccionario de candidatos a la siguiente ciudad
+DistanceCalculator.cs (106) : IDictionary<string, double> nextCityCandidates = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (108) : //Recorremos todas las ciudades del grafo para inicializar los diccionarios
+DistanceCalculator.cs (109) : foreach (var city in graph.Keys())
+DistanceCalculator.cs (110) : {
+DistanceCalculator.cs (111) : //verificamos si es la ciudad de origen
+DistanceCalculator.cs (112) : if (city == fromCity)
+DistanceCalculator.cs (113) : {
+DistanceCalculator.cs (114) : //distancia a si misma es 0
+DistanceCalculator.cs (115) : distanceToCity.Add(city, 0);
+DistanceCalculator.cs (116) : //agregamos la cicudad de origen como nuestro primer candidato a la siguiente ciudad
+DistanceCalculator.cs (117) : nextCityCandidates.Add(city, 0);
+DistanceCalculator.cs (118) : }
+DistanceCalculator.cs (119) : else
+DistanceCalculator.cs (120) : {
+DistanceCalculator.cs (121) : //distancia inicial a las demas ciudades es infinito, porque aún no sabemos la distancia real
+DistanceCalculator.cs (122) : distanceToCity.Add(city, double.MaxValue);
+DistanceCalculator.cs (123) : }
+DistanceCalculator.cs (124) : //inicialmente ninguna ciudad ha sido visitada
+DistanceCalculator.cs (125) : visited.Add(city, false);
+DistanceCalculator.cs (126) : }
+DistanceCalculator.cs (127) : //empezamos desde la ciudad de origen
+DistanceCalculator.cs (128) : string currentCity = fromCity;
+DistanceCalculator.cs (130) : while (currentCity != null)
+DistanceCalculator.cs (131) : {
+DistanceCalculator.cs (132) : //Marcar la ciudad actual como visitada
+DistanceCalculator.cs (133) : visited.Add(currentCity, true);
+DistanceCalculator.cs (134) : //Eliminar la ciudad actual de los candidatos a la siguiente ciudad
+DistanceCalculator.cs (135) : nextCityCandidates.Remove(currentCity);
+DistanceCalculator.cs (136) : //Actualizar los candidatos a la siguiente ciudad
+DistanceCalculator.cs (137) : CheckNeighbours(distanceToCity, visited, nextCityCandidates, currentCity);
+DistanceCalculator.cs (138) : //Seleccionar la siguiente ciudad
+DistanceCalculator.cs (139) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
+DistanceCalculator.cs (140) : }
+DistanceCalculator.cs (142) : return distanceToCity;
 GraphReaderWriter.cs (11) : for (int i = 0; i < str.Length; i++)
 GraphReaderWriter.cs (12) : {
 GraphReaderWriter.cs (13) : if (str[i] == '\n')

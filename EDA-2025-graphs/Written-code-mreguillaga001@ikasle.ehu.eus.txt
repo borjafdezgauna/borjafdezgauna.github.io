@@ -1,3 +1,82 @@
+BinaryGraphReaderWriter.cs (28) : TKey[] keys = graph.Elements();
+BinaryGraphReaderWriter.cs (29) : writer.Write(keys.Length);
+BinaryGraphReaderWriter.cs (32) : for(int i = 0; i < keys.Length; i++)
+BinaryGraphReaderWriter.cs (33) : {
+BinaryGraphReaderWriter.cs (34) : byte[] keyBytes = keyToByteArray(keys[i]);
+BinaryGraphReaderWriter.cs (35) : writer.Write(keyBytes.Length);
+BinaryGraphReaderWriter.cs (36) : writer.Write(keyBytes);
+BinaryGraphReaderWriter.cs (37) : }
+BinaryGraphReaderWriter.cs (40) : bool isDirected = graph is DirectedGraph<TKey, TWeight>;
+BinaryGraphReaderWriter.cs (43) : int numEdges = 0;
+BinaryGraphReaderWriter.cs (45) : if(isDirected == true)
+BinaryGraphReaderWriter.cs (46) : {
+BinaryGraphReaderWriter.cs (47) : numEdges = graph.EdgeCount();
+BinaryGraphReaderWriter.cs (48) : }
+BinaryGraphReaderWriter.cs (49) : else
+BinaryGraphReaderWriter.cs (50) : {
+BinaryGraphReaderWriter.cs (51) : for(int i = 0; i < keys.Length; i++)
+BinaryGraphReaderWriter.cs (52) : {
+BinaryGraphReaderWriter.cs (53) : Vertex<TKey, TWeight> vertex2 = graph.GetVertex(keys[i]);
+BinaryGraphReaderWriter.cs (54) : TKey[] connected1 = vertex2.ConnectedElements();
+BinaryGraphReaderWriter.cs (56) : for(int j = 0; j < connected1.Length; j++)
+BinaryGraphReaderWriter.cs (57) : {
+BinaryGraphReaderWriter.cs (58) : if(keys[i].CompareTo(connected1[j]) < 0)
+BinaryGraphReaderWriter.cs (59) : {
+BinaryGraphReaderWriter.cs (60) : numEdges++;
+BinaryGraphReaderWriter.cs (61) : }
+BinaryGraphReaderWriter.cs (62) : }
+BinaryGraphReaderWriter.cs (63) : }
+BinaryGraphReaderWriter.cs (64) : }
+BinaryGraphReaderWriter.cs (68) : writer.Write(numEdges);
+BinaryGraphReaderWriter.cs (70) : for(int i = 0; i < keys.Length; i++)
+BinaryGraphReaderWriter.cs (71) : {
+BinaryGraphReaderWriter.cs (72) : Vertex<TKey, TWeight> vertex3 = graph.GetVertex(keys[i]);
+BinaryGraphReaderWriter.cs (73) : TKey[] connected2 = vertex3.ConnectedElements();
+BinaryGraphReaderWriter.cs (75) : for(int j = 0; j < connected2.Length; j++)
+BinaryGraphReaderWriter.cs (76) : {
+BinaryGraphReaderWriter.cs (77) : bool writeEdge = true;
+BinaryGraphReaderWriter.cs (79) : if(isDirected == false)
+BinaryGraphReaderWriter.cs (80) : {
+BinaryGraphReaderWriter.cs (81) : writeEdge = keys[i].CompareTo(connected2[j]) < 0;
+BinaryGraphReaderWriter.cs (82) : }
+BinaryGraphReaderWriter.cs (84) : if(writeEdge == true)
+BinaryGraphReaderWriter.cs (85) : {
+BinaryGraphReaderWriter.cs (86) : TKey source = keys[i];
+BinaryGraphReaderWriter.cs (87) : TKey dest = connected2[j];
+BinaryGraphReaderWriter.cs (88) : TWeight weight = vertex3.GetEdgeWeight(dest);
+BinaryGraphReaderWriter.cs (91) : byte[] sourceBytes = keyToByteArray(source);
+BinaryGraphReaderWriter.cs (92) : writer.Write(sourceBytes.Length);
+BinaryGraphReaderWriter.cs (93) : writer.Write(sourceBytes);
+BinaryGraphReaderWriter.cs (95) : byte[] weightBytes = weightToByteArray(weight);
+BinaryGraphReaderWriter.cs (96) : writer.Write(weightBytes.Length);
+BinaryGraphReaderWriter.cs (97) : writer.Write(weightBytes);
+BinaryGraphReaderWriter.cs (99) : byte[] destBytes = keyToByteArray(dest);
+BinaryGraphReaderWriter.cs (100) : writer.Write(destBytes.Length);
+BinaryGraphReaderWriter.cs (101) : writer.Write(destBytes);
+BinaryGraphReaderWriter.cs (102) : }
+BinaryGraphReaderWriter.cs (103) : }
+BinaryGraphReaderWriter.cs (104) : }
+BinaryGraphReaderWriter.cs (134) : int numVertex = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (136) : TKey[] keys = new TKey[numVertex];
+BinaryGraphReaderWriter.cs (138) : for(int i = 0; i < numVertex; i++)
+BinaryGraphReaderWriter.cs (139) : {
+BinaryGraphReaderWriter.cs (140) : int keyLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (141) : byte[] keyBytes = reader.ReadBytes(keyLength);
+BinaryGraphReaderWriter.cs (142) : keys[i] = keyFromByteArray(keyBytes);
+BinaryGraphReaderWriter.cs (144) : graph.AddVertex(keys[i]);
+BinaryGraphReaderWriter.cs (145) : }
+BinaryGraphReaderWriter.cs (147) : int numEdges = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (149) : bool directedOrundirected = graph is DirectedGraph<TKey, TWeight>;
+BinaryGraphReaderWriter.cs (151) : for(int i = 0; i < numEdges; i++)
+BinaryGraphReaderWriter.cs (152) : {
+BinaryGraphReaderWriter.cs (153) : int sourceLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (154) : TKey source = keyFromByteArray(reader.ReadBytes(sourceLength));
+BinaryGraphReaderWriter.cs (156) : int weigthLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (157) : TWeight weight = weightFromByteArray(reader.ReadBytes(weigthLength));
+BinaryGraphReaderWriter.cs (159) : int destinationLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (160) : TKey destination = keyFromByteArray(reader.ReadBytes(destinationLength));
+BinaryGraphReaderWriter.cs (162) : graph.AddEdge(source, destination, weight);
+BinaryGraphReaderWriter.cs (163) : }
 DirectedGraph.cs (9) : Vertex<TElement, TWeight> sourceVertex = GetVertex(sourceKey);
 DirectedGraph.cs (10) : sourceVertex.AddEdge(destinationKey, weight);
 DirectedGraph.cs (17) : Vertex<TElement, TWeight> eliminatedVertex = GetVertex(element);
@@ -13,6 +92,38 @@ DirectedGraph.cs (30) : }
 DirectedGraph.cs (32) : Vertices.Remove(element);
 DirectedGraph.cs (38) : Vertex<TElement, TWeight> sourceVertex = GetVertex(sourceKey);
 DirectedGraph.cs (40) : sourceVertex.RemoveEdge(destKey);
+DistanceCalculator.cs (2) : using System.ComponentModel;
+DistanceCalculator.cs (3) : using System.ComponentModel.DataAnnotations;
+DistanceCalculator.cs (4) : using System.Data;
+DistanceCalculator.cs (5) : using System.Globalization;
+DistanceCalculator.cs (6) : using System.Security.Cryptography;
+DistanceCalculator.cs (14) : UndirectedGraph<String, double> graph;
+DistanceCalculator.cs (20) : if(isUndirected)
+DistanceCalculator.cs (21) : {
+DistanceCalculator.cs (22) : graph = new UndirectedGraph<string, double>();
+DistanceCalculator.cs (23) : }
+DistanceCalculator.cs (24) : else
+DistanceCalculator.cs (25) : {
+DistanceCalculator.cs (26) : graph = new DirectedGraph<string, double>();
+DistanceCalculator.cs (27) : }
+DistanceCalculator.cs (34) : graph.AddVertex(city);
+DistanceCalculator.cs (41) : graph.AddEdge(fromCity, toCity, distance);
+DistanceCalculator.cs (50) : double min = double.MaxValue;
+DistanceCalculator.cs (51) : string nextCity  = "";
+DistanceCalculator.cs (53) : for(int i = 0; i < nextCityCandidates.Count(); i++)
+DistanceCalculator.cs (54) : {
+DistanceCalculator.cs (55) : string city = nextCityCandidates.Keys()[i];
+DistanceCalculator.cs (56) : double distance = nextCityCandidates.Values()[i];
+DistanceCalculator.cs (58) : if(!visited.Get(city))
+DistanceCalculator.cs (59) : {
+DistanceCalculator.cs (60) : if(distance < min)
+DistanceCalculator.cs (61) : {
+DistanceCalculator.cs (62) : min = distance;
+DistanceCalculator.cs (63) : nextCity  = city;
+DistanceCalculator.cs (64) : }
+DistanceCalculator.cs (65) : }
+DistanceCalculator.cs (66) : }
+DistanceCalculator.cs (68) : return nextCity;
 GraphReaderWriter.cs (2) : using System.Globalization;
 GraphReaderWriter.cs (4) : using System.Runtime.CompilerServices;
 GraphReaderWriter.cs (14) : return str.Replace("\n", "[NEW_LINE]");

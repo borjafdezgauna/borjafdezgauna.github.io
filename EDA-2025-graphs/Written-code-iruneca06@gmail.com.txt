@@ -1,8 +1,96 @@
+BinaryGraphReaderWriter.cs (24) : try
+BinaryGraphReaderWriter.cs (25) : {
+BinaryGraphReaderWriter.cs (26) : BinaryWriter writer = new BinaryWriter(File.Open(filename, FileMode.Create));
+BinaryGraphReaderWriter.cs (28) : var elements = graph.Elements();
+BinaryGraphReaderWriter.cs (29) : int vLen = graph.VertexCount();
+BinaryGraphReaderWriter.cs (31) : var bytes = BitConverter.GetBytes(vLen);
+BinaryGraphReaderWriter.cs (32) : writer.Write(bytes);
+BinaryGraphReaderWriter.cs (34) : for (int i = 0; i < vLen; i++)
+BinaryGraphReaderWriter.cs (35) : {
+BinaryGraphReaderWriter.cs (36) : int s = keyToByteArray(elements[i]).Length;
+BinaryGraphReaderWriter.cs (37) : writer.Write(BitConverter.GetBytes(s));
+BinaryGraphReaderWriter.cs (39) : writer.Write(keyToByteArray(elements[i]));
+BinaryGraphReaderWriter.cs (40) : }
+BinaryGraphReaderWriter.cs (42) : var bytes2 = BitConverter.GetBytes(graph.EdgeCount());
+BinaryGraphReaderWriter.cs (43) : writer.Write(bytes2);
+BinaryGraphReaderWriter.cs (45) : for (int i = 0; i < vLen; i++)
+BinaryGraphReaderWriter.cs (46) : {
+BinaryGraphReaderWriter.cs (47) : var vertex = graph.GetVertex(elements[i]);
+BinaryGraphReaderWriter.cs (48) : var edgesOut = graph.GetVertex(elements[i]).edgesOut;
+BinaryGraphReaderWriter.cs (49) : var destinations = edgesOut.Keys();
+BinaryGraphReaderWriter.cs (50) : var weights = edgesOut.Values();
+BinaryGraphReaderWriter.cs (51) : int len = edgesOut.Count();
+BinaryGraphReaderWriter.cs (52) : for (int j = 0; j < len; j++)
+BinaryGraphReaderWriter.cs (53) : {
+BinaryGraphReaderWriter.cs (54) : int a = keyToByteArray(vertex.Element).Length;
+BinaryGraphReaderWriter.cs (55) : writer.Write(BitConverter.GetBytes(a));
+BinaryGraphReaderWriter.cs (56) : writer.Write(keyToByteArray(vertex.Element));
+BinaryGraphReaderWriter.cs (58) : int b = weightToByteArray(weights[j]).Length;
+BinaryGraphReaderWriter.cs (59) : writer.Write(BitConverter.GetBytes(b));
+BinaryGraphReaderWriter.cs (60) : writer.Write(weightToByteArray(weights[j]));
+BinaryGraphReaderWriter.cs (62) : int c = keyToByteArray(destinations[j]).Length;
+BinaryGraphReaderWriter.cs (63) : writer.Write(BitConverter.GetBytes(c));
+BinaryGraphReaderWriter.cs (64) : writer.Write(keyToByteArray(destinations[j]));
+BinaryGraphReaderWriter.cs (65) : }
+BinaryGraphReaderWriter.cs (66) : }
+BinaryGraphReaderWriter.cs (71) : catch (Exception)
+BinaryGraphReaderWriter.cs (89) : try
+BinaryGraphReaderWriter.cs (90) : {
+BinaryGraphReaderWriter.cs (91) : BinaryReader reader = new BinaryReader(File.Open(filename, FileMode.Open));
+BinaryGraphReaderWriter.cs (93) : int len = BitConverter.ToInt32(reader.ReadBytes(4));
+BinaryGraphReaderWriter.cs (94) : for (int i = 0; i < len; i++)
+BinaryGraphReaderWriter.cs (95) : {
+BinaryGraphReaderWriter.cs (96) : var L = BitConverter.ToInt32(reader.ReadBytes(4));
+BinaryGraphReaderWriter.cs (97) : var line = reader.ReadBytes(L);
+BinaryGraphReaderWriter.cs (98) : graph.AddVertex(keyFromByteArray(line));
+BinaryGraphReaderWriter.cs (99) : }
+BinaryGraphReaderWriter.cs (102) : int len2 = BitConverter.ToInt32(reader.ReadBytes(4));
+BinaryGraphReaderWriter.cs (103) : for (int i = 0; i < len2; i++)
+BinaryGraphReaderWriter.cs (104) : {
+BinaryGraphReaderWriter.cs (105) : var oneL = BitConverter.ToInt32(reader.ReadBytes(4));
+BinaryGraphReaderWriter.cs (106) : var one = keyFromByteArray(reader.ReadBytes(oneL));
+BinaryGraphReaderWriter.cs (108) : var twoL = BitConverter.ToInt32(reader.ReadBytes(4));
+BinaryGraphReaderWriter.cs (109) : var two = weightFromByteArray(reader.ReadBytes(twoL));
+BinaryGraphReaderWriter.cs (111) : var threeL = BitConverter.ToInt32(reader.ReadBytes(4));
+BinaryGraphReaderWriter.cs (112) : var three = keyFromByteArray(reader.ReadBytes(threeL));
+BinaryGraphReaderWriter.cs (114) : graph.AddEdge(one,three,two);
+BinaryGraphReaderWriter.cs (116) : }
+BinaryGraphReaderWriter.cs (118) : reader.Close();
+BinaryGraphReaderWriter.cs (121) : catch (Exception)
 DirectedGraph.cs (2) : using System.Runtime.Intrinsics.Arm;
 DirectedGraph.cs (3) : using System.Runtime.Intrinsics.X86;
 DirectedGraph.cs (4) : using System.Text;
 DirectedGraph.cs (5) : using System.Threading.Tasks.Dataflow;
 DirectedGraph.cs (36) : }
+DistanceCalculator.cs (2) : using System.Globalization;
+DistanceCalculator.cs (3) : using System.Security.Cryptography;
+DistanceCalculator.cs (10) : public UndirectedGraph<string, double> graph;
+DistanceCalculator.cs (15) : if (isUndirected)
+DistanceCalculator.cs (16) : {
+DistanceCalculator.cs (17) : graph = new UndirectedGraph<string, double>();
+DistanceCalculator.cs (18) : return;
+DistanceCalculator.cs (19) : }
+DistanceCalculator.cs (20) : graph = new DirectedGraph<string, double>();
+DistanceCalculator.cs (26) : graph.AddVertex(city);
+DistanceCalculator.cs (32) : if(graph.GetVertex(fromCity) != null && graph.GetVertex(toCity) != null)
+DistanceCalculator.cs (33) : graph.AddEdge(fromCity, toCity, distance);
+DistanceCalculator.cs (41) : double minDistance = double.MaxValue;
+DistanceCalculator.cs (42) : int bestPos = 0;
+DistanceCalculator.cs (43) : int len = nextCityCandidates.Count();
+DistanceCalculator.cs (44) : var keys = nextCityCandidates.Keys();
+DistanceCalculator.cs (45) : for (int i = 0; i<len; i++)
+DistanceCalculator.cs (46) : {
+DistanceCalculator.cs (47) : if (!visited.Get(keys[i]))
+DistanceCalculator.cs (48) : {
+DistanceCalculator.cs (49) : var a = nextCityCandidates.Get(keys[i]);
+DistanceCalculator.cs (50) : if (a < minDistance)
+DistanceCalculator.cs (51) : {
+DistanceCalculator.cs (52) : bestPos = i;
+DistanceCalculator.cs (53) : minDistance = a;
+DistanceCalculator.cs (54) : }
+DistanceCalculator.cs (55) : }
+DistanceCalculator.cs (56) : }
+DistanceCalculator.cs (57) : return keys[bestPos];
 GraphReaderWriter.cs (74) : while (reader.Peek() != -1)
 GraphReaderWriter.cs (75) : {
 GraphReaderWriter.cs (80) : }
