@@ -1,3 +1,24 @@
+BinaryGraphReaderWriter.cs (2) : using System.Formats.Asn1;
+BinaryGraphReaderWriter.cs (29) : writer.Write(graph.VertexCount());
+BinaryGraphReaderWriter.cs (31) : foreach(TKey v in graph.Elements())
+BinaryGraphReaderWriter.cs (32) : {
+BinaryGraphReaderWriter.cs (33) : byte[] data = keyToByteArray(v);
+BinaryGraphReaderWriter.cs (34) : writer.Write(data.Length);
+BinaryGraphReaderWriter.cs (35) : writer.Write(data);
+BinaryGraphReaderWriter.cs (36) : }
+BinaryGraphReaderWriter.cs (37) : writer.Write(graph.EdgeCount());
+BinaryGraphReaderWriter.cs (39) : foreach(TKey source in graph.Elements())
+BinaryGraphReaderWriter.cs (40) : {
+BinaryGraphReaderWriter.cs (41) : foreach(TKey destination in graph.Elements())
+BinaryGraphReaderWriter.cs (42) : {
+BinaryGraphReaderWriter.cs (43) : TWeight w = graph.GetEdgeWeight(source,destination);
+BinaryGraphReaderWriter.cs (45) : writer.Write(source.ToString());
+BinaryGraphReaderWriter.cs (46) : byte[] wArray = weightToByteArray(w);
+BinaryGraphReaderWriter.cs (48) : writer.Write(wArray.Length);
+BinaryGraphReaderWriter.cs (49) : writer.Write(wArray);
+BinaryGraphReaderWriter.cs (51) : writer.Write(destination.ToString());
+BinaryGraphReaderWriter.cs (52) : }
+BinaryGraphReaderWriter.cs (53) : }
 DirectedGraph.cs (3) : public class DirectedGraph<TElement, TWeight> : UndirectedGraph<TElement, TWeight>
 DirectedGraph.cs (4) : where TElement : IComparable<TElement>
 DirectedGraph.cs (9) : Vertices.Get(sourceKey).AddEdge(destinationKey, weight);
@@ -16,16 +37,64 @@ DistanceCalculator.cs (16) : else
 DistanceCalculator.cs (17) : {
 DistanceCalculator.cs (18) : graph = new DirectedGraph<string, double>();
 DistanceCalculator.cs (19) : }
-DistanceCalculator.cs (32) : private string ChooseNextUnvisitedCity(
-DistanceCalculator.cs (33) : IDictionary<string, bool> visited,
-DistanceCalculator.cs (34) : IDictionary<string, double> nextCityCandidates
-DistanceCalculator.cs (35) : )
-DistanceCalculator.cs (43) : private void CheckNeighbours(
-DistanceCalculator.cs (44) : IDictionary<string, double> distanceToCity,
-DistanceCalculator.cs (45) : IDictionary<string, bool> visited,
-DistanceCalculator.cs (46) : IDictionary<string, double> nextCityCandidates,
-DistanceCalculator.cs (47) : string currentCity
-DistanceCalculator.cs (48) : )
+DistanceCalculator.cs (26) : graph.AddVertex(city);
+DistanceCalculator.cs (33) : graph.AddEdge(fromCity, toCity, distance);
+DistanceCalculator.cs (37) : private string ChooseNextUnvisitedCity(IDictionary<string, bool> visited, IDictionary<string, double> nextCityCandidates
+DistanceCalculator.cs (38) : )
+DistanceCalculator.cs (43) : string selectedCity = null;
+DistanceCalculator.cs (45) : double minDistance = double.MaxValue;
+DistanceCalculator.cs (47) : foreach(var city in nextCityCandidates.Keys())
+DistanceCalculator.cs (48) : {
+DistanceCalculator.cs (49) : if(!visited.Get(city))
+DistanceCalculator.cs (50) : {
+DistanceCalculator.cs (51) : double candidateDistance = nextCityCandidates.Get(city);
+DistanceCalculator.cs (52) : if(candidateDistance < minDistance)
+DistanceCalculator.cs (53) : {
+DistanceCalculator.cs (54) : minDistance = candidateDistance;
+DistanceCalculator.cs (56) : selectedCity = city;
+DistanceCalculator.cs (57) : }
+DistanceCalculator.cs (58) : }
+DistanceCalculator.cs (59) : }
+DistanceCalculator.cs (61) : return selectedCity;
+DistanceCalculator.cs (64) : private void CheckNeighbours(IDictionary<string, double> distanceToCity,IDictionary<string, bool> visited, IDictionary<string, double> nextCityCandidates, string currentCity
+DistanceCalculator.cs (65) : )
+DistanceCalculator.cs (70) : Vertex<string,double> currentNode = graph.GetVertex(currentCity);
+DistanceCalculator.cs (72) : foreach( var neighbour in currentNode.ConnectedElements())
+DistanceCalculator.cs (73) : {
+DistanceCalculator.cs (74) : if(!visited.Get(neighbour))
+DistanceCalculator.cs (75) : {
+DistanceCalculator.cs (76) : double newDistance = distanceToCity.Get(currentCity) + currentNode.GetEdgeWeight(neighbour);
+DistanceCalculator.cs (78) : if(distanceToCity.Get(neighbour) == 0 || newDistance < distanceToCity.Get(neighbour))
+DistanceCalculator.cs (79) : {
+DistanceCalculator.cs (80) : distanceToCity.Add(neighbour, newDistance);
+DistanceCalculator.cs (81) : nextCityCandidates.Add(neighbour, newDistance);
+DistanceCalculator.cs (82) : }
+DistanceCalculator.cs (83) : }
+DistanceCalculator.cs (84) : }
+DistanceCalculator.cs (96) : IDictionary<string, double> resultado = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (98) : IDictionary<string, double> distanceToCity = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (99) : IDictionary <string , bool>visited = new HashTableDictionary<string, bool>();
+DistanceCalculator.cs (100) : IDictionary <string, double>nextCityCandidates= new HashTableDictionary<string, double>();
+DistanceCalculator.cs (102) : foreach(var node in graph.Elements())
+DistanceCalculator.cs (103) : {
+DistanceCalculator.cs (104) : distanceToCity.Add(node, double.MaxValue);
+DistanceCalculator.cs (105) : visited.Add(node, false);
+DistanceCalculator.cs (106) : }
+DistanceCalculator.cs (108) : // distanceToCity.Remove(fromCity);// en caso de funcionar regular
+DistanceCalculator.cs (109) : distanceToCity.Add(fromCity, 0);
+DistanceCalculator.cs (110) : nextCityCandidates.Add(fromCity, 0);
+DistanceCalculator.cs (112) : string currentCity = fromCity;
+DistanceCalculator.cs (114) : while(currentCity != null)
+DistanceCalculator.cs (115) : {
+DistanceCalculator.cs (116) : CheckNeighbours(distanceToCity, visited, nextCityCandidates, currentCity);
+DistanceCalculator.cs (118) : visited.Remove(currentCity);
+DistanceCalculator.cs (119) : visited.Add(currentCity, true);
+DistanceCalculator.cs (121) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
+DistanceCalculator.cs (124) : if (currentCity != null)
+DistanceCalculator.cs (125) : nextCityCandidates.Remove(currentCity);
+DistanceCalculator.cs (127) : }
+DistanceCalculator.cs (128) : resultado = distanceToCity;
+DistanceCalculator.cs (130) : return resultado;
 GenericList.cs (1) : using System.Collections;
 GenericList.cs (3) : public class GenericListNode<T>
 GenericList.cs (4) : {
