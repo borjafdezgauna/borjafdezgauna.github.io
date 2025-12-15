@@ -1,4 +1,5 @@
 BinaryGraphReaderWriter.cs (2) : using System.Formats.Asn1;
+BinaryGraphReaderWriter.cs (5) : using System.Reflection.PortableExecutable;
 BinaryGraphReaderWriter.cs (29) : writer.Write(graph.VertexCount());
 BinaryGraphReaderWriter.cs (31) : foreach(TKey v in graph.Elements())
 BinaryGraphReaderWriter.cs (32) : {
@@ -19,6 +20,27 @@ BinaryGraphReaderWriter.cs (49) : writer.Write(wArray);
 BinaryGraphReaderWriter.cs (51) : writer.Write(destination.ToString());
 BinaryGraphReaderWriter.cs (52) : }
 BinaryGraphReaderWriter.cs (53) : }
+BinaryGraphReaderWriter.cs (81) : int numeroVertices = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (83) : for(int i = 0; i < numeroVertices; i++)
+BinaryGraphReaderWriter.cs (84) : {
+BinaryGraphReaderWriter.cs (85) : int count= reader.ReadInt32();
+BinaryGraphReaderWriter.cs (86) : byte[] x = reader.ReadBytes(count);
+BinaryGraphReaderWriter.cs (88) : graph.AddVertex(keyFromByteArray(x));
+BinaryGraphReaderWriter.cs (89) : }
+BinaryGraphReaderWriter.cs (90) : int edgeCount = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (92) : for ( int i = 0; i < edgeCount ; i++)
+BinaryGraphReaderWriter.cs (93) : {
+BinaryGraphReaderWriter.cs (94) : int sourceKeyLenght = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (95) : byte[] sourceKeyBytes = reader.ReadBytes(sourceKeyLenght);
+BinaryGraphReaderWriter.cs (96) : TKey source = keyFromByteArray(sourceKeyBytes);
+BinaryGraphReaderWriter.cs (98) : int weightLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (99) : byte[] weightBytes = reader.ReadBytes(weightLength);
+BinaryGraphReaderWriter.cs (100) : TWeight weight = weightFromByteArray(weightBytes);
+BinaryGraphReaderWriter.cs (102) : int destKeyLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (103) : byte[] destKeyBytes = reader.ReadBytes(destKeyLength);
+BinaryGraphReaderWriter.cs (104) : TKey destination = keyFromByteArray(destKeyBytes);
+BinaryGraphReaderWriter.cs (106) : graph.AddEdge(source, destination, weight);
+BinaryGraphReaderWriter.cs (107) : }
 DirectedGraph.cs (3) : public class DirectedGraph<TElement, TWeight> : UndirectedGraph<TElement, TWeight>
 DirectedGraph.cs (4) : where TElement : IComparable<TElement>
 DirectedGraph.cs (9) : Vertices.Get(sourceKey).AddEdge(destinationKey, weight);
@@ -90,11 +112,12 @@ DistanceCalculator.cs (116) : CheckNeighbours(distanceToCity, visited, nextCityC
 DistanceCalculator.cs (118) : visited.Remove(currentCity);
 DistanceCalculator.cs (119) : visited.Add(currentCity, true);
 DistanceCalculator.cs (121) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
-DistanceCalculator.cs (124) : if (currentCity != null)
+DistanceCalculator.cs (123) : if (currentCity != null)
+DistanceCalculator.cs (124) : {
 DistanceCalculator.cs (125) : nextCityCandidates.Remove(currentCity);
-DistanceCalculator.cs (127) : }
-DistanceCalculator.cs (128) : resultado = distanceToCity;
-DistanceCalculator.cs (130) : return resultado;
+DistanceCalculator.cs (126) : }
+DistanceCalculator.cs (128) : }
+DistanceCalculator.cs (130) : return distanceToCity;
 GenericList.cs (1) : using System.Collections;
 GenericList.cs (3) : public class GenericListNode<T>
 GenericList.cs (4) : {
