@@ -1,218 +1,607 @@
-BinaryGraphReaderWriter.cs (29) : // --- número de vértices ---
-BinaryGraphReaderWriter.cs (30) : writer.Write(graph.Vertices.Count);
-BinaryGraphReaderWriter.cs (32) : // --- claves de los vértices ---
-BinaryGraphReaderWriter.cs (33) : foreach (var v in graph.Vertices)
-BinaryGraphReaderWriter.cs (34) : {
-BinaryGraphReaderWriter.cs (35) : byte[] data = keyToByteArray(v);
-BinaryGraphReaderWriter.cs (36) : writer.Write(data.Length);
-BinaryGraphReaderWriter.cs (37) : writer.Write(data);
-BinaryGraphReaderWriter.cs (38) : }
-BinaryGraphReaderWriter.cs (40) : // --- número de aristas ---
-BinaryGraphReaderWriter.cs (41) : writer.Write(graph.Edges.Count);
-BinaryGraphReaderWriter.cs (43) : // --- escribir aristas ---
-BinaryGraphReaderWriter.cs (44) : foreach (var edge in graph.Edges)
-BinaryGraphReaderWriter.cs (45) : {
-BinaryGraphReaderWriter.cs (46) : // edge = (source, dest, weight)
-BinaryGraphReaderWriter.cs (48) : byte[] srcBytes = keyToByteArray(edge.Item1);
-BinaryGraphReaderWriter.cs (49) : writer.Write(srcBytes.Length);
-BinaryGraphReaderWriter.cs (50) : writer.Write(srcBytes);
-BinaryGraphReaderWriter.cs (52) : byte[] weightBytes = weightToByteArray(edge.Item3);
-BinaryGraphReaderWriter.cs (53) : writer.Write(weightBytes.Length);
-BinaryGraphReaderWriter.cs (54) : writer.Write(weightBytes);
-BinaryGraphReaderWriter.cs (56) : byte[] dstBytes = keyToByteArray(edge.Item2);
-BinaryGraphReaderWriter.cs (57) : writer.Write(dstBytes.Length);
-BinaryGraphReaderWriter.cs (58) : writer.Write(dstBytes);
-BinaryGraphReaderWriter.cs (59) : }
-BinaryGraphReaderWriter.cs (88) : // --- número de vértices ---
-BinaryGraphReaderWriter.cs (89) : int vertexCount = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (91) : // --- leer claves de vértices ---
-BinaryGraphReaderWriter.cs (92) : for (int i = 0; i < vertexCount; i++)
-BinaryGraphReaderWriter.cs (93) : {
-BinaryGraphReaderWriter.cs (94) : int size = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (95) : byte[] data = reader.ReadBytes(size);
-BinaryGraphReaderWriter.cs (96) : TKey key = keyFromByteArray(data);
-BinaryGraphReaderWriter.cs (97) : graph.AddVertex(key);
-BinaryGraphReaderWriter.cs (98) : }
-BinaryGraphReaderWriter.cs (100) : // --- número de aristas ---
-BinaryGraphReaderWriter.cs (101) : int edgeCount = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (103) : // --- leer aristas ---
-BinaryGraphReaderWriter.cs (104) : for (int i = 0; i < edgeCount; i++)
-BinaryGraphReaderWriter.cs (105) : {
-BinaryGraphReaderWriter.cs (106) : // source
-BinaryGraphReaderWriter.cs (107) : int srcSize = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (108) : byte[] srcBytes = reader.ReadBytes(srcSize);
-BinaryGraphReaderWriter.cs (109) : TKey source = keyFromByteArray(srcBytes);
-BinaryGraphReaderWriter.cs (111) : // weight
-BinaryGraphReaderWriter.cs (112) : int weightSize = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (113) : byte[] weightBytes = reader.ReadBytes(weightSize);
-BinaryGraphReaderWriter.cs (114) : TWeight weight = weightFromByteArray(weightBytes);
-BinaryGraphReaderWriter.cs (116) : // destination
-BinaryGraphReaderWriter.cs (117) : int dstSize = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (118) : byte[] dstBytes = reader.ReadBytes(dstSize);
-BinaryGraphReaderWriter.cs (119) : TKey destination = keyFromByteArray(dstBytes);
-BinaryGraphReaderWriter.cs (121) : graph.AddEdge(source, destination, weight);
-BinaryGraphReaderWriter.cs (122) : }
-DirectedGraph.cs (10) : // En un grafo dirigido solo añadimos UNA arista:
-DirectedGraph.cs (11) : // source → destination
-DirectedGraph.cs (13) : if (!vertices.ContainsKey(sourceKey) || !vertices.ContainsKey(destinationKey))
-DirectedGraph.cs (14) : return;
-DirectedGraph.cs (16) : vertices[sourceKey].AddEdge(destinationKey, weight);
-DirectedGraph.cs (24) : if (!vertices.ContainsKey(element))
-DirectedGraph.cs (25) : return;
-DirectedGraph.cs (27) : // 1) Eliminar TODAS las aristas entrantes: X → element
-DirectedGraph.cs (28) : foreach (var v in vertices.Values)
-DirectedGraph.cs (29) : {
-DirectedGraph.cs (30) : v.RemoveEdge(element);
-DirectedGraph.cs (31) : }
-DirectedGraph.cs (33) : // 2) Eliminar las aristas salientes (la lista completa)
-DirectedGraph.cs (34) : vertices[element].ClearEdges();
-DirectedGraph.cs (36) : // 3) Quitar el vértice del diccionario
-DirectedGraph.cs (37) : vertices.Remove(element);
-DirectedGraph.cs (44) : if (!vertices.ContainsKey(sourceKey))
-DirectedGraph.cs (45) : return;
-DirectedGraph.cs (47) : vertices[sourceKey].RemoveEdge(destKey);
-DistanceCalculator.cs (9) : private IGraph<string, double> graph;
-DistanceCalculator.cs (16) : if (isUndirected)
-DistanceCalculator.cs (17) : graph = new UndirectedGraph<string, double>();
-DistanceCalculator.cs (18) : else
-DistanceCalculator.cs (19) : graph = new DirectedGraph<string, double>();
-DistanceCalculator.cs (26) : graph.AddVertex(city);
-DistanceCalculator.cs (33) : graph.AddEdge(fromCity, toCity, distance);
-DistanceCalculator.cs (37) : private string ChooseNextUnvisitedCity(
-DistanceCalculator.cs (38) : System.Collections.Generic.IDictionary<string, bool> visited,
-DistanceCalculator.cs (39) : System.Collections.Generic.IDictionary<string, double> nextCityCandidates)
-DistanceCalculator.cs (44) : string next = null;
-DistanceCalculator.cs (45) : double minDist = double.PositiveInfinity;
-DistanceCalculator.cs (47) : foreach (System.Collections.Generic.KeyValuePair<string, double> kv in nextCityCandidates)
-DistanceCalculator.cs (48) : {
-DistanceCalculator.cs (49) : if (!visited[kv.Key] && kv.Value < minDist)
-DistanceCalculator.cs (50) : {
-DistanceCalculator.cs (51) : minDist = kv.Value;
-DistanceCalculator.cs (52) : next = kv.Key;
-DistanceCalculator.cs (53) : }
-DistanceCalculator.cs (56) : return next;
-DistanceCalculator.cs (57) : }
-DistanceCalculator.cs (59) : private void CheckNeighbours(
-DistanceCalculator.cs (60) : System.Collections.Generic.IDictionary<string, double> distanceToCity,
-DistanceCalculator.cs (61) : System.Collections.Generic.IDictionary<string, bool> visited,
-DistanceCalculator.cs (62) : System.Collections.Generic.IDictionary<string, double> nextCityCandidates,
-DistanceCalculator.cs (63) : string currentCity)
-DistanceCalculator.cs (68) : foreach (var neighbourInfo in graph.GetNeighbours(currentCity))
-DistanceCalculator.cs (69) : {
-DistanceCalculator.cs (70) : string neighbour = neighbourInfo.Item1;
-DistanceCalculator.cs (71) : double weight = neighbourInfo.Item3;
-DistanceCalculator.cs (73) : if (!visited[neighbour])
-DistanceCalculator.cs (74) : {
-DistanceCalculator.cs (75) : double newDist = distanceToCity[currentCity] + weight;
-DistanceCalculator.cs (77) : if (!nextCityCandidates.ContainsKey(neighbour) || newDist < nextCityCandidates[neighbour])
-DistanceCalculator.cs (78) : {
-DistanceCalculator.cs (79) : nextCityCandidates[neighbour] = newDist;
-DistanceCalculator.cs (80) : distanceToCity[neighbour] = newDist;
-DistanceCalculator.cs (81) : }
-DistanceCalculator.cs (82) : }
-DistanceCalculator.cs (83) : }
-DistanceCalculator.cs (86) : public System.Collections.Generic.IDictionary<string, double> CalculateDistances(string fromCity)
-DistanceCalculator.cs (96) : var distanceToCity = new System.Collections.Generic.Dictionary<string, double>();
-DistanceCalculator.cs (97) : var visited = new System.Collections.Generic.Dictionary<string, bool>();
-DistanceCalculator.cs (98) : var nextCityCandidates = new System.Collections.Generic.Dictionary<string, double>();
-DistanceCalculator.cs (100) : // Inicializar distancias y visitados
-DistanceCalculator.cs (101) : foreach (string city in graph.Vertices)
-DistanceCalculator.cs (102) : {
-DistanceCalculator.cs (103) : distanceToCity[city] = double.PositiveInfinity;
-DistanceCalculator.cs (104) : visited[city] = false;
-DistanceCalculator.cs (105) : }
-DistanceCalculator.cs (107) : distanceToCity[fromCity] = 0;
-DistanceCalculator.cs (108) : nextCityCandidates[fromCity] = 0;
-DistanceCalculator.cs (110) : string currentCity = fromCity;
-DistanceCalculator.cs (112) : while (currentCity != null)
+BinaryGraphReaderWriter.cs (2) : using System.Diagnostics;
+BinaryGraphReaderWriter.cs (4) : using System.IO.Pipelines;
+BinaryGraphReaderWriter.cs (29) : writer.Write(graph.VertexCount());
+BinaryGraphReaderWriter.cs (31) : foreach( TKey v in graph.Elements() )
+BinaryGraphReaderWriter.cs (32) : {
+BinaryGraphReaderWriter.cs (33) : byte[] data = keyToByteArray(v);
+BinaryGraphReaderWriter.cs (35) : writer.Write(data.Length);
+BinaryGraphReaderWriter.cs (36) : writer.Write( data );
+BinaryGraphReaderWriter.cs (37) : }
+BinaryGraphReaderWriter.cs (39) : writer.Write(graph.EdgeCount());
+BinaryGraphReaderWriter.cs (41) : foreach (TKey source in graph.Elements())
+BinaryGraphReaderWriter.cs (42) : {
+BinaryGraphReaderWriter.cs (43) : foreach (TKey destination in graph.Elements())
+BinaryGraphReaderWriter.cs (44) : {
+BinaryGraphReaderWriter.cs (45) : writer.Write(source.ToString() );
+BinaryGraphReaderWriter.cs (47) : TWeight w = graph.GetEdgeWeight(source, destination);
+BinaryGraphReaderWriter.cs (48) : byte[] wArray = weightToByteArray(w);
+BinaryGraphReaderWriter.cs (49) : writer.Write( wArray.Length );
+BinaryGraphReaderWriter.cs (50) : writer.Write( wArray );
+BinaryGraphReaderWriter.cs (52) : writer.Write( w.ToString());
+BinaryGraphReaderWriter.cs (54) : writer.Write(destination.ToString());
+BinaryGraphReaderWriter.cs (56) : }
+BinaryGraphReaderWriter.cs (57) : }
+BinaryGraphReaderWriter.cs (85) : int numeroVertices = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (87) : for( int i = 0; i < numeroVertices;  i++ )
+BinaryGraphReaderWriter.cs (88) : {
+BinaryGraphReaderWriter.cs (89) : int count = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (90) : byte[] x = reader.ReadBytes(count);
+BinaryGraphReaderWriter.cs (91) : graph.AddVertex(keyFromByteArray( x ) );
+BinaryGraphReaderWriter.cs (92) : }
+BinaryGraphReaderWriter.cs (94) : int edgeCount = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (96) : for ( int i = 0; i < edgeCount; i++ )
+BinaryGraphReaderWriter.cs (97) : {
+BinaryGraphReaderWriter.cs (98) : int sourceKeyLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (99) : byte[] sourceKeyBytes = reader.ReadBytes(sourceKeyLength);
+BinaryGraphReaderWriter.cs (100) : TKey source = keyFromByteArray(sourceKeyBytes);
+BinaryGraphReaderWriter.cs (102) : int weightLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (103) : byte[] weightBytes = reader.ReadBytes(weightLength);
+BinaryGraphReaderWriter.cs (104) : TWeight weight = weightFromByteArray(weightBytes);
+BinaryGraphReaderWriter.cs (106) : int destKeyLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (107) : byte[] destKeyBytes = reader.ReadBytes(destKeyLength);
+BinaryGraphReaderWriter.cs (108) : TKey destination = keyFromByteArray(destKeyBytes);
+BinaryGraphReaderWriter.cs (110) : graph.AddEdge(source, destination, weight);
+BinaryGraphReaderWriter.cs (111) : }
+DirectedGraph.cs (2) : using System.Transactions;
+DirectedGraph.cs (10) : Vertices.Get(sourceKey).AddEdge(destinationKey, weight);
+DirectedGraph.cs (15) : //TODO #21: Remove the vertex that contains this element
+DirectedGraph.cs (16) : //and any edge that starts from or ends on that vertex
+DirectedGraph.cs (19) : Vertices.Remove(element);
+DirectedGraph.cs (21) : foreach (TElement key in Vertices.Keys())
+DirectedGraph.cs (22) : {
+DirectedGraph.cs (23) : RemoveEdge(key, element);
+DirectedGraph.cs (24) : }
+DirectedGraph.cs (30) : Vertices.Get(sourceKey).RemoveEdge(destKey);
+DistanceCalculator.cs (7) : //TODO #29: Declare a graph as a member-variable/attribute.
+DistanceCalculator.cs (8) : //We will store here the names of the cities and the distances between them
+DistanceCalculator.cs (10) : UndirectedGraph<string, double> graph;
+DistanceCalculator.cs (14) : //TODO #30: Initialize the graph used to store the cities/distances.
+DistanceCalculator.cs (15) : //If isUndirected, use an undirected graph. Otherwise, a directed
+DistanceCalculator.cs (16) : if ( isUndirected)
+DistanceCalculator.cs (17) : {
+DistanceCalculator.cs (18) : graph = new UndirectedGraph<string, double>();
+DistanceCalculator.cs (19) : }
+DistanceCalculator.cs (20) : else
+DistanceCalculator.cs (21) : {
+DistanceCalculator.cs (22) : graph = new DirectedGraph<string, double>();
+DistanceCalculator.cs (24) : }
+DistanceCalculator.cs (28) : //TODO #31: Add to the graph a vertex with the name of this city.
+DistanceCalculator.cs (29) : //This method will be called several times before calling CalculateDistances()
+DistanceCalculator.cs (30) : graph.AddVertex(city);
+DistanceCalculator.cs (36) : //TODO #32: Set the distance between these two cities in the graph.
+DistanceCalculator.cs (37) : //These cities should already be in the graph.
+DistanceCalculator.cs (38) : //This method will be called several times before calling CalculateDistances()
+DistanceCalculator.cs (40) : graph.AddEdge(fromCity, toCity, distance);
+DistanceCalculator.cs (44) : private string ChooseNextUnvisitedCity(IDictionary<string, bool> visited, IDictionary<string, double> nextCityCandidates)
+DistanceCalculator.cs (46) : //TODO #33: Choose the candidate with the minimum distance from nextCityCandidates
+DistanceCalculator.cs (47) : //that hasn't been visited yet
+DistanceCalculator.cs (50) : string selectedCity = null;
+DistanceCalculator.cs (51) : double minDistance = double.MaxValue;
+DistanceCalculator.cs (53) : foreach (var city in nextCityCandidates.Keys())
+DistanceCalculator.cs (54) : {
+DistanceCalculator.cs (55) : if (!visited.Get(city))
+DistanceCalculator.cs (56) : {
+DistanceCalculator.cs (57) : double candidateDistance = nextCityCandidates.Get(city);
+DistanceCalculator.cs (58) : if (candidateDistance < minDistance)
+DistanceCalculator.cs (59) : {
+DistanceCalculator.cs (60) : minDistance = candidateDistance;
+DistanceCalculator.cs (61) : selectedCity = city;
+DistanceCalculator.cs (62) : }
+DistanceCalculator.cs (64) : }
+DistanceCalculator.cs (66) : return selectedCity; // Retornar la ciudad con la menor distancia no visitada
+DistanceCalculator.cs (68) : }
+DistanceCalculator.cs (70) : private void CheckNeighbours(IDictionary<string, double> distanceToCity, IDictionary<string, bool> visited,
+DistanceCalculator.cs (71) : IDictionary<string, double> nextCityCandidates, string currentCity)
+DistanceCalculator.cs (74) : //TODO #34: Add to nextCityCandidates all the neighbours of the currentCity,
+DistanceCalculator.cs (75) : //updating their distances in distanceToCity too
+DistanceCalculator.cs (77) : Vertex<string, double> currentNode = graph.GetVertex(currentCity);
+DistanceCalculator.cs (79) : foreach (var neighbor in currentNode.ConnectedElements())
+DistanceCalculator.cs (80) : {
+DistanceCalculator.cs (81) : if (!visited.Get(neighbor))
+DistanceCalculator.cs (82) : {
+DistanceCalculator.cs (83) : double newDistance = distanceToCity.Get(currentCity) + currentNode.GetEdgeWeight(neighbor);
+DistanceCalculator.cs (85) : if ( distanceToCity.Get(neighbor) == 0 || newDistance < distanceToCity.Get(neighbor) )
+DistanceCalculator.cs (86) : {
+DistanceCalculator.cs (87) : distanceToCity.Add(neighbor, newDistance);
+DistanceCalculator.cs (88) : nextCityCandidates.Add(neighbor, newDistance);
+DistanceCalculator.cs (89) : }
+DistanceCalculator.cs (90) : }
+DistanceCalculator.cs (91) : }
+DistanceCalculator.cs (96) : public IDictionary<string, double> CalculateDistances(string fromCity)
+DistanceCalculator.cs (100) : //Calculate the distance to each city in the graph from fromCity.The result is a binary tree
+DistanceCalculator.cs (102) : //where the key is the city and the value the distance
+DistanceCalculator.cs (108) : IDictionary<string, double> distanceToCity = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (109) : IDictionary<string, bool> visited = new HashTableDictionary<string,bool>();
+DistanceCalculator.cs (110) : IDictionary<string, double> nextCityCandidates = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (112) : foreach (var node in graph.Elements())
 DistanceCalculator.cs (113) : {
-DistanceCalculator.cs (114) : visited[currentCity] = true;
-DistanceCalculator.cs (116) : // b.1) Update neighbours
-DistanceCalculator.cs (117) : CheckNeighbours(distanceToCity, visited, nextCityCandidates, currentCity);
-DistanceCalculator.cs (119) : // b.2) Choose next
-DistanceCalculator.cs (120) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
-DistanceCalculator.cs (121) : }
-DistanceCalculator.cs (123) : return distanceToCity;
-GraphReaderWriter.cs (12) : return str
-GraphReaderWriter.cs (13) : .Replace("\n", "[NEW_LINE]")
-GraphReaderWriter.cs (14) : .Replace("->", "[ARROW]")
-GraphReaderWriter.cs (15) : .Replace("\r", "[CR]");
-GraphReaderWriter.cs (22) : return str
-GraphReaderWriter.cs (23) : .Replace("[NEW_LINE]", "\n")
-GraphReaderWriter.cs (24) : .Replace("[ARROW]", "->")
-GraphReaderWriter.cs (25) : .Replace("[CR]", "\r");
-GraphReaderWriter.cs (37) : foreach (var vertex in graph.Vertices)
-GraphReaderWriter.cs (38) : {
-GraphReaderWriter.cs (39) : string encoded = EncodeString(keyToString(vertex));
-GraphReaderWriter.cs (40) : writer.WriteLine(encoded);
-GraphReaderWriter.cs (41) : }
-GraphReaderWriter.cs (43) : writer.WriteLine(); // Línea vacía para separar vértices de aristas
-GraphReaderWriter.cs (45) : foreach (var edge in graph.Edges)
-GraphReaderWriter.cs (46) : {
-GraphReaderWriter.cs (47) : string a = EncodeString(keyToString(edge.Item1));
-GraphReaderWriter.cs (48) : string w = EncodeString(weightToString(edge.Item3));
-GraphReaderWriter.cs (49) : string b = EncodeString(keyToString(edge.Item2));
-GraphReaderWriter.cs (51) : writer.WriteLine($"{a}->{w}->{b}");
-GraphReaderWriter.cs (52) : }
-GraphReaderWriter.cs (74) : string? line = reader.ReadLine();
-GraphReaderWriter.cs (76) : // Leer vértices
-GraphReaderWriter.cs (77) : while (line != null && line.Trim() != "")
-GraphReaderWriter.cs (78) : {
-GraphReaderWriter.cs (79) : string decoded = DecodeString(line);
-GraphReaderWriter.cs (80) : graph.AddVertex(stringToKey(decoded));
-GraphReaderWriter.cs (81) : line = reader.ReadLine();
-GraphReaderWriter.cs (82) : }
-GraphReaderWriter.cs (84) : // Ahora leer aristas
-GraphReaderWriter.cs (85) : line = reader.ReadLine();
-GraphReaderWriter.cs (87) : while (line != null)
-GraphReaderWriter.cs (88) : {
-GraphReaderWriter.cs (89) : if (line.Trim() != "")
+DistanceCalculator.cs (114) : distanceToCity.Add(node, double.MaxValue);
+DistanceCalculator.cs (115) : visited.Add(node, false);
+DistanceCalculator.cs (116) : }
+DistanceCalculator.cs (118) : distanceToCity.Add(fromCity, 0);
+DistanceCalculator.cs (119) : nextCityCandidates.Add(fromCity, 0);
+DistanceCalculator.cs (121) : string currentCity = fromCity;
+DistanceCalculator.cs (122) : currentCity = fromCity;
+DistanceCalculator.cs (124) : while (currentCity != null)
+DistanceCalculator.cs (125) : {
+DistanceCalculator.cs (126) : CheckNeighbours(distanceToCity, visited, nextCityCandidates, currentCity);
+DistanceCalculator.cs (128) : visited.Remove(currentCity);
+DistanceCalculator.cs (129) : visited.Add(currentCity, true);
+DistanceCalculator.cs (131) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
+DistanceCalculator.cs (133) : if (currentCity != null)
+DistanceCalculator.cs (134) : nextCityCandidates.Remove(currentCity);
+DistanceCalculator.cs (135) : }
+DistanceCalculator.cs (137) : return distanceToCity;
+GenericList.cs (1) : using System.Collections;
+GenericList.cs (3) : public class GenericListNode<T>
+GenericList.cs (4) : {
+GenericList.cs (5) : public T Value;
+GenericList.cs (6) : public GenericListNode<T> Next = null;
+GenericList.cs (8) : public GenericListNode(T value)
+GenericList.cs (9) : {
+GenericList.cs (10) : Value = value;
+GenericList.cs (11) : }
+GenericList.cs (13) : public override string ToString()
+GenericList.cs (14) : {
+GenericList.cs (15) : return Value.ToString();
+GenericList.cs (16) : }
+GenericList.cs (17) : }
+GenericList.cs (19) : public class GenericList<T> : IGenericList<T>
+GenericList.cs (20) : {
+GenericList.cs (21) : GenericListNode<T> First = null;
+GenericList.cs (22) : GenericListNode<T> Last = null;
+GenericList.cs (24) : private int count = 0;
+GenericList.cs (26) : public override string ToString()
+GenericList.cs (27) : {
+GenericList.cs (28) : GenericListNode<T> node = First;
+GenericList.cs (29) : string output = "[";
+GenericList.cs (31) : while (node != null)
+GenericList.cs (32) : {
+GenericList.cs (33) : output += node.ToString() + ",";
+GenericList.cs (34) : node = node.Next;
+GenericList.cs (35) : }
+GenericList.cs (36) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+GenericList.cs (38) : return output;
+GenericList.cs (39) : }
+GenericList.cs (41) : public void Add(T value)
+GenericList.cs (42) : {
+GenericList.cs (43) : //TODO #1: add a new element to the end of the list
+GenericList.cs (45) : if (First == null)
+GenericList.cs (46) : {
+GenericList.cs (47) : First = new GenericListNode<T>(value);
+GenericList.cs (48) : Last = First;
+GenericList.cs (49) : }
+GenericList.cs (50) : else
+GenericList.cs (51) : {
+GenericList.cs (52) : Last.Next = new GenericListNode<T>(value);
+GenericList.cs (53) : Last = Last.Next;
+GenericList.cs (54) : }
+GenericList.cs (56) : count++;
+GenericList.cs (57) : }
+GenericList.cs (59) : public T Get(int index)
+GenericList.cs (60) : {
+GenericList.cs (61) : //TODO #2: return the element on the index-th position.
+GenericList.cs (63) : if (index < 0 || index >= count)
+GenericList.cs (64) : return default(T);
+GenericList.cs (66) : GenericListNode<T> current = First;
+GenericList.cs (67) : for (int i = 0; i < index; i++)
+GenericList.cs (68) : current = current.Next;
+GenericList.cs (70) : return current.Value;
+GenericList.cs (71) : }
+GenericList.cs (73) : public int Count()
+GenericList.cs (74) : {
+GenericList.cs (75) : //TODO #3: return the number of elements on the list
+GenericList.cs (76) : return count;
+GenericList.cs (77) : }
+GenericList.cs (79) : public void Remove(int index)
+GenericList.cs (80) : {
+GenericList.cs (81) : //TODO #4: remove the element on the index-th position.
+GenericList.cs (83) : if (index < 0 || index >= count)
+GenericList.cs (84) : return;
+GenericList.cs (86) : if (index == 0)
+GenericList.cs (87) : {
+GenericList.cs (88) : First = First.Next;
+GenericList.cs (89) : if (count == 1)
+GenericList.cs (90) : Last = null;
+GenericList.cs (91) : }
+GenericList.cs (92) : else
+GenericList.cs (93) : {
+GenericList.cs (94) : GenericListNode<T> current = First;
+GenericList.cs (95) : for (int i = 0; i < index - 1; i++)
+GenericList.cs (96) : current = current.Next;
+GenericList.cs (98) : current.Next = current.Next.Next;
+GenericList.cs (100) : if (index == count - 1)
+GenericList.cs (101) : Last = current;
+GenericList.cs (102) : }
+GenericList.cs (104) : count--;
+GenericList.cs (105) : }
+GenericList.cs (107) : public void Clear()
+GenericList.cs (108) : {
+GenericList.cs (109) : //TODO #5: remove all the elements on the list
+GenericList.cs (110) : First = null;
+GenericList.cs (111) : Last = null;
+GenericList.cs (112) : count = 0;
+GenericList.cs (113) : }
+GenericList.cs (115) : public IEnumerator GetEnumerator()
+GenericList.cs (116) : {
+GenericList.cs (117) : //TODO #6: return all items one by one using "yield return ..."
+GenericList.cs (118) : GenericListNode<T> current = First;
+GenericList.cs (119) : while (current != null)
+GenericList.cs (120) : {
+GenericList.cs (121) : yield return current.Value;
+GenericList.cs (122) : current = current.Next;
+GenericList.cs (123) : }
+GenericList.cs (124) : }
+GenericList.cs (125) : }
+GraphReaderWriter.cs (3) : using System.Collections.Generic;
+GraphReaderWriter.cs (11) : //TODO #23: Replace all separators and special characters used in your file by some improbable tag (i.e, "[NEW_LINE]")
+GraphReaderWriter.cs (13) : // Escape seguro para soportar caracteres especiales
+GraphReaderWriter.cs (14) : return str
+GraphReaderWriter.cs (15) : .Replace("\\", "\\\\")
+GraphReaderWriter.cs (16) : .Replace("\n", "\\n")
+GraphReaderWriter.cs (17) : .Replace("\r", "\\r")
+GraphReaderWriter.cs (18) : .Replace("->", "\\a");
+GraphReaderWriter.cs (23) : //TODO #24: Replace your special tags (i.e, "NEW_LINE") by the original separator before encoding it
+GraphReaderWriter.cs (25) : return str
+GraphReaderWriter.cs (26) : .Replace("\\a", "->")
+GraphReaderWriter.cs (27) : .Replace("\\n", "\n")
+GraphReaderWriter.cs (28) : .Replace("\\r", "\r")
+GraphReaderWriter.cs (29) : .Replace("\\\\", "\\");
+GraphReaderWriter.cs (32) : public bool Write<TKey, TWeight>(UndirectedGraph<TKey, TWeight> graph, string filename,
+GraphReaderWriter.cs (33) : Func<TKey, string> keyToString, Func<TWeight, string> weightToString) where TKey : IComparable<TKey>
+GraphReaderWriter.cs (39) : //TODO #25: Write first all the vertices as strings (one line each), then one empty line, and then each of the edges with the format "A->1->B" (one line each)
+GraphReaderWriter.cs (41) : foreach (var vertex in graph.GetVertices()) // ahora usando método GetVertices()
+GraphReaderWriter.cs (42) : {
+GraphReaderWriter.cs (43) : string encoded = EncodeString(keyToString(vertex));
+GraphReaderWriter.cs (44) : writer.WriteLine(encoded);
+GraphReaderWriter.cs (45) : }
+GraphReaderWriter.cs (47) : writer.WriteLine(); // Línea vacía para separar vértices de aristas
+GraphReaderWriter.cs (49) : foreach (var edge in graph.GetEdges()) // ahora usando método GetEdges()
+GraphReaderWriter.cs (50) : {
+GraphReaderWriter.cs (51) : // edge = (source, destination, weight)
+GraphReaderWriter.cs (52) : string a = EncodeString(keyToString(edge.Item1));
+GraphReaderWriter.cs (53) : string w = EncodeString(weightToString(edge.Item3));
+GraphReaderWriter.cs (54) : string b = EncodeString(keyToString(edge.Item2));
+GraphReaderWriter.cs (56) : writer.WriteLine($"{a}->{w}->{b}");
+GraphReaderWriter.cs (57) : }
+GraphReaderWriter.cs (62) : catch (Exception)
+GraphReaderWriter.cs (68) : public bool Read<TKey, TWeight>(UndirectedGraph<TKey, TWeight> graph, string filename,
+GraphReaderWriter.cs (69) : Func<string, TKey> stringToKey, Func<string, TWeight> stringToWeight) where TKey : IComparable<TKey>
+GraphReaderWriter.cs (77) : string? line = reader.ReadLine();
+GraphReaderWriter.cs (79) : // Leer vértices
+GraphReaderWriter.cs (80) : while (line != null && line.Trim() != "")
+GraphReaderWriter.cs (81) : {
+GraphReaderWriter.cs (82) : string decoded = DecodeString(line);
+GraphReaderWriter.cs (83) : graph.AddVertex(stringToKey(decoded));
+GraphReaderWriter.cs (84) : line = reader.ReadLine();
+GraphReaderWriter.cs (85) : }
+GraphReaderWriter.cs (87) : // Leer aristas
+GraphReaderWriter.cs (88) : line = reader.ReadLine();
+GraphReaderWriter.cs (89) : while (line != null)
 GraphReaderWriter.cs (90) : {
-GraphReaderWriter.cs (91) : string decodedLine = DecodeString(line);
-GraphReaderWriter.cs (92) : var parts = decodedLine.Split("->");
-GraphReaderWriter.cs (94) : if (parts.Length == 3)
-GraphReaderWriter.cs (95) : {
-GraphReaderWriter.cs (96) : TKey a = stringToKey(parts[0]);
-GraphReaderWriter.cs (97) : TWeight w = stringToWeight(parts[1]);
-GraphReaderWriter.cs (98) : TKey b = stringToKey(parts[2]);
-GraphReaderWriter.cs (100) : graph.AddEdge(a, b, w);
-GraphReaderWriter.cs (101) : }
-GraphReaderWriter.cs (102) : }
-GraphReaderWriter.cs (104) : line = reader.ReadLine();
-GraphReaderWriter.cs (105) : }
-UnDirectedGraph.cs (2) : namespace Common;
-UnDirectedGraph.cs (9) : protected Dictionary<TElement, Vertex<TElement, TWeight>> Vertices;
-UnDirectedGraph.cs (15) : string output = string.Join("\n", Vertices.Values);
-UnDirectedGraph.cs (23) : TElement[] result = new TElement[Vertices.Count];
-UnDirectedGraph.cs (24) : int i = 0;
-UnDirectedGraph.cs (25) : foreach (var v in Vertices.Values)
-UnDirectedGraph.cs (26) : {
-UnDirectedGraph.cs (27) : result[i++] = v.Element;
-UnDirectedGraph.cs (28) : }
-UnDirectedGraph.cs (29) : return result;
-UnDirectedGraph.cs (36) : if (!Vertices.ContainsKey(element))
-UnDirectedGraph.cs (37) : Vertices[element] = new Vertex<TElement, TWeight>(element);
-UnDirectedGraph.cs (44) : if (!Vertices.ContainsKey(source))
-UnDirectedGraph.cs (45) : AddVertex(source);
-UnDirectedGraph.cs (46) : if (!Vertices.ContainsKey(destination))
-UnDirectedGraph.cs (47) : AddVertex(destination);
-UnDirectedGraph.cs (49) : Vertices[source].AddEdge(destination, weight);
-UnDirectedGraph.cs (50) : Vertices[destination].AddEdge(source, weight); // no dirigido
-UnDirectedGraph.cs (58) : return Vertices.Count;
-UnDirectedGraph.cs (66) : int total = 0;
-UnDirectedGraph.cs (67) : foreach (var v in Vertices.Values)
-UnDirectedGraph.cs (68) : total += v.EdgeCount();
-UnDirectedGraph.cs (70) : return total / 2; // porque es no dirigido (cada arista aparece dos veces)
-UnDirectedGraph.cs (78) : if (Vertices.ContainsKey(source))
-UnDirectedGraph.cs (79) : return Vertices[source].GetEdgeWeight(destination);
-UnDirectedGraph.cs (89) : if (Vertices.ContainsKey(source))
-UnDirectedGraph.cs (90) : Vertices[source].RemoveEdge(destination);
-UnDirectedGraph.cs (92) : if (Vertices.ContainsKey(destination))
-UnDirectedGraph.cs (93) : Vertices[destination].RemoveEdge(source);
-UnDirectedGraph.cs (100) : if (!Vertices.ContainsKey(element)) return;
-UnDirectedGraph.cs (102) : foreach (var v in Vertices.Values)
-UnDirectedGraph.cs (103) : v.RemoveEdge(element);
-UnDirectedGraph.cs (105) : Vertices.Remove(element);
-UnDirectedGraph.cs (112) : if (Vertices.ContainsKey(element))
-UnDirectedGraph.cs (113) : return Vertices[element];
-UnDirectedGraph.cs (115) : return null;
+GraphReaderWriter.cs (91) : if (line.Trim() != "")
+GraphReaderWriter.cs (92) : {
+GraphReaderWriter.cs (93) : string decodedLine = DecodeString(line);
+GraphReaderWriter.cs (94) : var parts = decodedLine.Split("->");
+GraphReaderWriter.cs (96) : if (parts.Length == 3)
+GraphReaderWriter.cs (97) : {
+GraphReaderWriter.cs (98) : TKey a = stringToKey(parts[0]);
+GraphReaderWriter.cs (99) : TWeight w = stringToWeight(parts[1]);
+GraphReaderWriter.cs (100) : TKey b = stringToKey(parts[2]);
+GraphReaderWriter.cs (102) : graph.AddEdge(a, b, w);
+GraphReaderWriter.cs (103) : }
+GraphReaderWriter.cs (104) : }
+GraphReaderWriter.cs (105) : line = reader.ReadLine();
+GraphReaderWriter.cs (106) : }
+GraphReaderWriter.cs (109) : return true;
+GraphReaderWriter.cs (110) : }
+GraphReaderWriter.cs (111) : catch (Exception)
+HashTableDictionary.cs (2) : using Common;
+HashTableDictionary.cs (3) : using System;
+HashTableDictionary.cs (4) : using System.Drawing;
+HashTableDictionary.cs (6) : public class HashTableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+HashTableDictionary.cs (7) : {
+HashTableDictionary.cs (8) : int DefaultNumEntries = 10000;
+HashTableDictionary.cs (9) : int NumElements = 0;
+HashTableDictionary.cs (10) : //TODO #1: Copy your implementation of List to the project HashTableDictionary
+HashTableDictionary.cs (11) : //and use it to declare Entries: an array of lists of HashTableDictionaryItem<TKey,TValue>
+HashTableDictionary.cs (12) : //[USE List and HashTableDictionaryItem HERE] [] Entries;
+HashTableDictionary.cs (14) : GenericList<HashTableDictionaryItem<TKey,TValue>> []Entries;
+HashTableDictionary.cs (16) : public HashTableDictionary()
+HashTableDictionary.cs (17) : {
+HashTableDictionary.cs (18) : //TODO #2: Initialize Entries with an array of size DefaultNumEntries
+HashTableDictionary.cs (19) : Entries = new GenericList<HashTableDictionaryItem<TKey, TValue>> [DefaultNumEntries];
+HashTableDictionary.cs (20) : }
+HashTableDictionary.cs (22) : public HashTableDictionary(int numEntries)
+HashTableDictionary.cs (23) : {
+HashTableDictionary.cs (24) : //TODO #2: Initialize Entries with a specific number of entries (numEntries)
+HashTableDictionary.cs (25) : Entries = new GenericList<HashTableDictionaryItem<TKey, TValue>>[numEntries];
+HashTableDictionary.cs (26) : }
+HashTableDictionary.cs (28) : public override string ToString()
+HashTableDictionary.cs (29) : {
+HashTableDictionary.cs (30) : string output = null;
+HashTableDictionary.cs (32) : //TODO #3: Uncomment the code below
+HashTableDictionary.cs (34) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (35) : {
+HashTableDictionary.cs (36) : if (Entries[i] != null)
+HashTableDictionary.cs (37) : {
+HashTableDictionary.cs (38) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (39) : {
+HashTableDictionary.cs (40) : HashTableDictionaryItem<TKey, TValue> entry = Entries[i].Get(j);
+HashTableDictionary.cs (41) : output += entry.ToString();
+HashTableDictionary.cs (42) : }
+HashTableDictionary.cs (43) : }
+HashTableDictionary.cs (44) : }
+HashTableDictionary.cs (46) : return output;
+HashTableDictionary.cs (47) : }
+HashTableDictionary.cs (49) : public int Count()
+HashTableDictionary.cs (50) : {
+HashTableDictionary.cs (51) : //TODO #4: Return the number of elements (NumElements: make sure this
+HashTableDictionary.cs (52) : return NumElements;
+HashTableDictionary.cs (54) : }
+HashTableDictionary.cs (56) : public int PositionOf(TKey key)
+HashTableDictionary.cs (57) : {
+HashTableDictionary.cs (58) : //TODO #5:  Calculate in which entry should this key be stored
+HashTableDictionary.cs (59) : //and return it (use key.GetHashCode() to calculate the hash function of the key)
+HashTableDictionary.cs (60) : //          Note:  GetHashCode() returns very large integer numbers,
+HashTableDictionary.cs (61) : //          but we need to map this value to the range [0, Entries.Length-1]
+HashTableDictionary.cs (62) : return Math.Abs( key.GetHashCode() % Entries.Length );
+HashTableDictionary.cs (63) : }
+HashTableDictionary.cs (65) : public TValue Get(TKey key)
+HashTableDictionary.cs (66) : {
+HashTableDictionary.cs (67) : //TODO #5:  Using PositionOf, calculate where this key should be in the
+HashTableDictionary.cs (68) : //array of entries and, then,
+HashTableDictionary.cs (69) : //          find the item with this key on the list, and return its value
+HashTableDictionary.cs (71) : int i = PositionOf(key);
+HashTableDictionary.cs (73) : if (Entries[i] == null)
+HashTableDictionary.cs (74) : {
+HashTableDictionary.cs (75) : return default(TValue);
+HashTableDictionary.cs (76) : }
+HashTableDictionary.cs (77) : else
+HashTableDictionary.cs (78) : {
+HashTableDictionary.cs (79) : int j = 0;
+HashTableDictionary.cs (80) : bool enc = false;
+HashTableDictionary.cs (81) : while (j < Entries[i].Count() && !enc)
+HashTableDictionary.cs (82) : {
+HashTableDictionary.cs (83) : if (Entries[i].Get(j).Key.Equals(key))
+HashTableDictionary.cs (84) : {
+HashTableDictionary.cs (85) : enc = true;
+HashTableDictionary.cs (86) : }
+HashTableDictionary.cs (87) : else
+HashTableDictionary.cs (88) : {
+HashTableDictionary.cs (89) : j++;
+HashTableDictionary.cs (90) : }
+HashTableDictionary.cs (91) : }
+HashTableDictionary.cs (93) : if (enc)
+HashTableDictionary.cs (94) : return Entries[i].Get(j).Value;
+HashTableDictionary.cs (95) : else
+HashTableDictionary.cs (96) : return default(TValue);
+HashTableDictionary.cs (97) : }
+HashTableDictionary.cs (98) : }
+HashTableDictionary.cs (100) : public void Add(TKey key, TValue value)
+HashTableDictionary.cs (101) : {
+HashTableDictionary.cs (102) : //TODO #5:  Using PositionOf, calculate where this key should be in the array of entries.
+HashTableDictionary.cs (103) : //Then, look for the item on the list.
+HashTableDictionary.cs (104) : //          - If the item is not found, add a new item to the list with the given key/value
+HashTableDictionary.cs (105) : //          - If the item is found, just update its value
+HashTableDictionary.cs (107) : int pos = PositionOf(key);
+HashTableDictionary.cs (109) : if (pos >= 0 && pos < Entries.Length)
+HashTableDictionary.cs (110) : {
+HashTableDictionary.cs (111) : GenericList<HashTableDictionaryItem<TKey, TValue>> lista = Entries[pos];
+HashTableDictionary.cs (113) : if (lista == null)
+HashTableDictionary.cs (114) : {
+HashTableDictionary.cs (115) : Entries[pos] = new GenericList<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (116) : Entries[pos].Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (117) : NumElements++;
+HashTableDictionary.cs (118) : }
+HashTableDictionary.cs (119) : else
+HashTableDictionary.cs (120) : {
+HashTableDictionary.cs (121) : bool enc = false;
+HashTableDictionary.cs (122) : int i = 0;
+HashTableDictionary.cs (123) : while (i < lista.Count() && !enc)
+HashTableDictionary.cs (124) : {
+HashTableDictionary.cs (125) : if (lista.Get(i).Key.Equals(key))
+HashTableDictionary.cs (126) : {
+HashTableDictionary.cs (127) : enc = true;
+HashTableDictionary.cs (128) : }
+HashTableDictionary.cs (129) : else
+HashTableDictionary.cs (130) : {
+HashTableDictionary.cs (131) : i++;
+HashTableDictionary.cs (132) : }
+HashTableDictionary.cs (133) : }
+HashTableDictionary.cs (135) : if (!enc)
+HashTableDictionary.cs (136) : {
+HashTableDictionary.cs (137) : lista.Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (138) : NumElements++;
+HashTableDictionary.cs (139) : }
+HashTableDictionary.cs (140) : else
+HashTableDictionary.cs (141) : {
+HashTableDictionary.cs (142) : lista.Get(i).Value = value; //update
+HashTableDictionary.cs (143) : }
+HashTableDictionary.cs (144) : }
+HashTableDictionary.cs (145) : }
+HashTableDictionary.cs (146) : }
+HashTableDictionary.cs (148) : public void Remove(TKey key)
+HashTableDictionary.cs (149) : {
+HashTableDictionary.cs (150) : //TODO #6: Using Position, calculate where this key should be in the array of entries. Then, look for the item on the list.
+HashTableDictionary.cs (151) : //         - If the item is not found, do nothing
+HashTableDictionary.cs (152) : //         - If the item is found, remove it from the list and return
+HashTableDictionary.cs (154) : int pos = PositionOf(key);
+HashTableDictionary.cs (156) : if (pos >= 0 && pos < Entries.Length)
+HashTableDictionary.cs (157) : {
+HashTableDictionary.cs (158) : GenericList<HashTableDictionaryItem<TKey, TValue>> lista = Entries[pos];
+HashTableDictionary.cs (160) : if (lista != null)
+HashTableDictionary.cs (161) : {
+HashTableDictionary.cs (162) : bool enc = false;
+HashTableDictionary.cs (163) : int i = 0;
+HashTableDictionary.cs (164) : while (i < lista.Count() && !enc)
+HashTableDictionary.cs (165) : {
+HashTableDictionary.cs (166) : if (lista.Get(i).Key.Equals(key))
+HashTableDictionary.cs (167) : {
+HashTableDictionary.cs (168) : enc = true;
+HashTableDictionary.cs (169) : }
+HashTableDictionary.cs (170) : else
+HashTableDictionary.cs (171) : {
+HashTableDictionary.cs (172) : i++;
+HashTableDictionary.cs (173) : }
+HashTableDictionary.cs (174) : }
+HashTableDictionary.cs (176) : if (enc)
+HashTableDictionary.cs (177) : {
+HashTableDictionary.cs (178) : lista.Remove(i);
+HashTableDictionary.cs (179) : NumElements--;
+HashTableDictionary.cs (180) : }
+HashTableDictionary.cs (182) : }
+HashTableDictionary.cs (183) : }
+HashTableDictionary.cs (184) : }
+HashTableDictionary.cs (186) : public TKey[] Keys()
+HashTableDictionary.cs (187) : {
+HashTableDictionary.cs (188) : //TODO #8: Return all the keys (not necessarily ordered) in an array
+HashTableDictionary.cs (189) : //         If there is no element, it should return an empty array (size=0)
+HashTableDictionary.cs (191) : int tam = Entries.Length;
+HashTableDictionary.cs (193) : int sum = 0;
+HashTableDictionary.cs (194) : for( int i = 0;  i < tam; i++ )
+HashTableDictionary.cs (195) : {
+HashTableDictionary.cs (196) : if (Entries[i] != null )
+HashTableDictionary.cs (197) : {
+HashTableDictionary.cs (198) : sum = sum +  Entries[i].Count();
+HashTableDictionary.cs (199) : }
+HashTableDictionary.cs (200) : }
+HashTableDictionary.cs (202) : TKey[] claves = new TKey[sum];
+HashTableDictionary.cs (204) : int k = 0;
+HashTableDictionary.cs (205) : for (int i = 0; i < tam; i++)
+HashTableDictionary.cs (206) : {
+HashTableDictionary.cs (207) : if (Entries[i] != null)
+HashTableDictionary.cs (208) : {
+HashTableDictionary.cs (209) : for (int j = 0; j < Entries[i].Count(); j++ )
+HashTableDictionary.cs (210) : {
+HashTableDictionary.cs (211) : claves[k] = Entries[i].Get(j).Key;
+HashTableDictionary.cs (212) : k++;
+HashTableDictionary.cs (213) : }
+HashTableDictionary.cs (214) : }
+HashTableDictionary.cs (215) : }
+HashTableDictionary.cs (217) : return claves;
+HashTableDictionary.cs (219) : }
+HashTableDictionary.cs (221) : public TValue[] Values()
+HashTableDictionary.cs (222) : {
+HashTableDictionary.cs (223) : //TODO #9: Return all the values (in the same order as the keys) in an array
+HashTableDictionary.cs (224) : //         If there is no element, it should return an empty array (size=0)
+HashTableDictionary.cs (226) : int tam = Entries.Length;
+HashTableDictionary.cs (227) : int sum = 0;
+HashTableDictionary.cs (228) : for (int i = 0; i < tam; i++)
+HashTableDictionary.cs (229) : {
+HashTableDictionary.cs (230) : if (Entries[i] != null)
+HashTableDictionary.cs (231) : {
+HashTableDictionary.cs (232) : sum = sum + Entries[i].Count();
+HashTableDictionary.cs (233) : }
+HashTableDictionary.cs (234) : }
+HashTableDictionary.cs (236) : TValue[] claves = new TValue[sum];
+HashTableDictionary.cs (238) : int k = 0;
+HashTableDictionary.cs (239) : for (int i = 0; i < tam; i++)
+HashTableDictionary.cs (240) : {
+HashTableDictionary.cs (241) : if (Entries[i] != null)
+HashTableDictionary.cs (242) : {
+HashTableDictionary.cs (243) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (244) : {
+HashTableDictionary.cs (245) : claves[k] = Entries[i].Get(j).Value;
+HashTableDictionary.cs (246) : k++;
+HashTableDictionary.cs (247) : }
+HashTableDictionary.cs (248) : }
+HashTableDictionary.cs (249) : }
+HashTableDictionary.cs (251) : return claves;
+HashTableDictionary.cs (253) : }
+HashTableDictionary.cs (254) : }
+HashTableDictionaryItem.cs (1) : public class HashTableDictionaryItem<TKey, TValue>
+HashTableDictionaryItem.cs (2) : {
+HashTableDictionaryItem.cs (3) : public TKey Key;
+HashTableDictionaryItem.cs (4) : public TValue Value;
+HashTableDictionaryItem.cs (6) : public HashTableDictionaryItem(TKey key, TValue value)
+HashTableDictionaryItem.cs (7) : {
+HashTableDictionaryItem.cs (8) : Key = key;
+HashTableDictionaryItem.cs (9) : Value = value;
+HashTableDictionaryItem.cs (10) : }
+HashTableDictionaryItem.cs (12) : public override string ToString()
+HashTableDictionaryItem.cs (13) : {
+HashTableDictionaryItem.cs (14) : if (!Key.Equals(default(TKey)))
+HashTableDictionaryItem.cs (15) : return $"[{Key}->{Value}]\n";
+HashTableDictionaryItem.cs (16) : else
+HashTableDictionaryItem.cs (17) : return null;
+HashTableDictionaryItem.cs (18) : }
+HashTableDictionaryItem.cs (19) : }
+IGenericList.cs (1) : using System;
+IGenericList.cs (2) : using System.Collections;
+IGenericList.cs (3) : using System.Collections.Generic;
+IGenericList.cs (4) : using System.Linq;
+IGenericList.cs (5) : using System.Text;
+IGenericList.cs (6) : using System.Threading.Tasks;
+IGenericList.cs (8) : public interface IGenericList<T> : IEnumerable
+IGenericList.cs (9) : {
+IGenericList.cs (10) : int Count();
+IGenericList.cs (12) : T Get(int index);
+IGenericList.cs (14) : void Add(T value);
+IGenericList.cs (16) : void Remove(int index);
+IGenericList.cs (18) : void Clear();
+IGenericList.cs (19) : }
+UnDirectedGraph.cs (3) : public class UndirectedGraph<TElement, TWeight>
+UnDirectedGraph.cs (4) : where TElement : IComparable<TElement>
+UnDirectedGraph.cs (6) : //TODO #9: Declare a PROTECTED member variable/attribute called Vertices.
+UnDirectedGraph.cs (7) : //Should store vertices of type Vertex<> in a way that a vertex can be quickly
+UnDirectedGraph.cs (8) : //found given an element.
+UnDirectedGraph.cs (9) : //We want it to be PROTECTED because we only want it to be
+UnDirectedGraph.cs (10) : //accessible from the subclass DirectedGraph
+UnDirectedGraph.cs (12) : protected HashTableDictionary<TElement, Vertex<TElement, TWeight>> Vertices
+UnDirectedGraph.cs (13) : = new HashTableDictionary<TElement, Vertex<TElement, TWeight>>();
+UnDirectedGraph.cs (15) : public override string ToString()
+UnDirectedGraph.cs (16) : {
+UnDirectedGraph.cs (17) : //TODO #10: Concatenate all vertices (converted to string) separated by a new line ("\n")
+UnDirectedGraph.cs (18) : string output = null;
+UnDirectedGraph.cs (20) : foreach (TElement v in Vertices.Keys())
+UnDirectedGraph.cs (21) : output += Vertices.Get(v).ToString() + "\n";
+UnDirectedGraph.cs (23) : return output;
+UnDirectedGraph.cs (28) : //TODO #11: Return all the elements in this graph
+UnDirectedGraph.cs (29) : return Vertices.Keys();
+UnDirectedGraph.cs (35) : if (Vertices.Get(element) == null)
+UnDirectedGraph.cs (36) : Vertices.Add(element, new Vertex<TElement, TWeight>(element));
+UnDirectedGraph.cs (42) : Vertices.Get(source).AddEdge(destination, weight);
+UnDirectedGraph.cs (43) : Vertices.Get(destination).AddEdge(source, weight);
+UnDirectedGraph.cs (49) : return Vertices.Count();
+UnDirectedGraph.cs (54) : //TODO #15: Return the number of edges.
+UnDirectedGraph.cs (55) : //Edges are stored in each vertex, so vertices need to be traversed to count edges
+UnDirectedGraph.cs (57) : int count = 0;
+UnDirectedGraph.cs (59) : foreach (TElement key in Vertices.Keys())
+UnDirectedGraph.cs (60) : {
+UnDirectedGraph.cs (61) : count += Vertices.Get(key).EdgeCount();
+UnDirectedGraph.cs (62) : }
+UnDirectedGraph.cs (64) : return count / 2;
+UnDirectedGraph.cs (69) : //TODO #16: Return the weight of the edge from source to destination
+UnDirectedGraph.cs (70) : return Vertices.Get(source).GetEdgeWeight(destination);
+UnDirectedGraph.cs (76) : if (Vertices.Get(source) != null)
+UnDirectedGraph.cs (77) : Vertices.Get(source).RemoveEdge(destination);
+UnDirectedGraph.cs (79) : if (Vertices.Get(destination) != null)
+UnDirectedGraph.cs (80) : Vertices.Get(destination).RemoveEdge(source);
+UnDirectedGraph.cs (85) : //TODO #18: Remove the vertex that contains element and
+UnDirectedGraph.cs (86) : //any edge that starts from or ends on that vertex
+UnDirectedGraph.cs (88) : if (Vertices.Get(element) == null)
+UnDirectedGraph.cs (89) : return;
+UnDirectedGraph.cs (91) : // Eliminar aristas entrantes directamente (más rápido)
+UnDirectedGraph.cs (92) : foreach (Vertex<TElement, TWeight> v in Vertices.Values())
+UnDirectedGraph.cs (93) : v.RemoveEdge(element);
+UnDirectedGraph.cs (95) : // Eliminar el vértice
+UnDirectedGraph.cs (96) : Vertices.Remove(element);
+UnDirectedGraph.cs (102) : return Vertices.Get(element);
+Vertex.cs (2) : using System.Security.Cryptography;
+Vertex.cs (7) : //TODO #1: Store edges starting from this vertex.
+Vertex.cs (8) : //Each edge has a weight and we want to be able to quickly find the edge to any other vertex
+Vertex.cs (10) : public HashTableDictionary<TElement, TWeight> edges;
+Vertex.cs (16) : this.Element = element;
+Vertex.cs (17) : edges = new HashTableDictionary<TElement, TWeight>();
+Vertex.cs (24) : return edges.Keys();
+Vertex.cs (31) : edges.Add(targetElement, weight);
+Vertex.cs (37) : //return edges.Keys().Length;
+Vertex.cs (38) : return edges.Count();
+Vertex.cs (44) : edges.Remove(targetElement);
+Vertex.cs (50) : return edges.Get(targetElement);
+Vertex.cs (61) : string output = null;
+Vertex.cs (63) : foreach(TElement clave in edges.Keys() )
+Vertex.cs (64) : {
+Vertex.cs (65) : output = output + Element + "->" + edges.Get(clave) + "->" + clave +"\n";
+Vertex.cs (66) : }

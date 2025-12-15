@@ -86,69 +86,72 @@ DistanceCalculator.cs (49) : string[] keys = nextCityCandidates.Keys();
 DistanceCalculator.cs (51) : for (int i = 0; i < keys.Length; i++)
 DistanceCalculator.cs (52) : {
 DistanceCalculator.cs (53) : string city = keys[i];
-DistanceCalculator.cs (54) : double distance = nextCityCandidates.Get(city);
-DistanceCalculator.cs (55) : if (!visited.Get(city) && distance < bestDistance)
-DistanceCalculator.cs (56) : {
-DistanceCalculator.cs (57) : bestCity = city;
-DistanceCalculator.cs (58) : bestDistance = distance;
-DistanceCalculator.cs (59) : }
-DistanceCalculator.cs (60) : }
-DistanceCalculator.cs (62) : return bestCity;
-DistanceCalculator.cs (71) : var neighbours = graph.Get(currentCity);
-DistanceCalculator.cs (72) : string[] keys = neighbours.Keys();
-DistanceCalculator.cs (74) : for (int i = 0; i < keys.Length; i++)
-DistanceCalculator.cs (75) : {
-DistanceCalculator.cs (76) : string neighbour = keys[i];
-DistanceCalculator.cs (78) : if (!visited.Get(neighbour))
-DistanceCalculator.cs (79) : {
-DistanceCalculator.cs (80) : double edgeDistance = neighbours.Get(neighbour);
-DistanceCalculator.cs (81) : double newDistance = distanceToCity.Get(currentCity) + edgeDistance;
-DistanceCalculator.cs (83) : if (newDistance < distanceToCity.Get(neighbour))
-DistanceCalculator.cs (84) : {
-DistanceCalculator.cs (85) : distanceToCity.Remove(neighbour);
-DistanceCalculator.cs (86) : distanceToCity.Add(neighbour, newDistance);
-DistanceCalculator.cs (87) : if (nextCityCandidates.Get(neighbour) != null)
-DistanceCalculator.cs (88) : {
-DistanceCalculator.cs (89) : nextCityCandidates.Remove(neighbour);
-DistanceCalculator.cs (90) : }
-DistanceCalculator.cs (91) : nextCityCandidates.Add(neighbour, newDistance);
-DistanceCalculator.cs (92) : }
+DistanceCalculator.cs (54) : if (!visited.Get(city))
+DistanceCalculator.cs (55) : {
+DistanceCalculator.cs (56) : double distance = nextCityCandidates.Get(city);
+DistanceCalculator.cs (57) : if (distance < bestDistance && distance!=0)
+DistanceCalculator.cs (58) : {
+DistanceCalculator.cs (59) : bestCity = city;
+DistanceCalculator.cs (60) : bestDistance = distance;
+DistanceCalculator.cs (61) : }
+DistanceCalculator.cs (62) : }
+DistanceCalculator.cs (63) : }
+DistanceCalculator.cs (65) : return bestCity;
+DistanceCalculator.cs (74) : var neighbours = graph.Get(currentCity);
+DistanceCalculator.cs (75) : string[] keys = neighbours.Keys();
+DistanceCalculator.cs (77) : for (int i = 0; i < keys.Length; i++)
+DistanceCalculator.cs (78) : {
+DistanceCalculator.cs (79) : string neighbour = keys[i];
+DistanceCalculator.cs (81) : if (!visited.Get(neighbour))
+DistanceCalculator.cs (82) : {
+DistanceCalculator.cs (83) : double edgeDistance = neighbours.Get(neighbour);
+DistanceCalculator.cs (84) : double newDistance = distanceToCity.Get(currentCity) + edgeDistance;
+DistanceCalculator.cs (86) : if (newDistance < distanceToCity.Get(neighbour))
+DistanceCalculator.cs (87) : {
+DistanceCalculator.cs (88) : distanceToCity.Remove(neighbour);
+DistanceCalculator.cs (89) : distanceToCity.Add(neighbour, newDistance);
+DistanceCalculator.cs (90) : if (nextCityCandidates.Get(neighbour) != null)
+DistanceCalculator.cs (91) : {
+DistanceCalculator.cs (92) : nextCityCandidates.Remove(neighbour);
 DistanceCalculator.cs (93) : }
+DistanceCalculator.cs (94) : nextCityCandidates.Add(neighbour, newDistance);
+DistanceCalculator.cs (95) : }
 DistanceCalculator.cs (96) : }
-DistanceCalculator.cs (106) : var distanceToCity = new HashTableDictionary<string, double>();
-DistanceCalculator.cs (107) : var visited = new HashTableDictionary<string, bool>();
-DistanceCalculator.cs (108) : var nextCityCandidates = new HashTableDictionary<string, double>();
-DistanceCalculator.cs (109) : string[] cities = graph.Keys();
-DistanceCalculator.cs (110) : for (int i = 0; i < cities.Length; i++)
-DistanceCalculator.cs (111) : {
-DistanceCalculator.cs (112) : string city = cities[i];
-DistanceCalculator.cs (113) : distanceToCity.Add(city, double.PositiveInfinity);
-DistanceCalculator.cs (114) : visited.Add(city, false);
-DistanceCalculator.cs (115) : }
-DistanceCalculator.cs (116) : distanceToCity.Remove(fromCity);
-DistanceCalculator.cs (117) : distanceToCity.Add(fromCity, 0);
-DistanceCalculator.cs (118) : nextCityCandidates.Add(fromCity, 0);
-DistanceCalculator.cs (119) : string currentCity = fromCity;
-DistanceCalculator.cs (120) : while (currentCity != null)
-DistanceCalculator.cs (121) : {
-DistanceCalculator.cs (122) : visited.Remove(currentCity);
-DistanceCalculator.cs (123) : visited.Add(currentCity, true);
-DistanceCalculator.cs (124) : CheckNeighbours(distanceToCity, visited, nextCityCandidates, currentCity);
-DistanceCalculator.cs (125) : nextCityCandidates.Remove(currentCity);
-DistanceCalculator.cs (126) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
-DistanceCalculator.cs (127) : }
-DistanceCalculator.cs (128) : string[] resultKeys = distanceToCity.Keys();
-DistanceCalculator.cs (129) : for (int i = 0; i < resultKeys.Length; i++)
-DistanceCalculator.cs (130) : {
-DistanceCalculator.cs (131) : string city = resultKeys[i];
-DistanceCalculator.cs (132) : double distance = distanceToCity.Get(city);
-DistanceCalculator.cs (134) : if (distance == double.PositiveInfinity)
-DistanceCalculator.cs (135) : {
-DistanceCalculator.cs (136) : distanceToCity.Remove(city);
-DistanceCalculator.cs (137) : distanceToCity.Add(city, double.MaxValue);
-DistanceCalculator.cs (138) : }
-DistanceCalculator.cs (139) : }
-DistanceCalculator.cs (140) : return distanceToCity;
+DistanceCalculator.cs (99) : }
+DistanceCalculator.cs (109) : var distanceToCity = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (110) : var visited = new HashTableDictionary<string, bool>();
+DistanceCalculator.cs (111) : var nextCityCandidates = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (112) : string[] cities = graph.Keys();
+DistanceCalculator.cs (113) : for (int i = 0; i < cities.Length; i++)
+DistanceCalculator.cs (114) : {
+DistanceCalculator.cs (115) : string city = cities[i];
+DistanceCalculator.cs (116) : distanceToCity.Add(city, double.PositiveInfinity);
+DistanceCalculator.cs (117) : visited.Add(city, false);
+DistanceCalculator.cs (118) : }
+DistanceCalculator.cs (119) : distanceToCity.Remove(fromCity);
+DistanceCalculator.cs (120) : distanceToCity.Add(fromCity, 0);
+DistanceCalculator.cs (121) : nextCityCandidates.Add(fromCity, 0);
+DistanceCalculator.cs (122) : string currentCity = fromCity;
+DistanceCalculator.cs (123) : while (currentCity != null)
+DistanceCalculator.cs (124) : {
+DistanceCalculator.cs (125) : visited.Remove(currentCity);
+DistanceCalculator.cs (126) : visited.Add(currentCity, true);
+DistanceCalculator.cs (127) : CheckNeighbours(distanceToCity, visited, nextCityCandidates, currentCity);
+DistanceCalculator.cs (128) : nextCityCandidates.Remove(currentCity);
+DistanceCalculator.cs (129) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
+DistanceCalculator.cs (130) : }
+DistanceCalculator.cs (131) : string[] resultKeys = distanceToCity.Keys();
+DistanceCalculator.cs (132) : for (int i = 0; i < resultKeys.Length; i++)
+DistanceCalculator.cs (133) : {
+DistanceCalculator.cs (134) : string city = resultKeys[i];
+DistanceCalculator.cs (135) : double distance = distanceToCity.Get(city);
+DistanceCalculator.cs (137) : if (distance == double.PositiveInfinity)
+DistanceCalculator.cs (138) : {
+DistanceCalculator.cs (139) : distanceToCity.Remove(city);
+DistanceCalculator.cs (140) : distanceToCity.Add(city, double.MaxValue);
+DistanceCalculator.cs (141) : }
+DistanceCalculator.cs (142) : }
+DistanceCalculator.cs (143) : return distanceToCity;
 GraphReaderWriter.cs (11) : return str
 GraphReaderWriter.cs (12) : .Replace("\n", "[NEWLINE]")
 GraphReaderWriter.cs (13) : .Replace("->", "[ARROW]")
@@ -192,24 +195,24 @@ GraphReaderWriter.cs (88) : if (line == "")
 GraphReaderWriter.cs (89) : {
 GraphReaderWriter.cs (90) : break;
 GraphReaderWriter.cs (91) : }
-GraphReaderWriter.cs (93) : string decoded = DecodeString(line);
-GraphReaderWriter.cs (94) : TKey key = stringToKey(decoded);
-GraphReaderWriter.cs (95) : graph.AddVertex(key);
-GraphReaderWriter.cs (96) : }
-GraphReaderWriter.cs (98) : while ((line = reader.ReadLine()) != null)
-GraphReaderWriter.cs (99) : {
-GraphReaderWriter.cs (100) : if (line != "")
-GraphReaderWriter.cs (101) : {
-GraphReaderWriter.cs (103) : string[] parts = line.Split("->");
-GraphReaderWriter.cs (104) : string partA = DecodeString(parts[0]);
-GraphReaderWriter.cs (105) : string partW = DecodeString(parts[1]);
-GraphReaderWriter.cs (106) : string partB = DecodeString(parts[2]);
-GraphReaderWriter.cs (107) : TKey A = stringToKey(partA);
-GraphReaderWriter.cs (108) : TWeight W = stringToWeight(partW);
-GraphReaderWriter.cs (109) : TKey B = stringToKey(partB);
-GraphReaderWriter.cs (112) : graph.AddEdge(A, B, W);
-GraphReaderWriter.cs (113) : }
-GraphReaderWriter.cs (115) : }
+GraphReaderWriter.cs (92) : string decoded = DecodeString(line);
+GraphReaderWriter.cs (93) : TKey key = stringToKey(decoded);
+GraphReaderWriter.cs (94) : graph.AddVertex(key);
+GraphReaderWriter.cs (95) : }
+GraphReaderWriter.cs (97) : while ((line = reader.ReadLine()) != null)
+GraphReaderWriter.cs (98) : {
+GraphReaderWriter.cs (99) : if (line != "")
+GraphReaderWriter.cs (100) : {
+GraphReaderWriter.cs (102) : string[] parts = line.Split("->");
+GraphReaderWriter.cs (103) : string partA = DecodeString(parts[0]);
+GraphReaderWriter.cs (104) : string partW = DecodeString(parts[1]);
+GraphReaderWriter.cs (105) : string partB = DecodeString(parts[2]);
+GraphReaderWriter.cs (106) : TKey A = stringToKey(partA);
+GraphReaderWriter.cs (107) : TWeight W = stringToWeight(partW);
+GraphReaderWriter.cs (108) : TKey B = stringToKey(partB);
+GraphReaderWriter.cs (111) : graph.AddEdge(A, B, W);
+GraphReaderWriter.cs (112) : }
+GraphReaderWriter.cs (114) : }
 HashTableDictionary.cs (1) : using System;
 HashTableDictionary.cs (2) : using System.Collections;
 HashTableDictionary.cs (3) : using Common;

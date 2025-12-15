@@ -387,11 +387,104 @@ List.cs (241) : {
 List.cs (242) : return m_numItems - 1;
 List.cs (243) : }
 List.cs (244) : }
+UnDirectedGraph.cs (2) : using System.Linq.Expressions;
+UnDirectedGraph.cs (3) : using System.Net.Http.Headers;
+UnDirectedGraph.cs (4) : using Common;
+UnDirectedGraph.cs (13) : protected HashTableDictionary<TElement, Vertex<TElement,TWeight>> Vertices = new HashTableDictionary<TElement, Vertex<TElement,TWeight>>();
+UnDirectedGraph.cs (20) : String output = "";
+UnDirectedGraph.cs (21) : //Por cada vertice dentro de "Vertices" concatenamos sus ToStrings()
+UnDirectedGraph.cs (22) : //para lograrlo usamos un foreach: vertex (del Tipo Vertex) dentro de Vertices.Values() = (NO) <TElement , (YES) Vertex<TElement,Tvalue>
+UnDirectedGraph.cs (23) : foreach(Vertex<TElement,TWeight> vertex in Vertices.Values())
+UnDirectedGraph.cs (24) : {
+UnDirectedGraph.cs (25) : output += vertex.ToString() + "\n";
+UnDirectedGraph.cs (26) : }
+UnDirectedGraph.cs (36) : //se podria hacer mejor con un for pero bueno, salió asi
+UnDirectedGraph.cs (38) : //creamos array vacio con tamaño correcto
+UnDirectedGraph.cs (39) : TElement[] AllElements = new TElement[Vertices.Count()];
+UnDirectedGraph.cs (40) : // iteramos Vertices y por cada elemento que haya, lo añadimos al array vacio
+UnDirectedGraph.cs (41) : int i = 0;
+UnDirectedGraph.cs (42) : foreach(TElement element in Vertices.Keys())
+UnDirectedGraph.cs (43) : {
+UnDirectedGraph.cs (44) : AllElements[i] = element;
+UnDirectedGraph.cs (45) : i++;
+UnDirectedGraph.cs (46) : }
+UnDirectedGraph.cs (47) : return AllElements;
+UnDirectedGraph.cs (55) : //in HashTableDictionary<TKey, TValue>   -------------->   public void Add(TKey key, TValue value)
+UnDirectedGraph.cs (56) : //cuando queremos hacer un add(X, Y) como nuestro Grafo consiste en un Vertices que es :  HashTableDictionary<TElement, Vertex<TElement,TWeight>>
+UnDirectedGraph.cs (57) : // X = TElement
+UnDirectedGraph.cs (58) : // Y = Vertex<TElement, TWeight>
+UnDirectedGraph.cs (60) : Vertex<TElement,TWeight> newVertex = new Vertex<TElement, TWeight>(element);
+UnDirectedGraph.cs (61) : Vertices.Add(element, newVertex);
+UnDirectedGraph.cs (71) : //ASUMIENDO QUE AMBOS VERTICES EXISTEN:
+UnDirectedGraph.cs (73) : //queremos que ambos se añadan a su lista de amigos :D
+UnDirectedGraph.cs (75) : //recordemos que en nuestro HASHTABLE<TK, TV> tenemos un metodo GET(TK) que te devuelve su TV correspondiente
+UnDirectedGraph.cs (76) : //en nuestro caso tenemos un HASHTABLE< TE, Vertex<TE,TV> > y justamente nos dan un TE (source) y queremos llegar al Vertex que contenga TE
+UnDirectedGraph.cs (77) : Vertex<TElement,TWeight> sourceVertex = Vertices.Get(source);
+UnDirectedGraph.cs (79) : //hacemos que source añada a Destination en su "Edges" , usando AddEdge(TElement targetElement, TWeight weight)
+UnDirectedGraph.cs (80) : sourceVertex.AddEdge(destination,weight);
+UnDirectedGraph.cs (81) : //ya hemos hecho que Source añada a Destination
+UnDirectedGraph.cs (83) : //hacemos lo mismo pero para la otra persona
+UnDirectedGraph.cs (85) : //hallamos el vertex que contiene TE destination
+UnDirectedGraph.cs (86) : Vertex<TElement,TWeight> destinationVertex = Vertices.Get(destination);
+UnDirectedGraph.cs (87) : destinationVertex.AddEdge(source,weight);
+UnDirectedGraph.cs (89) : // el weight es el mismo puesto que la distancia entre ambos es la misma para los 2
+UnDirectedGraph.cs (98) : int count = 0;
+UnDirectedGraph.cs (99) : foreach(TElement element in Vertices.Keys())
+UnDirectedGraph.cs (100) : {
+UnDirectedGraph.cs (101) : count++;
+UnDirectedGraph.cs (102) : }
+UnDirectedGraph.cs (104) : return count;
+UnDirectedGraph.cs (113) : int count = 0;
+UnDirectedGraph.cs (115) : //guardamos en VertexArray la version del grafo pero n array, es decir un array de Vertex
+UnDirectedGraph.cs (116) : Vertex<TElement,TWeight>[] VertexArray = Vertices.Values();
+UnDirectedGraph.cs (118) : //por cada vertex dentro del grafo, le sumamos su numero de Edges al contador
+UnDirectedGraph.cs (119) : int i = 0;
+UnDirectedGraph.cs (120) : foreach(Vertex<TElement,TWeight> vertex in VertexArray)
+UnDirectedGraph.cs (121) : {
+UnDirectedGraph.cs (122) : count += VertexArray[i].EdgeCount();
+UnDirectedGraph.cs (123) : i++;
+UnDirectedGraph.cs (124) : }
+UnDirectedGraph.cs (125) : return count;
+UnDirectedGraph.cs (133) : //asumo que el comentario esta mal y que lo que me pide es que:
+UnDirectedGraph.cs (134) : //al darnos 2 elementos que saquemos la distancia entre ambos
+UnDirectedGraph.cs (136) : //primero hallamos el vertex de unos de ellos con el TElement que nos dan
+UnDirectedGraph.cs (137) : Vertex<TElement,TWeight> sourceVertex = Vertices.Get(source);
+UnDirectedGraph.cs (138) : //Entremos dentro de los Edges de sourceVertex (que es hashtable de TE y TV)
+UnDirectedGraph.cs (139) : //ahora hacemos un Get(Tkey) que en este caso es un GET(TElement) que devuelve un TWEight
+UnDirectedGraph.cs (140) : return sourceVertex.Edges.Get(destination);
+UnDirectedGraph.cs (148) : //usamos lo mismo que en el TODO 13 pero en vez de usar AddEdge usamos RemoveEdge
+UnDirectedGraph.cs (149) : Vertex<TElement,TWeight> sourceVertex = Vertices.Get(source);
+UnDirectedGraph.cs (150) : sourceVertex.RemoveEdge(destination);
+UnDirectedGraph.cs (151) : Vertex<TElement,TWeight> destinationVertex = Vertices.Get(destination);
+UnDirectedGraph.cs (152) : destinationVertex.RemoveEdge(source);
+UnDirectedGraph.cs (161) : Vertex<TElement,TWeight> removedVertex = Vertices.Get(element); //GetVertex(element);
+UnDirectedGraph.cs (162) : //destruimos todos los Edges
+UnDirectedGraph.cs (163) : // no funciona porque itermos sobre los mimos edges que estamos destruyendo
+UnDirectedGraph.cs (165) : /*int i = 0;
+UnDirectedGraph.cs (166) : foreach(TElement element1 in removedVertex.Edges.Keys())
+UnDirectedGraph.cs (167) : {
+UnDirectedGraph.cs (168) : RemoveEdge(removedVertex.Edges.Keys()[i],element);
+UnDirectedGraph.cs (169) : i++;
+UnDirectedGraph.cs (170) : }
+UnDirectedGraph.cs (171) : */
+UnDirectedGraph.cs (173) : if(removedVertex == null)
+UnDirectedGraph.cs (174) : {
+UnDirectedGraph.cs (175) : return;
+UnDirectedGraph.cs (176) : }
+UnDirectedGraph.cs (178) : //copiamos la lista sobre la que iteramos para eliminar --A--> un array -----> luego iteramos sobre el array para que cuando eliminemos algo -----> Array no cambia
+UnDirectedGraph.cs (179) : TElement[] connectedElements = removedVertex.ConnectedElements();
+UnDirectedGraph.cs (181) : foreach(TElement amigo in connectedElements)
+UnDirectedGraph.cs (182) : {
+UnDirectedGraph.cs (183) : RemoveEdge(amigo, element);
+UnDirectedGraph.cs (184) : }
+UnDirectedGraph.cs (186) : //finalmente se elimina el vertice en sí
+UnDirectedGraph.cs (187) : Vertices.Remove(element);
+UnDirectedGraph.cs (197) : return Vertices.Get(element);
 Vertex.cs (2) : using System.Collections;
 Vertex.cs (3) : using System.Linq;
 Vertex.cs (4) : using System.Text;
 Vertex.cs (5) : using Common;
-Vertex.cs (11) : public HashTableDictionary<TElement,TWeight> Edges;
+Vertex.cs (11) : public HashTableDictionary<TElement,TWeight> Edges = new HashTableDictionary<TElement, TWeight>();
 Vertex.cs (16) : Element = element;
 Vertex.cs (17) : //*********
 Vertex.cs (24) : TElement[] elements = new TElement[Edges.Count()];

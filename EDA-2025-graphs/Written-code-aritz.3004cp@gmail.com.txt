@@ -1,3 +1,11 @@
+BinaryGraphReaderWriter.cs (27) : writer.Write(BitConverter.GetBytes(graph.VertexCount()));
+BinaryGraphReaderWriter.cs (28) : TKey[] llaves = graph.Elements();
+BinaryGraphReaderWriter.cs (29) : for (int i = 0; i < llaves.Length; i++)
+BinaryGraphReaderWriter.cs (30) : {
+BinaryGraphReaderWriter.cs (31) : writer.Write(keyToByteArray(llaves[i]));
+BinaryGraphReaderWriter.cs (32) : }
+BinaryGraphReaderWriter.cs (49) : reader.ReadInt32();
+BinaryGraphReaderWriter.cs (50) : reader.ReadBytes(30);
 DirectedGraph.cs (9) : Vertices.Get(sourceKey).AddEdge(destinationKey, weight);
 DirectedGraph.cs (10) : Vertices.Get(destinationKey).pointingAtMeVertices.Add(sourceKey, sourceKey);
 DirectedGraph.cs (17) : TElement[] elementos = Vertices.Get(element).pointingAtMeVertices.Keys();
@@ -13,6 +21,40 @@ DirectedGraph.cs (26) : Vertices.Get(elementos[i]).pointingAtMeVertices.Remove(e
 DirectedGraph.cs (27) : }
 DirectedGraph.cs (33) : Vertices.Get(sourceKey).RemoveEdge(destKey);
 DirectedGraph.cs (34) : Vertices.Get(destKey).pointingAtMeVertices.Remove(sourceKey);
+GraphReaderWriter.cs (2) : using System.Globalization;
+GraphReaderWriter.cs (13) : return str.Replace("\n", "[NEW_LINE]").Replace("->", "[NEW_ARROW]");
+GraphReaderWriter.cs (20) : return str.Replace("[NEW_LINE]", "\n").Replace("[NEW_ARROW]", "->");
+GraphReaderWriter.cs (30) : TKey[] llaves = graph.Elements();
+GraphReaderWriter.cs (31) : for (int i = 0; i < llaves.Length; i++)
+GraphReaderWriter.cs (32) : {
+GraphReaderWriter.cs (33) : writer.Write(EncodeString(keyToString(llaves[i])) + "\n");
+GraphReaderWriter.cs (34) : }
+GraphReaderWriter.cs (35) : writer.Write("\n");
+GraphReaderWriter.cs (36) : TKey[] keys;
+GraphReaderWriter.cs (37) : for (int i = 0; i < llaves.Length; i++)
+GraphReaderWriter.cs (38) : {
+GraphReaderWriter.cs (39) : Vertex<TKey, TWeight> vertx = graph.GetVertex(llaves[i]);
+GraphReaderWriter.cs (40) : keys = vertx.Edges.Keys();
+GraphReaderWriter.cs (41) : for (int j = 0; j < keys.Length; j++)
+GraphReaderWriter.cs (42) : {
+GraphReaderWriter.cs (43) : writer.Write(EncodeString(vertx.Element.ToString()) + "->" + EncodeString(vertx.Edges.Get(keys[j]).ToString()) + "->" + EncodeString(keys[j].ToString()) + "\n");
+GraphReaderWriter.cs (44) : }
+GraphReaderWriter.cs (45) : }
+GraphReaderWriter.cs (64) : String linea = reader.ReadLine();
+GraphReaderWriter.cs (65) : String[] partes;
+GraphReaderWriter.cs (66) : while (!linea.Equals(""))
+GraphReaderWriter.cs (67) : {
+GraphReaderWriter.cs (68) : linea = DecodeString(linea);
+GraphReaderWriter.cs (69) : graph.AddVertex(stringToKey(linea));
+GraphReaderWriter.cs (70) : linea = reader.ReadLine();
+GraphReaderWriter.cs (71) : }
+GraphReaderWriter.cs (72) : linea = reader.ReadLine();
+GraphReaderWriter.cs (73) : while (linea != null)
+GraphReaderWriter.cs (74) : {
+GraphReaderWriter.cs (75) : partes = linea.Split("->");
+GraphReaderWriter.cs (76) : graph.AddEdge(stringToKey(DecodeString(partes[0])), stringToKey(DecodeString(partes[2])), stringToWeight(DecodeString(partes[1])));
+GraphReaderWriter.cs (77) : linea = reader.ReadLine();
+GraphReaderWriter.cs (78) : }
 HashTableDictionary.cs (2) : using Common;
 HashTableDictionary.cs (3) : using System;
 HashTableDictionary.cs (4) : using System.Threading;
