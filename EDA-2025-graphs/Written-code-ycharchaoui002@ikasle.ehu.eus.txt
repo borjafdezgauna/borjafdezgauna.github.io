@@ -1,3 +1,12 @@
+DirectedGraph.cs (9) : Vertices.Get(sourceKey).AddEdge(destinationKey,weight);
+DirectedGraph.cs (14) : //TODO #21: Remove the vertex that contains this element and any edge that starts from or ends on
+DirectedGraph.cs (15) : // that vertex
+DirectedGraph.cs (17) : Vertices.Remove(element);
+DirectedGraph.cs (18) : foreach(TElement edge in Vertices.Keys())
+DirectedGraph.cs (19) : {
+DirectedGraph.cs (20) : RemoveEdge(edge,element);
+DirectedGraph.cs (21) : }
+DirectedGraph.cs (27) : Vertices.Get(sourceKey).RemoveEdge(destKey);
 DistanceCalculator.cs (7) : //TODO #29: Declare a graph as a member-variable/attribute. We will store here the names of the cities
 DistanceCalculator.cs (8) : // and the distances between them
 DistanceCalculator.cs (9) : UndirectedGraph<string, double> graph;
@@ -73,8 +82,60 @@ DistanceCalculator.cs (125) : return distcity;
 GraphReaderWriter.cs (3) : using Common;
 GraphReaderWriter.cs (11) : //TODO #23: Replace all separators and special characters used in your file by
 GraphReaderWriter.cs (12) : // some improbable tag (i.e, "[NEW_LINE]")
-GraphReaderWriter.cs (13) : return str;
+GraphReaderWriter.cs (13) : return str.Replace("\n", "[NEW_LINE]");
 GraphReaderWriter.cs (14) : }
+GraphReaderWriter.cs (20) : return str.Replace("[NEW_LINE]", "\n");
+GraphReaderWriter.cs (30) : //TODO #25: Write first all the vertices as strings (one line each), then one empty line,
+GraphReaderWriter.cs (31) : // and then each of the edges with the format "A->1->B" (one line each)
+GraphReaderWriter.cs (34) : foreach (TKey key in graph.Elements())
+GraphReaderWriter.cs (35) : {
+GraphReaderWriter.cs (36) : writer.WriteLine(EncodeString(keyToString(key)));
+GraphReaderWriter.cs (37) : }
+GraphReaderWriter.cs (39) : writer.WriteLine();
+GraphReaderWriter.cs (41) : foreach (TKey or in graph.Elements())
+GraphReaderWriter.cs (42) : {
+GraphReaderWriter.cs (43) : foreach (TKey dest in graph.GetVertex(or).edges.Keys())
+GraphReaderWriter.cs (44) : {
+GraphReaderWriter.cs (45) : if (!or.Equals(dest))
+GraphReaderWriter.cs (46) : {
+GraphReaderWriter.cs (47) : TWeight weight = graph.GetEdgeWeight(or, dest);
+GraphReaderWriter.cs (48) : string l = keyToString(or) + "->" + weightToString(weight) + "->" + keyToString(dest);
+GraphReaderWriter.cs (49) : writer.WriteLine(EncodeString(l));
+GraphReaderWriter.cs (50) : }
+GraphReaderWriter.cs (51) : }
+GraphReaderWriter.cs (52) : }
+GraphReaderWriter.cs (72) : string l=reader.ReadLine();
+GraphReaderWriter.cs (73) : bool readvertex=true;
+GraphReaderWriter.cs (74) : while (l!=null)
+GraphReaderWriter.cs (75) : {
+GraphReaderWriter.cs (76) : if (readvertex)
+GraphReaderWriter.cs (77) : {
+GraphReaderWriter.cs (78) : if (l == "")
+GraphReaderWriter.cs (79) : {
+GraphReaderWriter.cs (80) : readvertex = false;
+GraphReaderWriter.cs (81) : }
+GraphReaderWriter.cs (82) : else
+GraphReaderWriter.cs (83) : {
+GraphReaderWriter.cs (84) : graph.AddVertex(stringToKey(DecodeString(l)));
+GraphReaderWriter.cs (85) : }
+GraphReaderWriter.cs (86) : }
+GraphReaderWriter.cs (87) : else
+GraphReaderWriter.cs (88) : {
+GraphReaderWriter.cs (89) : if (l != "")
+GraphReaderWriter.cs (90) : {
+GraphReaderWriter.cs (91) : string dec = DecodeString(l);
+GraphReaderWriter.cs (92) : string[] datos = dec.Split(new[] { "->" }, StringSplitOptions.None);
+GraphReaderWriter.cs (94) : if (datos.Length == 3)
+GraphReaderWriter.cs (95) : {
+GraphReaderWriter.cs (96) : TKey or = stringToKey(datos[0]);
+GraphReaderWriter.cs (97) : TKey dest = stringToKey(datos[2]);
+GraphReaderWriter.cs (98) : TWeight we = stringToWeight(datos[1]);
+GraphReaderWriter.cs (100) : graph.AddEdge(or, dest, we);
+GraphReaderWriter.cs (101) : }
+GraphReaderWriter.cs (102) : }
+GraphReaderWriter.cs (103) : }
+GraphReaderWriter.cs (105) : l = reader.ReadLine();
+GraphReaderWriter.cs (107) : }
 HashTableDictionary.cs (2) : using Common;
 HashTableDictionary.cs (3) : using System;
 HashTableDictionary.cs (4) : using System.Drawing;
@@ -460,50 +521,51 @@ ListNode.cs (160) : value=value.Next;
 ListNode.cs (161) : }
 ListNode.cs (163) : }
 ListNode.cs (164) : }
-UnDirectedGraph.cs (10) : protected HashTableDictionary<TElement, Vertex<TElement,TWeight>> Vertices=new HashTableDictionary<TElement, Vertex<TElement, TWeight>>();
-UnDirectedGraph.cs (16) : foreach(TElement city in Vertices.Keys())
-UnDirectedGraph.cs (17) : {
-UnDirectedGraph.cs (18) : output=output+ Vertices.Get(city).ToString()+"\n";
-UnDirectedGraph.cs (19) : }
-UnDirectedGraph.cs (27) : int i = 0;
-UnDirectedGraph.cs (28) : TElement[] result = new TElement[Vertices.Count()];
-UnDirectedGraph.cs (29) : foreach( TElement city in Vertices.Keys() )
-UnDirectedGraph.cs (30) : {
-UnDirectedGraph.cs (31) : result[ i ] = city;
-UnDirectedGraph.cs (32) : i++;
-UnDirectedGraph.cs (33) : }
-UnDirectedGraph.cs (35) : return result;
-UnDirectedGraph.cs (42) : //Vertices.Add(element, default);
-UnDirectedGraph.cs (43) : Vertex<TElement, TWeight> non= new Vertex<TElement, TWeight>(element);
-UnDirectedGraph.cs (44) : Vertices.Add(element, non);
-UnDirectedGraph.cs (51) : Vertices.Get(source).AddEdge(destination,weight);
-UnDirectedGraph.cs (52) : Vertices.Get(destination).AddEdge(source,weight);
-UnDirectedGraph.cs (59) : return Vertices.Count();
-UnDirectedGraph.cs (65) : //TODO #15: Return the number of edges. Edges are stored in
-UnDirectedGraph.cs (66) : // each vertex, so vertices need to be traversed to count
-UnDirectedGraph.cs (67) : // edges
-UnDirectedGraph.cs (68) : int count=0;
-UnDirectedGraph.cs (69) : foreach(Vertex<TElement, TWeight> v in Vertices.Values())
-UnDirectedGraph.cs (70) : {
-UnDirectedGraph.cs (71) : count=count+v.EdgeCount();
-UnDirectedGraph.cs (72) : }
-UnDirectedGraph.cs (73) : return count;
-UnDirectedGraph.cs (80) : return Vertices.Get(source).GetEdgeWeight(destination);
-UnDirectedGraph.cs (87) : if (Vertices.Get(source) != null)
-UnDirectedGraph.cs (88) : {
-UnDirectedGraph.cs (89) : Vertices.Get(source).RemoveEdge(destination);
-UnDirectedGraph.cs (91) : }
-UnDirectedGraph.cs (92) : if (Vertices.Get(destination) != null)
-UnDirectedGraph.cs (93) : {
-UnDirectedGraph.cs (94) : Vertices.Get(destination).RemoveEdge(source);
-UnDirectedGraph.cs (95) : }
-UnDirectedGraph.cs (102) : Vertices.Remove(element);
-UnDirectedGraph.cs (103) : foreach(TElement v in Vertices.Keys())
-UnDirectedGraph.cs (104) : {
-UnDirectedGraph.cs (105) : RemoveEdge(v,element);
-UnDirectedGraph.cs (106) : }
-UnDirectedGraph.cs (112) : // the edges of vertices
-UnDirectedGraph.cs (113) : return Vertices.Get(element);
+UnDirectedGraph.cs (10) : protected HashTableDictionary<TElement, Vertex<TElement,TWeight>> Vertices
+UnDirectedGraph.cs (11) : =new HashTableDictionary<TElement, Vertex<TElement, TWeight>>();
+UnDirectedGraph.cs (17) : foreach(TElement city in Vertices.Keys())
+UnDirectedGraph.cs (18) : {
+UnDirectedGraph.cs (19) : output=output+ Vertices.Get(city).ToString()+"\n";
+UnDirectedGraph.cs (20) : }
+UnDirectedGraph.cs (28) : int i = 0;
+UnDirectedGraph.cs (29) : TElement[] result = new TElement[Vertices.Count()];
+UnDirectedGraph.cs (30) : foreach( TElement city in Vertices.Keys() )
+UnDirectedGraph.cs (31) : {
+UnDirectedGraph.cs (32) : result[ i ] = city;
+UnDirectedGraph.cs (33) : i++;
+UnDirectedGraph.cs (34) : }
+UnDirectedGraph.cs (36) : return result;
+UnDirectedGraph.cs (43) : //Vertices.Add(element, default);
+UnDirectedGraph.cs (44) : Vertex<TElement, TWeight> non= new Vertex<TElement, TWeight>(element);
+UnDirectedGraph.cs (45) : Vertices.Add(element, non);
+UnDirectedGraph.cs (52) : Vertices.Get(source).AddEdge(destination,weight);
+UnDirectedGraph.cs (53) : Vertices.Get(destination).AddEdge(source,weight);
+UnDirectedGraph.cs (60) : return Vertices.Count();
+UnDirectedGraph.cs (66) : //TODO #15: Return the number of edges. Edges are stored in
+UnDirectedGraph.cs (67) : // each vertex, so vertices need to be traversed to count
+UnDirectedGraph.cs (68) : // edges
+UnDirectedGraph.cs (69) : int count=0;
+UnDirectedGraph.cs (70) : foreach(Vertex<TElement, TWeight> v in Vertices.Values())
+UnDirectedGraph.cs (71) : {
+UnDirectedGraph.cs (72) : count=count+v.EdgeCount();
+UnDirectedGraph.cs (73) : }
+UnDirectedGraph.cs (74) : return count;
+UnDirectedGraph.cs (81) : return Vertices.Get(source).GetEdgeWeight(destination);
+UnDirectedGraph.cs (88) : if (Vertices.Get(source) != null)
+UnDirectedGraph.cs (89) : {
+UnDirectedGraph.cs (90) : Vertices.Get(source).RemoveEdge(destination);
+UnDirectedGraph.cs (92) : }
+UnDirectedGraph.cs (93) : if (Vertices.Get(destination) != null)
+UnDirectedGraph.cs (94) : {
+UnDirectedGraph.cs (95) : Vertices.Get(destination).RemoveEdge(source);
+UnDirectedGraph.cs (96) : }
+UnDirectedGraph.cs (103) : Vertices.Remove(element);
+UnDirectedGraph.cs (104) : foreach(TElement v in Vertices.Keys())
+UnDirectedGraph.cs (105) : {
+UnDirectedGraph.cs (106) : RemoveEdge(v,element);
+UnDirectedGraph.cs (107) : }
+UnDirectedGraph.cs (113) : // the edges of vertices
+UnDirectedGraph.cs (114) : return Vertices.Get(element);
 Vertex.cs (6) : //TODO #1: Store edges starting from this vertex. Each edge has a weight and we want
 Vertex.cs (7) : // to be able to quickly find the edge to any other vertex
 Vertex.cs (8) : public HashTableDictionary<TElement,TWeight> edges;

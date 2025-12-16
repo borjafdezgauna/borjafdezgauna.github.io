@@ -1,3 +1,10 @@
+BinaryGraphReaderWriter.cs (27) : writer.Write(BitConverter.GetBytes(graph.VertexCount()));
+BinaryGraphReaderWriter.cs (28) : TKey[] keys = graph.Elements();
+BinaryGraphReaderWriter.cs (30) : for (int i = 0; i < keys.Length; i++)
+BinaryGraphReaderWriter.cs (31) : {
+BinaryGraphReaderWriter.cs (33) : writer.Write(keyToByteArray(keys[i]));
+BinaryGraphReaderWriter.cs (34) : }
+BinaryGraphReaderWriter.cs (35) : writer.Write(BitConverter.GetBytes(graph.EdgeCount()));
 DirectedGraph.cs (2) : using System.ComponentModel.DataAnnotations;
 DirectedGraph.cs (10) : Vertices.Get(sourceKey).AddEdge(destinationKey, weight);
 DirectedGraph.cs (11) : Vertices.Get(destinationKey).ReturnedEdges.Add(sourceKey, sourceKey);
@@ -7,13 +14,49 @@ DirectedGraph.cs (20) : {
 DirectedGraph.cs (21) : RemoveEdge(elementos[i], element);
 DirectedGraph.cs (22) : }
 DirectedGraph.cs (23) : elementos = Vertices.Get(element).ConnectedElements();
-DirectedGraph.cs (24) : for (int i = 0; i < elementos.Length; i++)
-DirectedGraph.cs (25) : {
-DirectedGraph.cs (26) : Vertices.Get(elementos[i]).ReturnedEdges.Remove(element);
-DirectedGraph.cs (27) : }
-DirectedGraph.cs (28) : Vertices.Remove(element);
-DirectedGraph.cs (34) : Vertices.Get(sourceKey).RemoveEdge(destKey);
-DirectedGraph.cs (35) : Vertices.Get(destKey).ReturnedEdges.Remove(sourceKey);
+DirectedGraph.cs (24) : Vertices.Remove(element);
+DirectedGraph.cs (25) : for (int i = 0; i < elementos.Length; i++)
+DirectedGraph.cs (26) : {
+DirectedGraph.cs (27) : Vertices.Get(elementos[i]).ReturnedEdges.Remove(element);
+DirectedGraph.cs (28) : }
+DirectedGraph.cs (35) : Vertices.Get(sourceKey).RemoveEdge(destKey);
+DirectedGraph.cs (36) : Vertices.Get(destKey).ReturnedEdges.Remove(sourceKey);
+GraphReaderWriter.cs (2) : using System.Globalization;
+GraphReaderWriter.cs (13) : return str.Replace("\n", "[NEW_LINE]").Replace("->", "[ARROW]");
+GraphReaderWriter.cs (20) : return str.Replace("[NEW_LINE]", "\n").Replace("[ARROW]", "->");
+GraphReaderWriter.cs (32) : TKey[] elements = graph.Elements();
+GraphReaderWriter.cs (33) : TKey[] edges;
+GraphReaderWriter.cs (34) : TKey[] connected;
+GraphReaderWriter.cs (35) : for (int i = 0; i < elements.Length; i++)
+GraphReaderWriter.cs (36) : {
+GraphReaderWriter.cs (37) : writer.WriteLine(EncodeString(keyToString(elements[i])));
+GraphReaderWriter.cs (38) : }
+GraphReaderWriter.cs (39) : writer.Write("\n");
+GraphReaderWriter.cs (41) : for (int i = 0; i < elements.Length; i++)
+GraphReaderWriter.cs (42) : {
+GraphReaderWriter.cs (43) : edges = graph.GetVertex(elements[i]).Edges.Keys();
+GraphReaderWriter.cs (44) : connected = graph.GetVertex(elements[i]).ConnectedElements();
+GraphReaderWriter.cs (46) : for (int j = 0; j < edges.Length; j++)
+GraphReaderWriter.cs (47) : {
+GraphReaderWriter.cs (48) : writer.WriteLine(EncodeString(elements[i].ToString()) + "->" + EncodeString(graph.GetVertex(elements[i]).Edges.Get(connected[j]).ToString()) + "->" + EncodeString(connected[j].ToString()));
+GraphReaderWriter.cs (49) : }
+GraphReaderWriter.cs (50) : }
+GraphReaderWriter.cs (51) : writer.Close();
+GraphReaderWriter.cs (70) : String linea = reader.ReadLine();
+GraphReaderWriter.cs (71) : String[] split = new string[3];
+GraphReaderWriter.cs (72) : while (!linea.Equals(""))
+GraphReaderWriter.cs (73) : {
+GraphReaderWriter.cs (74) : linea = DecodeString(linea);
+GraphReaderWriter.cs (75) : graph.AddVertex(stringToKey(linea));
+GraphReaderWriter.cs (76) : linea = reader.ReadLine();
+GraphReaderWriter.cs (77) : }
+GraphReaderWriter.cs (79) : linea = reader.ReadLine();
+GraphReaderWriter.cs (80) : while (linea != null)
+GraphReaderWriter.cs (81) : {
+GraphReaderWriter.cs (82) : split = linea.Split("->");
+GraphReaderWriter.cs (83) : graph.AddEdge(stringToKey(DecodeString(split[0])), stringToKey(DecodeString(split[2])), stringToWeight(DecodeString(split[1])));
+GraphReaderWriter.cs (84) : linea = reader.ReadLine();
+GraphReaderWriter.cs (85) : }
 HashTableDictionary.cs (2) : using Common;
 HashTableDictionary.cs (3) : using System;
 HashTableDictionary.cs (4) : using System.Diagnostics;

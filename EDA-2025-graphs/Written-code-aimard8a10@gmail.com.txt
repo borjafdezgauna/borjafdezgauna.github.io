@@ -1,46 +1,53 @@
 BinaryGraphReaderWriter.cs (2) : using System.Formats.Asn1;
 BinaryGraphReaderWriter.cs (5) : using System.Reflection.PortableExecutable;
-BinaryGraphReaderWriter.cs (29) : writer.Write(graph.VertexCount());
-BinaryGraphReaderWriter.cs (31) : foreach(TKey v in graph.Elements())
-BinaryGraphReaderWriter.cs (32) : {
-BinaryGraphReaderWriter.cs (33) : byte[] data = keyToByteArray(v);
-BinaryGraphReaderWriter.cs (34) : writer.Write(data.Length);
-BinaryGraphReaderWriter.cs (35) : writer.Write(data);
-BinaryGraphReaderWriter.cs (36) : }
-BinaryGraphReaderWriter.cs (37) : writer.Write(graph.EdgeCount());
-BinaryGraphReaderWriter.cs (39) : foreach(TKey source in graph.Elements())
-BinaryGraphReaderWriter.cs (40) : {
-BinaryGraphReaderWriter.cs (41) : foreach(TKey destination in graph.Elements())
-BinaryGraphReaderWriter.cs (42) : {
-BinaryGraphReaderWriter.cs (43) : TWeight w = graph.GetEdgeWeight(source,destination);
-BinaryGraphReaderWriter.cs (45) : writer.Write(source.ToString());
-BinaryGraphReaderWriter.cs (46) : byte[] wArray = weightToByteArray(w);
-BinaryGraphReaderWriter.cs (48) : writer.Write(wArray.Length);
-BinaryGraphReaderWriter.cs (49) : writer.Write(wArray);
-BinaryGraphReaderWriter.cs (51) : writer.Write(destination.ToString());
-BinaryGraphReaderWriter.cs (52) : }
-BinaryGraphReaderWriter.cs (53) : }
-BinaryGraphReaderWriter.cs (81) : int numeroVertices = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (83) : for(int i = 0; i < numeroVertices; i++)
-BinaryGraphReaderWriter.cs (84) : {
-BinaryGraphReaderWriter.cs (85) : int count= reader.ReadInt32();
-BinaryGraphReaderWriter.cs (86) : byte[] x = reader.ReadBytes(count);
-BinaryGraphReaderWriter.cs (88) : graph.AddVertex(keyFromByteArray(x));
-BinaryGraphReaderWriter.cs (89) : }
-BinaryGraphReaderWriter.cs (90) : int edgeCount = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (92) : for ( int i = 0; i < edgeCount ; i++)
-BinaryGraphReaderWriter.cs (93) : {
-BinaryGraphReaderWriter.cs (94) : int sourceKeyLenght = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (95) : byte[] sourceKeyBytes = reader.ReadBytes(sourceKeyLenght);
-BinaryGraphReaderWriter.cs (96) : TKey source = keyFromByteArray(sourceKeyBytes);
-BinaryGraphReaderWriter.cs (98) : int weightLength = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (99) : byte[] weightBytes = reader.ReadBytes(weightLength);
-BinaryGraphReaderWriter.cs (100) : TWeight weight = weightFromByteArray(weightBytes);
-BinaryGraphReaderWriter.cs (102) : int destKeyLength = reader.ReadInt32();
-BinaryGraphReaderWriter.cs (103) : byte[] destKeyBytes = reader.ReadBytes(destKeyLength);
-BinaryGraphReaderWriter.cs (104) : TKey destination = keyFromByteArray(destKeyBytes);
-BinaryGraphReaderWriter.cs (106) : graph.AddEdge(source, destination, weight);
-BinaryGraphReaderWriter.cs (107) : }
+BinaryGraphReaderWriter.cs (30) : writer.Write(graph.VertexCount());
+BinaryGraphReaderWriter.cs (33) : foreach (TKey v in graph.Elements())
+BinaryGraphReaderWriter.cs (34) : {
+BinaryGraphReaderWriter.cs (35) : byte[] data = keyToByteArray(v);
+BinaryGraphReaderWriter.cs (36) : writer.Write(data.Length);
+BinaryGraphReaderWriter.cs (37) : writer.Write(data);
+BinaryGraphReaderWriter.cs (38) : }
+BinaryGraphReaderWriter.cs (41) : writer.Write(graph.EdgeCount());
+BinaryGraphReaderWriter.cs (44) : foreach (TKey source in graph.Elements())
+BinaryGraphReaderWriter.cs (45) : {
+BinaryGraphReaderWriter.cs (46) : Vertex<TKey, TWeight> vert = graph.GetVertex(source);
+BinaryGraphReaderWriter.cs (47) : foreach (TKey destination in vert.edges.Keys())
+BinaryGraphReaderWriter.cs (48) : {
+BinaryGraphReaderWriter.cs (50) : byte[] sourceBytes = keyToByteArray(source);
+BinaryGraphReaderWriter.cs (51) : writer.Write(sourceBytes.Length);
+BinaryGraphReaderWriter.cs (52) : writer.Write(sourceBytes);
+BinaryGraphReaderWriter.cs (55) : TWeight w = graph.GetEdgeWeight(source, destination);
+BinaryGraphReaderWriter.cs (56) : byte[] wBytes = weightToByteArray(w);
+BinaryGraphReaderWriter.cs (57) : writer.Write(wBytes.Length);
+BinaryGraphReaderWriter.cs (58) : writer.Write(wBytes);
+BinaryGraphReaderWriter.cs (61) : byte[] destBytes = keyToByteArray(destination);
+BinaryGraphReaderWriter.cs (62) : writer.Write(destBytes.Length);
+BinaryGraphReaderWriter.cs (63) : writer.Write(destBytes);
+BinaryGraphReaderWriter.cs (64) : }
+BinaryGraphReaderWriter.cs (65) : }
+BinaryGraphReaderWriter.cs (93) : int numVertices = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (96) : for (int i = 0; i < numVertices; i++)
+BinaryGraphReaderWriter.cs (97) : {
+BinaryGraphReaderWriter.cs (98) : int keyLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (99) : byte[] keyBytes = reader.ReadBytes(keyLength);
+BinaryGraphReaderWriter.cs (100) : TKey key = keyFromByteArray(keyBytes);
+BinaryGraphReaderWriter.cs (101) : graph.AddVertex(key);
+BinaryGraphReaderWriter.cs (102) : }
+BinaryGraphReaderWriter.cs (105) : int numeroAristas = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (108) : for (int i = 0; i < numeroAristas; i++)
+BinaryGraphReaderWriter.cs (109) : {
+BinaryGraphReaderWriter.cs (110) : int sourceLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (111) : byte[] sourceBytes = reader.ReadBytes(sourceLength);
+BinaryGraphReaderWriter.cs (112) : TKey source = keyFromByteArray(sourceBytes);
+BinaryGraphReaderWriter.cs (114) : int weightLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (115) : byte[] weightBytes = reader.ReadBytes(weightLength);
+BinaryGraphReaderWriter.cs (116) : TWeight weight = weightFromByteArray(weightBytes);
+BinaryGraphReaderWriter.cs (118) : int destLength = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (119) : byte[] destBytes = reader.ReadBytes(destLength);
+BinaryGraphReaderWriter.cs (120) : TKey destination = keyFromByteArray(destBytes);
+BinaryGraphReaderWriter.cs (122) : graph.AddEdge(source, destination, weight);
+BinaryGraphReaderWriter.cs (123) : }
+BinaryGraphReaderWriter.cs (125) : reader.Close();
 DirectedGraph.cs (3) : public class DirectedGraph<TElement, TWeight> : UndirectedGraph<TElement, TWeight>
 DirectedGraph.cs (4) : where TElement : IComparable<TElement>
 DirectedGraph.cs (9) : Vertices.Get(sourceKey).AddEdge(destinationKey, weight);
@@ -257,54 +264,75 @@ GenericList.cs (157) : }
 GenericList.cs (158) : }
 GenericList.cs (159) : }
 GraphReaderWriter.cs (2) : using System.Data;
-GraphReaderWriter.cs (12) : str.Replace("\n", "[NEW_LINE]");
-GraphReaderWriter.cs (20) : str.Replace("[NEW_LINE]", "\n");
-GraphReaderWriter.cs (25) : public bool Write<TKey, TWeight>(
-GraphReaderWriter.cs (26) : UndirectedGraph<TKey, TWeight> graph,
-GraphReaderWriter.cs (27) : string filename,
-GraphReaderWriter.cs (28) : Func<TKey, string> keyToString,
-GraphReaderWriter.cs (29) : Func<TWeight, string> weightToString
-GraphReaderWriter.cs (30) : )
-GraphReaderWriter.cs (31) : where TKey : IComparable<TKey>
-GraphReaderWriter.cs (37) : //TODO #25: Write first all the vertices as strings (one line each), then one empty line,
-GraphReaderWriter.cs (38) : // and then each of the edges with the format "A->1->B" (one line each)
-GraphReaderWriter.cs (40) : foreach (TKey clave in graph.Elements())
-GraphReaderWriter.cs (41) : {
-GraphReaderWriter.cs (42) : writer.WriteLine(keyToString(clave));
-GraphReaderWriter.cs (43) : }
-GraphReaderWriter.cs (45) : writer.WriteLine();//whiteLine
-GraphReaderWriter.cs (47) : foreach(TKey origen in graph.Elements())
+GraphReaderWriter.cs (13) : return str.Replace("\n", "[NEW_LINE]");;
+GraphReaderWriter.cs (20) : return str.Replace("[NEW_LINE]", "\n");;
+GraphReaderWriter.cs (23) : public bool Write<TKey, TWeight>(
+GraphReaderWriter.cs (24) : UndirectedGraph<TKey, TWeight> graph,
+GraphReaderWriter.cs (25) : string filename,
+GraphReaderWriter.cs (26) : Func<TKey, string> keyToString,
+GraphReaderWriter.cs (27) : Func<TWeight, string> weightToString
+GraphReaderWriter.cs (28) : )
+GraphReaderWriter.cs (29) : where TKey : IComparable<TKey>
+GraphReaderWriter.cs (35) : //TODO #25: Write first all the vertices as strings (one line each), then one empty line,
+GraphReaderWriter.cs (36) : // and then each of the edges with the format "A->1->B" (one line each)
+GraphReaderWriter.cs (38) : foreach (TKey clave in graph.Elements())
+GraphReaderWriter.cs (39) : {
+GraphReaderWriter.cs (40) : writer.WriteLine(EncodeString(keyToString(clave)));
+GraphReaderWriter.cs (41) : }
+GraphReaderWriter.cs (43) : writer.WriteLine();
+GraphReaderWriter.cs (45) : foreach (TKey origen in graph.Elements())
+GraphReaderWriter.cs (46) : {
+GraphReaderWriter.cs (47) : foreach (TKey destino in graph.GetVertex(origen).edges.Keys())
 GraphReaderWriter.cs (48) : {
-GraphReaderWriter.cs (49) : foreach(TKey destino in graph.GetVertex(origen).edges.Keys())
+GraphReaderWriter.cs (49) : if (!origen.Equals(destino))
 GraphReaderWriter.cs (50) : {
-GraphReaderWriter.cs (51) : if(!origen.Equals(destino))
-GraphReaderWriter.cs (52) : {
-GraphReaderWriter.cs (53) : TWeight weight = graph.GetEdgeWeight(origen, destino);
-GraphReaderWriter.cs (55) : String yyy891 = keyToString(origen) + "->" + weightToString(weight) + "->" + keyToString(destino);
-GraphReaderWriter.cs (57) : writer.WriteLine(EncodeString(yyy891));
-GraphReaderWriter.cs (59) : }
-GraphReaderWriter.cs (60) : }
-GraphReaderWriter.cs (61) : }
-GraphReaderWriter.cs (72) : public bool Read<TKey, TWeight>(
-GraphReaderWriter.cs (73) : UndirectedGraph<TKey, TWeight> graph,
-GraphReaderWriter.cs (74) : string filename,
-GraphReaderWriter.cs (75) : Func<string, TKey> stringToKey,
-GraphReaderWriter.cs (76) : Func<string, TWeight> stringToWeight
-GraphReaderWriter.cs (77) : )
-GraphReaderWriter.cs (78) : where TKey : IComparable<TKey>
-GraphReaderWriter.cs (87) : String linea;
-GraphReaderWriter.cs (89) : while ((linea = reader.ReadLine()) != "")
+GraphReaderWriter.cs (51) : TWeight weight = graph.GetEdgeWeight(origen, destino);
+GraphReaderWriter.cs (52) : string linea = keyToString(origen) + "->" + weightToString(weight) + "->" + keyToString(destino);
+GraphReaderWriter.cs (53) : writer.WriteLine(EncodeString(linea));
+GraphReaderWriter.cs (54) : }
+GraphReaderWriter.cs (55) : }
+GraphReaderWriter.cs (56) : }
+GraphReaderWriter.cs (58) : writer.Close();
+GraphReaderWriter.cs (67) : public bool Read<TKey, TWeight>(
+GraphReaderWriter.cs (68) : UndirectedGraph<TKey, TWeight> graph,
+GraphReaderWriter.cs (69) : string filename,
+GraphReaderWriter.cs (70) : Func<string, TKey> stringToKey,
+GraphReaderWriter.cs (71) : Func<string, TWeight> stringToWeight
+GraphReaderWriter.cs (72) : )
+GraphReaderWriter.cs (73) : where TKey : IComparable<TKey>
+GraphReaderWriter.cs (82) : string linea = reader.ReadLine();
+GraphReaderWriter.cs (83) : bool leyendoVertices = true;
+GraphReaderWriter.cs (85) : while (linea != null)
+GraphReaderWriter.cs (86) : {
+GraphReaderWriter.cs (87) : if (leyendoVertices)
+GraphReaderWriter.cs (88) : {
+GraphReaderWriter.cs (89) : if (linea == "")
 GraphReaderWriter.cs (90) : {
-GraphReaderWriter.cs (91) : graph.AddVertex(stringToKey(DecodeString(linea)));
+GraphReaderWriter.cs (91) : leyendoVertices = false;
 GraphReaderWriter.cs (92) : }
-GraphReaderWriter.cs (94) : reader.ReadLine();
-GraphReaderWriter.cs (96) : while((linea = reader.ReadLine()) != null)
-GraphReaderWriter.cs (97) : {
-GraphReaderWriter.cs (98) : linea = DecodeString(linea);
-GraphReaderWriter.cs (100) : String[] datos = linea.Split("->");
-GraphReaderWriter.cs (102) : graph.AddVertex(stringToKey(datos[0]));
-GraphReaderWriter.cs (104) : graph.AddEdge(stringToKey(datos[0]), stringToKey(datos[2]), stringToWeight(datos[1]));
-GraphReaderWriter.cs (105) : }
+GraphReaderWriter.cs (93) : else
+GraphReaderWriter.cs (94) : {
+GraphReaderWriter.cs (95) : graph.AddVertex(stringToKey(DecodeString(linea)));
+GraphReaderWriter.cs (96) : }
+GraphReaderWriter.cs (97) : }
+GraphReaderWriter.cs (98) : else
+GraphReaderWriter.cs (99) : {
+GraphReaderWriter.cs (100) : if (linea != "")
+GraphReaderWriter.cs (101) : {
+GraphReaderWriter.cs (102) : string dec = DecodeString(linea);
+GraphReaderWriter.cs (103) : string[] datos = dec.Split(new[] { "->" }, StringSplitOptions.None);
+GraphReaderWriter.cs (105) : if (datos.Length == 3)
+GraphReaderWriter.cs (106) : {
+GraphReaderWriter.cs (107) : TKey origen = stringToKey(datos[0]);
+GraphReaderWriter.cs (108) : TKey destino = stringToKey(datos[2]);
+GraphReaderWriter.cs (109) : TWeight peso = stringToWeight(datos[1]);
+GraphReaderWriter.cs (111) : graph.AddEdge(origen, destino, peso);
+GraphReaderWriter.cs (112) : }
+GraphReaderWriter.cs (113) : }
+GraphReaderWriter.cs (114) : }
+GraphReaderWriter.cs (116) : linea = reader.ReadLine();
+GraphReaderWriter.cs (117) : }
+GraphReaderWriter.cs (119) : reader.Close();
 HashTableDictionary.cs (1) : using System;
 HashTableDictionary.cs (2) : using System.Globalization;
 HashTableDictionary.cs (3) : using Common;
