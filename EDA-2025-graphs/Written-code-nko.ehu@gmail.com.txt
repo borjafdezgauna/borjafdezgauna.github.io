@@ -2,6 +2,73 @@ DirectedGraph.cs (3) : using System.Data;
 DirectedGraph.cs (4) : using System.Runtime.CompilerServices;
 DirectedGraph.cs (5) : using System.Runtime.InteropServices.Marshalling;
 DirectedGraph.cs (6) : using System.Threading;
+DistanceCalculator.cs (2) : using System.ComponentModel.DataAnnotations;
+DistanceCalculator.cs (3) : using System.Globalization;
+DistanceCalculator.cs (10) : public UndirectedGraph<String, double> graph;
+DistanceCalculator.cs (15) : if (isUndirected)
+DistanceCalculator.cs (16) : graph = new UndirectedGraph<String,double>();
+DistanceCalculator.cs (17) : else
+DistanceCalculator.cs (18) : graph = new DirectedGraph<String, double>();
+DistanceCalculator.cs (24) : graph.AddVertex(city);
+DistanceCalculator.cs (30) : graph.AddEdge(fromCity, toCity, distance);
+DistanceCalculator.cs (38) : String[] visitsString = visited.Keys();
+DistanceCalculator.cs (39) : String[] nextsString = nextCityCandidates.Keys();
+DistanceCalculator.cs (40) : double minDist=double.MaxValue;
+DistanceCalculator.cs (41) : String destination="";
+DistanceCalculator.cs (42) : bool check = false;
+DistanceCalculator.cs (43) : for (int i = 0; i < nextsString.Length; i++)
+DistanceCalculator.cs (44) : {
+DistanceCalculator.cs (45) : if (minDist > nextCityCandidates.Get(nextsString[i]))
+DistanceCalculator.cs (46) : {
+DistanceCalculator.cs (47) : for (int j = 0; j < visitsString.Length; j++)
+DistanceCalculator.cs (48) : {
+DistanceCalculator.cs (49) : if (nextsString[i].Equals(visitsString[j]))
+DistanceCalculator.cs (50) : check = true;
+DistanceCalculator.cs (51) : }
+DistanceCalculator.cs (52) : if (!check)
+DistanceCalculator.cs (53) : {
+DistanceCalculator.cs (54) : destination = nextsString[i];
+DistanceCalculator.cs (55) : minDist = nextCityCandidates.Get(nextsString[i]);
+DistanceCalculator.cs (56) : }
+DistanceCalculator.cs (57) : else
+DistanceCalculator.cs (58) : check = false;
+DistanceCalculator.cs (59) : }
+DistanceCalculator.cs (60) : }
+DistanceCalculator.cs (61) : return destination;
+DistanceCalculator.cs (71) : String[] connectedCities = new string[graph.VertexCount()];
+DistanceCalculator.cs (72) : connectedCities = graph.GetVertex(currentCity).ConnectedElements();
+DistanceCalculator.cs (74) : for (int i = 0; i < connectedCities.Length; i++)
+DistanceCalculator.cs (75) : {
+DistanceCalculator.cs (76) : nextCityCandidates.Add(connectedCities[i], graph.GetEdgeWeight(currentCity, connectedCities[i]));
+DistanceCalculator.cs (77) : distanceToCity.Add(connectedCities[i], graph.GetEdgeWeight(currentCity, connectedCities[i]));
+DistanceCalculator.cs (78) : visited.Add(currentCity, true);
+DistanceCalculator.cs (80) : }
+DistanceCalculator.cs (94) : HashTableDictionary<String, double> nextCityCandidate = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (95) : HashTableDictionary<String, double> distanceToCity = new HashTableDictionary<string, double>();
+DistanceCalculator.cs (96) : HashTableDictionary<String, bool> visited = new HashTableDictionary<String,bool>();
+DistanceCalculator.cs (97) : IDictionary<String, double> tableFinal = new HashTableDictionary<String,double>();
+DistanceCalculator.cs (98) : for (int i = 0; i < graph.VertexCount(); i++)
+DistanceCalculator.cs (99) : {
+DistanceCalculator.cs (100) : tableFinal.Add(graph.Elements()[i], double.MaxValue);
+DistanceCalculator.cs (101) : }
+DistanceCalculator.cs (102) : String currentCity = fromCity;
+DistanceCalculator.cs (105) : while (currentCity != null&&currentCity!="")
+DistanceCalculator.cs (106) : {
+DistanceCalculator.cs (107) : CheckNeighbours(distanceToCity, visited, nextCityCandidate, currentCity);
+DistanceCalculator.cs (108) : double[] distances = nextCityCandidate.Values();
+DistanceCalculator.cs (109) : String[] strings = nextCityCandidate.Keys();
+DistanceCalculator.cs (110) : double[] resultDistances = tableFinal.Values();
+DistanceCalculator.cs (111) : tableFinal.Add(currentCity, 0);
+DistanceCalculator.cs (112) : for (int i = 0; i < distances.Length; i++)
+DistanceCalculator.cs (113) : {
+DistanceCalculator.cs (114) : if (distances[i] < resultDistances[i])
+DistanceCalculator.cs (115) : {
+DistanceCalculator.cs (116) : tableFinal.Add(strings[i], distances[i]);
+DistanceCalculator.cs (117) : }
+DistanceCalculator.cs (118) : }
+DistanceCalculator.cs (119) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidate);
+DistanceCalculator.cs (120) : }
+DistanceCalculator.cs (123) : return tableFinal;
 GraphReaderWriter.cs (2) : using System.Globalization;
 GraphReaderWriter.cs (13) : String returnString = str.Replace("\n", "[NEW_LINE]");
 GraphReaderWriter.cs (14) : returnString = returnString.Replace(" ", "[SPACEBAR]");
@@ -21,25 +88,27 @@ GraphReaderWriter.cs (52) : {
 GraphReaderWriter.cs (54) : TKey[] keys = graph.GetVertex(elements[i]).ConnectedElements();
 GraphReaderWriter.cs (55) : for (int j = 0; j < keys.Length; j++)
 GraphReaderWriter.cs (56) : {
-GraphReaderWriter.cs (62) : }
+GraphReaderWriter.cs (58) : if(destKey!=null)
+GraphReaderWriter.cs (59) : {
 GraphReaderWriter.cs (63) : }
 GraphReaderWriter.cs (64) : }
-GraphReaderWriter.cs (81) : string strElement = reader.ReadLine();
-GraphReaderWriter.cs (82) : while (strElement != "")
-GraphReaderWriter.cs (83) : {
-GraphReaderWriter.cs (84) : TKey key = stringToKey(DecodeString(strElement));
-GraphReaderWriter.cs (85) : graph.AddVertex(key);
-GraphReaderWriter.cs (86) : strElement = reader.ReadLine();
-GraphReaderWriter.cs (87) : }
-GraphReaderWriter.cs (88) : strElement = reader.ReadLine();
-GraphReaderWriter.cs (89) : while (strElement != null)
-GraphReaderWriter.cs (90) : {
-GraphReaderWriter.cs (91) : while(strElement == "")
-GraphReaderWriter.cs (92) : strElement = reader.ReadLine();
-GraphReaderWriter.cs (93) : String[] Edges = DecodeString(strElement).Split("->");
-GraphReaderWriter.cs (94) : graph.AddEdge(stringToKey(Edges[0]), stringToKey(Edges[2]), stringToWeight(Edges[1]));
-GraphReaderWriter.cs (95) : strElement = reader.ReadLine();
-GraphReaderWriter.cs (96) : }
+GraphReaderWriter.cs (65) : }
+GraphReaderWriter.cs (82) : string strElement = reader.ReadLine();
+GraphReaderWriter.cs (83) : while (strElement != "")
+GraphReaderWriter.cs (84) : {
+GraphReaderWriter.cs (85) : TKey key = stringToKey(DecodeString(strElement));
+GraphReaderWriter.cs (86) : graph.AddVertex(key);
+GraphReaderWriter.cs (87) : strElement = reader.ReadLine();
+GraphReaderWriter.cs (88) : }
+GraphReaderWriter.cs (89) : strElement = reader.ReadLine();
+GraphReaderWriter.cs (90) : while (strElement != null)
+GraphReaderWriter.cs (91) : {
+GraphReaderWriter.cs (92) : while(strElement == "")
+GraphReaderWriter.cs (93) : strElement = reader.ReadLine();
+GraphReaderWriter.cs (94) : String[] Edges = DecodeString(strElement).Split("->");
+GraphReaderWriter.cs (95) : graph.AddEdge(stringToKey(Edges[0]), stringToKey(Edges[2]), stringToWeight(Edges[1]));
+GraphReaderWriter.cs (96) : strElement = reader.ReadLine();
+GraphReaderWriter.cs (97) : }
 UnDirectedGraph.cs (2) : using System.Collections.Generic;
 UnDirectedGraph.cs (12) : protected HashTableDictionary<TElement,Vertex<TElement, TWeight>> Vertices=new HashTableDictionary<TElement, Vertex<TElement, TWeight>>();
 UnDirectedGraph.cs (18) : Vertex<TElement, TWeight>[] stringVertices = Vertices.Values();
