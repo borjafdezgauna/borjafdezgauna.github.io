@@ -78,13 +78,107 @@ DirectedGraph.cs (38) : if (this.Vertices.ContainsKey(sourceKey) && this.Vertice
 DirectedGraph.cs (39) : {
 DirectedGraph.cs (40) : this.Vertices[sourceKey].RemoveEdge(destKey);
 DirectedGraph.cs (41) : }
+DistanceCalculator.cs (2) : using System.Collections.Generic;
+DistanceCalculator.cs (4) : using Common;
+DistanceCalculator.cs (6) : public class AdapterDictionary<TKey, TValue> : Common.IDictionary<TKey, TValue>
+DistanceCalculator.cs (8) : private Dictionary<TKey, TValue> _dictionary;
+DistanceCalculator.cs (10) : public AdapterDictionary()
+DistanceCalculator.cs (12) : _dictionary = new Dictionary<TKey, TValue>();
+DistanceCalculator.cs (15) : public void Add(TKey key, TValue value)
+DistanceCalculator.cs (17) : if (_dictionary.ContainsKey(key))
+DistanceCalculator.cs (18) : _dictionary[key] = value;
+DistanceCalculator.cs (19) : else
+DistanceCalculator.cs (20) : _dictionary.Add(key, value);
+DistanceCalculator.cs (25) : return _dictionary.Count;
+DistanceCalculator.cs (30) : if (!_dictionary.ContainsKey(key))
+DistanceCalculator.cs (31) : return default(TValue);
+DistanceCalculator.cs (32) : return _dictionary[key];
+DistanceCalculator.cs (37) : return _dictionary.Keys.ToArray();
+DistanceCalculator.cs (40) : public void Remove(TKey key)
+DistanceCalculator.cs (42) : _dictionary.Remove(key);
+DistanceCalculator.cs (45) : public TValue[] Values()
+DistanceCalculator.cs (47) : return _dictionary.Values.ToArray();
+DistanceCalculator.cs (51) : public class DistanceCalculator
+DistanceCalculator.cs (53) : //TODO #29: Declare a graph as a member-variable/attribute. We will store here the names of the cities and the distances between them
+DistanceCalculator.cs (54) : private UndirectedGraph<string, double> graph;
+DistanceCalculator.cs (56) : public DistanceCalculator(bool isUndirected)
+DistanceCalculator.cs (58) : //TODO #30: Initialize the graph used to store the cities/distances. If isUndirected, use an undirected graph. Otherwise, a directed
+DistanceCalculator.cs (59) : if (isUndirected)
+DistanceCalculator.cs (61) : this.graph = new UndirectedGraph<string, double>();
+DistanceCalculator.cs (63) : else
+DistanceCalculator.cs (65) : this.graph = new DirectedGraph<string, double>();
+DistanceCalculator.cs (69) : public void AddCity(string city)
+DistanceCalculator.cs (71) : //TODO #31: Add to the graph a vertex with the name of this city. This method will be called several times before calling CalculateDistances()
+DistanceCalculator.cs (72) : this.graph.AddVertex(city);
+DistanceCalculator.cs (75) : public void AddDistance(string fromCity, string toCity, double distance)
+DistanceCalculator.cs (77) : //TODO #32: Set the distance between these two cities in the graph. These cities should already be in the graph. This method will be called several times before calling CalculateDistances()
+DistanceCalculator.cs (78) : this.graph.AddEdge(fromCity, toCity, distance);
+DistanceCalculator.cs (81) : private string ChooseNextUnvisitedCity(Common.IDictionary<string, bool> visited, Common.IDictionary<string, double> nextCityCandidates)
+DistanceCalculator.cs (83) : //TODO #33: Choose the candidate with the minimum distance from nextCityCandidates that hasn't been visited yet
+DistanceCalculator.cs (84) : //We will use this method in CalculateDistances()
+DistanceCalculator.cs (86) : string closestCity = null;
+DistanceCalculator.cs (87) : double minDistance = double.MaxValue;
+DistanceCalculator.cs (89) : string[] candidates = nextCityCandidates.Keys();
+DistanceCalculator.cs (90) : foreach (var city in candidates)
+DistanceCalculator.cs (92) : bool isVisited = false;
+DistanceCalculator.cs (93) : if (visited.Get(city) == true)
+DistanceCalculator.cs (95) : isVisited = true;
+DistanceCalculator.cs (98) : if (!isVisited)
+DistanceCalculator.cs (100) : double dist = nextCityCandidates.Get(city);
+DistanceCalculator.cs (101) : if (dist < minDistance)
+DistanceCalculator.cs (103) : minDistance = dist;
+DistanceCalculator.cs (104) : closestCity = city;
+DistanceCalculator.cs (108) : return closestCity;
+DistanceCalculator.cs (111) : private void CheckNeighbour(Common.IDictionary<string, double> distanceToCity, Common.IDictionary<string, bool> visited,
+DistanceCalculator.cs (112) : Common.IDictionary<string, double> nextCityCandidates, string currentCity)
+DistanceCalculator.cs (114) : //TODO #34: Add to nextCityCandidates all the neighbours of the currentCity, updating their distances in distanceToCity too
+DistanceCalculator.cs (115) : //We will use this method in CalculateDistances()
+DistanceCalculator.cs (117) : var vertex = this.graph.GetVertex(currentCity);
+DistanceCalculator.cs (118) : string[] neighbors = vertex.ConnectedElements();
+DistanceCalculator.cs (119) : double currentDist = distanceToCity.Get(currentCity);
+DistanceCalculator.cs (121) : foreach (string neighbor in neighbors)
+DistanceCalculator.cs (123) : if (visited.Get(neighbor))
+DistanceCalculator.cs (124) : continue;
+DistanceCalculator.cs (126) : double weight = vertex.GetEdgeWeight(neighbor);
+DistanceCalculator.cs (127) : double newDist = currentDist + weight;
+DistanceCalculator.cs (129) : double oldDist = distanceToCity.Get(neighbor);
+DistanceCalculator.cs (131) : // Si no existe (0 es el default de nuestro adapter si no existe, pero ojo si la distancia real es 0.
+DistanceCalculator.cs (132) : // Mejor lógica: si es double.MaxValue o si no está en keys)
+DistanceCalculator.cs (133) : // Asumimos que distanceToCity se inicializa con MaxValue o comprobamos claves.
+DistanceCalculator.cs (134) : // En nuestra lógica de CalculateDistances inicializamos todo.
+DistanceCalculator.cs (136) : if (newDist < oldDist)
+DistanceCalculator.cs (138) : distanceToCity.Add(neighbor, newDist);
+DistanceCalculator.cs (139) : nextCityCandidates.Add(neighbor, newDist);
+DistanceCalculator.cs (144) : public Common.IDictionary<string, double> CalculateDistances(string fromCity)
+DistanceCalculator.cs (146) : //TODO #34: Add one of the two dictionary classes to this project before implementing this method
+DistanceCalculator.cs (147) : //Calculate the distance to each city in the graph from fromCity.The result is a binary tree where the key is the city and the value the distance
+DistanceCalculator.cs (148) : //          a) Initialize variables: distanceToCity<string,double>, visited<string,bool> and nextCityCandidates<string,double>, currentCity
+DistanceCalculator.cs (149) : //          b) While currentyCity != null
+DistanceCalculator.cs (150) : //          b.1)    Find candidates for next step calculating (updating nextCityCandidates) -> USE CheckNeighbours()
+DistanceCalculator.cs (151) : //          b.2)    Select the next city (the one with the min distance in nextCityCandidates) and update currentCity -> USE ChooseNextUnvisitedCity()
+DistanceCalculator.cs (153) : var distanceToCity = new AdapterDictionary<string, double>();
+DistanceCalculator.cs (154) : var visited = new AdapterDictionary<string, bool>();
+DistanceCalculator.cs (155) : var nextCityCandidates = new AdapterDictionary<string, double>();
+DistanceCalculator.cs (157) : string[] allCities = this.graph.Elements();
+DistanceCalculator.cs (158) : foreach (var city in allCities)
+DistanceCalculator.cs (160) : if (city == fromCity)
+DistanceCalculator.cs (162) : distanceToCity.Add(city, 0);
+DistanceCalculator.cs (163) : nextCityCandidates.Add(city, 0);
+DistanceCalculator.cs (165) : else
+DistanceCalculator.cs (167) : distanceToCity.Add(city, double.MaxValue);
+DistanceCalculator.cs (169) : visited.Add(city, false);
+DistanceCalculator.cs (172) : string currentCity = fromCity;
+DistanceCalculator.cs (174) : while (currentCity != null)
+DistanceCalculator.cs (176) : visited.Add(currentCity, true);
+DistanceCalculator.cs (177) : nextCityCandidates.Remove(currentCity);
+DistanceCalculator.cs (179) : CheckNeighbour(distanceToCity, visited, nextCityCandidates, currentCity);
+DistanceCalculator.cs (181) : currentCity = ChooseNextUnvisitedCity(visited, nextCityCandidates);
+DistanceCalculator.cs (184) : return distanceToCity;
 GraphReaderWriter.cs (3) : using System.Collections.Generic;
-GraphReaderWriter.cs (12) : // Reemplazamos el salto de línea y el separador de flecha para evitar conflictos al leer
 GraphReaderWriter.cs (13) : if (str == null) return "null";
 GraphReaderWriter.cs (14) : return str.Replace("\n", "[NEW_LINE]").Replace("->", "[ARROW]");
-GraphReaderWriter.cs (20) : if (str == "null") return null;
+GraphReaderWriter.cs (20) : if (str == null) return null;
 GraphReaderWriter.cs (21) : return str.Replace("[NEW_LINE]", "\n").Replace("[ARROW]", "->");
-GraphReaderWriter.cs (29) : // Usamos 'using' para asegurar que el archivo se cierra correctamente
 GraphReaderWriter.cs (30) : using (TextWriter writer = File.CreateText(filename))
 GraphReaderWriter.cs (31) : {
 GraphReaderWriter.cs (34) : foreach (TKey key in graph.Elements())
@@ -165,10 +259,10 @@ UnDirectedGraph.cs (61) : {
 UnDirectedGraph.cs (62) : count += vertex.EdgeCount();
 UnDirectedGraph.cs (63) : }
 UnDirectedGraph.cs (64) : return count;
-UnDirectedGraph.cs (69) : //TODO #16: Return the number of edges.
+UnDirectedGraph.cs (69) : // TODO #16: Return the weight of the edge...
 UnDirectedGraph.cs (70) : if (!this.Vertices.ContainsKey(source))
 UnDirectedGraph.cs (71) : {
-UnDirectedGraph.cs (72) : throw new KeyNotFoundException($"Vertex {source} does not exist.");
+UnDirectedGraph.cs (72) : return default(TWeight);
 UnDirectedGraph.cs (73) : }
 UnDirectedGraph.cs (75) : return this.Vertices[source].GetEdgeWeight(destination);
 UnDirectedGraph.cs (81) : if (this.Vertices.ContainsKey(source) && this.Vertices.ContainsKey(destination))
@@ -211,11 +305,12 @@ Vertex.cs (35) : }
 Vertex.cs (36) : }
 Vertex.cs (41) : return this.edges.Count;
 Vertex.cs (47) : this.edges.Remove(targetElement);
-Vertex.cs (53) : if (!this.edges.ContainsKey(targetElement))
+Vertex.cs (52) : // TODO #7: Return the weight of the edge...
+Vertex.cs (53) : if (this.edges.ContainsKey(targetElement))
 Vertex.cs (54) : {
-Vertex.cs (55) : throw new KeyNotFoundException($"Edge to {targetElement} not found.");
-Vertex.cs (56) : }
-Vertex.cs (57) : return this.edges[targetElement];
+Vertex.cs (55) : return this.edges[targetElement];
+Vertex.cs (57) : return default(TWeight);
+Vertex.cs (58) : }
 Vertex.cs (62) : //TODO #8: Represent the edges in this vertex with the following format.
 Vertex.cs (63) : StringBuilder sb = new StringBuilder();
 Vertex.cs (64) : foreach (KeyValuePair<TElement, TWeight> item in this.edges)
