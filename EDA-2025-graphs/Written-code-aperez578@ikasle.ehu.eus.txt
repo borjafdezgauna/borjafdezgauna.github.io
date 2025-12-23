@@ -1,3 +1,52 @@
+BinaryGraphReaderWriter.cs (27) : writer.Write(graph.VertexCount());
+BinaryGraphReaderWriter.cs (28) : TKey[] keys=graph.Elements();
+BinaryGraphReaderWriter.cs (29) : for(int i = 0; i < graph.VertexCount(); i++)
+BinaryGraphReaderWriter.cs (30) : {
+BinaryGraphReaderWriter.cs (31) : byte[] keyBytes = keyToByteArray(keys[i]);
+BinaryGraphReaderWriter.cs (32) : writer.Write(keyBytes.Length);
+BinaryGraphReaderWriter.cs (33) : writer.Write(keyBytes);
+BinaryGraphReaderWriter.cs (34) : }
+BinaryGraphReaderWriter.cs (35) : writer.Write(graph.EdgeCount());
+BinaryGraphReaderWriter.cs (36) : for(int i = 0; i < graph.VertexCount(); i++)
+BinaryGraphReaderWriter.cs (37) : {
+BinaryGraphReaderWriter.cs (38) : Vertex<TKey,TWeight> vertexOrigin=graph.GetVertex(graph.Elements()[i]);
+BinaryGraphReaderWriter.cs (39) : TKey origin=graph.Elements()[i];
+BinaryGraphReaderWriter.cs (40) : TKey[] keysConnected=vertexOrigin.ConnectedElements();
+BinaryGraphReaderWriter.cs (41) : for(int j = 0; j < keysConnected.Length; j++)
+BinaryGraphReaderWriter.cs (42) : {
+BinaryGraphReaderWriter.cs (43) : byte[] OriginVertBytes=keyToByteArray(origin);
+BinaryGraphReaderWriter.cs (44) : writer.Write(OriginVertBytes.Length);
+BinaryGraphReaderWriter.cs (45) : writer.Write(OriginVertBytes);
+BinaryGraphReaderWriter.cs (47) : byte[] WeightBytes=weightToByteArray(graph.GetEdgeWeight(origin,keysConnected[j]));
+BinaryGraphReaderWriter.cs (48) : writer.Write(WeightBytes.Length);
+BinaryGraphReaderWriter.cs (49) : writer.Write(WeightBytes);
+BinaryGraphReaderWriter.cs (51) : byte[] DestVertBytes=keyToByteArray(keysConnected[j]);
+BinaryGraphReaderWriter.cs (52) : writer.Write(DestVertBytes.Length);
+BinaryGraphReaderWriter.cs (53) : writer.Write(DestVertBytes);
+BinaryGraphReaderWriter.cs (55) : }
+BinaryGraphReaderWriter.cs (56) : }
+BinaryGraphReaderWriter.cs (83) : int numVertex=reader.ReadInt32();
+BinaryGraphReaderWriter.cs (84) : for(int i = 0; i < numVertex; i++)
+BinaryGraphReaderWriter.cs (85) : {
+BinaryGraphReaderWriter.cs (86) : int keySize = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (87) : byte[] Bytevertex=reader.ReadBytes(keySize);
+BinaryGraphReaderWriter.cs (88) : TKey key = keyFromByteArray(Bytevertex);
+BinaryGraphReaderWriter.cs (89) : graph.AddVertex(key);
+BinaryGraphReaderWriter.cs (90) : }
+BinaryGraphReaderWriter.cs (91) : int numEdges=reader.ReadInt32();
+BinaryGraphReaderWriter.cs (92) : for(int i = 0; i < numEdges; i++)
+BinaryGraphReaderWriter.cs (93) : {
+BinaryGraphReaderWriter.cs (94) : int keySizeO = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (96) : byte[] byteVertexOrigin=reader.ReadBytes(keySizeO);
+BinaryGraphReaderWriter.cs (97) : TKey keyOrigin=keyFromByteArray(byteVertexOrigin);
+BinaryGraphReaderWriter.cs (99) : int keySizeW = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (100) : byte[] byteEdge=reader.ReadBytes(keySizeW);
+BinaryGraphReaderWriter.cs (101) : TWeight weightEdge=weightFromByteArray(byteEdge);
+BinaryGraphReaderWriter.cs (103) : int keySizeD = reader.ReadInt32();
+BinaryGraphReaderWriter.cs (104) : byte[] byteVertexDestination=reader.ReadBytes(keySizeD);
+BinaryGraphReaderWriter.cs (105) : TKey keyDestination=keyFromByteArray(byteVertexDestination);
+BinaryGraphReaderWriter.cs (106) : graph.AddEdge(keyOrigin,keyDestination,weightEdge);
+BinaryGraphReaderWriter.cs (107) : }
 DirectedGraph.cs (2) : using System.Collections.Generic;
 DirectedGraph.cs (14) : Vertex<TElement, TWeight> finalVertex = GetVertex(destinationKey);
 DirectedGraph.cs (15) : bool EdgeExisted = false;
@@ -26,6 +75,7 @@ DirectedGraph.cs (45) : }
 DirectedGraph.cs (46) : }
 DirectedGraph.cs (47) : base.RemoveVertex(element);
 DirectedGraph.cs (53) : base.RemoveEdge(sourceKey, destKey);
+DistanceCalculator.cs (71) : String[] connectedCities= graph.GetVertex(currentCity).ConnectedElements();
 GraphReaderWriter.cs (51) : for (int i = 0; i < elements.Length; i++)
 GraphReaderWriter.cs (53) : TKey sourceKey=elements[i];
 GraphReaderWriter.cs (57) : TKey destKey=keys[j];
