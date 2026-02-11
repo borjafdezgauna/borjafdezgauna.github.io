@@ -1,0 +1,405 @@
+Database.cs (5) : using System.Collections.Immutable;
+Database.cs (8) : using System.Reflection.Metadata;
+Database.cs (11) : using System.Threading.Tasks.Dataflow;
+Database.cs (22) : public Manager SecurityManager
+Database.cs (23) : {
+Database.cs (24) : get;
+Database.cs (25) : private set;
+Database.cs (26) : }
+Database.cs (37) : m_username= adminUsername;
+Database.cs (47) : return true;
+Database.cs (54) : for(int i=0; i<Tables.Count; i++)
+Database.cs (55) : {
+Database.cs (56) : if(Tables[i].Name==tableName)
+Database.cs (57) : {
+Database.cs (58) : return Tables[i];
+Database.cs (59) : }
+Database.cs (60) : }
+Database.cs (67) : //DEADLINE 1.B: Create a new table with the given name and columns. If there is already a table with that name,
+Database.cs (72) : for (int i= 0; i<Tables.Count; i++){
+Database.cs (74) : if (Tables[i].Name == tableName)
+Database.cs (75) : {
+Database.cs (76) : LastErrorMessage= Constants.TableAlreadyExistsError;
+Database.cs (77) : return false;
+Database.cs (78) : }
+Database.cs (79) : else if(ColumnDefinition==null)
+Database.cs (80) : {
+Database.cs (81) : LastErrorMessage= Constants.TableAlreadyExistsError;
+Database.cs (83) : }
+Database.cs (84) : else
+Database.cs (85) : {
+Database.cs (86) : Table newTable= new Table(tableName, ColumnDefinition);
+Database.cs (88) : }
+Database.cs (90) : }
+Database.cs (92) : return false;
+Database.cs (100) : for (int i= Tables.Count-1; i>=0; i--)
+Database.cs (101) : {
+Database.cs (102) : if(Tables[i].Name==tableName)
+Database.cs (103) : {
+Database.cs (104) : Tables.RemoveAt(i);
+Database.cs (105) : LastErrorMessage= Constants.DeleteSuccess;
+Database.cs (106) : return true;
+Database.cs (107) : }
+Database.cs (108) : }
+Database.cs (109) : LastErrorMessage= Constants.TableDoesNotExistError;
+Database.cs (118) : for(int i=0; i<Tables.Count; i++)
+Database.cs (119) : {
+Database.cs (120) : if(Tables[i].Name==tableName)
+Database.cs (121) : {
+Database.cs (122) : Tables[i].Insert(values);
+Database.cs (124) : }
+Database.cs (125) : else
+Database.cs (130) : }
+Database.cs (131) : return false;
+Database.cs (139) : for(int i=0; i<Tables.Count; i++)
+Database.cs (140) : {
+Database.cs (141) : if(Tables[i].Name==tableName)
+Database.cs (142) : {
+Database.cs (143) : Table table= Tables[i];
+Database.cs (145) : for(int c=0; c<columns.Count; c++)
+Database.cs (146) : {
+Database.cs (147) : bool found= false;
+Database.cs (149) : for(int j=0; j<table.NumColumns(); j++)
+Database.cs (150) : {
+Database.cs (151) : if(table.GetColumn(j).Name==columns[c])
+Database.cs (152) : {
+Database.cs (153) : found=true;
+Database.cs (154) : break;
+Database.cs (155) : }
+Database.cs (156) : }
+Database.cs (158) : if(found!=true)
+Database.cs (163) : }
+Database.cs (164) : return table.Select(columns, condition);
+Database.cs (167) : }
+Database.cs (168) : else
+Database.cs (173) : return null;
+Database.cs (182) : for(int i=0; i<Tables.Count; i++)
+Database.cs (183) : {
+Database.cs (184) : if(Tables[i].Name==tableName)
+Database.cs (185) : {
+Database.cs (186) : Table table= Tables[i];
+Database.cs (187) : bool columnExists= false;
+Database.cs (189) : for(int j=0; j<table.NumColumns();j++)
+Database.cs (191) : if(table.GetColumn(j).Name==columnCondition.ColumnName)
+Database.cs (192) : {
+Database.cs (193) : columnExists=true;
+Database.cs (194) : break;
+Database.cs (196) : }
+Database.cs (198) : if(!columnExists)
+Database.cs (203) : table.DeleteWhere(columnCondition);
+Database.cs (205) : }
+Database.cs (206) : }
+Database.cs (207) : return false;
+Database.cs (216) : for(int i=0; i<Tables.Count; i++)
+Database.cs (218) : if(Tables[i].Name==tableName)
+Database.cs (219) : {
+Database.cs (220) : Table table= Tables[i];
+Database.cs (222) : bool columnConditionExists= false;
+Database.cs (224) : for(int j=0; j<table.NumColumns();j++)
+Database.cs (225) : {
+Database.cs (226) : if(table.GetColumn(j).Name==columnCondition.ColumnName)
+Database.cs (227) : {
+Database.cs (228) : columnConditionExists=true;
+Database.cs (229) : break;
+Database.cs (232) : }
+Database.cs (233) : if(!columnConditionExists)
+Database.cs (238) : for(int c=0; c<columnNames.Count; c++)
+Database.cs (239) : {
+Database.cs (240) : bool columnExists= false;
+Database.cs (242) : for(int j=0; j<table.NumColumns(); j++)
+Database.cs (243) : {
+Database.cs (244) : if(table.GetColumn(j).Name==columnNames[c].ColumnName)
+Database.cs (245) : {
+Database.cs (246) : columnExists=true;
+Database.cs (247) : break;
+Database.cs (250) : }
+Database.cs (251) : if(!columnExists)
+Database.cs (252) : {
+Database.cs (253) : LastErrorMessage= Constants.ColumnDoesNotExistError;
+Database.cs (254) : return false;
+Database.cs (255) : }
+Database.cs (256) : }
+Database.cs (257) : table.Update(columnNames, columnCondition);
+Database.cs (258) : return true;
+Database.cs (259) : }
+Database.cs (260) : }
+Database.cs (261) : return false;
+Database.cs (262) : }
+Database.cs (274) : try
+Database.cs (275) : {
+Database.cs (276) : using (FileStream fs = new FileStream(databaseName, FileMode.Create))
+Database.cs (277) : using (BinaryWriter writer = new BinaryWriter(fs))
+Database.cs (278) : {
+Database.cs (279) : writer.Write(m_username);
+Database.cs (281) : writer.Write(Tables.Count);
+Database.cs (283) : for(int i=0; i<Tables.Count; i++)
+Database.cs (284) : {
+Database.cs (285) : Table table= Tables[i];
+Database.cs (287) : writer.Write(table.Name);
+Database.cs (289) : writer.Write(table.NumColumns());
+Database.cs (291) : for(int c=0; c<table.NumColumns(); c++)
+Database.cs (292) : {
+Database.cs (293) : ColumnDefinition col= table.GetColumn(c);
+Database.cs (294) : writer.Write(col.Name);
+Database.cs (295) : writer.Write(col.Type.ToString());
+Database.cs (297) : }
+Database.cs (299) : writer.Write(table.NumRows());
+Database.cs (300) : for(int r=0; r<table.NumRows();r++)
+Database.cs (301) : {
+Database.cs (302) : Row row= table.GetRow(r);
+Database.cs (303) : List<string> rowValues= row.Values;
+Database.cs (304) : writer.Write(rowValues.Count);
+Database.cs (306) : for(int v=0; v<rowValues.Count; v++)
+Database.cs (307) : {
+Database.cs (308) : writer.Write(rowValues[v]);
+Database.cs (309) : }
+Database.cs (310) : }
+Database.cs (311) : }
+Database.cs (312) : }
+Database.cs (313) : SecurityManager.Save(databaseName);
+Database.cs (314) : return true;
+Database.cs (316) : }
+Database.cs (317) : catch
+Database.cs (318) : {
+Database.cs (320) : }
+Row.cs (39) : i++;
+Row.cs (53) : i++;
+Row.cs (114) : i++;
+Table.cs (12) : public string Name {
+Table.cs (14) : get;
+Table.cs (16) : private set;
+Table.cs (18) : } = null;
+Table.cs (22) : //Cambio para commit
+Table.cs (25) : ColumnDefinitions= columns;
+Table.cs (26) : Name= name;
+Table.cs (34) : if(i>=0 || i<Rows.Count)
+Table.cs (35) : {
+Table.cs (36) : return Rows[i];
+Table.cs (37) : }
+Table.cs (48) : Rows.Add(row);
+Table.cs (56) : return Rows.Count;
+Table.cs (64) : if(i>=0 || i<ColumnDefinitions.Count)
+Table.cs (65) : {
+Table.cs (66) : return ColumnDefinitions[i];
+Table.cs (68) : }
+Table.cs (77) : return ColumnDefinitions.Count;
+Table.cs (83) : //TODO DEADLINE 1.A: Return the name of the instance
+Table.cs (84) : for(int i=0; i<ColumnDefinitions.Count; i++)
+Table.cs (85) : {
+Table.cs (86) : if(ColumnDefinitions[i].Name==column)
+Table.cs (87) : {
+Table.cs (88) : return ColumnDefinitions[i];
+Table.cs (90) : }
+Table.cs (92) : }
+Table.cs (101) : for(int i=0; i<ColumnDefinitions.Count; i++)
+Table.cs (102) : {
+Table.cs (104) : {
+Table.cs (105) : return i;
+Table.cs (107) : }
+Table.cs (109) : }
+Table.cs (123) : if(ColumnDefinitions.Count==0)
+Table.cs (124) : {
+Table.cs (125) : return "";
+Table.cs (126) : }
+Table.cs (127) : string result= "[";
+Table.cs (129) : for (int i=0; i<ColumnDefinitions.Count; i++)
+Table.cs (130) : {
+Table.cs (131) : result+= "'" + ColumnDefinitions[i].Name + "'";
+Table.cs (133) : if(i<ColumnDefinitions.Count-1)
+Table.cs (134) : {
+Table.cs (135) : result+= ",";
+Table.cs (137) : }
+Table.cs (139) : result +="]";
+Table.cs (142) : for(int row=0; row<Rows.Count; row++)
+Table.cs (143) : {
+Table.cs (144) : result+="{";
+Table.cs (146) : for(int col=0; col<ColumnDefinitions.Count;col++)
+Table.cs (147) : {
+Table.cs (148) : result+= "'" + Rows[row].Values[col] + "'";
+Table.cs (150) : if(col<ColumnDefinitions.Count-1)
+Table.cs (151) : {
+Table.cs (152) : result+=",";
+Table.cs (154) : }
+Table.cs (156) : }
+Table.cs (157) : result+= "}";
+Table.cs (160) : }
+Table.cs (162) : return result;
+Table.cs (163) : }
+Table.cs (171) : if(row>=0 && row<Rows.Count)
+Table.cs (172) : {
+Table.cs (173) : Rows.RemoveAt(row);
+Table.cs (175) : }
+Table.cs (182) : List<int> index= new List<int>();
+Table.cs (183) : for (int i=0; i<Rows.Count; i++)
+Table.cs (184) : {
+Table.cs (185) : if(Rows[i].IsTrue(condition))
+Table.cs (186) : {
+Table.cs (187) : index.Add(i);
+Table.cs (189) : }
+Table.cs (191) : }
+Table.cs (193) : return index;
+Table.cs (200) : List<int> index= RowIndicesWhereConditionIsTrue(condition);
+Table.cs (201) : for(int i= index.Count; i>=0; i --)
+Table.cs (202) : {
+Table.cs (203) : int rowI= index[i];
+Table.cs (205) : DeleteIthRow(rowI);
+Table.cs (209) : }
+Table.cs (217) : List<ColumnDefinition> newC = new List<ColumnDefinition>();
+Table.cs (218) : foreach(string name in columnNames)
+Table.cs (219) : {
+Table.cs (220) : ColumnDefinition col= ColumnByName(name);
+Table.cs (221) : if(col!=null)
+Table.cs (222) : {
+Table.cs (223) : newC.Add(col);
+Table.cs (224) : }
+Table.cs (226) : }
+Table.cs (228) : Table Result= new Table ("Result", newC);
+Table.cs (229) : for (int i=0; i<Rows.Count; i++)
+Table.cs (230) : {
+Table.cs (231) : if(condition == null || Rows[i].IsTrue(condition))
+Table.cs (232) : {
+Table.cs (233) : List<string> newValues= new List<string>();
+Table.cs (235) : foreach(ColumnDefinition col in newC)
+Table.cs (236) : {
+Table.cs (238) : int originalI= ColumnIndexByName(col.Name);
+Table.cs (239) : newValues.Add(Rows[i].Values[originalI]);
+Table.cs (241) : }
+Table.cs (242) : Row newRow= new Row(newC, newValues);
+Table.cs (243) : Result.AddRow(newRow);
+Table.cs (247) : }
+Table.cs (248) : return Result;
+Table.cs (249) : }
+Table.cs (256) : if(values.Count!=ColumnDefinitions.Count)
+Table.cs (257) : {
+Table.cs (260) : }
+Table.cs (263) : AddRow(newRow);
+Table.cs (265) : return true;
+Table.cs (274) : bool update=false;
+Table.cs (276) : if(condition==null || setValues==null || setValues.Count==0)
+Table.cs (277) : {
+Table.cs (279) : }
+Table.cs (281) : for(int i=0; i<Rows.Count; i++)
+Table.cs (282) : {
+Table.cs (283) : if (Rows[i].IsTrue(condition))
+Table.cs (284) : {
+Table.cs (285) : for(int j=0; j<setValues.Count; j++)
+Table.cs (286) : {
+Table.cs (287) : Rows[i].SetValue(setValues[j].ColumnName, setValues[j].Value);
+Table.cs (288) : }
+Table.cs (289) : update= true;
+Table.cs (290) : }
+Table.cs (291) : }
+Table.cs (294) : return update;
+AddUser.cs (5) : using DbManager.Security;
+AddUser.cs (20) : Username= username;
+AddUser.cs (21) : Password=password;
+AddUser.cs (22) : ProfileName=profileName;
+AddUser.cs (29) : Profile profile= database.SecurityManager.ProfileByName(Username);
+AddUser.cs (31) : if(profile==null)
+AddUser.cs (32) : {
+AddUser.cs (33) : User user= new User();
+AddUser.cs (34) : user.Username= Username;
+AddUser.cs (35) : user.EncryptedPassword=Password;
+AddUser.cs (37) : //database.SecurityManager.AddUser(user);
+AddUser.cs (38) : }
+AddUser.cs (39) : if(database.LastErrorMessage!=null)
+AddUser.cs (40) : {
+AddUser.cs (41) : return database.LastErrorMessage;
+AddUser.cs (42) : }
+AddUser.cs (45) : return "AddUserSuccess";
+CreateSecurityProfile.cs (5) : using DbManager.Security;
+CreateSecurityProfile.cs (17) : ProfileName=profileName;
+CreateSecurityProfile.cs (24) : Profile profile= new Profile();
+CreateSecurityProfile.cs (25) : profile.Name= ProfileName;
+CreateSecurityProfile.cs (27) : database.SecurityManager.AddProfile(profile);
+CreateSecurityProfile.cs (28) : if(database.LastErrorMessage!=null)
+CreateSecurityProfile.cs (29) : {
+CreateSecurityProfile.cs (30) : return database.LastErrorMessage;
+CreateSecurityProfile.cs (31) : }
+CreateSecurityProfile.cs (35) : return "CreateSecurityProfileSuccess";
+CreateTable.cs (17) : Table= table;
+CreateTable.cs (18) : ColumnsParameters= columns;
+CreateTable.cs (25) : database.CreateTable(Table, ColumnsParameters);
+CreateTable.cs (27) : if(database.LastErrorMessage!=null)
+CreateTable.cs (28) : {
+CreateTable.cs (29) : return database.LastErrorMessage;
+CreateTable.cs (30) : }
+CreateTable.cs (32) : return "CreateTableSuccess";
+Delete.cs (15) : Table= table;
+Delete.cs (16) : Where= where;
+Delete.cs (24) : database.DeleteWhere(Table, Where);
+Delete.cs (27) : if(database.LastErrorMessage!=null)
+Delete.cs (28) : {
+Delete.cs (29) : return database.LastErrorMessage;
+Delete.cs (30) : }
+Delete.cs (32) : return "DeleteSuccess";
+DeleteUser.cs (16) : Username= username;
+DeleteUser.cs (23) : bool remove= database.SecurityManager.RemoveProfile(Username);
+DeleteUser.cs (25) : if(database.LastErrorMessage!=null)
+DeleteUser.cs (26) : {
+DeleteUser.cs (27) : return database.LastErrorMessage;
+DeleteUser.cs (28) : }
+DeleteUser.cs (30) : if(!remove)
+DeleteUser.cs (31) : {
+DeleteUser.cs (32) : return "UserDoesNotExistError";
+DeleteUser.cs (33) : }
+DeleteUser.cs (36) : return "DeleteUserSucces";
+DropSecurityProfile.cs (16) : ProfileName= profileName;
+DropSecurityProfile.cs (23) : bool remove= database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (25) : if(database.LastErrorMessage!=null)
+DropSecurityProfile.cs (26) : {
+DropSecurityProfile.cs (27) : return database.LastErrorMessage;
+DropSecurityProfile.cs (28) : }
+DropSecurityProfile.cs (30) : if(!remove)
+DropSecurityProfile.cs (31) : {
+DropSecurityProfile.cs (32) : return "SecurityProfileDoesNotExistError";
+DropSecurityProfile.cs (33) : }
+DropSecurityProfile.cs (36) : return "DropSecurityProfileSuccess";
+DropTable.cs (15) : Table= table;
+DropTable.cs (23) : database.DropTable(Table);
+DropTable.cs (24) : if(database.LastErrorMessage!=null)
+DropTable.cs (25) : {
+DropTable.cs (26) : return database.LastErrorMessage;
+DropTable.cs (27) : }
+DropTable.cs (30) : return "DropTableSuccess";
+Grant.cs (5) : using DbManager.Security;
+Grant.cs (19) : PrivilegeName= privilegeName;
+Grant.cs (20) : TableName= tableName;
+Grant.cs (21) : ProfileName= profileName;
+Grant.cs (28) : database.SecurityManager.GrantPrivilege(PrivilegeName, TableName,PrivilegeUtils.FromPrivilegeName(ProfileName));
+Grant.cs (29) : if(database.LastErrorMessage!=null)
+Grant.cs (30) : {
+Grant.cs (31) : return database.LastErrorMessage;
+Grant.cs (32) : }
+Grant.cs (35) : return "GrantPrivilegeSuccess";
+Insert.cs (16) : Table= table;
+Insert.cs (17) : Values= values;
+Insert.cs (26) : database.Insert(Table, Values);
+Insert.cs (28) : if(database.LastErrorMessage!=null)
+Insert.cs (29) : {
+Insert.cs (30) : return database.LastErrorMessage;
+Insert.cs (31) : }
+Insert.cs (33) : return "InsertSuccess";
+Revoke.cs (18) : PrivilegeName= privilegeName;
+Revoke.cs (19) : TableName=tableName;
+Revoke.cs (20) : ProfileName=profileName;
+Revoke.cs (28) : database.SecurityManager.RevokePrivilege(PrivilegeName, TableName, PrivilegeUtils.FromPrivilegeName(ProfileName));
+Revoke.cs (30) : if(database.LastErrorMessage!=null)
+Revoke.cs (31) : {
+Revoke.cs (32) : return database.LastErrorMessage;
+Revoke.cs (34) : }
+Revoke.cs (36) : return "RevokePrivilageSuccess";
+Select.cs (18) : Table= table;
+Select.cs (19) : Columns= columns;
+Select.cs (20) : Where= condition;
+Select.cs (27) : Table result= database.Select(Table, Columns, Where);
+Select.cs (29) : if(database.LastErrorMessage!=null)
+Select.cs (30) : {
+Select.cs (31) : return database.LastErrorMessage;
+Select.cs (33) : }
+Select.cs (35) : return result.ToString();
+Update.cs (26) : if(database.LastErrorMessage!=null)
+Update.cs (27) : {
+Update.cs (28) : return database.LastErrorMessage;
+Update.cs (30) : }
+Update.cs (31) : return "UpdateSuccess";

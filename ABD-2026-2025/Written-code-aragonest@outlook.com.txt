@@ -1,0 +1,90 @@
+Condition.cs (18) : ColumnName=column;
+Condition.cs (19) : Operator=op;
+Condition.cs (20) : LiteralValue=literalValue;
+Condition.cs (33) : //Convert first the strings to the appropriate type and
+Condition.cs (34) : //then compare (depending on the operator of the condition)
+Condition.cs (35) : bool esIg=false;
+Condition.cs (36) : bool esMa=false;
+Condition.cs (37) : bool esMe = false;
+Condition.cs (38) : switch (type) {
+Condition.cs (39) : case ColumnDefinition.DataType.String:
+Condition.cs (40) : esIg=string.Compare(LiteralValue, value)==0;
+Condition.cs (41) : esMa=string.Compare(LiteralValue,value)<0;
+Condition.cs (42) : esMe= string.Compare(LiteralValue, value)>0;
+Condition.cs (43) : break;
+Condition.cs (44) : case ColumnDefinition.DataType.Int:
+Condition.cs (45) : int v = int.Parse(value);
+Condition.cs (46) : int tab=int.Parse(LiteralValue);
+Condition.cs (47) : esIg = v == tab;
+Condition.cs (48) : esMa=v > tab;
+Condition.cs (49) : esMe=v < tab;
+Condition.cs (50) : break;
+Condition.cs (51) : case ColumnDefinition.DataType.Double:
+Condition.cs (52) : double v2 = double.Parse(value);
+Condition.cs (53) : double tab2 = double.Parse(LiteralValue);
+Condition.cs (54) : double dif = v2 - tab2;
+Condition.cs (55) : esIg=((dif < 0.0000000000000001) && (-dif < 0.0000000000000001));
+Condition.cs (56) : esMa=(dif> 0.0000000000000001);
+Condition.cs (57) : esMe=(-dif > 0.0000000000000001);
+Condition.cs (58) : break;
+Condition.cs (59) : }
+Condition.cs (60) : if (Operator == "=") { return esIg; }
+Condition.cs (61) : if (Operator == ">") { return esMa; }
+Condition.cs (62) : if (Operator == "<") { return esMe; }
+Row.cs (20) : ColumnDefinitions = columnDefinitions;
+Row.cs (21) : foreach (var i in values)
+Row.cs (22) : {
+Row.cs (23) : Encode(i);
+Row.cs (24) : }
+Row.cs (25) : Values = values;
+Row.cs (32) : int i = 0;
+Row.cs (33) : foreach (var item in ColumnDefinitions)
+Row.cs (34) : {
+Row.cs (35) : if (item.Name == columnName)
+Row.cs (36) : {
+Row.cs (37) : Values[i]=Encode(value);
+Row.cs (38) : }
+Row.cs (40) : }
+Row.cs (47) : int i = 0;
+Row.cs (48) : foreach (var item in ColumnDefinitions)
+Row.cs (49) : {
+Row.cs (50) : if (item.Name == columnName) {
+Row.cs (51) : return Decode(Values[i]);
+Row.cs (52) : }
+Row.cs (54) : }
+Row.cs (63) : string comprobar = condition.LiteralValue;
+Row.cs (64) : string nombreCol= condition.ColumnName;
+Row.cs (65) : ColumnDefinition.DataType type = DataTypeUtils.FromMiniTypeName(comprobar);
+Row.cs (66) : string a = GetValue(nombreCol);
+Row.cs (71) : return condition.IsTrue(a,type);
+Row.cs (81) : if (value == null) {
+Row.cs (83) : }
+Row.cs (85) : return value.Replace(Delimiter,DelimiterEncoded);
+Row.cs (93) : if (value == null)
+Row.cs (94) : {
+Row.cs (96) : }
+Row.cs (98) : return value.Replace(DelimiterEncoded, Delimiter);
+Row.cs (106) : int i = 0;
+Row.cs (107) : String row = Values[i];
+Row.cs (108) : foreach (var item in Values)
+Row.cs (109) : {
+Row.cs (110) : if (i > 0)
+Row.cs (111) : {
+Row.cs (112) : row = row + Delimiter + Encode(Values[i]);
+Row.cs (113) : }
+Row.cs (115) : }
+Row.cs (116) : return row;
+Row.cs (124) : string[] ret=new string[columns.Count];
+Row.cs (126) : ret = value.Split(Delimiter);
+Row.cs (128) : List<String> rows = new List<String>();
+Row.cs (129) : for (int i = 0; i < ret.Count(); i++)
+Row.cs (130) : {
+Row.cs (131) : rows.Add(Decode(ret[i]));
+Row.cs (132) : }
+Row.cs (133) : return new Row(columns,rows);
+Table.cs (103) : if(ColumnDefinitions[i].Name==columnName)
+Table.cs (261) : Row newRow= new Row(ColumnDefinitions, values);
+Update.cs (15) : Table = table;
+Update.cs (16) : Columns = columnNames;
+Update.cs (17) : Where = where;
+Update.cs (23) : database.Update(Table,Columns,Where);
