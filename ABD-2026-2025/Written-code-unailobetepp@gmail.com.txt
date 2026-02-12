@@ -33,39 +33,60 @@ Database.cs (82) : Tables.Add(newTable);
 Database.cs (84) : LastErrorMessage = Constants.CreateTableSuccess;
 Database.cs (85) : return true;
 Database.cs (90) : public bool DropTable(string tableName) // Maialen
-Database.cs (106) : public bool Insert(string tableName, List<string> values) // Maialen
-Database.cs (130) : public Table Select(string tableName, List<string> columns, Condition condition) // Endika
-Database.cs (140) : public bool DeleteWhere(string tableName, Condition columnCondition) // Unai
-Database.cs (150) : public bool Update(string tableName, List<SetValue> columnNames, Condition columnCondition) // Aitana
-Database.cs (164) : public bool Save(string databaseName) // Endika
-Database.cs (174) : public static Database Load(string databaseName, string username, string password) // Endika
+Database.cs (109) : public bool Insert(string tableName, List<string> values) // Maialen
+Database.cs (132) : public Table Select(string tableName, List<string> columns, Condition condition) // Endika
+Database.cs (142) : public bool DeleteWhere(string tableName, Condition columnCondition) // Unai
+Database.cs (148) : // Check for table
+Database.cs (149) : Table selectedTable = TableByName(tableName);
+Database.cs (151) : if (selectedTable == null)
+Database.cs (152) : {
+Database.cs (153) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (154) : return false;
+Database.cs (155) : }
+Database.cs (157) : // Check for column
+Database.cs (158) : if (selectedTable.ColumnIndexByName(columnCondition.ColumnName) == -1)
+Database.cs (159) : {
+Database.cs (160) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (162) : }
+Database.cs (164) : // Final removal
+Database.cs (165) : for (int i = selectedTable.NumRows() - 1; i >= 0; i--)
+Database.cs (166) : {
+Database.cs (167) : if (selectedTable.GetRow(i).IsTrue(columnCondition))
+Database.cs (168) : {
+Database.cs (169) : selectedTable.DeleteIthRow(i);
+Database.cs (170) : }
+Database.cs (171) : }
+Database.cs (173) : return true;
+Database.cs (176) : public bool Update(string tableName, List<SetValue> columnNames, Condition columnCondition) // Aitana
+Database.cs (190) : public bool Save(string databaseName) // Endika
+Database.cs (200) : public static Database Load(string databaseName, string username, string password) // Endika
 Row.cs (17) : public Row(List<ColumnDefinition> columnDefinitions, List<string> values) // Endika
 Row.cs (24) : public void SetValue(string columnName, string value) // Endika
 Row.cs (37) : public string GetValue(string columnName) // Endika
 Row.cs (49) : public bool IsTrue(Condition condition) // Aitana
-Row.cs (77) : private static string Encode(string value) // Maialen
-Row.cs (90) : private static string Decode(string value) // Maialen
-Row.cs (103) : public string AsText() // Unai
-Row.cs (106) : string result = "";
-Row.cs (108) : for (int i = 0; i < Values.Count; i++)
-Row.cs (109) : {
-Row.cs (110) : string encodedValue = Encode(Values[i]);
-Row.cs (112) : result += encodedValue;
-Row.cs (114) : if (i < Values.Count - 1)
-Row.cs (115) : {
-Row.cs (116) : result += Delimiter;
-Row.cs (117) : }
-Row.cs (118) : }
-Row.cs (120) : return result;
-Row.cs (124) : public static Row Parse(List<ColumnDefinition> columns, string value) // Unai
-Row.cs (127) : string[] parts = value.Split(Delimiter);
-Row.cs (129) : Row row = new(columns, []);
-Row.cs (131) : foreach (string part in parts)
-Row.cs (132) : {
-Row.cs (133) : string decoded = Decode(part);
-Row.cs (134) : row.Values.Add(decoded);
-Row.cs (135) : }
-Row.cs (137) : return row;
+Row.cs (82) : private static string Encode(string value) // Maialen
+Row.cs (95) : private static string Decode(string value) // Maialen
+Row.cs (108) : public string AsText() // Unai
+Row.cs (111) : string result = "";
+Row.cs (113) : for (int i = 0; i < Values.Count; i++)
+Row.cs (114) : {
+Row.cs (115) : string encodedValue = Encode(Values[i]);
+Row.cs (117) : result += encodedValue;
+Row.cs (119) : if (i < Values.Count - 1)
+Row.cs (120) : {
+Row.cs (121) : result += Delimiter;
+Row.cs (122) : }
+Row.cs (123) : }
+Row.cs (125) : return result;
+Row.cs (129) : public static Row Parse(List<ColumnDefinition> columns, string value) // Unai
+Row.cs (132) : string[] parts = value.Split(Delimiter);
+Row.cs (134) : Row row = new(columns, []);
+Row.cs (136) : foreach (string part in parts)
+Row.cs (137) : {
+Row.cs (138) : string decoded = Decode(part);
+Row.cs (139) : row.Values.Add(decoded);
+Row.cs (140) : }
+Row.cs (142) : return row;
 Table.cs (14) : public Table(string name, List<ColumnDefinition> columns) // Maialen
 Table.cs (22) : public Row GetRow(int i) // Maialen
 Table.cs (36) : public void AddRow(Row row) // Maialen
@@ -95,22 +116,22 @@ Table.cs (88) : }
 Table.cs (89) : }
 Table.cs (93) : public int ColumnIndexByName(string columnName) // Aitana
 Table.cs (106) : public override string ToString() // Aitana
-Table.cs (119) : public void DeleteIthRow(int row) // Unai
-Table.cs (122) : if (row >= 0 && row < Rows.Count)
-Table.cs (123) : {
-Table.cs (124) : Rows.RemoveAt(row);
-Table.cs (125) : }
-Table.cs (128) : private List<int> RowIndicesWhereConditionIsTrue(Condition condition) // Unai
-Table.cs (131) : List<int> isTrueList = [];
-Table.cs (133) : for (int i = 0; i < Rows.Count; i++)
-Table.cs (134) : {
-Table.cs (135) : if (Rows[i].IsTrue(condition))
-Table.cs (136) : {
-Table.cs (137) : isTrueList.Add(i);
-Table.cs (138) : }
-Table.cs (139) : }
-Table.cs (140) : return isTrueList;
-Table.cs (143) : public void DeleteWhere(Condition condition) // Endika
-Table.cs (149) : public Table Select(List<string> columnNames, Condition condition) // Aitana
-Table.cs (158) : public bool Insert(List<string> values) // Aitana
-Table.cs (172) : public bool Update(List<SetValue> setValues, Condition condition) // Aitana
+Table.cs (151) : public void DeleteIthRow(int row) // Unai
+Table.cs (154) : if (row >= 0 && row < Rows.Count)
+Table.cs (155) : {
+Table.cs (156) : Rows.RemoveAt(row);
+Table.cs (157) : }
+Table.cs (160) : private List<int> RowIndicesWhereConditionIsTrue(Condition condition) // Unai
+Table.cs (163) : List<int> isTrueList = [];
+Table.cs (165) : for (int i = 0; i < Rows.Count; i++)
+Table.cs (166) : {
+Table.cs (167) : if (Rows[i].IsTrue(condition))
+Table.cs (168) : {
+Table.cs (169) : isTrueList.Add(i);
+Table.cs (170) : }
+Table.cs (171) : }
+Table.cs (172) : return isTrueList;
+Table.cs (175) : public void DeleteWhere(Condition condition) // Endika
+Table.cs (181) : public Table Select(List<string> columnNames, Condition condition) // Aitana
+Table.cs (226) : public bool Insert(List<string> values) // Aitana
+Table.cs (243) : public bool Update(List<SetValue> setValues, Condition condition) // Aitana

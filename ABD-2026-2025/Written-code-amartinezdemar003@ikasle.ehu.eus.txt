@@ -1,25 +1,103 @@
 ColumnDefinition.cs (18) : Type = type;
 ColumnDefinition.cs (19) : Name = name;
 Row.cs (4) : using System.Data.Common;
-Row.cs (55) : ColumnDefinition c = null;
-Row.cs (57) : foreach (var col in ColumnDefinitions)
-Row.cs (58) : {
-Row.cs (59) : if (col.Name == condition.ColumnName)
-Row.cs (60) : {
-Row.cs (61) : c = col;
-Row.cs (62) : }
-Row.cs (63) : }
-Row.cs (64) : if (c == null)
-Row.cs (65) : {
+Row.cs (54) : if (condition == null) return true;
+Row.cs (56) : ColumnDefinition c = null;
+Row.cs (57) : string rowValue = null;
+Row.cs (59) : // Recorremos sin usar break
+Row.cs (60) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Row.cs (61) : {
+Row.cs (62) : // Comparamos el nombre de la columna directamente
+Row.cs (63) : if (ColumnDefinitions[i].Name == condition.ColumnName)
+Row.cs (64) : {
+Row.cs (65) : c = ColumnDefinitions[i];
+Row.cs (66) : rowValue = Values[i];
 Row.cs (67) : }
-Row.cs (68) : string rowValue = GetValue(condition.ColumnName);
-Row.cs (70) : return condition.IsTrue(rowValue, c.Type);
+Row.cs (68) : }
+Row.cs (70) : // Si no se encontr� la columna en esta fila
+Row.cs (71) : if (c == null) return false;
+Row.cs (73) : // Llamamos a la l�gica de la condici�n con el valor tal cual est�
+Row.cs (74) : return condition.IsTrue(rowValue, c.Type);
 Table.cs (96) : for (int i = 0; i < ColumnDefinitions.Count; i++)
 Table.cs (97) : {
 Table.cs (98) : if (ColumnDefinitions[i].Name == columnName)
 Table.cs (99) : return i;
 Table.cs (100) : }
-Table.cs (162) : if (values.Count != ColumnDefinitions.Count)
-Table.cs (165) : Row newRow = new Row(ColumnDefinitions, values);
-Table.cs (166) : Rows.Add(newRow);
-Table.cs (167) : return true;
+Table.cs (115) : if (ColumnDefinitions.Count == 0 && Rows.Count == 0)
+Table.cs (116) : {
+Table.cs (117) : return "";
+Table.cs (118) : }
+Table.cs (119) : string result = "";
+Table.cs (120) : if (ColumnDefinitions.Count > 0 || Rows.Count >0)
+Table.cs (121) : {
+Table.cs (122) : result += "[";
+Table.cs (123) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Table.cs (124) : {
+Table.cs (125) : result += "'" + ColumnDefinitions[i].Name + "'";
+Table.cs (127) : if (i < ColumnDefinitions.Count - 1)
+Table.cs (128) : result += ",";
+Table.cs (129) : }
+Table.cs (130) : result += "]";
+Table.cs (132) : }
+Table.cs (134) : for (int i = 0; i < Rows.Count; i++)
+Table.cs (135) : {
+Table.cs (136) : result += "{";
+Table.cs (137) : for (int j = 0; j < Rows[i].Values.Count; j++)
+Table.cs (138) : {
+Table.cs (139) : result += "'" + Rows[i].Values[j] + "'";
+Table.cs (141) : if (j < Rows[i].Values.Count - 1)
+Table.cs (142) : result += ",";
+Table.cs (143) : }
+Table.cs (144) : result += "}";
+Table.cs (145) : }
+Table.cs (147) : return result;
+Table.cs (187) : List<ColumnDefinition> selectedColumns = new List<ColumnDefinition>();
+Table.cs (188) : foreach (string name in columnNames)
+Table.cs (189) : {
+Table.cs (190) : int index = ColumnIndexByName(name);
+Table.cs (191) : if (index != -1)
+Table.cs (192) : {
+Table.cs (193) : selectedColumns.Add(ColumnDefinitions[index]);
+Table.cs (194) : }
+Table.cs (195) : }
+Table.cs (197) : Table result = new Table("Result", selectedColumns);
+Table.cs (199) : foreach (var row in Rows)
+Table.cs (200) : {
+Table.cs (201) : if (condition == null || row.IsTrue(condition))
+Table.cs (202) : {
+Table.cs (203) : List<string> selectedValues = new List<string>();
+Table.cs (205) : foreach (var name in columnNames)
+Table.cs (206) : {
+Table.cs (207) : int colIndex = ColumnIndexByName(name);
+Table.cs (208) : if (colIndex != -1)
+Table.cs (209) : {
+Table.cs (210) : selectedValues.Add(row.Values[colIndex]);
+Table.cs (211) : }
+Table.cs (212) : }
+Table.cs (215) : Row newRow = new Row(selectedColumns, selectedValues);
+Table.cs (216) : result.AddRow(newRow);
+Table.cs (217) : }
+Table.cs (220) : return result;
+Table.cs (222) : }
+Table.cs (229) : if (values == null || values.Count != ColumnDefinitions.Count)
+Table.cs (230) : {
+Table.cs (231) : return false;
+Table.cs (232) : }
+Table.cs (234) : Row newRow = new Row(ColumnDefinitions, values);
+Table.cs (237) : Rows.Add(newRow);
+Table.cs (239) : return true;
+Table.cs (248) : if (condition == null) return false;
+Table.cs (250) : if (setValues == null || setValues.Count == 0) return true;
+Table.cs (252) : foreach (var row in Rows)
+Table.cs (253) : {
+Table.cs (254) : if (row.IsTrue(condition))
+Table.cs (255) : {
+Table.cs (256) : foreach (var sv in setValues)
+Table.cs (257) : {
+Table.cs (258) : row.SetValue(sv.ColumnName, sv.Value);
+Table.cs (259) : }
+Table.cs (260) : }
+Table.cs (261) : }
+Table.cs (262) : return true;
+SetValue.cs (17) : ColumnName = column;
+SetValue.cs (18) : Value = value;
