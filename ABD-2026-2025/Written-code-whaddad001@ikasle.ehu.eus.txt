@@ -10,33 +10,126 @@ ColumnDefinition.cs (44) : {
 ColumnDefinition.cs (46) : }
 ColumnDefinition.cs (48) : String decode = value.Replace(DelimiterEncoded, Delimiter);
 ColumnDefinition.cs (50) : return decode;
-ColumnDefinition.cs (58) : String res = Name + Delimiter + Type;
+ColumnDefinition.cs (58) : String res = Encode(Name) + Delimiter + Type;
 ColumnDefinition.cs (59) : return res;
 ColumnDefinition.cs (67) : String[] div = value.Split(Delimiter);
-ColumnDefinition.cs (69) : String name = div[0];
+ColumnDefinition.cs (69) : String name = Decode(div[0]);
 ColumnDefinition.cs (70) : DataType type = DataTypeUtils.FromMiniTypeName(div[1]);
-ColumnDefinition.cs (73) : return new ColumnDefinition(type,name);
-Database.cs (45) : Tables.Add(table);
-Database.cs (126) : {
-Database.cs (127) : LastErrorMessage= Constants.TableDoesNotExistError;
-Database.cs (129) : }
-Database.cs (159) : {
-Database.cs (160) : LastErrorMessage= Constants.TableDoesNotExistError;
-Database.cs (162) : }
-Database.cs (169) : {
-Database.cs (170) : LastErrorMessage= Constants.ColumnDoesNotExistError;
-Database.cs (171) : }
-Database.cs (172) : }
-Database.cs (190) : {
-Database.cs (197) : }
-Database.cs (199) : {
-Database.cs (200) : LastErrorMessage= Constants.ColumnDoesNotExistError;
+ColumnDefinition.cs (73) : return new ColumnDefinition(type, name);
+Condition.cs (1) : using DbManager;
+Condition.cs (39) : if (value == null) { value = ""; }
+Condition.cs (40) : if (LiteralValue == null) { LiteralValue = ""; }
+Condition.cs (42) : switch (type)
+Condition.cs (43) : {
+Condition.cs (45) : int cmp = string.Compare(value, LiteralValue);
+Condition.cs (46) : esIg = (cmp == 0);
+Condition.cs (47) : esMa = (cmp > 0);
+Condition.cs (48) : esMe = (cmp < 0);
+Condition.cs (51) : int vInt = int.Parse(value);
+Condition.cs (52) : int literalInt = int.Parse(LiteralValue);
+Condition.cs (53) : if (vInt == literalInt) { esIg = true; }
+Condition.cs (54) : if (vInt > literalInt) { esMa = true; }
+Condition.cs (55) : if (vInt < literalInt) { esMe = true; }
+Condition.cs (58) : string vLimpio = value.Replace(".", ",");
+Condition.cs (59) : string lLimpio = LiteralValue.Replace(".", ",");
+Condition.cs (61) : double vDouble = double.Parse(vLimpio);
+Condition.cs (62) : double literalDouble = double.Parse(lLimpio);
+Condition.cs (64) : if (vDouble == literalDouble) { esIg = true; }
+Condition.cs (65) : if (vDouble > literalDouble) { esMa = true; }
+Condition.cs (66) : if (vDouble < literalDouble) { esMe = true; }
+Condition.cs (67) : break;
+Database.cs (36) : SecurityManager = new Manager(m_username);
+Database.cs (44) : if (table == null)
+Database.cs (45) : return false;
+Database.cs (47) : Tables.Add(table);
+Database.cs (74) : if (TableByName(tableName) != null)
+Database.cs (79) : else if (tableName == null || ColumnDefinition.Count() == 0)
+Database.cs (81) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (87) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (88) : return true;
+Database.cs (98) : if (TableByName(tableName) == null)
+Database.cs (104) : List<Table> remove = new List<Table>();
+Database.cs (105) : remove.Add(TableByName(tableName));
+Database.cs (107) : foreach (Table table in remove)
+Database.cs (108) : {
+Database.cs (109) : Tables.Remove(table);
+Database.cs (110) : }
+Database.cs (111) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (112) : return true;
+Database.cs (114) : }
+Database.cs (121) : if (TableByName(tableName) == null)
+Database.cs (122) : {
+Database.cs (123) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (125) : }
+Database.cs (127) : TableByName(tableName).Insert(values);
+Database.cs (128) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (129) : return true;
+Database.cs (139) : if (TableByName(tableName) == null)
+Database.cs (140) : {
+Database.cs (141) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (143) : }
+Database.cs (145) : for (int i = 0; i < columns.Count; i++)
+Database.cs (146) : {
+Database.cs (147) : if (TableByName(tableName).ColumnByName(columns[i]) == null)
+Database.cs (148) : {
+Database.cs (149) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (152) : }
+Database.cs (153) : Table table = TableByName(tableName).Select(columns, condition);
+Database.cs (154) : return table;
+Database.cs (156) : }
+Database.cs (164) : if (TableByName(tableName) == null)
+Database.cs (166) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (167) : return false;
+Database.cs (168) : }
+Database.cs (169) : else if (TableByName(tableName).ColumnByName(columnCondition.ColumnName) == null)
+Database.cs (170) : {
+Database.cs (171) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (173) : }
+Database.cs (175) : TableByName(tableName).DeleteWhere(columnCondition);
+Database.cs (176) : LastErrorMessage = Constants.DeleteSuccess;
+Database.cs (177) : return true;
+Database.cs (187) : if (TableByName(tableName) == null)
+Database.cs (189) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (191) : }
+Database.cs (192) : else if (TableByName(tableName).ColumnByName(columnCondition.ColumnName) == null)
+Database.cs (198) : TableByName(tableName).Update(columnNames, columnCondition);
+Database.cs (199) : LastErrorMessage = Constants.UpdateSuccess;
+Database.cs (200) : return true;
 Database.cs (202) : }
-Database.cs (204) : return true;
-Database.cs (217) : {
-Database.cs (231) : }
-Database.cs (234) : {
-Database.cs (235) : LastErrorMessage= Constants.ColumnDoesNotExistError;
-Database.cs (237) : }
-SetValue.cs (17) : column = ColumnName;
-SetValue.cs (18) : value = Value;
+Row.cs (21) : Values = new List<string>();
+Row.cs (23) : for (int i = 0; i < values.Count; i++)
+Row.cs (25) : Values.Add(Encode(values[i]));
+Row.cs (33) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Row.cs (35) : if (ColumnDefinitions[i].Name == columnName)
+Row.cs (49) : if (item.Name == columnName)
+Row.cs (50) : {
+Row.cs (66) : if (a == null)
+Row.cs (67) : return false;
+Row.cs (69) : ColumnDefinition.DataType type = ColumnDefinition.DataType.String;
+Row.cs (71) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Row.cs (72) : {
+Row.cs (73) : if (ColumnDefinitions[i].Name == nombreCol)
+Row.cs (74) : {
+Row.cs (75) : type = ColumnDefinitions[i].Type;
+Row.cs (76) : break;
+Row.cs (77) : }
+Row.cs (78) : }
+Row.cs (93) : if (value == null)
+Row.cs (94) : {
+Row.cs (119) : if (Values == null || Values.Count == 0)
+Row.cs (120) : return "";
+Row.cs (122) : string row = "";
+Row.cs (123) : for (int i = 0; i < Values.Count; i++)
+Row.cs (125) : row += Values[i];
+Row.cs (126) : if (i < Values.Count - 1)
+Row.cs (128) : row += Delimiter;
+Row.cs (144) : for (int i = 0; i < ret.Length && i < columns.Count; i++)
+Row.cs (146) : rows.Add(ret[i]);
+Table.cs (12) : public string Name
+Table.cs (13) : {
+Table.cs (202) : for (int i = index.Count - 1; i >= 0; i--)
+Table.cs (288) : string colNombre = setValues[j].ColumnName;
+Table.cs (289) : string nuevoValor = setValues[j].Value;
+Table.cs (291) : Rows[i].SetValue(colNombre, nuevoValor);
+SetValue.cs (17) : ColumnName = column;
+SetValue.cs (18) : Value = value;
