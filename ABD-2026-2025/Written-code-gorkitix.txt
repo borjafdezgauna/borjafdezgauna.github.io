@@ -1,0 +1,59 @@
+Condition.cs (18) : if (string.IsNullOrWhiteSpace(column) || string.IsNullOrWhiteSpace(op)) { return; }
+Condition.cs (19) : ColumnName = column;
+Condition.cs (20) : Operator = op;
+Condition.cs (21) : LiteralValue = literalValue;
+Condition.cs (33) : if (value == null || LiteralValue == null || Operator == null) { return false; }
+Condition.cs (35) : int cmp;
+Condition.cs (37) : if (type == ColumnDefinition.DataType.String)
+Condition.cs (38) : {
+Condition.cs (39) : cmp = string.Compare(value, LiteralValue);
+Condition.cs (40) : }
+Condition.cs (41) : else if (type == ColumnDefinition.DataType.Int ||
+Condition.cs (42) : type == ColumnDefinition.DataType.Double)
+Condition.cs (43) : {
+Condition.cs (44) : double v, lit;
+Condition.cs (46) : string normalizedValue = value.Replace('.', ',');
+Condition.cs (47) : string normalizedLiteral = LiteralValue.Replace('.', ',');
+Condition.cs (49) : if (!double.TryParse(normalizedValue, out v)) return false;
+Condition.cs (50) : if (!double.TryParse(normalizedLiteral, out lit)) return false;
+Condition.cs (52) : cmp = v.CompareTo(lit);
+Condition.cs (53) : }
+Condition.cs (54) : else { return false; }
+Condition.cs (56) : switch (Operator)
+Condition.cs (57) : {
+Condition.cs (58) : case "=": return cmp == 0;
+Condition.cs (59) : case "!=": return cmp != 0;
+Condition.cs (60) : case "<": return cmp < 0;
+Condition.cs (61) : case "<=": return cmp <= 0;
+Condition.cs (62) : case ">": return cmp > 0;
+Condition.cs (63) : case ">=": return cmp >= 0;
+Condition.cs (64) : default: return false;
+Condition.cs (65) : }
+Table.cs (94) : // No columns => empty string (as in documentation examples)
+Table.cs (96) : if (NumColumns() == 0) { return ""; }
+Table.cs (98) : string result = "['";
+Table.cs (99) : string rows = "{'";
+Table.cs (101) : for (int c = 0; c < NumColumns(); c++)
+Table.cs (102) : {
+Table.cs (103) : result += GetColumn(c).Name;
+Table.cs (104) : if (c < NumColumns() - 1) { result += "','"; }
+Table.cs (105) : }
+Table.cs (107) : result += "']";
+Table.cs (109) : for (int r = 0; r < NumRows(); r++)
+Table.cs (110) : {
+Table.cs (111) : Row row = GetRow(r);
+Table.cs (112) : result += "{'";
+Table.cs (114) : for (int c = 0; c < NumColumns(); c++)
+Table.cs (115) : {
+Table.cs (116) : string columnName = GetColumn(c).Name;
+Table.cs (117) : string value = row.GetValue(columnName);
+Table.cs (119) : result += value;
+Table.cs (121) : if (c < NumColumns() - 1)
+Table.cs (122) : result += "','";
+Table.cs (123) : }
+Table.cs (124) : result += "'}";
+Table.cs (125) : }
+Table.cs (126) : return result;
+SetValue.cs (17) : if (string.IsNullOrWhiteSpace(column)) { return; }
+SetValue.cs (18) : ColumnName = column;
+SetValue.cs (19) : Value = value;
