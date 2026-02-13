@@ -1,76 +1,127 @@
-Database.cs (9) : using System.Threading.Tasks.Dataflow;
-Database.cs (20) : public Manager SecurityManager
-Database.cs (21) : {
-Database.cs (22) : get;
-Database.cs (23) : private set;
-Database.cs (24) : }
-Database.cs (35) : m_username = adminUsername;
-Database.cs (48) : return true;
-Database.cs (55) : for (int i = 0; i < Tables.Count; i++)
-Database.cs (56) : {
-Database.cs (57) : if (Tables[i].Name == tableName)
-Database.cs (58) : {
-Database.cs (59) : return Tables[i];
-Database.cs (60) : }
+Database.cs (6) : using System.IO.Enumeration;
+Database.cs (10) : using System.Threading.Tasks.Dataflow;
+Database.cs (21) : public Manager SecurityManager
+Database.cs (22) : {
+Database.cs (23) : get;
+Database.cs (24) : private set;
+Database.cs (25) : }
+Database.cs (36) : m_username = adminUsername;
+Database.cs (49) : return true;
+Database.cs (56) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (57) : {
+Database.cs (58) : if (Tables[i].Name == tableName)
+Database.cs (59) : {
+Database.cs (60) : return Tables[i];
 Database.cs (61) : }
-Database.cs (68) : //DEADLINE 1.B: Create a new table with the given name and columns. If there is already a table with that name,
-Database.cs (75) : {
-Database.cs (76) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (77) : return false;
-Database.cs (78) : }
-Database.cs (80) : {
-Database.cs (83) : }
-Database.cs (84) : else
-Database.cs (85) : {
-Database.cs (86) : Table newTable = new Table(tableName, ColumnDefinition);
+Database.cs (62) : }
+Database.cs (69) : //DEADLINE 1.B: Create a new table with the given name and columns. If there is already a table with that name,
+Database.cs (76) : {
+Database.cs (77) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (78) : return false;
+Database.cs (79) : }
+Database.cs (81) : {
+Database.cs (84) : }
+Database.cs (85) : else
+Database.cs (86) : {
+Database.cs (87) : Table newTable = new Table(tableName, ColumnDefinition);
 Database.cs (90) : }
 Database.cs (92) : }
 Database.cs (100) : {
 Database.cs (101) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (159) : return null;
-Database.cs (174) : {
-Database.cs (197) : {
-Database.cs (202) : {
-Database.cs (203) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (204) : return false;
-Database.cs (205) : }
-Database.cs (219) : try
-Database.cs (220) : {
-Database.cs (221) : using (FileStream fs = new FileStream(databaseName, FileMode.Create))
-Database.cs (222) : using (BinaryWriter writer = new BinaryWriter(fs))
-Database.cs (223) : {
-Database.cs (224) : writer.Write(m_username);
-Database.cs (226) : writer.Write(Tables.Count);
-Database.cs (228) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (151) : return null;
+Database.cs (166) : {
+Database.cs (189) : {
+Database.cs (194) : {
+Database.cs (195) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (196) : return false;
+Database.cs (197) : }
+Database.cs (211) : try
+Database.cs (212) : {
+Database.cs (213) : using (FileStream fs = new FileStream(databaseName, FileMode.Create))
+Database.cs (214) : using (BinaryWriter writer = new BinaryWriter(fs))
+Database.cs (215) : {
+Database.cs (216) : writer.Write(m_username);
+Database.cs (218) : writer.Write(Tables.Count);
+Database.cs (220) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (221) : {
+Database.cs (222) : Table table = Tables[i];
+Database.cs (224) : writer.Write(table.Name);
+Database.cs (226) : writer.Write(table.NumColumns());
+Database.cs (228) : for (int c = 0; c < table.NumColumns(); c++)
 Database.cs (229) : {
-Database.cs (230) : Table table = Tables[i];
-Database.cs (232) : writer.Write(table.Name);
-Database.cs (234) : writer.Write(table.NumColumns());
-Database.cs (236) : for (int c = 0; c < table.NumColumns(); c++)
-Database.cs (237) : {
-Database.cs (238) : ColumnDefinition col = table.GetColumn(c);
-Database.cs (239) : writer.Write(col.Name);
-Database.cs (240) : writer.Write(col.Type.ToString());
-Database.cs (242) : }
-Database.cs (244) : writer.Write(table.NumRows());
-Database.cs (245) : for (int r = 0; r < table.NumRows(); r++)
-Database.cs (246) : {
-Database.cs (247) : Row row = table.GetRow(r);
-Database.cs (248) : List<string> rowValues = row.Values;
-Database.cs (249) : writer.Write(rowValues.Count);
-Database.cs (251) : for (int v = 0; v < rowValues.Count; v++)
-Database.cs (252) : {
-Database.cs (253) : writer.Write(rowValues[v]);
+Database.cs (230) : ColumnDefinition col = table.GetColumn(c);
+Database.cs (232) : writer.Write(col.Name);
+Database.cs (233) : writer.Write(col.Type.ToString());
+Database.cs (235) : }
+Database.cs (237) : writer.Write(table.NumRows());
+Database.cs (238) : for (int r = 0; r < table.NumRows(); r++)
+Database.cs (239) : {
+Database.cs (240) : Row row = table.GetRow(r);
+Database.cs (241) : List<string> rowValues = row.Values;
+Database.cs (242) : writer.Write(rowValues.Count);
+Database.cs (244) : for (int v = 0; v < rowValues.Count; v++)
+Database.cs (245) : {
+Database.cs (246) : writer.Write(rowValues[v]);
+Database.cs (247) : }
+Database.cs (248) : }
+Database.cs (249) : }
+Database.cs (250) : }
+Database.cs (251) : SecurityManager.Save(databaseName);
+Database.cs (252) : return true;
 Database.cs (254) : }
-Database.cs (255) : }
-Database.cs (256) : }
-Database.cs (257) : }
-Database.cs (258) : SecurityManager.Save(databaseName);
-Database.cs (259) : return true;
-Database.cs (261) : }
-Database.cs (262) : catch
-Database.cs (263) : {
-Database.cs (265) : }
+Database.cs (255) : catch
+Database.cs (256) : {
+Database.cs (258) : }
+Database.cs (272) : try
+Database.cs (273) : {
+Database.cs (275) : Database db= new Database();
+Database.cs (276) : using (FileStream fs = new FileStream(databaseName, FileMode.Open))
+Database.cs (277) : using (BinaryReader reader = new BinaryReader(fs))
+Database.cs (278) : {
+Database.cs (280) : db.m_username= reader.ReadString();
+Database.cs (282) : int numTables= reader.ReadInt32();
+Database.cs (284) : for(int i=0; i<numTables; i++)
+Database.cs (285) : {
+Database.cs (286) : string tableName= reader.ReadString();
+Database.cs (288) : int columnCount= reader.ReadInt32();
+Database.cs (290) : List<ColumnDefinition> columns= new List<ColumnDefinition>();
+Database.cs (292) : for (int c=0; c<columnCount; c++)
+Database.cs (293) : {
+Database.cs (295) : string columnName= reader.ReadString();
+Database.cs (296) : string columnTypeString= reader.ReadString();
+Database.cs (298) : ColumnDefinition.DataType type= (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), columnTypeString);
+Database.cs (299) : columns.Add(new ColumnDefinition(type, columnName));
+Database.cs (300) : }
+Database.cs (302) : Table table= new Table(tableName, columns);
+Database.cs (304) : int rowCount= reader.ReadInt32();
+Database.cs (306) : for(int r=0; r<rowCount; r++)
+Database.cs (307) : {
+Database.cs (308) : int valueCount= reader.ReadInt32();
+Database.cs (310) : List<string> values= new List<string>();
+Database.cs (312) : for(int v=0; v<valueCount; v++)
+Database.cs (313) : {
+Database.cs (314) : values.Add(reader.ReadString());
+Database.cs (316) : }
+Database.cs (317) : table.Insert(values);
+Database.cs (318) : }
+Database.cs (320) : db.Tables.Add(table);
+Database.cs (322) : }
+Database.cs (324) : }
+Database.cs (326) : Manager manager= Manager.Load(databaseName, username);
+Database.cs (328) : if(manager==null)
+Database.cs (329) : {
+Database.cs (330) : return null;
+Database.cs (331) : }
+Database.cs (333) : if(!manager.IsPasswordCorrect(username, password))
+Database.cs (334) : {
+Database.cs (335) : return null;
+Database.cs (336) : }
+Database.cs (338) : db.SecurityManager=manager;
+Database.cs (340) : return db;
+Database.cs (343) : }
+Database.cs (344) : catch
+Database.cs (345) : {
+Database.cs (349) : }
 Row.cs (53) : i++;
 Table.cs (15) : get;
 Table.cs (17) : private set;
@@ -150,50 +201,50 @@ Table.cs (204) : int rowI = index[i];
 Table.cs (206) : DeleteIthRow(rowI);
 Table.cs (210) : }
 Table.cs (218) : List<ColumnDefinition> newC = new List<ColumnDefinition>();
-Table.cs (219) : foreach (string name in columnNames)
-Table.cs (220) : {
-Table.cs (221) : ColumnDefinition col = ColumnByName(name);
-Table.cs (222) : if (col != null)
-Table.cs (223) : {
-Table.cs (224) : newC.Add(col);
-Table.cs (225) : }
+Table.cs (220) : foreach (string name in columnNames)
+Table.cs (221) : {
+Table.cs (222) : ColumnDefinition col = ColumnByName(name);
+Table.cs (224) : if (col != null)
+Table.cs (225) : {
+Table.cs (226) : newC.Add(col);
 Table.cs (227) : }
-Table.cs (229) : Table Result = new Table("Result", newC);
-Table.cs (230) : for (int i = 0; i < Rows.Count; i++)
-Table.cs (231) : {
-Table.cs (232) : if (condition == null || Rows[i].IsTrue(condition))
+Table.cs (228) : }
+Table.cs (230) : Table Result = new Table("Result", newC);
+Table.cs (232) : for (int i = 0; i < Rows.Count; i++)
 Table.cs (233) : {
-Table.cs (234) : List<string> newValues = new List<string>();
-Table.cs (236) : foreach (ColumnDefinition col in newC)
-Table.cs (237) : {
-Table.cs (239) : int originalI = ColumnIndexByName(col.Name);
-Table.cs (240) : newValues.Add(Rows[i].Values[originalI]);
-Table.cs (242) : }
-Table.cs (243) : Row newRow = new Row(newC, newValues);
-Table.cs (244) : Result.AddRow(newRow);
-Table.cs (248) : }
-Table.cs (249) : return Result;
-Table.cs (250) : }
-Table.cs (257) : if (values.Count != ColumnDefinitions.Count)
-Table.cs (258) : {
-Table.cs (261) : }
-Table.cs (264) : AddRow(newRow);
-Table.cs (266) : return true;
-Table.cs (275) : bool update = false;
-Table.cs (277) : if (condition == null || setValues == null || setValues.Count == 0)
-Table.cs (278) : {
-Table.cs (280) : }
-Table.cs (282) : for (int i = 0; i < Rows.Count; i++)
-Table.cs (283) : {
-Table.cs (284) : if (Rows[i].IsTrue(condition))
-Table.cs (285) : {
-Table.cs (286) : for (int j = 0; j < setValues.Count; j++)
+Table.cs (234) : if (condition == null || Rows[i].IsTrue(condition))
+Table.cs (235) : {
+Table.cs (236) : List<string> newValues = new List<string>();
+Table.cs (238) : foreach (ColumnDefinition col in newC)
+Table.cs (239) : {
+Table.cs (241) : int originalI = ColumnIndexByName(col.Name);
+Table.cs (243) : newValues.Add(Rows[i].Values[originalI]);
+Table.cs (245) : }
+Table.cs (247) : Row newRow = new Row(newC, newValues);
+Table.cs (248) : Result.AddRow(newRow);
+Table.cs (252) : }
+Table.cs (253) : return Result;
+Table.cs (254) : }
+Table.cs (261) : if (values.Count != ColumnDefinitions.Count)
+Table.cs (262) : {
+Table.cs (265) : }
+Table.cs (268) : AddRow(newRow);
+Table.cs (270) : return true;
+Table.cs (279) : bool update = false;
+Table.cs (281) : if (condition == null || setValues == null || setValues.Count == 0)
+Table.cs (282) : {
+Table.cs (284) : }
+Table.cs (286) : for (int i = 0; i < Rows.Count; i++)
 Table.cs (287) : {
-Table.cs (292) : }
-Table.cs (293) : update = true;
-Table.cs (294) : }
-Table.cs (295) : }
-Table.cs (296) : return update;
+Table.cs (288) : if (Rows[i].IsTrue(condition))
+Table.cs (289) : {
+Table.cs (290) : for (int j = 0; j < setValues.Count; j++)
+Table.cs (291) : {
+Table.cs (296) : }
+Table.cs (297) : update = true;
+Table.cs (298) : }
+Table.cs (299) : }
+Table.cs (300) : return update;
 AddUser.cs (5) : using DbManager.Security;
 AddUser.cs (20) : Username= username;
 AddUser.cs (21) : Password=password;
