@@ -8,27 +8,24 @@ Condition.cs (37) : if (type == ColumnDefinition.DataType.String)
 Condition.cs (38) : {
 Condition.cs (39) : cmp = string.Compare(value, LiteralValue);
 Condition.cs (40) : }
-Condition.cs (41) : else if (type == ColumnDefinition.DataType.Int ||
-Condition.cs (42) : type == ColumnDefinition.DataType.Double)
-Condition.cs (43) : {
-Condition.cs (44) : double v, lit;
-Condition.cs (46) : string normalizedValue = value.Replace('.', ',');
-Condition.cs (47) : string normalizedLiteral = LiteralValue.Replace('.', ',');
-Condition.cs (49) : if (!double.TryParse(normalizedValue, out v)) return false;
-Condition.cs (50) : if (!double.TryParse(normalizedLiteral, out lit)) return false;
-Condition.cs (52) : cmp = v.CompareTo(lit);
-Condition.cs (53) : }
-Condition.cs (54) : else { return false; }
-Condition.cs (56) : switch (Operator)
-Condition.cs (57) : {
-Condition.cs (58) : case "=": return cmp == 0;
-Condition.cs (59) : case "!=": return cmp != 0;
-Condition.cs (60) : case "<": return cmp < 0;
-Condition.cs (61) : case "<=": return cmp <= 0;
-Condition.cs (62) : case ">": return cmp > 0;
-Condition.cs (63) : case ">=": return cmp >= 0;
-Condition.cs (64) : default: return false;
-Condition.cs (65) : }
+Condition.cs (41) : else if (type == ColumnDefinition.DataType.Int ||  type == ColumnDefinition.DataType.Double)
+Condition.cs (42) : {
+Condition.cs (43) : double v, lit;
+Condition.cs (45) : if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out v)) { return false; }
+Condition.cs (47) : if (!double.TryParse(LiteralValue, NumberStyles.Float, CultureInfo.InvariantCulture, out lit)) { return false; }
+Condition.cs (49) : cmp = v.CompareTo(lit);
+Condition.cs (50) : }
+Condition.cs (51) : else { return false; }
+Condition.cs (53) : switch (Operator)
+Condition.cs (54) : {
+Condition.cs (55) : case "=": return cmp == 0;
+Condition.cs (56) : case "!=": return cmp != 0;
+Condition.cs (57) : case "<": return cmp < 0;
+Condition.cs (58) : case "<=": return cmp <= 0;
+Condition.cs (59) : case ">": return cmp > 0;
+Condition.cs (60) : case ">=": return cmp >= 0;
+Condition.cs (61) : default: return false;
+Condition.cs (62) : }
 Table.cs (94) : // No columns => empty string (as in documentation examples)
 Table.cs (96) : if (NumColumns() == 0) { return ""; }
 Table.cs (98) : string result = "['";
@@ -54,6 +51,16 @@ Table.cs (123) : }
 Table.cs (124) : result += "'}";
 Table.cs (125) : }
 Table.cs (126) : return result;
+Table.cs (132) : if (row < 0 || row >= NumRows()) { return; }
+Table.cs (133) : List<Row> newRows = new List<Row>();
+Table.cs (134) : for (int i = 0; i < NumRows(); i++)
+Table.cs (135) : {
+Table.cs (136) : if (i != row)
+Table.cs (137) : {
+Table.cs (138) : newRows.Add(Rows[i]);
+Table.cs (139) : }
+Table.cs (140) : }
+Table.cs (141) : Rows = newRows;
 SetValue.cs (17) : if (string.IsNullOrWhiteSpace(column)) { return; }
 SetValue.cs (18) : ColumnName = column;
 SetValue.cs (19) : Value = value;
