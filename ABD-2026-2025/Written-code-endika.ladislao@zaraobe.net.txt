@@ -4,65 +4,120 @@ ColumnDefinition.cs (57) : string[] parts = value.Split(Delimiter, 2);
 ColumnDefinition.cs (59) : if (parts.Length != 2) return null;
 ColumnDefinition.cs (61) : if (!Enum.TryParse<DataType>(parts[1], out var type)) return null;
 ColumnDefinition.cs (63) : return new ColumnDefinition(type, Decode(parts[0]));
-Database.cs (69) : if (TableByName(tableName) != null)
-Database.cs (70) : {
-Database.cs (71) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (72) : return false;
-Database.cs (73) : }
-Database.cs (75) : if (ColumnDefinition.Count == 0)
-Database.cs (76) : {
-Database.cs (77) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
-Database.cs (79) : }
-Database.cs (81) : Table newTable = new(tableName, ColumnDefinition);
-Database.cs (82) : Tables.Add(newTable);
-Database.cs (84) : LastErrorMessage = Constants.CreateTableSuccess;
-Database.cs (85) : return true;
-Database.cs (130) : LastErrorMessage = Constants.ColumnCountsDontMatch;
-Database.cs (132) : }
-Database.cs (142) : Table table= TableByName(tableName);
-Database.cs (143) : if (table == null)
-Database.cs (144) : {
-Database.cs (145) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (147) : }
-Database.cs (148) : if(columns == null || columns.Count==0)
-Database.cs (149) : {
-Database.cs (150) : columns = new List<string>();
-Database.cs (151) : for (int i=0; i<table.NumColumns(); i++)
-Database.cs (152) : {
-Database.cs (153) : columns.Add(table.GetColumn(i).Name);
-Database.cs (154) : }
-Database.cs (155) : }
-Database.cs (156) : foreach (string col in columns)
-Database.cs (157) : {
-Database.cs (158) : if (table.ColumnIndexByName(col)==-1)
-Database.cs (159) : {
-Database.cs (160) : LastErrorMessage=Constants.ColumnDoesNotExistError;
-Database.cs (161) : return null;
-Database.cs (162) : }
-Database.cs (163) : }
-Database.cs (164) : Table result = table.Select(columns, condition);
-Database.cs (165) : return result;
-Database.cs (174) : // Check for table
-Database.cs (175) : Table selectedTable = TableByName(tableName);
-Database.cs (177) : if (selectedTable == null)
-Database.cs (178) : {
-Database.cs (179) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (181) : }
-Database.cs (183) : // Check for column
-Database.cs (184) : if (selectedTable.ColumnIndexByName(columnCondition.ColumnName) == -1)
-Database.cs (185) : {
-Database.cs (186) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (187) : return false;
-Database.cs (188) : }
-Database.cs (190) : // Final removal
-Database.cs (191) : for (int i = selectedTable.NumRows() - 1; i >= 0; i--)
-Database.cs (192) : {
-Database.cs (193) : if (selectedTable.GetRow(i).IsTrue(columnCondition))
-Database.cs (194) : {
-Database.cs (195) : selectedTable.DeleteIthRow(i);
-Database.cs (196) : }
-Database.cs (197) : }
-Database.cs (199) : return true;
+Database.cs (86) : if (TableByName(tableName) != null)
+Database.cs (87) : {
+Database.cs (88) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (89) : return false;
+Database.cs (90) : }
+Database.cs (92) : if (ColumnDefinition.Count == 0)
+Database.cs (93) : {
+Database.cs (94) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (96) : }
+Database.cs (98) : Table newTable = new(tableName, ColumnDefinition);
+Database.cs (99) : Tables.Add(newTable);
+Database.cs (101) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (102) : return true;
+Database.cs (147) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (149) : }
+Database.cs (159) : Table table= TableByName(tableName);
+Database.cs (160) : if (table == null)
+Database.cs (161) : {
+Database.cs (162) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (164) : }
+Database.cs (165) : if(columns == null || columns.Count==0)
+Database.cs (166) : {
+Database.cs (167) : columns = new List<string>();
+Database.cs (168) : for (int i=0; i<table.NumColumns(); i++)
+Database.cs (169) : {
+Database.cs (170) : columns.Add(table.GetColumn(i).Name);
+Database.cs (171) : }
+Database.cs (172) : }
+Database.cs (173) : foreach (string col in columns)
+Database.cs (174) : {
+Database.cs (175) : if (table.ColumnIndexByName(col)==-1)
+Database.cs (176) : {
+Database.cs (177) : LastErrorMessage=Constants.ColumnDoesNotExistError;
+Database.cs (178) : return null;
+Database.cs (179) : }
+Database.cs (180) : }
+Database.cs (181) : Table result = table.Select(columns, condition);
+Database.cs (182) : return result;
+Database.cs (191) : // Check for table
+Database.cs (192) : Table selectedTable = TableByName(tableName);
+Database.cs (194) : if (selectedTable == null)
+Database.cs (195) : {
+Database.cs (196) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (198) : }
+Database.cs (200) : // Check for column
+Database.cs (201) : if (selectedTable.ColumnIndexByName(columnCondition.ColumnName) == -1)
+Database.cs (202) : {
+Database.cs (203) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (204) : return false;
+Database.cs (205) : }
+Database.cs (207) : // Final removal
+Database.cs (208) : for (int i = selectedTable.NumRows() - 1; i >= 0; i--)
+Database.cs (209) : {
+Database.cs (210) : if (selectedTable.GetRow(i).IsTrue(columnCondition))
+Database.cs (211) : {
+Database.cs (212) : selectedTable.DeleteIthRow(i);
+Database.cs (213) : }
+Database.cs (214) : }
+Database.cs (216) : return true;
+Database.cs (254) : try
+Database.cs (255) : {
+Database.cs (256) : Directory.CreateDirectory(databaseName);
+Database.cs (257) : foreach(Table table in Tables)
+Database.cs (258) : {
+Database.cs (259) : string fileName = Path.Combine(databaseName, table.Name + ".tbl");
+Database.cs (260) : using (TextWriter writer = File.CreateText(fileName))
+Database.cs (261) : {
+Database.cs (262) : for(int i=0; i<table.NumColumns(); i++)
+Database.cs (263) : {
+Database.cs (264) : writer.WriteLine(table.GetColumn(i).AsText());
+Database.cs (265) : }
+Database.cs (266) : writer.WriteLine("--");
+Database.cs (267) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (268) : {
+Database.cs (269) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (270) : }
+Database.cs (271) : }
+Database.cs (272) : }
+Database.cs (273) : SecurityManager.Save(databaseName);
+Database.cs (274) : return true;
+Database.cs (275) : }
+Database.cs (276) : catch
+Database.cs (277) : {
+Database.cs (279) : }
+Database.cs (289) : try
+Database.cs (290) : {
+Database.cs (291) : Database db = new Database(username, password);
+Database.cs (292) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (293) : if (!Directory.Exists(path)) {
+Database.cs (294) : return null;
+Database.cs (295) : }
+Database.cs (296) : foreach (string filePath in Directory.GetFiles(path, "*.tbl"))
+Database.cs (297) : {
+Database.cs (298) : using (TextReader reader = File.OpenText(filePath))
+Database.cs (299) : {
+Database.cs (300) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (301) : string line;
+Database.cs (302) : while ((line = reader.ReadLine()) != "--")
+Database.cs (303) : {
+Database.cs (304) : columns.Add(ColumnDefinition.Parse(line));
+Database.cs (305) : }
+Database.cs (306) : string tableName = Path.GetFileNameWithoutExtension(filePath);
+Database.cs (307) : db.CreateTable(tableName, columns);
+Database.cs (308) : Table table = db.TableByName(tableName);
+Database.cs (309) : while ((line = reader.ReadLine()) != null)
+Database.cs (310) : {
+Database.cs (311) : table.Insert(Row.Parse(columns, line).Values);
+Database.cs (312) : }
+Database.cs (314) : }
+Database.cs (315) : }
+Database.cs (316) : return db;
+Database.cs (317) : }
+Database.cs (318) : catch {
+Database.cs (321) : }
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
 Row.cs (27) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)
@@ -124,50 +179,50 @@ Table.cs (180) : for (int i=0; i<indices.Count; i++)
 Table.cs (181) : {
 Table.cs (182) : Rows.RemoveAt(indices[i]);
 Table.cs (183) : }
-Table.cs (192) : List<ColumnDefinition> selectedColumns = new List<ColumnDefinition>();
-Table.cs (193) : foreach (string name in columnNames)
-Table.cs (194) : {
-Table.cs (195) : int index = ColumnIndexByName(name);
-Table.cs (196) : if (index != -1)
-Table.cs (197) : {
-Table.cs (198) : selectedColumns.Add(ColumnDefinitions[index]);
-Table.cs (199) : }
-Table.cs (202) : Table result = new Table("Result", selectedColumns);
-Table.cs (204) : foreach (var row in Rows)
+Table.cs (200) : List<ColumnDefinition> selectedColumns = new List<ColumnDefinition>();
+Table.cs (201) : foreach (string name in columnNames)
+Table.cs (202) : {
+Table.cs (203) : int index = ColumnIndexByName(name);
+Table.cs (204) : if (index != -1)
 Table.cs (205) : {
-Table.cs (206) : if (condition == null || row.IsTrue(condition))
-Table.cs (207) : {
-Table.cs (208) : List<string> selectedValues = new List<string>();
-Table.cs (210) : foreach (var name in columnNames)
-Table.cs (211) : {
-Table.cs (212) : int colIndex = ColumnIndexByName(name);
-Table.cs (213) : if (colIndex != -1)
-Table.cs (214) : {
-Table.cs (215) : selectedValues.Add(row.Values[colIndex]);
-Table.cs (216) : }
-Table.cs (217) : }
-Table.cs (220) : Row newRow = new Row(selectedColumns, selectedValues);
-Table.cs (221) : result.AddRow(newRow);
-Table.cs (222) : }
-Table.cs (223) : }
-Table.cs (225) : return result;
-Table.cs (227) : }
-Table.cs (234) : if (values == null || values.Count != ColumnDefinitions.Count)
-Table.cs (235) : {
-Table.cs (237) : }
-Table.cs (244) : return true;
-Table.cs (253) : if (condition == null) return false;
-Table.cs (255) : if (setValues == null || setValues.Count == 0) return true;
-Table.cs (257) : foreach (var row in Rows)
-Table.cs (258) : {
-Table.cs (259) : if (row.IsTrue(condition))
-Table.cs (260) : {
-Table.cs (261) : foreach (var sv in setValues)
-Table.cs (262) : {
-Table.cs (263) : row.SetValue(sv.ColumnName, sv.Value);
-Table.cs (264) : }
-Table.cs (265) : }
-Table.cs (266) : }
-Table.cs (267) : return true;
+Table.cs (206) : selectedColumns.Add(ColumnDefinitions[index]);
+Table.cs (207) : }
+Table.cs (210) : Table result = new Table("Result", selectedColumns);
+Table.cs (212) : foreach (var row in Rows)
+Table.cs (213) : {
+Table.cs (214) : if (condition == null || row.IsTrue(condition))
+Table.cs (215) : {
+Table.cs (216) : List<string> selectedValues = new List<string>();
+Table.cs (218) : foreach (var name in columnNames)
+Table.cs (219) : {
+Table.cs (220) : int colIndex = ColumnIndexByName(name);
+Table.cs (221) : if (colIndex != -1)
+Table.cs (222) : {
+Table.cs (223) : selectedValues.Add(row.Values[colIndex]);
+Table.cs (224) : }
+Table.cs (225) : }
+Table.cs (227) : Row newRow = new Row(selectedColumns, selectedValues);
+Table.cs (228) : result.AddRow(newRow);
+Table.cs (229) : }
+Table.cs (230) : }
+Table.cs (232) : return result;
+Table.cs (234) : }
+Table.cs (241) : if (values == null || values.Count != ColumnDefinitions.Count)
+Table.cs (242) : {
+Table.cs (244) : }
+Table.cs (251) : return true;
+Table.cs (260) : if (condition == null) return false;
+Table.cs (262) : if (setValues == null || setValues.Count == 0) return true;
+Table.cs (264) : foreach (var row in Rows)
+Table.cs (265) : {
+Table.cs (266) : if (row.IsTrue(condition))
+Table.cs (267) : {
+Table.cs (268) : foreach (var sv in setValues)
+Table.cs (269) : {
+Table.cs (270) : row.SetValue(sv.ColumnName, sv.Value);
+Table.cs (271) : }
+Table.cs (272) : }
+Table.cs (273) : }
+Table.cs (274) : return true;
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
