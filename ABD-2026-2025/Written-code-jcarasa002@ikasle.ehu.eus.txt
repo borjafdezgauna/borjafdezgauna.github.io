@@ -1,9 +1,24 @@
 ColumnDefinition.cs (18) : this.Type = type;
 ColumnDefinition.cs (19) : this.Name = name;
-ColumnDefinition.cs (29) : return null;
-ColumnDefinition.cs (36) : return null;
-ColumnDefinition.cs (43) : return null;
-ColumnDefinition.cs (50) : return null;
+ColumnDefinition.cs (28) : if(value == null)
+ColumnDefinition.cs (29) : {
+ColumnDefinition.cs (30) : return null;
+ColumnDefinition.cs (32) : value = value.Replace(Delimiter, DelimiterEncoded);
+ColumnDefinition.cs (33) : return value;
+ColumnDefinition.cs (35) : }
+ColumnDefinition.cs (40) : if(value == null)
+ColumnDefinition.cs (41) : {
+ColumnDefinition.cs (42) : return null;
+ColumnDefinition.cs (44) : value = value.Replace(DelimiterEncoded,Delimiter);
+ColumnDefinition.cs (45) : return value;
+ColumnDefinition.cs (46) : }
+ColumnDefinition.cs (51) : string nombre = Encode(this.Name);
+ColumnDefinition.cs (52) : return nombre+Delimiter+this.Type.ToString();
+ColumnDefinition.cs (58) : int posicion = value.IndexOf(Delimiter);
+ColumnDefinition.cs (59) : String nombre = value.Substring(0,posicion);
+ColumnDefinition.cs (60) : String tipo = value.Substring(posicion + Delimiter.Length);
+ColumnDefinition.cs (61) : String nombreDecodificado = Decode(nombre);
+ColumnDefinition.cs (63) : return null;
 Condition.cs (15) : private string mayorQue = ">";
 Condition.cs (16) : private string menorQue = "<";
 Condition.cs (17) : private string igualQue = "=";
@@ -66,38 +81,57 @@ Database.cs (205) : {
 Database.cs (206) : LastErrorMessage = Constants.UpdateSuccess;
 Database.cs (207) : }
 Database.cs (208) : return resultado;
-Row.cs (21) : {
-Row.cs (22) : this.ColumnDefinitions=columnDefinitions;
-Row.cs (23) : this.Values=values;
+Row.cs (19) : this.Values = new List<string>();
+Row.cs (21) : if(columnDefinitions != null)
+Row.cs (22) : {
+Row.cs (23) : this.ColumnDefinitions=columnDefinitions;
 Row.cs (24) : }
-Row.cs (32) : int contador = 0;
-Row.cs (33) : foreach(ColumnDefinition item in ColumnDefinitions)
-Row.cs (34) : {
-Row.cs (35) : if (item.Name.Equals(columnName))
-Row.cs (36) : {
-Row.cs (37) : Values[contador]=value;
-Row.cs (38) : return;
-Row.cs (39) : }
-Row.cs (40) : contador++;
-Row.cs (41) : }
-Row.cs (48) : int contador = 0;
-Row.cs (49) : foreach(ColumnDefinition item in ColumnDefinitions)
-Row.cs (50) : {
-Row.cs (51) : if (item.Name.Equals(columnName))
-Row.cs (52) : {
-Row.cs (53) : return Values[contador];
-Row.cs (54) : }
-Row.cs (55) : contador++;
-Row.cs (56) : }
-Row.cs (68) : int contador = 0;
-Row.cs (69) : foreach(ColumnDefinition item in ColumnDefinitions)
-Row.cs (70) : {
-Row.cs (71) : if (item.Name.Equals(condition.ColumnName))
-Row.cs (72) : {
-Row.cs (73) : return condition.IsTrue(Values[contador],item.Type);
-Row.cs (74) : }
-Row.cs (75) : contador++;
-Row.cs (76) : }
+Row.cs (25) : if(values != null)
+Row.cs (26) : {
+Row.cs (27) : this.Values=values;
+Row.cs (28) : }
+Row.cs (37) : int contador = 0;
+Row.cs (38) : foreach(ColumnDefinition item in ColumnDefinitions)
+Row.cs (39) : {
+Row.cs (40) : if (item.Name.Equals(columnName))
+Row.cs (41) : {
+Row.cs (42) : while(Values.Count <= contador)
+Row.cs (43) : {
+Row.cs (44) : Values.Add(null);
+Row.cs (45) : }
+Row.cs (46) : Values[contador]=value;
+Row.cs (47) : return;
+Row.cs (48) : }
+Row.cs (49) : contador++;
+Row.cs (50) : }
+Row.cs (57) : int contador = 0;
+Row.cs (58) : foreach(ColumnDefinition item in ColumnDefinitions)
+Row.cs (59) : {
+Row.cs (60) : if (item.Name.Equals(columnName))
+Row.cs (61) : {
+Row.cs (62) : if(Values.Count > contador)
+Row.cs (63) : {
+Row.cs (64) : return Values[contador];
+Row.cs (65) : }
+Row.cs (66) : else
+Row.cs (67) : {
+Row.cs (68) : return null;
+Row.cs (69) : }
+Row.cs (71) : }
+Row.cs (72) : contador++;
+Row.cs (73) : }
+Row.cs (85) : int contador = 0;
+Row.cs (86) : foreach(ColumnDefinition item in ColumnDefinitions)
+Row.cs (87) : {
+Row.cs (88) : if (item.Name.Equals(condition.ColumnName))
+Row.cs (89) : {
+Row.cs (90) : if(contador < Values.Count)
+Row.cs (91) : {
+Row.cs (92) : return condition.IsTrue(Values[contador],item.Type);
+Row.cs (93) : }
+Row.cs (94) : }
+Row.cs (95) : contador++;
+Row.cs (96) : }
 Table.cs (115) : string result = "[";
 Table.cs (118) : for (int i = 0; i < ColumnDefinitions.Count; i++)
 Table.cs (120) : ColumnDefinition c = ColumnDefinitions[i];
