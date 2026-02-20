@@ -43,28 +43,88 @@ Condition.cs (80) : ">=" => cmp >= 0,
 Condition.cs (81) : _ => false
 Condition.cs (82) : };
 Condition.cs (83) : }
-Table.cs (20) : this.ColumnDefinitions = columns ?? new List<ColumnDefinition>();  // <- asegurar que no sea null
-Table.cs (21) : this.Rows = new List<Row>();
-Table.cs (33) : if (i < 0 || i >= Rows.Count) return null;
-Table.cs (61) : public ColumnDefinition ColumnByName(string name)
-Table.cs (63) : int index = ColumnIndexByName(name);
-Table.cs (64) : if (index == -1) return null;
-Table.cs (65) : return ColumnDefinitions[index];
-Table.cs (68) : public int ColumnIndexByName(string name)
-Table.cs (71) : if (string.IsNullOrEmpty(name)) return -1;
-Table.cs (74) : var colName = ColumnDefinitions[i].Name;
-Table.cs (75) : if (!string.IsNullOrEmpty(colName) && colName.Equals(name, StringComparison.OrdinalIgnoreCase))
-Table.cs (96) : public void DeleteIthRow(int index)
-Table.cs (98) : if (index >= 0 && index < Rows.Count)
-Table.cs (100) : Rows.RemoveAt(index);
-Table.cs (107) : var listaIndices = new List<int>();
-Table.cs (109) : for (int i = 0; i < Rows.Count; i++)
-Table.cs (110) : {
-Table.cs (111) : if (Rows[i] == null) continue;
-Table.cs (112) : if (condition == null || Rows[i].IsTrue(condition))
-Table.cs (113) : {
-Table.cs (114) : listaIndices.Add(i);
-Table.cs (115) : }
-Table.cs (116) : }
-Table.cs (117) : return listaIndices;
-Table.cs (204) : return true;
+Database.cs (8) : using System.Text.Json;
+Database.cs (31) : Tables = new List<Table>();
+Database.cs (32) : m_username = adminUsername;
+Database.cs (33) : SecurityManager = new Manager(adminUsername);
+Database.cs (39) : if (table == null)
+Database.cs (41) : if (TableByName(table.Name) != null)
+Database.cs (42) : return false;
+Database.cs (44) : Tables.Add(table);
+Database.cs (45) : return true;
+Database.cs (52) : if (tableName == null)
+Database.cs (55) : foreach (var table in Tables)
+Database.cs (56) : {
+Database.cs (57) : if (table.Name != null &&
+Database.cs (58) : table.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase))
+Database.cs (59) : return table;
+Database.cs (60) : }
+Database.cs (61) : return null;
+Database.cs (171) : try
+Database.cs (172) : {
+Database.cs (173) : if (string.IsNullOrEmpty(databaseName))
+Database.cs (176) : string filePath = databaseName + ".db";
+Database.cs (177) : var options = new JsonSerializerOptions
+Database.cs (178) : {
+Database.cs (179) : IncludeFields = true
+Database.cs (180) : };
+Database.cs (181) : string json = JsonSerializer.Serialize(Tables, options);
+Database.cs (182) : File.WriteAllText(filePath, json);
+Database.cs (183) : return true;
+Database.cs (184) : }
+Database.cs (185) : catch
+Database.cs (186) : {
+Database.cs (187) : return false;
+Database.cs (188) : }
+Database.cs (197) : try
+Database.cs (198) : {
+Database.cs (199) : string filePath = databaseName + ".db";
+Database.cs (201) : if (!File.Exists(filePath))
+Database.cs (202) : return null;
+Database.cs (203) : var options = new JsonSerializerOptions
+Database.cs (204) : {
+Database.cs (205) : IncludeFields = true
+Database.cs (206) : };
+Database.cs (207) : string json = File.ReadAllText(filePath);
+Database.cs (208) : List<Table> tables = JsonSerializer.Deserialize<List<Table>>(json, options);
+Database.cs (210) : if (tables == null)
+Database.cs (213) : Database db = new Database();
+Database.cs (214) : db.Tables = tables;
+Database.cs (215) : db.m_username = username;
+Database.cs (216) : db.SecurityManager = new Manager(username);
+Database.cs (217) : return db;
+Database.cs (218) : }
+Database.cs (219) : catch
+Database.cs (220) : {
+Database.cs (221) : return null;
+Database.cs (222) : }
+Row.cs (13) : [System.Text.Json.Serialization.JsonInclude]
+Table.cs (11) : [System.Text.Json.Serialization.JsonInclude]
+Table.cs (12) : private List<ColumnDefinition> ColumnDefinitions = new List<ColumnDefinition>();
+Table.cs (13) : [System.Text.Json.Serialization.JsonInclude]
+Table.cs (15) : [System.Text.Json.Serialization.JsonInclude]
+Table.cs (22) : this.ColumnDefinitions = columns ?? new List<ColumnDefinition>();  // <- asegurar que no sea null
+Table.cs (23) : this.Rows = new List<Row>();
+Table.cs (35) : if (i < 0 || i >= Rows.Count) return null;
+Table.cs (68) : public ColumnDefinition ColumnByName(string name)
+Table.cs (70) : int index = ColumnIndexByName(name);
+Table.cs (71) : if (index == -1) return null;
+Table.cs (72) : return ColumnDefinitions[index];
+Table.cs (75) : public int ColumnIndexByName(string name)
+Table.cs (78) : if (string.IsNullOrEmpty(name)) return -1;
+Table.cs (81) : var colName = ColumnDefinitions[i].Name;
+Table.cs (82) : if (!string.IsNullOrEmpty(colName) && colName.Equals(name, StringComparison.OrdinalIgnoreCase))
+Table.cs (135) : public void DeleteIthRow(int index)
+Table.cs (137) : if (index >= 0 && index < Rows.Count)
+Table.cs (139) : Rows.RemoveAt(index);
+Table.cs (146) : var listaIndices = new List<int>();
+Table.cs (148) : for (int i = 0; i < Rows.Count; i++)
+Table.cs (149) : {
+Table.cs (150) : if (Rows[i] == null) continue;
+Table.cs (151) : if (condition == null || Rows[i].IsTrue(condition))
+Table.cs (152) : {
+Table.cs (153) : listaIndices.Add(i);
+Table.cs (154) : }
+Table.cs (155) : }
+Table.cs (156) : return listaIndices;
+Table.cs (252) : return true;
