@@ -1,5 +1,31 @@
 ColumnDefinition.cs (18) : this.Type = type;
 ColumnDefinition.cs (19) : this.Name = name;
+ColumnDefinition.cs (50) : return Name + "->" + Type;
+ColumnDefinition.cs (58) : string[] parts = value.Split("->");
+ColumnDefinition.cs (60) : string name = Decode(parts[0]);
+ColumnDefinition.cs (62) : DataType type = (DataType)Enum.Parse(typeof(DataType), parts[1]);
+ColumnDefinition.cs (64) : return new ColumnDefinition(type, name);
+Database.cs (71) : if (ColumnDefinition == null || ColumnDefinition.Count == 0)
+Database.cs (72) : {
+Database.cs (73) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (75) : }
+Database.cs (77) : if (TableByName(tableName) != null)
+Database.cs (78) : {
+Database.cs (79) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (80) : return false;
+Database.cs (81) : }
+Database.cs (83) : Table table = new Table(tableName, ColumnDefinition);
+Database.cs (84) : Tables.Add(table);
+Database.cs (86) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (87) : return true;
+Database.cs (96) : Table table = TableByName(tableName);
+Database.cs (98) : if (table == null)
+Database.cs (99) : {
+Database.cs (100) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (104) : Tables.Remove(table);
+Database.cs (106) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (107) : return true;
+Database.cs (108) : }
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
 Row.cs (27) : for (int i = 0; i < ColumnDefinitions.Count; i++)
@@ -28,5 +54,9 @@ Row.cs (65) : ColumnDefinition.DataType type = ColumnDefinitions[i].Type;
 Row.cs (67) : return condition.IsTrue(value, type);
 Row.cs (68) : }
 Row.cs (69) : }
+Row.cs (102) : return string.Join(":", Values);
+Row.cs (110) : string[] parts = value.Split(':');
+Row.cs (111) : List<string> values = new List<string>(parts);
+Row.cs (113) : return new Row(columns, values);
 SetValue.cs (17) : this.ColumnName = column;
 SetValue.cs (18) : this.Value = Value;
