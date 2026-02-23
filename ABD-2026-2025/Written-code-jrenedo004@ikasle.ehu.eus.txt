@@ -1,4 +1,5 @@
 ColumnDefinition.cs (3) : using System.Runtime.CompilerServices;
+ColumnDefinition.cs (8) : public class ColumnDefinition : IEquatable<ColumnDefinition>
 ColumnDefinition.cs (19) : this.Type = type;
 ColumnDefinition.cs (20) : this.Name = name;
 ColumnDefinition.cs (30) : return value.Replace(Delimiter, DelimiterEncoded);
@@ -26,6 +27,35 @@ ColumnDefinition.cs (69) : break;
 ColumnDefinition.cs (70) : }
 ColumnDefinition.cs (71) : cd = new ColumnDefinition(type, parsedValue);
 ColumnDefinition.cs (72) : return cd;
+ColumnDefinition.cs (74) : public static ColumnDefinition CreateTestColumnString()
+ColumnDefinition.cs (75) : {
+ColumnDefinition.cs (76) : string TestColumn1Name = "Name";
+ColumnDefinition.cs (77) : ColumnDefinition.DataType TestColumn1Type = ColumnDefinition.DataType.String;
+ColumnDefinition.cs (78) : return new ColumnDefinition(TestColumn1Type, TestColumn1Name);
+ColumnDefinition.cs (80) : }
+ColumnDefinition.cs (81) : public static ColumnDefinition CreateTestColumnDouble()
+ColumnDefinition.cs (82) : {
+ColumnDefinition.cs (83) : string TestColumn2Name = "Height";
+ColumnDefinition.cs (84) : ColumnDefinition.DataType TestColumn2Type = ColumnDefinition.DataType.Double;
+ColumnDefinition.cs (85) : return new ColumnDefinition(TestColumn2Type, TestColumn2Name);
+ColumnDefinition.cs (86) : }
+ColumnDefinition.cs (87) : public static ColumnDefinition CreateTestColumnInt()
+ColumnDefinition.cs (88) : {
+ColumnDefinition.cs (89) : string TestColumn3Name = "Age";
+ColumnDefinition.cs (90) : ColumnDefinition.DataType TestColumn3Type = ColumnDefinition.DataType.Int;
+ColumnDefinition.cs (91) : return new ColumnDefinition(TestColumn3Type, TestColumn3Name);
+ColumnDefinition.cs (92) : }
+ColumnDefinition.cs (93) : public bool Equals(ColumnDefinition other)
+ColumnDefinition.cs (94) : {
+ColumnDefinition.cs (95) : if (other.AsText().Equals(this.AsText()))
+ColumnDefinition.cs (96) : {
+ColumnDefinition.cs (97) : return true;
+ColumnDefinition.cs (98) : }
+ColumnDefinition.cs (99) : else
+ColumnDefinition.cs (100) : {
+ColumnDefinition.cs (101) : return false;
+ColumnDefinition.cs (102) : }
+ColumnDefinition.cs (103) : }
 Database.cs (128) : Table t = TableByName(tableName);
 Database.cs (129) : if (t == null)
 Database.cs (130) : {
@@ -73,10 +103,90 @@ Database.cs (191) : }
 Database.cs (192) : }
 Database.cs (194) : t.Update(columnNames, columnCondition);
 Database.cs (195) : return true;
-Table.cs (192) : List<int> filas = RowIndicesWhereConditionIsTrue(condition);
-Table.cs (193) : for (int i = filas.Count -1; i >= 0; i--)
-Table.cs (195) : Rows.RemoveAt(i);
-Table.cs (229) : if (Rows[i] != null && i >= 0)
-Table.cs (230) : {
-Table.cs (238) : for (int i = 0; i < filasResultado.Count; i++)
-Table.cs (239) : {
+Row.cs (11) : public class Row : IEquatable<Row>
+Row.cs (176) : public bool Equals(Row other)
+Row.cs (177) : {
+Row.cs (178) : if (other.AsText().Equals(this.AsText()))
+Row.cs (179) : {
+Row.cs (180) : return true;
+Row.cs (181) : }
+Row.cs (182) : else
+Row.cs (183) : {
+Row.cs (184) : return false;
+Row.cs (185) : }
+Row.cs (186) : }
+Table.cs (169) : if ((row < Rows.Count) && row >= 0)
+Table.cs (170) : {
+Table.cs (193) : List<int> filas = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (194) : for (int i = filas.Count - 1; i >= 0; i--)
+Table.cs (196) : Rows.RemoveAt(filas[i]);
+Table.cs (222) : List<string> valores = new List<string>();
+Table.cs (223) : for (int i = 0; i < columnasResultado.Count; i++)
+Table.cs (224) : {
+Table.cs (225) : valores.Add(fila.GetValue(columnasResultado[i].Name));
+Table.cs (226) : }
+Table.cs (227) : Result.AddRow(new Row(columnasResultado, valores));
+Table.cs (235) : if (Rows[i] != null && i >= 0)
+Table.cs (236) : {
+Table.cs (244) : for (int i = 0; i < filasResultado.Count; i++)
+Table.cs (245) : {
+Table.cs (246) : List<string> valores = new List<string>();
+Table.cs (247) : for (int j = 0; j < columnasResultado.Count; j++)
+Table.cs (248) : {
+Table.cs (249) : valores.Add(filasResultado[i].GetValue(columnasResultado[j].Name));
+Table.cs (250) : }
+Table.cs (251) : Result.AddRow(new Row(columnasResultado, valores));
+Table.cs (308) : public const string TestColumn1Row2 = "Maider";
+Table.cs (309) : public const string TestColumn2Row2 = "1.67";
+Table.cs (311) : public const string TestColumn1Row3 = "Pepe";
+Table.cs (312) : public const string TestColumn2Row3 = "1.55";
+Table.cs (331) : public static Table CreateTestTableDisordered(string tableName = TestTableName)
+Table.cs (332) : {
+Table.cs (333) : Table table = new Table(tableName, new List<ColumnDefinition>()
+Table.cs (334) : {
+Table.cs (335) : new ColumnDefinition(TestColumn3Type, TestColumn3Name),
+Table.cs (336) : new ColumnDefinition(TestColumn2Type, TestColumn2Name),
+Table.cs (337) : new ColumnDefinition(TestColumn1Type, TestColumn1Name)
+Table.cs (339) : });
+Table.cs (340) : table.Insert(new List<string>() { TestColumn3Row1, TestColumn2Row1, TestColumn1Row1 });
+Table.cs (341) : table.Insert(new List<string>() { TestColumn3Row2, TestColumn2Row2, TestColumn1Row2 });
+Table.cs (342) : table.Insert(new List<string>() { TestColumn3Row3, TestColumn2Row3, TestColumn1Row3 });
+Table.cs (343) : return table;
+Table.cs (344) : }
+Table.cs (345) : public static Table CreateTestTable(params int[] rowIndex)
+Table.cs (346) : {
+Table.cs (347) : Table table = new Table(TestTableName, new List<ColumnDefinition>()
+Table.cs (348) : {
+Table.cs (349) : new ColumnDefinition(TestColumn1Type, TestColumn1Name),
+Table.cs (350) : new ColumnDefinition(TestColumn2Type, TestColumn2Name),
+Table.cs (351) : new ColumnDefinition(TestColumn3Type, TestColumn3Name)
+Table.cs (352) : });
+Table.cs (353) : foreach (int index in rowIndex)
+Table.cs (354) : {
+Table.cs (355) : switch (index)
+Table.cs (356) : {
+Table.cs (357) : case 0:
+Table.cs (358) : table.Insert(new List<string> { TestColumn1Row1, TestColumn2Row1, TestColumn3Row1 });
+Table.cs (359) : break;
+Table.cs (360) : case 1:
+Table.cs (361) : table.Insert(new List<string> { TestColumn1Row2, TestColumn2Row2, TestColumn3Row2 });
+Table.cs (362) : break;
+Table.cs (363) : case 2:
+Table.cs (364) : table.Insert(new List<string> { TestColumn1Row3, TestColumn2Row3, TestColumn3Row3 });
+Table.cs (365) : break;
+Table.cs (366) : }
+Table.cs (367) : }
+Table.cs (368) : return table;
+Table.cs (369) : }
+Table.cs (371) : public static Table CreateTestTable2Columns(string tableName = TestTableName)
+Table.cs (372) : {
+Table.cs (373) : Table table = new Table(tableName, new List<ColumnDefinition>()
+Table.cs (374) : {
+Table.cs (375) : new ColumnDefinition(TestColumn2Type, TestColumn2Name),
+Table.cs (376) : new ColumnDefinition(TestColumn1Type, TestColumn1Name)
+Table.cs (378) : });
+Table.cs (379) : table.Insert(new List<string>() {TestColumn2Row1, TestColumn1Row1 });
+Table.cs (380) : table.Insert(new List<string>() {TestColumn2Row2, TestColumn1Row2 });
+Table.cs (381) : table.Insert(new List<string>() {TestColumn2Row3, TestColumn1Row3 });
+Table.cs (382) : return table;
+Table.cs (383) : }

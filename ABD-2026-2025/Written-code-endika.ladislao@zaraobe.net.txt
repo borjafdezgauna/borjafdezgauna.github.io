@@ -63,61 +63,61 @@ Database.cs (212) : selectedTable.DeleteIthRow(i);
 Database.cs (213) : }
 Database.cs (214) : }
 Database.cs (216) : return true;
-Database.cs (254) : try
-Database.cs (255) : {
-Database.cs (256) : Directory.CreateDirectory(databaseName);
-Database.cs (257) : foreach(Table table in Tables)
-Database.cs (258) : {
-Database.cs (259) : string fileName = Path.Combine(databaseName, table.Name + ".tbl");
-Database.cs (260) : using (TextWriter writer = File.CreateText(fileName))
-Database.cs (261) : {
-Database.cs (262) : for(int i=0; i<table.NumColumns(); i++)
-Database.cs (263) : {
-Database.cs (264) : writer.WriteLine(table.GetColumn(i).AsText());
-Database.cs (265) : }
-Database.cs (266) : writer.WriteLine("--");
-Database.cs (267) : for (int i = 0; i < table.NumRows(); i++)
-Database.cs (268) : {
-Database.cs (269) : writer.WriteLine(table.GetRow(i).AsText());
-Database.cs (270) : }
+Database.cs (250) : try
+Database.cs (251) : {
+Database.cs (252) : Directory.CreateDirectory(databaseName);
+Database.cs (253) : foreach(Table table in Tables)
+Database.cs (254) : {
+Database.cs (255) : string fileName = Path.Combine(databaseName, table.Name + ".tbl");
+Database.cs (256) : using (TextWriter writer = File.CreateText(fileName))
+Database.cs (257) : {
+Database.cs (258) : for(int i=0; i<table.NumColumns(); i++)
+Database.cs (259) : {
+Database.cs (260) : writer.WriteLine(table.GetColumn(i).AsText());
+Database.cs (261) : }
+Database.cs (262) : writer.WriteLine("--");
+Database.cs (263) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (264) : {
+Database.cs (265) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (266) : }
+Database.cs (267) : }
+Database.cs (268) : }
+Database.cs (269) : SecurityManager.Save(databaseName);
+Database.cs (270) : return true;
 Database.cs (271) : }
-Database.cs (272) : }
-Database.cs (273) : SecurityManager.Save(databaseName);
-Database.cs (274) : return true;
+Database.cs (272) : catch
+Database.cs (273) : {
 Database.cs (275) : }
-Database.cs (276) : catch
-Database.cs (277) : {
-Database.cs (279) : }
-Database.cs (289) : try
-Database.cs (290) : {
-Database.cs (291) : Database db = new Database(username, password);
-Database.cs (292) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Database.cs (293) : if (!Directory.Exists(path)) {
-Database.cs (294) : return null;
-Database.cs (295) : }
-Database.cs (296) : foreach (string filePath in Directory.GetFiles(path, "*.tbl"))
-Database.cs (297) : {
-Database.cs (298) : using (TextReader reader = File.OpenText(filePath))
+Database.cs (285) : try
+Database.cs (286) : {
+Database.cs (287) : Database db = new Database(username, password);
+Database.cs (288) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (289) : if (!Directory.Exists(path)) {
+Database.cs (290) : return null;
+Database.cs (291) : }
+Database.cs (292) : foreach (string filePath in Directory.GetFiles(path, "*.tbl"))
+Database.cs (293) : {
+Database.cs (294) : using (TextReader reader = File.OpenText(filePath))
+Database.cs (295) : {
+Database.cs (296) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (297) : string line;
+Database.cs (298) : while ((line = reader.ReadLine()) != "--")
 Database.cs (299) : {
-Database.cs (300) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (301) : string line;
-Database.cs (302) : while ((line = reader.ReadLine()) != "--")
-Database.cs (303) : {
-Database.cs (304) : columns.Add(ColumnDefinition.Parse(line));
-Database.cs (305) : }
-Database.cs (306) : string tableName = Path.GetFileNameWithoutExtension(filePath);
-Database.cs (307) : db.CreateTable(tableName, columns);
-Database.cs (308) : Table table = db.TableByName(tableName);
-Database.cs (309) : while ((line = reader.ReadLine()) != null)
-Database.cs (310) : {
-Database.cs (311) : table.Insert(Row.Parse(columns, line).Values);
-Database.cs (312) : }
-Database.cs (314) : }
-Database.cs (315) : }
-Database.cs (316) : return db;
+Database.cs (300) : columns.Add(ColumnDefinition.Parse(line));
+Database.cs (301) : }
+Database.cs (302) : string tableName = Path.GetFileNameWithoutExtension(filePath);
+Database.cs (303) : db.CreateTable(tableName, columns);
+Database.cs (304) : Table table = db.TableByName(tableName);
+Database.cs (305) : while ((line = reader.ReadLine()) != null)
+Database.cs (306) : {
+Database.cs (307) : table.Insert(Row.Parse(columns, line).Values);
+Database.cs (308) : }
+Database.cs (310) : }
+Database.cs (311) : }
+Database.cs (312) : return db;
+Database.cs (313) : }
+Database.cs (314) : catch {
 Database.cs (317) : }
-Database.cs (318) : catch {
-Database.cs (321) : }
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
 Row.cs (27) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)

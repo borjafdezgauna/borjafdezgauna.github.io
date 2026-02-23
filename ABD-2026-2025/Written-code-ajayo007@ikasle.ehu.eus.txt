@@ -1,3 +1,47 @@
+Database.cs (112) : //DEADLINE 1.B: Insert a new row to the table. If it doesn't exist return
+Database.cs (113) : //false and set LastErrorMessage appropriately
+Database.cs (114) : //If everything goes ok, set LastErrorMessage with the appropriate
+Database.cs (115) : //success message (Check Constants.cs)
+Database.cs (116) : Table table = TableByName(tableName);
+Database.cs (117) : if (table == null)
+Database.cs (118) : {
+Database.cs (119) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (121) : }
+Database.cs (123) : bool insertGoneGood = table.Insert(values);
+Database.cs (124) : if (insertGoneGood)
+Database.cs (125) : {
+Database.cs (126) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (127) : return true;
+Database.cs (128) : }
+Database.cs (129) : else
+Database.cs (130) : {
+Database.cs (131) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (132) : return false;
+Database.cs (133) : }
+Database.cs (138) : //DEADLINE 1.B: Return the result of the select. If the table doesn't exist
+Database.cs (139) : //return null and set LastErrorMessage appropriately (Check Constants.cs)
+Database.cs (140) : //If any of the requested columns doesn't exist, return null and set
+Database.cs (141) : //LastErrorMessage (Check Constants.cs)
+Database.cs (143) : Table table = TableByName(tableName);
+Database.cs (144) : if (table == null)
+Database.cs (145) : {
+Database.cs (146) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (148) : }
+Database.cs (149) : if (columns != null && columns.Count>0)
+Database.cs (150) : {
+Database.cs (151) : for (int i=0; i<columns.Count; i++)
+Database.cs (152) : {
+Database.cs (153) : string columnName = columns[i];
+Database.cs (154) : if (table.ColumnIndexByName(columnName) == -1)
+Database.cs (155) : {
+Database.cs (156) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (157) : return null;
+Database.cs (158) : }
+Database.cs (159) : }
+Database.cs (160) : }
+Database.cs (161) : Table result = table.Select(columns, condition);
+Database.cs (162) : //LastErrorMessage = Constants.success;
+Database.cs (163) : return result;
 Table.cs (3) : using System.Data.Common;
 Table.cs (4) : using System.Xml.Linq;
 Table.cs (5) : using DbManager.Parser;
@@ -29,79 +73,56 @@ Table.cs (95) : "['Name','Age']{'Adolfo','23'}{'Jacinto','24'}" <- two
 Table.cs (96) : columns, two rows
 Table.cs (97) : "" <- no columns, no rows
 Table.cs (98) : "['Name']" <- one column, no rows
-Table.cs (138) : {
-Table.cs (140) : }
-Table.cs (178) : List<ColumnDefinition> selectedColumns = new List<ColumnDefinition>();
-Table.cs (179) : List<int> selected = new List<int>();
-Table.cs (180) : if (columnNames == null || columnNames.Count == 0)
-Table.cs (181) : {
-Table.cs (182) : for (int i = 0; i < ColumnDefinitions.Count; i++)
-Table.cs (183) : {
-Table.cs (184) : selected.Add(i);
-Table.cs (185) : selectedColumns.Add(ColumnDefinitions[i]);
-Table.cs (186) : }
-Table.cs (187) : }
-Table.cs (188) : else
+Table.cs (118) : {
+Table.cs (120) : }
+Table.cs (155) : List<ColumnDefinition> selectedColumns = new List<ColumnDefinition>();
+Table.cs (156) : List<int> selectedIndex = new List<int>();
+Table.cs (157) : if (columnNames == null || columnNames.Count == 0)
+Table.cs (158) : {
+Table.cs (159) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Table.cs (160) : {
+Table.cs (161) : selectedIndex.Add(i);
+Table.cs (162) : selectedColumns.Add(ColumnDefinitions[i]);
+Table.cs (163) : }
+Table.cs (164) : }
+Table.cs (165) : else
+Table.cs (166) : {
+Table.cs (167) : for (int j = 0; j < columnNames.Count; j++)
+Table.cs (168) : {
+Table.cs (169) : string name = columnNames[j];
+Table.cs (170) : int index = ColumnIndexByName(name);
+Table.cs (172) : if (index >= 0)
+Table.cs (173) : {
+Table.cs (174) : selectedIndex.Add(index);
+Table.cs (175) : selectedColumns.Add(ColumnDefinitions[index]);
+Table.cs (176) : }
+Table.cs (177) : }
+Table.cs (178) : }
+Table.cs (179) : Table table = new Table("Result", selectedColumns);
+Table.cs (181) : for (int z = 0; z < Rows.Count; z++)
+Table.cs (182) : {
+Table.cs (183) : Row row = Rows[z];
+Table.cs (184) : if (condition == null || row.IsTrue(condition))
+Table.cs (185) : {
+Table.cs (186) : //TODO DEADLINE 1.A: Insert a new row with the values given. If the number of values is not correct, return false.True otherwise
+Table.cs (187) : List<string> newValues = new List<string>();
+Table.cs (188) : for (int k = 0; k < selectedIndex.Count; k++)
 Table.cs (189) : {
-Table.cs (190) : for (int j = 0; j < columnNames.Count; j++)
-Table.cs (191) : {
-Table.cs (192) : string name = columnNames[j];
-Table.cs (193) : int index = ColumnIndexByName(name);
-Table.cs (195) : if (index >= 0)
-Table.cs (196) : {
-Table.cs (197) : selected.Add(index);
-Table.cs (198) : selectedColumns.Add(ColumnDefinitions[index]);
-Table.cs (199) : }
-Table.cs (200) : }
-Table.cs (201) : }
-Table.cs (202) : Table table = new Table("Result", selectedColumns);
-Table.cs (204) : for (int z = 0; z < Rows.Count; z++)
-Table.cs (205) : {
-Table.cs (206) : Row row = Rows[z];
-Table.cs (207) : if (condition == null || row.IsTrue(condition))
-Table.cs (208) : {
-Table.cs (209) : //TODO DEADLINE 1.A: Insert a new row with the values given. If the number of values is not correct, return false.True otherwise
-Table.cs (210) : List<string> newValues = new List<string>();
-Table.cs (211) : for (int k = 0; k < selected.Count; k++)
-Table.cs (212) : {
-Table.cs (213) : newValues.Add(row.Values[selected[k]]);
-Table.cs (214) : }
-Table.cs (215) : table.AddRow(new Row(selectedColumns, newValues));
-Table.cs (216) : }
-Table.cs (218) : return table;
-Table.cs (223) : //TODO DEADLINE 1.A: Insert a new row with the values given. If the number of values is not correct, return false.True otherwise
-Table.cs (224) : if (values == null) return false;
-Table.cs (225) : if (values.Count != ColumnDefinitions.Count)
-Table.cs (226) : return false;
-Table.cs (227) : for (int i = 0; i < values.Count; i++)
-Table.cs (228) : {
-Table.cs (229) : var columnDef = ColumnDefinitions[i];
-Table.cs (230) : string value = values[i];
-Table.cs (231) : /*switch (columnDef.Type)
-Table.cs (232) : {
-Table.cs (233) : case ColumnDefinition.DataType.String:
-Table.cs (234) : // Always valid as string
-Table.cs (235) : break;
-Table.cs (236) : case ColumnDefinition.DataType.Int:
-Table.cs (237) : if (!int.TryParse(value, out _))
-Table.cs (238) : return false;
-Table.cs (239) : break;
-Table.cs (240) : case ColumnDefinition.DataType.Double:
-Table.cs (241) : if (!double.TryParse(value,
-Table.cs (242) : System.Globalization.NumberStyles.Any,
-Table.cs (243) : System.Globalization.CultureInfo.InvariantCulture, out _))
-Table.cs (244) : return false;
-Table.cs (245) : break;
-Table.cs (246) : default:
-Table.cs (247) : return false;
-Table.cs (248) : }*/
-Table.cs (249) : }
-Table.cs (250) : Row row = new Row(ColumnDefinitions, values);
-Table.cs (251) : AddRow(row);
-Table.cs (277) : public const ColumnDefinition.DataType TestColumn1Type =
-Table.cs (278) : ColumnDefinition.DataType.String;
-Table.cs (279) : public const ColumnDefinition.DataType TestColumn2Type =
-Table.cs (280) : ColumnDefinition.DataType.Double;
-Table.cs (281) : public const ColumnDefinition.DataType TestColumn3Type =
-Table.cs (282) : ColumnDefinition.DataType.Int;
-Table.cs (300) : if (rows.Count != NumRows()) throw new Exception($"The table has {NumRows()} rows and {rows.Count} were expected");
+Table.cs (190) : newValues.Add(row.Values[selectedIndex[k]]);
+Table.cs (191) : }
+Table.cs (192) : table.AddRow(new Row(selectedColumns, newValues));
+Table.cs (193) : }
+Table.cs (195) : return table;
+Table.cs (200) : //TODO DEADLINE 1.A: Insert a new row with the values given. If the number of values is not correct, return false.True otherwise
+Table.cs (201) : if (values == null) return false;
+Table.cs (202) : if (values.Count != ColumnDefinitions.Count)
+Table.cs (203) : return false;
+Table.cs (205) : Row row = new Row(ColumnDefinitions, values);
+Table.cs (206) : AddRow(row);
+Table.cs (232) : public const ColumnDefinition.DataType TestColumn1Type =
+Table.cs (233) : ColumnDefinition.DataType.String;
+Table.cs (234) : public const ColumnDefinition.DataType TestColumn2Type =
+Table.cs (235) : ColumnDefinition.DataType.Double;
+Table.cs (236) : public const ColumnDefinition.DataType TestColumn3Type =
+Table.cs (237) : ColumnDefinition.DataType.Int;
+Table.cs (255) : if (rows.Count != NumRows()) throw new Exception($"The table has {NumRows()} rows and {rows.Count} were expected");

@@ -5,93 +5,98 @@ Database.cs (42) : foreach (Table table in Tables)
 Database.cs (43) : {
 Database.cs (44) : if (table.Name == tableName) return table;
 Database.cs (45) : }
-Row.cs (19) : //Check that the number of column definitions matches the number of values, otherwise return without doing anything
-Row.cs (20) : if (columnDefinitions.Count() != values.Count()) { return; }
-Row.cs (21) : //Check that there is at least one column definition, otherwise return without doing anything
-Row.cs (22) : if (columnDefinitions.Count() == 0) { return; }
-Row.cs (56) : foreach (ColumnDefinition column in ColumnDefinitions)
-Row.cs (57) : {
-Row.cs (58) : if (column.Name == condition.ColumnName)
-Row.cs (59) : {
-Row.cs (60) : int index = ColumnDefinitions.IndexOf(column);
-Row.cs (61) : string value = Values[index];
-Row.cs (62) : return condition.IsTrue(value, column.Type);
-Row.cs (63) : }
-Row.cs (64) : }
+Row.cs (20) : //Check that the number of column definitions matches the number of values, otherwise return without doing anything
+Row.cs (21) : if (columnDefinitions.Count() != values.Count()) { return; }
+Row.cs (22) : //Check that there is at least one column definition, otherwise return without doing anything
+Row.cs (23) : if (columnDefinitions.Count() == 0) { return; }
+Row.cs (60) : foreach (ColumnDefinition column in ColumnDefinitions)
+Row.cs (61) : {
+Row.cs (62) : if (column.Name == condition.ColumnName)
+Row.cs (63) : {
+Row.cs (64) : int index = ColumnDefinitions.IndexOf(column);
+Row.cs (65) : string value = Values[index];
+Row.cs (66) : return condition.IsTrue(value, column.Type);
+Row.cs (67) : }
+Row.cs (68) : }
 Table.cs (18) : if (string.IsNullOrEmpty(name)) return;
-Table.cs (144) : public List<int> RowIndicesWhereConditionIsTrue(Condition condition)
-Table.cs (147) : List<int> indexes = new List<int>();
-Table.cs (148) : foreach (Row row in Rows)
-Table.cs (149) : {
-Table.cs (150) : if (row.IsTrue(condition))
-Table.cs (151) : {
-Table.cs (152) : indexes.Add(Rows.IndexOf(row));
-Table.cs (153) : }
-Table.cs (154) : }
-Table.cs (155) : return indexes;
-Table.cs (161) : var indexes = RowIndicesWhereConditionIsTrue(condition);
-Table.cs (162) : for (int i = indexes.Count - 1; i >= 0; i--)
-Table.cs (163) : {
-Table.cs (164) : DeleteIthRow(indexes[i]);
-Table.cs (165) : }
-Table.cs (172) : Table newTable;
-Table.cs (173) : List<int> columnIndexes = new List<int>();
-Table.cs (174) : List<Row> newRows = new List<Row>();
-Table.cs (175) : List<ColumnDefinition> newColumnDefinitions = new List<ColumnDefinition>();
-Table.cs (177) : foreach (string columnName in columnNames)
-Table.cs (178) : {
-Table.cs (179) : newColumnDefinitions.Add(ColumnByName(columnName));
-Table.cs (180) : columnIndexes.Add(ColumnIndexByName(columnName));
-Table.cs (181) : }
-Table.cs (182) : if (condition == null)
+Table.cs (35) : if (row.Values.Count != ColumnDefinitions.Count) { return; }
+Table.cs (76) : if (string.IsNullOrEmpty(columnName)) { return 0; }
+Table.cs (77) : if (!ColumnDefinitions.Exists(colDef => colDef.Name == columnName)) return 0;
+Table.cs (78) : return ColumnDefinitions.FindIndex(colDef => colDef.Name == columnName);
+Table.cs (139) : public List<int> RowIndicesWhereConditionIsTrue(Condition condition)
+Table.cs (142) : List<int> indexes = new List<int>();
+Table.cs (143) : foreach (Row row in Rows)
+Table.cs (144) : {
+Table.cs (145) : if (row.IsTrue(condition))
+Table.cs (146) : {
+Table.cs (147) : indexes.Add(Rows.IndexOf(row));
+Table.cs (148) : }
+Table.cs (149) : }
+Table.cs (150) : return indexes;
+Table.cs (156) : var indexes = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (157) : for (int i = indexes.Count - 1; i >= 0; i--)
+Table.cs (158) : {
+Table.cs (159) : DeleteIthRow(indexes[i]);
+Table.cs (160) : }
+Table.cs (167) : Table newTable;
+Table.cs (168) : List<int> columnIndexes = new List<int>();
+Table.cs (169) : List<Row> newRows = new List<Row>();
+Table.cs (170) : List<ColumnDefinition> newColumnDefinitions = new List<ColumnDefinition>();
+Table.cs (172) : foreach (string columnName in columnNames)
+Table.cs (173) : {
+Table.cs (174) : var originalCol = ColumnByName(columnName);
+Table.cs (175) : newColumnDefinitions.Add(new ColumnDefinition(originalCol.Type, originalCol.Name));
+Table.cs (177) : columnIndexes.Add(ColumnIndexByName(columnName));
+Table.cs (178) : }
+Table.cs (180) : if (condition == null)
+Table.cs (181) : {
+Table.cs (182) : foreach (Row row in Rows)
 Table.cs (183) : {
-Table.cs (184) : foreach (Row row in Rows)
-Table.cs (185) : {
-Table.cs (186) : List<string> newValues = new List<string>();
-Table.cs (187) : foreach (int columnIndex in columnIndexes)
-Table.cs (188) : {
-Table.cs (189) : newValues.Add(row.Values[columnIndex]);
+Table.cs (184) : List<string> newValues = new List<string>();
+Table.cs (185) : foreach (int columnIndex in columnIndexes)
+Table.cs (186) : {
+Table.cs (187) : newValues.Add(row.Values[columnIndex]);
+Table.cs (188) : }
+Table.cs (189) : newRows.Add(new Row(newColumnDefinitions, newValues));
 Table.cs (190) : }
-Table.cs (191) : newRows.Add(new Row(newColumnDefinitions, newValues));
-Table.cs (192) : }
-Table.cs (193) : newTable = new Table("Result", newColumnDefinitions);
-Table.cs (194) : foreach (Row row in newRows)
-Table.cs (195) : {
-Table.cs (196) : newTable.AddRow(row);
+Table.cs (191) : newTable = new Table("Result", newColumnDefinitions);
+Table.cs (192) : foreach (Row row in newRows)
+Table.cs (193) : {
+Table.cs (194) : newTable.AddRow(row);
+Table.cs (195) : }
+Table.cs (196) : return newTable;
 Table.cs (197) : }
-Table.cs (198) : return newTable;
-Table.cs (199) : }
-Table.cs (201) : foreach (Row row in Rows)
+Table.cs (199) : foreach (Row row in Rows)
+Table.cs (200) : {
+Table.cs (201) : if (row.IsTrue(condition))
 Table.cs (202) : {
-Table.cs (203) : if (row.IsTrue(condition))
-Table.cs (204) : {
-Table.cs (205) : List<string> newValues = new List<string>();
-Table.cs (206) : foreach (int columnIndex in columnIndexes)
-Table.cs (207) : {
-Table.cs (208) : newValues.Add(row.Values[columnIndex]);
+Table.cs (203) : List<string> newValues = new List<string>();
+Table.cs (204) : foreach (int columnIndex in columnIndexes)
+Table.cs (205) : {
+Table.cs (206) : newValues.Add(row.Values[columnIndex]);
+Table.cs (207) : }
+Table.cs (208) : newRows.Add(new Row(newColumnDefinitions, newValues));
 Table.cs (209) : }
-Table.cs (210) : newRows.Add(new Row(newColumnDefinitions, newValues));
-Table.cs (211) : }
-Table.cs (212) : }
-Table.cs (213) : newTable = new Table("Result", newColumnDefinitions);
-Table.cs (214) : foreach (Row row in newRows)
-Table.cs (215) : {
-Table.cs (216) : newTable.AddRow(row);
-Table.cs (217) : }
-Table.cs (218) : return newTable;
-Table.cs (224) : if (values.Count != ColumnDefinitions.Count) return false;
-Table.cs (225) : Row newRow = new Row(ColumnDefinitions, values);
-Table.cs (226) : AddRow(newRow);
-Table.cs (227) : return true;
-Table.cs (235) : if (condition == null) return false;
-Table.cs (236) : List<int> rowIndexes = RowIndicesWhereConditionIsTrue(condition);
-Table.cs (237) : foreach (int rowIndex in rowIndexes)
-Table.cs (238) : {
-Table.cs (239) : Row row = GetRow(rowIndex);
-Table.cs (240) : foreach (SetValue setValue in setValues)
-Table.cs (241) : {
-Table.cs (242) : int columnIndex = ColumnIndexByName(setValue.ColumnName);
-Table.cs (243) : row.Values[columnIndex] = setValue.Value;
-Table.cs (244) : }
-Table.cs (245) : }
-Table.cs (246) : return true;
+Table.cs (210) : }
+Table.cs (211) : newTable = new Table("Result", newColumnDefinitions);
+Table.cs (212) : foreach (Row row in newRows)
+Table.cs (213) : {
+Table.cs (214) : newTable.AddRow(row);
+Table.cs (215) : }
+Table.cs (216) : return newTable;
+Table.cs (222) : if (values.Count != ColumnDefinitions.Count) return false;
+Table.cs (223) : Row newRow = new Row(ColumnDefinitions, values);
+Table.cs (224) : AddRow(newRow);
+Table.cs (225) : return true;
+Table.cs (233) : if (condition == null) return false;
+Table.cs (234) : List<int> rowIndexes = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (235) : foreach (int rowIndex in rowIndexes)
+Table.cs (236) : {
+Table.cs (237) : Row row = GetRow(rowIndex);
+Table.cs (238) : foreach (SetValue setValue in setValues)
+Table.cs (239) : {
+Table.cs (240) : int columnIndex = ColumnIndexByName(setValue.ColumnName);
+Table.cs (241) : row.Values[columnIndex] = setValue.Value;
+Table.cs (242) : }
+Table.cs (243) : }
+Table.cs (244) : return true;
