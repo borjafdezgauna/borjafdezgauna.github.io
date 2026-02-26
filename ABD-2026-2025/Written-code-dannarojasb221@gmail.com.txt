@@ -1,3 +1,105 @@
+ColumnDefinition.cs (18) : this.Type = type;
+ColumnDefinition.cs (19) : this.Name = name;
+ColumnDefinition.cs (30) : if(string.IsNullOrEmpty(value)){
+ColumnDefinition.cs (31) : return value;
+ColumnDefinition.cs (32) : }
+ColumnDefinition.cs (33) : return value.Replace(Delimiter, DelimiterEncoded);
+ColumnDefinition.cs (40) : if(string.IsNullOrEmpty(value)){
+ColumnDefinition.cs (41) : return value;
+ColumnDefinition.cs (42) : }
+ColumnDefinition.cs (43) : return value.Replace(DelimiterEncoded, Delimiter);
+ColumnDefinition.cs (51) : return Type.ToString() + Delimiter + Encode(Name);
+ColumnDefinition.cs (59) : string[] parts = value.Split(new string[] { Delimiter }, StringSplitOptions.None);
+ColumnDefinition.cs (61) : DataType type = (DataType)Enum.Parse(typeof(DataType), parts[0]);
+ColumnDefinition.cs (62) : string name = Decode(parts[1]);
+ColumnDefinition.cs (64) : return new ColumnDefinition(type, name);
+Constants.cs (31) : public const string UserAlreadyExist = Error + "User Already Exists";
+Database.cs (29) : m_username = adminUsername;
+Database.cs (30) : Tables = new List<Table>();
+Database.cs (31) : SecurityManager = new Manager(adminUsername);
+Database.cs (37) : Tables.Add(table);
+Database.cs (38) : return true;
+Database.cs (45) : foreach(Table table in Tables)
+Database.cs (46) : {
+Database.cs (47) : if(table.Name == tableName)
+Database.cs (48) : {
+Database.cs (49) : return table;
+Database.cs (50) : }
+Database.cs (51) : }
+Database.cs (63) : if (TableByName(tableName)!=null)
+Database.cs (64) : {
+Database.cs (65) : LastErrorMessage=Constants.TableAlreadyExistsError;
+Database.cs (67) : }
+Database.cs (68) : if(ColumnDefinition==null || ColumnDefinition.Count==0)
+Database.cs (69) : {
+Database.cs (70) : LastErrorMessage=Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (71) : return false;
+Database.cs (72) : }
+Database.cs (73) : Table newTable =new Table(tableName,ColumnDefinition);
+Database.cs (74) : Tables.Add(newTable);
+Database.cs (75) : LastErrorMessage=Constants.CreateTableSuccess;
+Database.cs (77) : return true;
+Database.cs (93) : Table table = TableByName(tableName);
+Database.cs (94) : if (table == null)
+Database.cs (95) : {
+Database.cs (96) : this.LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (97) : return false;
+Database.cs (98) : }
+Database.cs (99) : bool success = table.Insert(values);
+Database.cs (100) : if (!success)
+Database.cs (101) : {
+Database.cs (102) : this.LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (104) : }
+Database.cs (105) : this.LastErrorMessage = Constants.InsertSuccess;
+Database.cs (106) : return true;
+Database.cs (116) : Table table = TableByName(tableName);
+Database.cs (117) : if (table == null)
+Database.cs (118) : {
+Database.cs (119) : this.LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (121) : }
+Database.cs (122) : foreach (string colName in columns)
+Database.cs (123) : {
+Database.cs (124) : if (table.ColumnByName(colName) == null)
+Database.cs (125) : {
+Database.cs (126) : this.LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (127) : return null;
+Database.cs (128) : }
+Database.cs (129) : }
+Database.cs (130) : return table.Select(columns, condition);
+Database.cs (141) : Table table = TableByName(tableName);
+Database.cs (143) : if (table == null)
+Database.cs (144) : {
+Database.cs (145) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (146) : return false;
+Database.cs (147) : }
+Database.cs (149) : if (table.ColumnByName(columnCondition.ColumnName) == null)
+Database.cs (150) : {
+Database.cs (151) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (153) : }
+Database.cs (155) : table.DeleteWhere(columnCondition);
+Database.cs (157) : LastErrorMessage = Constants.DeleteSuccess;
+Database.cs (158) : return true;
+Database.cs (168) : Table table = TableByName(tableName);
+Database.cs (170) : if (table == null)
+Database.cs (171) : {
+Database.cs (172) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (174) : }
+Database.cs (176) : if (table.ColumnByName(columnCondition.ColumnName) == null)
+Database.cs (177) : {
+Database.cs (178) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (179) : return false;
+Database.cs (180) : }
+Database.cs (182) : foreach (SetValue setValue in columnNames)
+Database.cs (183) : {
+Database.cs (184) : if (table.ColumnByName(setValue.ColumnName) == null)
+Database.cs (185) : {
+Database.cs (186) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (187) : return false;
+Database.cs (188) : }
+Database.cs (189) : }
+Database.cs (191) : table.Update(columnNames, columnCondition);
+Database.cs (193) : LastErrorMessage = Constants.UpdateSuccess;
+Database.cs (194) : return true;
 Row.cs (19) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (20) : this.Values = values;
 Row.cs (27) : var column = this.ColumnDefinitions.FirstOrDefault(col => col.Name == columnName);
@@ -20,3 +122,97 @@ Row.cs (60) : {
 Row.cs (61) : return condition.IsTrue(valueColumn, columnDef.Type);
 Row.cs (62) : }
 Row.cs (65) : return false;
+Row.cs (75) : if(string.IsNullOrEmpty(value)){
+Row.cs (76) : return value;
+Row.cs (77) : }
+Row.cs (79) : return value.Replace(Delimiter, DelimiterEncoded);
+Row.cs (86) : if (string.IsNullOrEmpty(value))
+Row.cs (87) : {
+Row.cs (88) : return value;
+Row.cs (89) : }
+Row.cs (91) : return value.Replace(DelimiterEncoded, Delimiter);
+Row.cs (99) : if (this.Values == null || this.Values.Count == 0)
+Row.cs (100) : {
+Row.cs (101) : return "";
+Row.cs (102) : }
+Row.cs (103) : List<string> encodedValues = new List<string>();
+Row.cs (104) : foreach(string val in this.Values)
+Row.cs (105) : {
+Row.cs (106) : encodedValues.Add(Encode(val));
+Row.cs (107) : }
+Row.cs (108) : return string.Join(Delimiter,encodedValues);
+Row.cs (115) : if (string.IsNullOrEmpty(value))
+Row.cs (116) : {
+Row.cs (118) : }
+Row.cs (119) : string[] parts = value.Split(new string[] { Delimiter }, StringSplitOptions.None);
+Row.cs (120) : List<string> decodedValues = new List<string>();
+Row.cs (121) : foreach (string part in parts)
+Row.cs (122) : {
+Row.cs (123) : decodedValues.Add(Decode(part));
+Row.cs (124) : }
+Row.cs (125) : return new Row(columns, decodedValues);
+AddUser.cs (5) : using DbManager.Security;
+AddUser.cs (19) : this.Username = username;
+AddUser.cs (20) : this.Password = password;
+AddUser.cs (21) : this.ProfileName = profileName;
+AddUser.cs (28) : Profile profile = database.SecurityManager.ProfileByName(this.ProfileName);
+AddUser.cs (29) : if (profile == null)
+AddUser.cs (30) : {
+AddUser.cs (31) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (32) : }
+AddUser.cs (33) : if (database.SecurityManager.UserByName(this.Username) != null)
+AddUser.cs (34) : {
+AddUser.cs (35) : return Constants.UserAlreadyExist;
+AddUser.cs (36) : }
+AddUser.cs (37) : User user = new User(this.Username, this.Password);
+AddUser.cs (38) : profile.Users.Add(user);
+AddUser.cs (40) : return Constants.AddUserSuccess;
+MiniSQLParser.cs (28) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (30) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(SELECT|INSERT|DELETE|UPDATE)\s+ON\s+([a-zA-Z0-9]+)\s+TO\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (34) : const string revokePattern = @"^REVOKE\s+(SELECT|INSERT|DELETE|UPDATE)\s+ON\s+([a-zA-Z0-9]+)\s+TO\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(\s*([a-zA-Z0-9]+)\s*,\s*([a-zA-Z0-9]+)\s*,\s*([a-zA-Z0-9]+)\s*\)$";
+MiniSQLParser.cs (38) : const string deleteUserPattern = @"^DELETE\s+USER\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (40) : Match match;
+MiniSQLParser.cs (50) : match = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (51) : if (match.Success)
+MiniSQLParser.cs (52) : return new AddUser(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value);
+MiniSQLParser.cs (54) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (55) : if (match.Success)
+MiniSQLParser.cs (56) : return new CreateSecurityProfile(match.Groups[1].Value);
+MiniSQLParser.cs (58) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (59) : if (match.Success)
+MiniSQLParser.cs (60) : return new DropSecurityProfile(match.Groups[1].Value);
+MiniSQLParser.cs (62) : match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (63) : if (match.Success)
+MiniSQLParser.cs (64) : return new DeleteUser(match.Groups[1].Value);
+MiniSQLParser.cs (66) : match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (67) : if (match.Success)
+MiniSQLParser.cs (68) : return new Grant(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value);
+Update.cs (3) : using System.Data.Common;
+Update.cs (4) : using System.Security.AccessControl;
+Update.cs (17) : this.Table = table;
+Update.cs (18) : this.Columns = columnNames;
+Update.cs (19) : this.Where = where;
+Update.cs (26) : Table table = database.TableByName(this.Table);
+Update.cs (27) : if (table == null)
+Update.cs (28) : return Constants.TableDoesNotExistError;
+Update.cs (29) : foreach (SetValue setValue in this.Columns)
+Update.cs (30) : {
+Update.cs (32) : if (table.ColumnByName(setValue.ColumnName) == null)
+Update.cs (33) : return Constants.ColumnDoesNotExistError;
+Update.cs (34) : }
+Update.cs (36) : for (int i = 0; i < table.NumRows(); i++)
+Update.cs (37) : {
+Update.cs (38) : Row row = table.GetRow(i);
+Update.cs (39) : if  (row != null)
+Update.cs (40) : {
+Update.cs (41) : if (this.Where==null || row.IsTrue(this.Where)){
+Update.cs (43) : foreach (SetValue setValue in this.Columns)
+Update.cs (44) : {
+Update.cs (45) : row.SetValue(setValue.ColumnName, setValue.Value);
+Update.cs (46) : }
+Update.cs (47) : }
+Update.cs (48) : }
+Update.cs (49) : }
+Update.cs (51) : return Constants.UpdateSuccess;
