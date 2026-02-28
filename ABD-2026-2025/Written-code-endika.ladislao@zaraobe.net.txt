@@ -63,88 +63,121 @@ Database.cs (212) : selectedTable.DeleteIthRow(i);
 Database.cs (213) : }
 Database.cs (214) : }
 Database.cs (216) : return true;
-Database.cs (250) : try
-Database.cs (251) : {
-Database.cs (252) : Directory.CreateDirectory(databaseName);
-Database.cs (253) : foreach(Table table in Tables)
-Database.cs (254) : {
-Database.cs (255) : string fileName = Path.Combine(databaseName, table.Name + ".tbl");
-Database.cs (256) : using (TextWriter writer = File.CreateText(fileName))
-Database.cs (257) : {
-Database.cs (258) : for(int i=0; i<table.NumColumns(); i++)
+Database.cs (245) : private const string tbl=".tbl";
+Database.cs (246) : private const string Delimiter = "--";
+Database.cs (254) : try
+Database.cs (255) : {
+Database.cs (256) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (257) : Directory.CreateDirectory(databaseName);
+Database.cs (258) : foreach (Table table in Tables)
 Database.cs (259) : {
-Database.cs (260) : writer.WriteLine(table.GetColumn(i).AsText());
-Database.cs (261) : }
-Database.cs (262) : writer.WriteLine("--");
-Database.cs (263) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (260) : string fileName = Path.Combine(path, table.Name + tbl);
+Database.cs (261) : using (TextWriter writer = File.CreateText(fileName))
+Database.cs (262) : {
+Database.cs (263) : for (int i = 0; i < table.NumColumns(); i++)
 Database.cs (264) : {
-Database.cs (265) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (265) : writer.WriteLine(table.GetColumn(i).AsText().Replace("->", "\\->"));
 Database.cs (266) : }
-Database.cs (267) : }
-Database.cs (268) : }
-Database.cs (269) : SecurityManager.Save(databaseName);
-Database.cs (270) : return true;
+Database.cs (267) : writer.WriteLine(Delimiter);
+Database.cs (268) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (269) : {
+Database.cs (270) : writer.WriteLine(table.GetRow(i).AsText().Replace(":", "\\:"));
 Database.cs (271) : }
-Database.cs (272) : catch
-Database.cs (273) : {
+Database.cs (272) : }
+Database.cs (273) : }
+Database.cs (274) : return true;
 Database.cs (275) : }
-Database.cs (285) : try
-Database.cs (286) : {
-Database.cs (287) : Database db = new Database(username, password);
-Database.cs (288) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Database.cs (289) : if (!Directory.Exists(path)) {
-Database.cs (290) : return null;
-Database.cs (291) : }
-Database.cs (292) : foreach (string filePath in Directory.GetFiles(path, "*.tbl"))
-Database.cs (293) : {
-Database.cs (294) : using (TextReader reader = File.OpenText(filePath))
-Database.cs (295) : {
-Database.cs (296) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (297) : string line;
-Database.cs (298) : while ((line = reader.ReadLine()) != "--")
-Database.cs (299) : {
-Database.cs (300) : columns.Add(ColumnDefinition.Parse(line));
-Database.cs (301) : }
-Database.cs (302) : string tableName = Path.GetFileNameWithoutExtension(filePath);
-Database.cs (303) : db.CreateTable(tableName, columns);
-Database.cs (304) : Table table = db.TableByName(tableName);
-Database.cs (305) : while ((line = reader.ReadLine()) != null)
-Database.cs (306) : {
-Database.cs (307) : table.Insert(Row.Parse(columns, line).Values);
-Database.cs (308) : }
+Database.cs (276) : catch (Exception ex)
+Database.cs (277) : {
+Database.cs (278) : LastErrorMessage = Constants.Error + ex.Message;
+Database.cs (280) : }
+Database.cs (290) : try
+Database.cs (291) : {
+Database.cs (292) : Database db = new Database(username, password);
+Database.cs (293) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (294) : if (!Directory.Exists(path)) {
+Database.cs (295) : return null;
+Database.cs (296) : }
+Database.cs (297) : foreach (var filePath in Directory.GetFiles(path, "*"+tbl))
+Database.cs (298) : {
+Database.cs (299) : using (TextReader reader = File.OpenText(filePath))
+Database.cs (300) : {
+Database.cs (301) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (302) : string line;
+Database.cs (303) : while ((line = reader.ReadLine()) != Delimiter)
+Database.cs (304) : {
+Database.cs (305) : ColumnDefinition col=ColumnDefinition.Parse(line.Replace("\\->", "->"));
+Database.cs (307) : if (columns != null)
+Database.cs (308) : {
+Database.cs (309) : columns.Add(col);
 Database.cs (310) : }
-Database.cs (311) : }
-Database.cs (312) : return db;
-Database.cs (313) : }
-Database.cs (314) : catch {
-Database.cs (317) : }
+Database.cs (311) : else {
+Database.cs (312) : db.LastErrorMessage=Constants.SyntaxError;
+Database.cs (313) : return null;
+Database.cs (314) : }
+Database.cs (315) : }
+Database.cs (316) : string tableName = Path.GetFileNameWithoutExtension(filePath);
+Database.cs (317) : db.CreateTable(tableName, columns);
+Database.cs (318) : Table table = db.TableByName(tableName);
+Database.cs (319) : if (table == null)
+Database.cs (320) : {
+Database.cs (321) : db.LastErrorMessage=Constants.TableDoesNotExistError;
+Database.cs (322) : return null;
+Database.cs (323) : }
+Database.cs (324) : while ((line = reader.ReadLine()) != null)
+Database.cs (325) : {
+Database.cs (326) : Row row=Row.Parse(columns, line.Replace("\\:", ":"));
+Database.cs (327) : db.TableByName(tableName).Insert(row.Values);
+Database.cs (328) : }
+Database.cs (330) : }
+Database.cs (331) : }
+Database.cs (333) : return db;
+Database.cs (334) : }
+Database.cs (335) : catch(Exception ex) {
+Database.cs (336) : Database db=new Database(username, password);
+Database.cs (337) : db.LastErrorMessage = ex.Message;
+Database.cs (340) : }
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
-Row.cs (27) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)
-Row.cs (28) : {
-Row.cs (29) : if (ColumnDefinitions[i].Name == columnName)
+Row.cs (29) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)
 Row.cs (30) : {
-Row.cs (31) : Values[i]=value;
-Row.cs (32) : return;
-Row.cs (33) : }
-Row.cs (34) : }
-Row.cs (40) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)
-Row.cs (41) : {
-Row.cs (42) : if (ColumnDefinitions[i].Name == columnName) {
-Row.cs (43) : return Values[i];
-Row.cs (44) : }
-Row.cs (45) : }
-Row.cs (54) : if (condition == null) return true;
-Row.cs (57) : string rowValue = null;
-Row.cs (59) : // Recorremos sin usar break
-Row.cs (60) : for (int i = 0; i < ColumnDefinitions.Count; i++)
-Row.cs (62) : // Comparamos el nombre de la columna directamente
-Row.cs (63) : if (ColumnDefinitions[i].Name == condition.ColumnName)
-Row.cs (65) : c = ColumnDefinitions[i];
-Row.cs (66) : rowValue = Values[i];
-Row.cs (70) : // Si no se encontr� la columna en esta fila
-Row.cs (71) : if (c == null) return false;
-Row.cs (73) : // Llamamos a la l�gica de la condici�n con el valor tal cual est�
+Row.cs (31) : if (ColumnDefinitions[i].Name == columnName)
+Row.cs (32) : {
+Row.cs (33) : if (i<Values.Count)
+Row.cs (34) : {
+Row.cs (35) : Values[i] = value;
+Row.cs (36) : }
+Row.cs (37) : else
+Row.cs (38) : {
+Row.cs (39) : Values.Add(value);
+Row.cs (40) : }
+Row.cs (41) : return;
+Row.cs (42) : }
+Row.cs (43) : }
+Row.cs (49) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)
+Row.cs (50) : {
+Row.cs (51) : if (ColumnDefinitions[i].Name == columnName) {
+Row.cs (52) : if (i<Values.Count)
+Row.cs (53) : {
+Row.cs (54) : return Values[i];
+Row.cs (55) : }
+Row.cs (56) : else
+Row.cs (57) : {
+Row.cs (58) : return null;
+Row.cs (59) : }
+Row.cs (61) : }
+Row.cs (62) : }
+Row.cs (71) : if (condition == null) return true;
+Row.cs (74) : string rowValue = null;
+Row.cs (76) : // Recorremos sin usar break
+Row.cs (77) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Row.cs (79) : // Comparamos el nombre de la columna directamente
+Row.cs (80) : if (ColumnDefinitions[i].Name == condition.ColumnName)
+Row.cs (82) : c = ColumnDefinitions[i];
+Row.cs (83) : rowValue = Values[i];
+Row.cs (87) : // Si no se encontr� la columna en esta fila
+Row.cs (88) : if (c == null) return false;
+Row.cs (90) : // Llamamos a la l�gica de la condici�n con el valor tal cual est�
 Table.cs (115) : if (ColumnDefinitions.Count == 0 && Rows.Count == 0)
 Table.cs (116) : {
 Table.cs (117) : return "";
@@ -174,10 +207,10 @@ Table.cs (144) : result += "}";
 Table.cs (145) : }
 Table.cs (147) : return result;
 Table.cs (178) : if(condition == null) return;
-Table.cs (179) : var indices= RowIndicesWhereConditionIsTrue(condition);
-Table.cs (180) : for (int i=0; i<indices.Count; i++)
+Table.cs (179) : var index= RowIndicesWhereConditionIsTrue(condition);
+Table.cs (180) : for (int i=index.Count -1; i>=0; i--)
 Table.cs (181) : {
-Table.cs (182) : Rows.RemoveAt(indices[i]);
+Table.cs (182) : Rows.RemoveAt(index[i]);
 Table.cs (183) : }
 Table.cs (200) : List<ColumnDefinition> selectedColumns = new List<ColumnDefinition>();
 Table.cs (201) : foreach (string name in columnNames)

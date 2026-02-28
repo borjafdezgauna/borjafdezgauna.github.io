@@ -82,46 +82,45 @@ Database.cs (171) : }
 Database.cs (172) : return table.Select(columns, condition);
 Table.cs (177) : if (columnNames == null || columnNames.Count == 0)
 Table.cs (178) : return null;
-Table.cs (179) : Table result = new Table("Result", new List<ColumnDefinition>());
-Table.cs (180) : List<int> columnIndices = new List<int>();
-Table.cs (182) : foreach (string columnName in columnNames)
-Table.cs (183) : {
-Table.cs (184) : ColumnDefinition column = ColumnByName(columnName);
-Table.cs (185) : if (column == null)
-Table.cs (186) : throw new Exception("La columna " + columnName + " no existe");
-Table.cs (187) : result.ColumnDefinitions.Add(column);
+Table.cs (180) : List<ColumnDefinition> resultCols = new List<ColumnDefinition>();
+Table.cs (181) : List<int> columnIndices = new List<int>();
+Table.cs (183) : foreach (string columnName in columnNames)
+Table.cs (184) : {
+Table.cs (185) : ColumnDefinition column = ColumnByName(columnName);
+Table.cs (186) : if (column == null)
+Table.cs (187) : return null;
 Table.cs (188) : columnIndices.Add(ColumnIndexByName(columnName));
-Table.cs (189) : }
-Table.cs (191) : List<int> rowIndices = RowIndicesWhereConditionIsTrue(condition);
-Table.cs (192) : foreach (int rowIndex in rowIndices)
-Table.cs (193) : {
-Table.cs (194) : List<string> newRowValues = new List<string>();
-Table.cs (195) : foreach(int colIndex in columnIndices)
+Table.cs (189) : resultCols.Add(column);
+Table.cs (190) : }
+Table.cs (192) : Table result = new Table("Result", resultCols);
+Table.cs (194) : List<int> rowIndices = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (195) : foreach (int rowIndex in rowIndices)
 Table.cs (196) : {
-Table.cs (197) : newRowValues.Add(Rows[rowIndex].Values[colIndex]);
-Table.cs (198) : }
-Table.cs (199) : result.Rows.Add(new Row(result.ColumnDefinitions, newRowValues));
-Table.cs (200) : }
-Table.cs (201) : return result;
-Table.cs (207) : if (values.Count != ColumnDefinitions.Count)
-Table.cs (208) : {
-Table.cs (210) : }
-Table.cs (211) : Rows.Add(new Row(ColumnDefinitions, values));
-Table.cs (212) : return true;
-Table.cs (219) : //TODO DEADLINE 1.A: Update all the rows where the condition is true using all the SetValues (ColumnName-Value). If condition is null,
-Table.cs (220) : //return false, otherwise return true
-Table.cs (221) : if (condition == null)
-Table.cs (223) : List<int> rowIndices = RowIndicesWhereConditionIsTrue(condition);
-Table.cs (224) : foreach (int rowIndex in rowIndices)
-Table.cs (225) : {
-Table.cs (226) : foreach (SetValue setValue in setValues)
+Table.cs (197) : List<string> newRowValues = new List<string>();
+Table.cs (198) : foreach (int colIndex in columnIndices)
+Table.cs (199) : newRowValues.Add(Rows[rowIndex].Values[colIndex]);
+Table.cs (201) : result.AddRow(new Row(resultCols, newRowValues));
+Table.cs (202) : }
+Table.cs (203) : return result;
+Table.cs (209) : if (values.Count != ColumnDefinitions.Count)
+Table.cs (210) : {
+Table.cs (212) : }
+Table.cs (213) : Rows.Add(new Row(ColumnDefinitions, values));
+Table.cs (214) : return true;
+Table.cs (221) : //TODO DEADLINE 1.A: Update all the rows where the condition is true using all the SetValues (ColumnName-Value). If condition is null,
+Table.cs (222) : //return false, otherwise return true
+Table.cs (223) : if (condition == null)
+Table.cs (225) : List<int> rowIndices = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (226) : foreach (int rowIndex in rowIndices)
 Table.cs (227) : {
-Table.cs (228) : int columnIndex = ColumnIndexByName(setValue.ColumnName);
-Table.cs (229) : if (columnIndex == -1)
-Table.cs (230) : throw new Exception("La columna " + setValue.ColumnName + " no existe");
-Table.cs (231) : Rows[rowIndex].Values[columnIndex] = setValue.Value;
-Table.cs (232) : }
-Table.cs (233) : }
-Table.cs (234) : return true;
+Table.cs (228) : foreach (SetValue setValue in setValues)
+Table.cs (229) : {
+Table.cs (230) : int columnIndex = ColumnIndexByName(setValue.ColumnName);
+Table.cs (231) : if (columnIndex == -1)
+Table.cs (232) : throw new Exception("La columna " + setValue.ColumnName + " no existe");
+Table.cs (233) : Rows[rowIndex].Values[columnIndex] = setValue.Value;
+Table.cs (234) : }
+Table.cs (235) : }
+Table.cs (236) : return true;
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
