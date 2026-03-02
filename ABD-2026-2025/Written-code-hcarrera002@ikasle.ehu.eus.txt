@@ -36,55 +36,129 @@ Condition.cs (64) : case "=": if (valor == valor2) { return true; } return false
 Condition.cs (65) : case ">": if (valor > valor2) { return true; } return false; ;
 Condition.cs (67) : }
 Condition.cs (69) : }
-Database.cs (29) : this.m_username = adminUsername;
-Database.cs (35) : Tables.Add(table);
-Database.cs (36) : return true;
-Database.cs (43) : Table winnerTable = null;
-Database.cs (44) : foreach (Table table in Tables)
-Database.cs (45) : {
-Database.cs (46) : if (table.Name.Equals(tableName))
+Database.cs (7) : using System.Reflection.PortableExecutable;
+Database.cs (8) : using System.Runtime.InteropServices;
+Database.cs (31) : this.m_username = adminUsername;
+Database.cs (37) : Tables.Add(table);
+Database.cs (38) : return true;
+Database.cs (45) : Table winnerTable = null;
+Database.cs (46) : foreach (Table table in Tables)
 Database.cs (47) : {
-Database.cs (48) : winnerTable = table;
-Database.cs (49) : }
-Database.cs (50) : }
-Database.cs (51) : return winnerTable;
-Database.cs (61) : if (TableByName(tableName) != null)
-Database.cs (62) : {
-Database.cs (63) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (64) : return false;
-Database.cs (65) : }
-Database.cs (66) : if (ColumnDefinition.Count() == 0)
-Database.cs (67) : {
-Database.cs (68) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
-Database.cs (70) : }
-Database.cs (71) : Tables.Add(new Table(tableName, ColumnDefinition));
-Database.cs (72) : LastErrorMessage = Constants.CreateTableSuccess;
-Database.cs (73) : return true;
-Database.cs (81) : if (TableByName(tableName) != null)
-Database.cs (82) : {
-Database.cs (83) : Tables.Remove(TableByName(tableName));
-Database.cs (84) : LastErrorMessage = Constants.DropTableSuccess;
-Database.cs (85) : return true;
-Database.cs (86) : }
-Database.cs (87) : else
-Database.cs (88) : {
-Database.cs (89) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (95) : }
-Database.cs (101) : Table table = TableByName(tableName);
-Database.cs (102) : if (table == null)
-Database.cs (103) : {
-Database.cs (104) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (105) : return false;
-Database.cs (106) : }
-Database.cs (107) : if (values == null) { return false; }
-Database.cs (108) : if (values.Count() == table.NumColumns())
-Database.cs (109) : {
-Database.cs (110) : List<ColumnDefinition> Columns = new List<ColumnDefinition>();
-Database.cs (111) : for (int i = 0; i < table.NumColumns(); i++)
-Database.cs (112) : {
-Database.cs (113) : Columns.Add(table.GetColumn(i));
-Database.cs (114) : }
-Database.cs (115) : table.AddRow(new Row(Columns, values));
-Database.cs (116) : LastErrorMessage = Constants.InsertSuccess;
-Database.cs (117) : return true;
-Database.cs (118) : }
+Database.cs (48) : if (table.Name.Equals(tableName))
+Database.cs (49) : {
+Database.cs (50) : winnerTable = table;
+Database.cs (51) : }
+Database.cs (52) : }
+Database.cs (53) : return winnerTable;
+Database.cs (63) : if (TableByName(tableName) != null)
+Database.cs (64) : {
+Database.cs (65) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (66) : return false;
+Database.cs (67) : }
+Database.cs (68) : if (ColumnDefinition.Count() == 0)
+Database.cs (69) : {
+Database.cs (70) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (72) : }
+Database.cs (73) : Tables.Add(new Table(tableName, ColumnDefinition));
+Database.cs (74) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (75) : return true;
+Database.cs (83) : if (TableByName(tableName) != null)
+Database.cs (84) : {
+Database.cs (85) : Tables.Remove(TableByName(tableName));
+Database.cs (86) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (87) : return true;
+Database.cs (88) : }
+Database.cs (89) : else
+Database.cs (90) : {
+Database.cs (91) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (97) : }
+Database.cs (103) : Table table = TableByName(tableName);
+Database.cs (104) : Boolean success;
+Database.cs (105) : if (table==null)
+Database.cs (106) : {
+Database.cs (107) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (108) : return false;
+Database.cs (109) : }
+Database.cs (110) : if (values == null)
+Database.cs (111) : {
+Database.cs (112) : return false;
+Database.cs (113) : }
+Database.cs (114) : success=table.Insert(values);
+Database.cs (115) : if(success)
+Database.cs (116) : {
+Database.cs (117) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (118) : return success;
+Database.cs (119) : }
+Database.cs (121) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (122) : return success;
+Database.cs (212) : if (!Directory.Exists(databaseName))
+Database.cs (213) : {
+Database.cs (214) : Directory.CreateDirectory(databaseName);
+Database.cs (215) : }
+Database.cs (216) : foreach (Table table in Tables)
+Database.cs (217) : {
+Database.cs (218) : TextWriter writer=null;
+Database.cs (219) : try
+Database.cs (220) : {
+Database.cs (221) : writer = File.CreateText(databaseName + "\\" + table.Name + ".txt");
+Database.cs (222) : for (int i = 0; i < table.NumColumns(); i++)
+Database.cs (223) : {
+Database.cs (224) : writer.WriteLine(table.GetColumn(i).AsText());
+Database.cs (225) : }
+Database.cs (226) : writer.WriteLine("{[VALUES]}");
+Database.cs (227) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (228) : {
+Database.cs (229) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (230) : }
+Database.cs (231) : writer.Close();
+Database.cs (233) : }
+Database.cs (234) : catch (Exception ex)
+Database.cs (235) : {
+Database.cs (236) : Console.WriteLine(ex.ToString());
+Database.cs (237) : if (writer != null) {  writer.Close(); }
+Database.cs (238) : return false;
+Database.cs (239) : }
+Database.cs (240) : }
+Database.cs (241) : return true;
+Database.cs (250) : Boolean exists = false;
+Database.cs (251) : Database database = new Database();
+Database.cs (252) : try
+Database.cs (253) : {
+Database.cs (254) : exists=Directory.Exists(databaseName);
+Database.cs (255) : if (!exists) { return null;}
+Database.cs (256) : if (exists)
+Database.cs (257) : {
+Database.cs (258) : String[] files= Directory.GetFiles(databaseName,"*.txt");
+Database.cs (259) : foreach (String file in files)
+Database.cs (260) : {
+Database.cs (261) : TextReader reader = File.OpenText(file);
+Database.cs (262) : String tableName = Path.GetFileNameWithoutExtension(file);
+Database.cs (263) : String Line;
+Database.cs (264) : List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
+Database.cs (266) : while((Line=reader.ReadLine())!=null)
+Database.cs (267) : {
+Database.cs (268) : if (Line.Equals("{[VALUES]}"))
+Database.cs (269) : {
+Database.cs (270) : break;
+Database.cs (271) : }
+Database.cs (272) : ColumnDefinition column=ColumnDefinition.Parse(Line);
+Database.cs (273) : columnDefinitions.Add(column);
+Database.cs (275) : }
+Database.cs (276) : Table table = new Table(tableName, columnDefinitions);
+Database.cs (277) : database.Tables.Add(table);
+Database.cs (278) : while ((Line=reader.ReadLine()) != null)
+Database.cs (279) : {
+Database.cs (280) : Row values = Row.Parse(columnDefinitions,Line);
+Database.cs (281) : table.AddRow(values);
+Database.cs (282) : }
+Database.cs (283) : reader.Close();
+Database.cs (284) : }
+Database.cs (285) : }
+Database.cs (286) : }
+Database.cs (287) : catch (Exception ex)
+Database.cs (288) : {
+Database.cs (290) : Console.WriteLine(ex.ToString());
+Database.cs (291) : return null;
+Database.cs (292) : }
+Database.cs (293) : return database;
+Insert.cs (17) : Values = values;

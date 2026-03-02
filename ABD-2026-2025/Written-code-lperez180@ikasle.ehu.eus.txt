@@ -251,17 +251,18 @@ AddUser.cs (22) : ProfileName=profileName;
 AddUser.cs (29) : Profile profile= database.SecurityManager.ProfileByName(Username);
 AddUser.cs (31) : if(profile==null)
 AddUser.cs (32) : {
-AddUser.cs (33) : User user= new User();
-AddUser.cs (34) : user.Username= Username;
-AddUser.cs (35) : user.EncryptedPassword=Password;
-AddUser.cs (37) : profile.Users.Add(user);
-AddUser.cs (39) : database.SecurityManager.AddProfile(profile);
-AddUser.cs (41) : }
-AddUser.cs (42) : if(database.LastErrorMessage!=null)
-AddUser.cs (43) : {
-AddUser.cs (44) : return database.LastErrorMessage;
-AddUser.cs (45) : }
-AddUser.cs (48) : return "AddUserSuccess";
+AddUser.cs (33) : return "SecurityProfileDoesNotExistError";
+AddUser.cs (34) : }
+AddUser.cs (36) : User user= new User();
+AddUser.cs (37) : user.Username= Username;
+AddUser.cs (38) : user.EncryptedPassword=Password;
+AddUser.cs (40) : profile.Users.Add(user);
+AddUser.cs (42) : database.SecurityManager.AddProfile(profile);
+AddUser.cs (44) : if(database.LastErrorMessage!=null)
+AddUser.cs (45) : {
+AddUser.cs (46) : return database.LastErrorMessage;
+AddUser.cs (47) : }
+AddUser.cs (50) : return "AddUserSuccess";
 CreateSecurityProfile.cs (5) : using DbManager.Security;
 CreateSecurityProfile.cs (17) : ProfileName=profileName;
 CreateSecurityProfile.cs (25) : Profile profile= new Profile();
@@ -335,6 +336,24 @@ Insert.cs (29) : {
 Insert.cs (30) : return database.LastErrorMessage;
 Insert.cs (31) : }
 Insert.cs (33) : return "InsertSuccess";
+MiniSQLParser.cs (2) : using System;
+MiniSQLParser.cs (13) : //SELECT columnas FROM tabla patrón
+MiniSQLParser.cs (14) : const string selectPattern =@"^SELECT\s+([a-zA-Z0-9,\s\*]+)\s+FROM\s+([a-zA-Z0-9]+)$" ;
+MiniSQLParser.cs (16) : //INSERT INTO tabla VALUES columnas patrón
+MiniSQLParser.cs (17) : const string insertPattern = @"^INSERT\s+INTO\s+([a-zA-Z0-9]+)\s+VALUES\s+\(([a-zA-Z0-9, ]+)\)$";
+MiniSQLParser.cs (19) : //DROP TABLE tabla patrón
+MiniSQLParser.cs (20) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (24) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z0-9]+)\s+\(([a-zA-Z0-9,\s]*)\)$";
+MiniSQLParser.cs (26) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z0-9]+)\s+SET\s+([a-zA-Z0-9\s\=\,]+)\s+WHERE\s+(.+)$";
+MiniSQLParser.cs (28) : const string deletePattern = @"^DELETE\s+FROM\s+([a-zA-Z0-9]+)\s+WHERE\s+(.+)$";
+MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (35) : //Captura la tabla, el privilegio y el perfil
+MiniSQLParser.cs (36) : const string grantPattern = @"^GRANT\s+(SELECT|INSERT|UPDATE|DELETE)\s+ON\s+([a-zA-Z0-9]+)\s+TO\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (38) : const string revokePattern = @"^REVOKE\s+(SELECT|INSERT|UPDATE|DELETE)\s+ON\s+([a-zA-Z0-9]+)\s+TO\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (40) : //Patrón para obtener ADD USER (usuario)(contraseña)(perfil) con espacio entre add y user y los paréntesis de luego
+MiniSQLParser.cs (41) : const string addUserPattern = @"^ADD\s+USER\s+\(([a-zA-Z0-9]+),\s*([a-zA-Z0-9]+),\s*([a-zA-Z0-9]+)\)$";
+MiniSQLParser.cs (43) : const string deleteUserPattern = @"^DELETE\s+USER\s+([a-zA-Z0-9]+)$";
 Revoke.cs (18) : PrivilegeName= privilegeName;
 Revoke.cs (19) : TableName=tableName;
 Revoke.cs (20) : ProfileName=profileName;
