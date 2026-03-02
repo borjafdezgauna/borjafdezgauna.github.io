@@ -36,6 +36,30 @@ Database.cs (33) : m_username = adminUsername;
 Database.cs (34) : Tables = new List<Table>();
 Database.cs (35) : LastErrorMessage = string.Empty;
 Database.cs (36) : SecurityManager = new Manager(adminUsername);
+Database.cs (46) : if (table == null)
+Database.cs (47) : {
+Database.cs (49) : }
+Database.cs (52) : if (TableByName(table.Name) != null)
+Database.cs (53) : {
+Database.cs (54) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (55) : return false;
+Database.cs (56) : }
+Database.cs (58) : Tables.Add(table);
+Database.cs (61) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (63) : return true;
+Database.cs (86) : if (TableByName(tableName) != null)
+Database.cs (87) : {
+Database.cs (88) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (89) : return false;
+Database.cs (90) : }
+Database.cs (92) : if (ColumnDefinition.Count == 0)
+Database.cs (93) : {
+Database.cs (94) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (96) : }
+Database.cs (98) : Table newTable = new(tableName, ColumnDefinition);
+Database.cs (99) : Tables.Add(newTable);
+Database.cs (101) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (102) : return true;
 Database.cs (111) : Table table = TableByName(tableName);
 Database.cs (113) : if(table==null)
 Database.cs (114) : {
@@ -55,8 +79,113 @@ Database.cs (141) : if(success)
 Database.cs (142) : {
 Database.cs (143) : LastErrorMessage=Constants.InsertSuccess;
 Database.cs (144) : return true;
-Database.cs (145) : }else
-Database.cs (146) : {
+Database.cs (145) : }
+Database.cs (146) : else
+Database.cs (147) : {
+Database.cs (148) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (149) : return false;
+Database.cs (150) : }
+Database.cs (160) : Table table= TableByName(tableName);
+Database.cs (161) : if (table == null)
+Database.cs (162) : {
+Database.cs (163) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (165) : }
+Database.cs (166) : if(columns == null || columns.Count==0)
+Database.cs (167) : {
+Database.cs (168) : columns = new List<string>();
+Database.cs (169) : for (int i=0; i<table.NumColumns(); i++)
+Database.cs (170) : {
+Database.cs (171) : columns.Add(table.GetColumn(i).Name);
+Database.cs (172) : }
+Database.cs (173) : }
+Database.cs (174) : foreach (string col in columns)
+Database.cs (175) : {
+Database.cs (176) : if (table.ColumnIndexByName(col)==-1)
+Database.cs (177) : {
+Database.cs (178) : LastErrorMessage=Constants.ColumnDoesNotExistError;
+Database.cs (179) : return null;
+Database.cs (180) : }
+Database.cs (181) : }
+Database.cs (182) : Table result = table.Select(columns, condition);
+Database.cs (183) : return result;
+Database.cs (192) : // Check for table
+Database.cs (193) : Table selectedTable = TableByName(tableName);
+Database.cs (195) : if (selectedTable == null)
+Database.cs (196) : {
+Database.cs (197) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (199) : }
+Database.cs (201) : // Check for column
+Database.cs (202) : if (selectedTable.ColumnIndexByName(columnCondition.ColumnName) == -1)
+Database.cs (203) : {
+Database.cs (204) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (205) : return false;
+Database.cs (206) : }
+Database.cs (208) : // Final removal
+Database.cs (209) : for (int i = selectedTable.NumRows() - 1; i >= 0; i--)
+Database.cs (210) : {
+Database.cs (211) : if (selectedTable.GetRow(i).IsTrue(columnCondition))
+Database.cs (212) : {
+Database.cs (213) : selectedTable.DeleteIthRow(i);
+Database.cs (214) : }
+Database.cs (215) : }
+Database.cs (217) : return true;
+Database.cs (226) : Table table = TableByName(tableName);
+Database.cs (227) : if (table == null)
+Database.cs (228) : {
+Database.cs (229) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (233) : if (columnCondition == null ||
+Database.cs (234) : table.ColumnIndexByName(columnCondition.ColumnName) == -1)
+Database.cs (235) : {
+Database.cs (236) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (237) : return false;
+Database.cs (238) : }
+Database.cs (241) : table.Update(columnNames, columnCondition);
+Database.cs (243) : return true;
+Database.cs (244) : }
+Database.cs (255) : try
+Database.cs (256) : {
+Database.cs (258) : Directory.CreateDirectory(databaseName);
+Database.cs (259) : foreach (Table table in Tables)
+Database.cs (260) : {
+Database.cs (262) : using (TextWriter writer = File.CreateText(fileName))
+Database.cs (263) : {
+Database.cs (264) : for (int i = 0; i < table.NumColumns(); i++)
+Database.cs (265) : {
+Database.cs (267) : }
+Database.cs (269) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (270) : {
+Database.cs (272) : }
+Database.cs (273) : }
+Database.cs (274) : }
+Database.cs (275) : return true;
+Database.cs (276) : }
+Database.cs (278) : {
+Database.cs (281) : }
+Database.cs (291) : try
+Database.cs (292) : {
+Database.cs (293) : Database db = new Database(username, password);
+Database.cs (294) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (295) : if (!Directory.Exists(path)) {
+Database.cs (296) : return null;
+Database.cs (297) : }
+Database.cs (299) : {
+Database.cs (300) : using (TextReader reader = File.OpenText(filePath))
+Database.cs (301) : {
+Database.cs (302) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (303) : string line;
+Database.cs (305) : {
+Database.cs (316) : }
+Database.cs (317) : string tableName = Path.GetFileNameWithoutExtension(filePath);
+Database.cs (318) : db.CreateTable(tableName, columns);
+Database.cs (319) : Table table = db.TableByName(tableName);
+Database.cs (325) : while ((line = reader.ReadLine()) != null)
+Database.cs (326) : {
+Database.cs (329) : }
+Database.cs (331) : }
+Database.cs (332) : }
+Database.cs (334) : return db;
+Database.cs (335) : }
+Database.cs (341) : }
 Row.cs (103) : if (string.IsNullOrEmpty(value))
 Row.cs (104) : {
 Row.cs (105) : return value;

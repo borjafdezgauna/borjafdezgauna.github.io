@@ -4,139 +4,36 @@ ColumnDefinition.cs (57) : string[] parts = value.Split(Delimiter, 2);
 ColumnDefinition.cs (59) : if (parts.Length != 2) return null;
 ColumnDefinition.cs (61) : if (!Enum.TryParse<DataType>(parts[1], out var type)) return null;
 ColumnDefinition.cs (63) : return new ColumnDefinition(type, Decode(parts[0]));
-Database.cs (86) : if (TableByName(tableName) != null)
-Database.cs (87) : {
-Database.cs (88) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (89) : return false;
-Database.cs (90) : }
-Database.cs (92) : if (ColumnDefinition.Count == 0)
-Database.cs (93) : {
-Database.cs (94) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
-Database.cs (96) : }
-Database.cs (98) : Table newTable = new(tableName, ColumnDefinition);
-Database.cs (99) : Tables.Add(newTable);
-Database.cs (101) : LastErrorMessage = Constants.CreateTableSuccess;
-Database.cs (102) : return true;
-Database.cs (147) : LastErrorMessage = Constants.ColumnCountsDontMatch;
-Database.cs (149) : }
-Database.cs (159) : Table table= TableByName(tableName);
-Database.cs (160) : if (table == null)
-Database.cs (161) : {
-Database.cs (162) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (164) : }
-Database.cs (165) : if(columns == null || columns.Count==0)
-Database.cs (166) : {
-Database.cs (167) : columns = new List<string>();
-Database.cs (168) : for (int i=0; i<table.NumColumns(); i++)
-Database.cs (169) : {
-Database.cs (170) : columns.Add(table.GetColumn(i).Name);
-Database.cs (171) : }
-Database.cs (172) : }
-Database.cs (173) : foreach (string col in columns)
-Database.cs (174) : {
-Database.cs (175) : if (table.ColumnIndexByName(col)==-1)
-Database.cs (176) : {
-Database.cs (177) : LastErrorMessage=Constants.ColumnDoesNotExistError;
-Database.cs (178) : return null;
-Database.cs (179) : }
-Database.cs (180) : }
-Database.cs (181) : Table result = table.Select(columns, condition);
-Database.cs (182) : return result;
-Database.cs (191) : // Check for table
-Database.cs (192) : Table selectedTable = TableByName(tableName);
-Database.cs (194) : if (selectedTable == null)
-Database.cs (195) : {
-Database.cs (196) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (198) : }
-Database.cs (200) : // Check for column
-Database.cs (201) : if (selectedTable.ColumnIndexByName(columnCondition.ColumnName) == -1)
-Database.cs (202) : {
-Database.cs (203) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (204) : return false;
-Database.cs (205) : }
-Database.cs (207) : // Final removal
-Database.cs (208) : for (int i = selectedTable.NumRows() - 1; i >= 0; i--)
-Database.cs (209) : {
-Database.cs (210) : if (selectedTable.GetRow(i).IsTrue(columnCondition))
-Database.cs (211) : {
-Database.cs (212) : selectedTable.DeleteIthRow(i);
-Database.cs (213) : }
-Database.cs (214) : }
-Database.cs (216) : return true;
-Database.cs (245) : private const string tbl=".tbl";
-Database.cs (246) : private const string Delimiter = "--";
-Database.cs (254) : try
-Database.cs (255) : {
-Database.cs (256) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Database.cs (257) : Directory.CreateDirectory(databaseName);
-Database.cs (258) : foreach (Table table in Tables)
-Database.cs (259) : {
-Database.cs (260) : string fileName = Path.Combine(path, table.Name + tbl);
-Database.cs (261) : using (TextWriter writer = File.CreateText(fileName))
-Database.cs (262) : {
-Database.cs (263) : for (int i = 0; i < table.NumColumns(); i++)
-Database.cs (264) : {
-Database.cs (265) : writer.WriteLine(table.GetColumn(i).AsText().Replace("->", "\\->"));
-Database.cs (266) : }
-Database.cs (267) : writer.WriteLine(Delimiter);
-Database.cs (268) : for (int i = 0; i < table.NumRows(); i++)
-Database.cs (269) : {
-Database.cs (270) : writer.WriteLine(table.GetRow(i).AsText().Replace(":", "\\:"));
-Database.cs (271) : }
-Database.cs (272) : }
-Database.cs (273) : }
-Database.cs (274) : return true;
-Database.cs (275) : }
-Database.cs (276) : catch (Exception ex)
-Database.cs (277) : {
-Database.cs (278) : LastErrorMessage = Constants.Error + ex.Message;
-Database.cs (280) : }
-Database.cs (290) : try
-Database.cs (291) : {
-Database.cs (292) : Database db = new Database(username, password);
-Database.cs (293) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Database.cs (294) : if (!Directory.Exists(path)) {
-Database.cs (295) : return null;
-Database.cs (296) : }
-Database.cs (297) : foreach (var filePath in Directory.GetFiles(path, "*"+tbl))
-Database.cs (298) : {
-Database.cs (299) : using (TextReader reader = File.OpenText(filePath))
-Database.cs (300) : {
-Database.cs (301) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (302) : string line;
-Database.cs (303) : while ((line = reader.ReadLine()) != Delimiter)
-Database.cs (304) : {
-Database.cs (305) : ColumnDefinition col=ColumnDefinition.Parse(line.Replace("\\->", "->"));
-Database.cs (307) : if (columns != null)
-Database.cs (308) : {
-Database.cs (309) : columns.Add(col);
-Database.cs (310) : }
-Database.cs (311) : else {
-Database.cs (312) : db.LastErrorMessage=Constants.SyntaxError;
-Database.cs (313) : return null;
-Database.cs (314) : }
+Database.cs (246) : private const string tbl=".tbl";
+Database.cs (247) : private const string Delimiter = "--";
+Database.cs (257) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (261) : string fileName = Path.Combine(path, table.Name + tbl);
+Database.cs (266) : writer.WriteLine(table.GetColumn(i).AsText().Replace("->", "\\->"));
+Database.cs (268) : writer.WriteLine(Delimiter);
+Database.cs (271) : writer.WriteLine(table.GetRow(i).AsText().Replace(":", "\\:"));
+Database.cs (277) : catch (Exception ex)
+Database.cs (279) : LastErrorMessage = Constants.Error + ex.Message;
+Database.cs (298) : foreach (var filePath in Directory.GetFiles(path, "*"+tbl))
+Database.cs (304) : while ((line = reader.ReadLine()) != Delimiter)
+Database.cs (306) : ColumnDefinition col=ColumnDefinition.Parse(line.Replace("\\->", "->"));
+Database.cs (308) : if (columns != null)
+Database.cs (309) : {
+Database.cs (310) : columns.Add(col);
+Database.cs (311) : }
+Database.cs (312) : else {
+Database.cs (313) : db.LastErrorMessage=Constants.SyntaxError;
+Database.cs (314) : return null;
 Database.cs (315) : }
-Database.cs (316) : string tableName = Path.GetFileNameWithoutExtension(filePath);
-Database.cs (317) : db.CreateTable(tableName, columns);
-Database.cs (318) : Table table = db.TableByName(tableName);
-Database.cs (319) : if (table == null)
-Database.cs (320) : {
-Database.cs (321) : db.LastErrorMessage=Constants.TableDoesNotExistError;
-Database.cs (322) : return null;
-Database.cs (323) : }
-Database.cs (324) : while ((line = reader.ReadLine()) != null)
-Database.cs (325) : {
-Database.cs (326) : Row row=Row.Parse(columns, line.Replace("\\:", ":"));
-Database.cs (327) : db.TableByName(tableName).Insert(row.Values);
-Database.cs (328) : }
-Database.cs (330) : }
-Database.cs (331) : }
-Database.cs (333) : return db;
-Database.cs (334) : }
-Database.cs (335) : catch(Exception ex) {
-Database.cs (336) : Database db=new Database(username, password);
-Database.cs (337) : db.LastErrorMessage = ex.Message;
-Database.cs (340) : }
+Database.cs (320) : if (table == null)
+Database.cs (321) : {
+Database.cs (322) : db.LastErrorMessage=Constants.TableDoesNotExistError;
+Database.cs (323) : return null;
+Database.cs (324) : }
+Database.cs (327) : Row row=Row.Parse(columns, line.Replace("\\:", ":"));
+Database.cs (328) : db.TableByName(tableName).Insert(row.Values);
+Database.cs (336) : catch(Exception ex) {
+Database.cs (337) : Database db=new Database(username, password);
+Database.cs (338) : db.LastErrorMessage = ex.Message;
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
 Row.cs (29) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)
