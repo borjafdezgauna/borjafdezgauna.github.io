@@ -8,32 +8,34 @@ Database.cs (246) : private const string tbl=".tbl";
 Database.cs (247) : private const string Delimiter = "--";
 Database.cs (257) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
 Database.cs (261) : string fileName = Path.Combine(path, table.Name + tbl);
-Database.cs (266) : writer.WriteLine(table.GetColumn(i).AsText().Replace("->", "\\->"));
+Database.cs (266) : writer.WriteLine(table.GetColumn(i).AsText());
 Database.cs (268) : writer.WriteLine(Delimiter);
-Database.cs (271) : writer.WriteLine(table.GetRow(i).AsText().Replace(":", "\\:"));
-Database.cs (277) : catch (Exception ex)
-Database.cs (279) : LastErrorMessage = Constants.Error + ex.Message;
-Database.cs (298) : foreach (var filePath in Directory.GetFiles(path, "*"+tbl))
-Database.cs (304) : while ((line = reader.ReadLine()) != Delimiter)
-Database.cs (306) : ColumnDefinition col=ColumnDefinition.Parse(line.Replace("\\->", "->"));
-Database.cs (308) : if (columns != null)
-Database.cs (309) : {
-Database.cs (310) : columns.Add(col);
-Database.cs (311) : }
-Database.cs (312) : else {
-Database.cs (313) : db.LastErrorMessage=Constants.SyntaxError;
-Database.cs (314) : return null;
-Database.cs (315) : }
-Database.cs (320) : if (table == null)
-Database.cs (321) : {
-Database.cs (322) : db.LastErrorMessage=Constants.TableDoesNotExistError;
-Database.cs (323) : return null;
-Database.cs (324) : }
-Database.cs (327) : Row row=Row.Parse(columns, line.Replace("\\:", ":"));
-Database.cs (328) : db.TableByName(tableName).Insert(row.Values);
-Database.cs (336) : catch(Exception ex) {
-Database.cs (337) : Database db=new Database(username, password);
-Database.cs (338) : db.LastErrorMessage = ex.Message;
+Database.cs (271) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (275) : SecurityManager.Save(Path.Combine(path, "security.dat"));
+Database.cs (278) : catch (Exception ex)
+Database.cs (280) : LastErrorMessage = Constants.Error + ex.Message;
+Database.cs (294) : Database db = new Database();
+Database.cs (295) : db.m_username = username;
+Database.cs (297) : if (!Directory.Exists(path))
+Database.cs (298) : {
+Database.cs (301) : foreach (var filePath in Directory.GetFiles(path, "*"+tbl))
+Database.cs (307) : while ((line = reader.ReadLine()) != Delimiter)
+Database.cs (309) : columns.Add(ColumnDefinition.Parse(line));
+Database.cs (314) : if (table == null)
+Database.cs (315) : {
+Database.cs (316) : db.LastErrorMessage=Constants.TableDoesNotExistError;
+Database.cs (317) : return null;
+Database.cs (318) : }
+Database.cs (321) : Row row=Row.Parse(columns, line);
+Database.cs (322) : db.TableByName(tableName).Insert(row.Values);
+Database.cs (327) : string secFile = Path.Combine(path, "security.dat");
+Database.cs (328) : db.SecurityManager = Manager.Load(secFile, username);
+Database.cs (329) : if(!db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (330) : {
+Database.cs (331) : return null;
+Database.cs (332) : }
+Database.cs (335) : catch(Exception ex)
+Database.cs (336) : {
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
 Row.cs (29) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)
@@ -154,5 +156,21 @@ Table.cs (271) : }
 Table.cs (272) : }
 Table.cs (273) : }
 Table.cs (274) : return true;
+Delete.cs (16) : this.Table = table;
+Delete.cs (17) : this.Where = where;
+Delete.cs (26) : if (database == null)
+Delete.cs (27) : {
+Delete.cs (28) : return Constants.Error;
+Delete.cs (29) : }
+Delete.cs (30) : Table table = database.TableByName(Table);
+Delete.cs (32) : if (table == null)
+Delete.cs (33) : {
+Delete.cs (34) : return Constants.TableDoesNotExistError;
+Delete.cs (35) : }
+Delete.cs (36) : table.DeleteWhere(Where);
+Delete.cs (37) : return Constants.DeleteSuccess;
+Grant.cs (19) : this.PrivilegeName = privilegeName;
+Grant.cs (20) : this.TableName = tableName;
+Grant.cs (21) : this.ProfileName = profileName;
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
