@@ -62,26 +62,31 @@ Database.cs (183) : table.DeleteWhere(columnCondition);
 Database.cs (184) : LastErrorMessage = Constants.DeleteSuccess;
 Database.cs (185) : return true;
 Database.cs (186) : }
-Database.cs (187) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (188) : }
+Database.cs (187) : }
+Database.cs (188) : LastErrorMessage = Constants.TableDoesNotExistError;
 Database.cs (197) : foreach (Table table in Tables) // provisional loop to find the table, we will change it later when we have the method TableByName implemented
 Database.cs (198) : {
 Database.cs (199) : if (table.Name == tableName)
 Database.cs (200) : {
-Database.cs (201) : foreach (var setValue in columnNames)
+Database.cs (201) : if (table.ColumnByName(columnCondition.ColumnName) == null)
 Database.cs (202) : {
-Database.cs (203) : if (table.ColumnByName(setValue.ColumnName) == null)
-Database.cs (204) : {
-Database.cs (205) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (206) : return false;
-Database.cs (207) : }
-Database.cs (208) : }
-Database.cs (209) : table.Update(columnNames, columnCondition);
-Database.cs (210) : LastErrorMessage = Constants.UpdateSuccess;
-Database.cs (211) : return true;
-Database.cs (212) : }
-Database.cs (213) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (203) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (204) : return false;
+Database.cs (205) : }
+Database.cs (207) : foreach (var setValue in columnNames)
+Database.cs (208) : {
+Database.cs (209) : if (table.ColumnByName(setValue.ColumnName) == null)
+Database.cs (210) : {
+Database.cs (211) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (212) : return false;
+Database.cs (213) : }
 Database.cs (214) : }
+Database.cs (216) : table.Update(columnNames, columnCondition);
+Database.cs (217) : LastErrorMessage = Constants.UpdateSuccess;
+Database.cs (218) : return true;
+Database.cs (219) : }
+Database.cs (220) : }
+Database.cs (221) : LastErrorMessage = Constants.TableDoesNotExistError;
 Row.cs (8) : private const string Delimiter = ":";
 Row.cs (9) : private const string DelimiterEncoded = "[SEPARATOR]";
 Row.cs (16) : ColumnDefinitions = columnDefinitions;
@@ -126,3 +131,5 @@ Row.cs (105) : //  ⣿⣿⣿⣿⣿⣿⡿⠀⠀⢸⣿⣿⠀⠀⠣⠀⠀⠀⠀⠀�
 Row.cs (106) : //  ⣿⣿⣿⡿⠟⠋⠀⠀⠀⠀⠹⣿⣧⣀⠀⠀⠀⠀⡀⣴⠁⢘⡙⢿⣿⣿⣿⣿⣿⣿⣿⣿
 Row.cs (107) : //  ⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢿⠗⠂⠄⠀⣴⡟⠀⠀⡃⠀⠉⠉⠟⡿⣿⣿⣿⣿
 Row.cs (108) : //  ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢷⠾⠛⠂⢹⠀⠀⠀⢡⠀⠀⠀⠀⠀⠙⠛⠿⢿
+Table.cs (182) : var cols = columnNames.ConvertAll(ColumnByName);
+Table.cs (187) : var values = columnNames.ConvertAll(row.GetValue);
