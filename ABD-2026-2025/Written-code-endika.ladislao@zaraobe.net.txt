@@ -7,6 +7,7 @@ ColumnDefinition.cs (63) : return new ColumnDefinition(type, Decode(parts[0]));
 Database.cs (246) : private const string tbl=".tbl";
 Database.cs (247) : private const string Delimiter = "--";
 Database.cs (257) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (258) : Directory.CreateDirectory(path);
 Database.cs (261) : string fileName = Path.Combine(path, table.Name + tbl);
 Database.cs (266) : writer.WriteLine(table.GetColumn(i).AsText());
 Database.cs (268) : writer.WriteLine(Delimiter);
@@ -19,23 +20,31 @@ Database.cs (295) : db.m_username = username;
 Database.cs (297) : if (!Directory.Exists(path))
 Database.cs (298) : {
 Database.cs (301) : foreach (var filePath in Directory.GetFiles(path, "*"+tbl))
-Database.cs (307) : while ((line = reader.ReadLine()) != Delimiter)
+Database.cs (307) : while ((line = reader.ReadLine()) != null&&line!=Delimiter)
 Database.cs (309) : columns.Add(ColumnDefinition.Parse(line));
 Database.cs (314) : if (table == null)
 Database.cs (315) : {
 Database.cs (316) : db.LastErrorMessage=Constants.TableDoesNotExistError;
 Database.cs (317) : return null;
 Database.cs (318) : }
-Database.cs (321) : Row row=Row.Parse(columns, line);
-Database.cs (322) : db.TableByName(tableName).Insert(row.Values);
-Database.cs (327) : string secFile = Path.Combine(path, "security.dat");
-Database.cs (328) : db.SecurityManager = Manager.Load(secFile, username);
-Database.cs (329) : if(!db.SecurityManager.IsPasswordCorrect(username, password))
-Database.cs (330) : {
-Database.cs (331) : return null;
-Database.cs (332) : }
-Database.cs (335) : catch(Exception ex)
-Database.cs (336) : {
+Database.cs (319) : if (line==Delimiter)
+Database.cs (320) : {
+Database.cs (323) : Row row = Row.Parse(columns, line);
+Database.cs (324) : table.Insert(row.Values);
+Database.cs (325) : }
+Database.cs (329) : string secFile = Path.Combine(path, "security.dat");
+Database.cs (330) : if (!File.Exists(secFile))
+Database.cs (331) : {
+Database.cs (332) : db.SecurityManager = new Manager("system");
+Database.cs (333) : return db;
+Database.cs (334) : }
+Database.cs (335) : db.SecurityManager = Manager.Load(secFile, username);
+Database.cs (336) : if(db.SecurityManager == null||!db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (337) : {
+Database.cs (338) : return null;
+Database.cs (339) : }
+Database.cs (342) : catch(Exception ex)
+Database.cs (343) : {
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
 Row.cs (29) : for (int i = 0; i < this.ColumnDefinitions.Count; i++)
@@ -172,5 +181,9 @@ Delete.cs (37) : return Constants.DeleteSuccess;
 Grant.cs (19) : this.PrivilegeName = privilegeName;
 Grant.cs (20) : this.TableName = tableName;
 Grant.cs (21) : this.ProfileName = profileName;
+Grant.cs (28) : if (database == null)
+Grant.cs (29) : {
+Grant.cs (30) : return Constants.Error;
+Grant.cs (31) : }
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;

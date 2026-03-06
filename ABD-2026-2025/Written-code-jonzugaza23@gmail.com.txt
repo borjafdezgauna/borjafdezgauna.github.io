@@ -5,59 +5,124 @@ ColumnDefinition.cs (46) : string[] partes = value.Split(Delimiter);
 ColumnDefinition.cs (48) : string name = Decode(partes[0]);
 ColumnDefinition.cs (49) : DataType type = Enum.Parse<DataType>(partes[1]);
 ColumnDefinition.cs (51) : return new ColumnDefinition(type, name);
-Database.cs (57) : if(ColumnDefinition == null || ColumnDefinition.Count == 0)
-Database.cs (58) : {
-Database.cs (59) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
-Database.cs (61) : }
-Database.cs (63) : foreach(Table tabla in Tables)
-Database.cs (64) : {
-Database.cs (65) : if(tabla.Name==tableName)
+Database.cs (4) : using System;
+Database.cs (5) : using System.IO;
+Database.cs (59) : if(ColumnDefinition == null || ColumnDefinition.Count == 0)
+Database.cs (60) : {
+Database.cs (61) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (63) : }
+Database.cs (65) : foreach(Table tabla in Tables)
 Database.cs (66) : {
-Database.cs (67) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (68) : return false;
-Database.cs (69) : }
-Database.cs (70) : }
-Database.cs (72) : LastErrorMessage = Constants.CreateTableSuccess;
-Database.cs (73) : Table nueva = new Table(tableName,ColumnDefinition);
-Database.cs (74) : Tables.Add(nueva);
-Database.cs (75) : return true;
-Database.cs (84) : Table tablaEliminada = null;
-Database.cs (86) : foreach(Table tabla in Tables)
-Database.cs (87) : {
-Database.cs (88) : if(tabla.Name==tableName)
+Database.cs (67) : if(tabla.Name==tableName)
+Database.cs (68) : {
+Database.cs (69) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (70) : return false;
+Database.cs (71) : }
+Database.cs (72) : }
+Database.cs (74) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (75) : Table nueva = new Table(tableName,ColumnDefinition);
+Database.cs (76) : Tables.Add(nueva);
+Database.cs (77) : return true;
+Database.cs (86) : Table tablaEliminada = null;
+Database.cs (88) : foreach(Table tabla in Tables)
 Database.cs (89) : {
-Database.cs (90) : tablaEliminada = tabla;
-Database.cs (91) : }
-Database.cs (92) : }
-Database.cs (94) : if(tablaEliminada==null)
-Database.cs (95) : {
-Database.cs (96) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (99) : else
-Database.cs (100) : {
-Database.cs (101) : LastErrorMessage = Constants.DropTableSuccess;
-Database.cs (102) : Tables.Remove(tablaEliminada);
-Database.cs (103) : return true;
-Database.cs (104) : }
-Database.cs (105) : }
-Database.cs (112) : Table tablaEncontrada = null;
-Database.cs (114) : foreach(Table tabla in Tables)
-Database.cs (115) : {
-Database.cs (116) : if(tabla.Name==tableName)
+Database.cs (90) : if(tabla.Name==tableName)
+Database.cs (91) : {
+Database.cs (92) : tablaEliminada = tabla;
+Database.cs (93) : }
+Database.cs (94) : }
+Database.cs (96) : if(tablaEliminada==null)
+Database.cs (97) : {
+Database.cs (98) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (101) : else
+Database.cs (102) : {
+Database.cs (103) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (104) : Tables.Remove(tablaEliminada);
+Database.cs (105) : return true;
+Database.cs (106) : }
+Database.cs (107) : }
+Database.cs (114) : Table tablaEncontrada = null;
+Database.cs (116) : foreach(Table tabla in Tables)
 Database.cs (117) : {
-Database.cs (118) : tablaEncontrada = tabla;
-Database.cs (119) : }
-Database.cs (120) : }
-Database.cs (122) : if(tablaEncontrada==null)
-Database.cs (123) : {
-Database.cs (124) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (125) : return false;
-Database.cs (126) : }
-Database.cs (127) : else
-Database.cs (128) : {
-Database.cs (129) : LastErrorMessage = Constants.InsertSuccess;
-Database.cs (130) : tablaEncontrada.Insert(values);
-Database.cs (131) : return true;
-Database.cs (132) : }
+Database.cs (118) : if(tabla.Name==tableName)
+Database.cs (119) : {
+Database.cs (120) : tablaEncontrada = tabla;
+Database.cs (121) : }
+Database.cs (122) : }
+Database.cs (124) : if(tablaEncontrada==null)
+Database.cs (125) : {
+Database.cs (126) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (127) : return false;
+Database.cs (128) : }
+Database.cs (129) : else
+Database.cs (130) : {
+Database.cs (131) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (132) : tablaEncontrada.Insert(values);
+Database.cs (133) : return true;
+Database.cs (134) : }
+Database.cs (223) : try
+Database.cs (224) : {
+Database.cs (225) : string filePath = databaseName + ".txt";
+Database.cs (227) : using (StreamWriter writer = new StreamWriter(filePath))
+Database.cs (228) : {
+Database.cs (229) : writer.WriteLine(Tables.Count);
+Database.cs (231) : foreach (Table table in Tables)
+Database.cs (232) : {
+Database.cs (233) : writer.WriteLine(table.Name);
+Database.cs (235) : writer.WriteLine(table.NumColumns());
+Database.cs (236) : for (int i = 0; i < table.NumColumns(); i++)
+Database.cs (237) : {
+Database.cs (238) : writer.WriteLine(table.GetColumn(i).AsText());
+Database.cs (239) : }
+Database.cs (241) : writer.WriteLine(table.NumRows());
+Database.cs (242) : for (int i = 0; i < table.NumRows(); i++)
+Database.cs (243) : {
+Database.cs (244) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (245) : }
+Database.cs (246) : }
+Database.cs (247) : }
+Database.cs (248) : return true;
+Database.cs (249) : }
+Database.cs (251) : catch (Exception)
+Database.cs (252) : {
+Database.cs (253) : return false;
+Database.cs (254) : }
+Database.cs (263) : try
+Database.cs (264) : {
+Database.cs (265) : string filePath = databaseName + ".txt";
+Database.cs (267) : if (!File.Exists(filePath))
+Database.cs (268) : {
+Database.cs (272) : Database db = new Database();
+Database.cs (274) : using (StreamReader reader = new StreamReader(filePath))
+Database.cs (275) : {
+Database.cs (276) : int numberOfTables = int.Parse(reader.ReadLine());
+Database.cs (278) : for (int t = 0; t < numberOfTables; t++)
+Database.cs (279) : {
+Database.cs (280) : string tableName = reader.ReadLine();
+Database.cs (282) : int numColumns = int.Parse(reader.ReadLine());
+Database.cs (283) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (284) : for (int c = 0; c < numColumns; c++)
+Database.cs (285) : {
+Database.cs (286) : string columnText = reader.ReadLine();
+Database.cs (287) : columns.Add(ColumnDefinition.Parse(columnText));
+Database.cs (288) : }
+Database.cs (290) : Table newTable = new Table(tableName, columns);
+Database.cs (292) : int numRows = int.Parse(reader.ReadLine());
+Database.cs (293) : for (int r = 0; r < numRows; r++)
+Database.cs (294) : {
+Database.cs (295) : string rowText = reader.ReadLine();
+Database.cs (296) : newTable.AddRow(Row.Parse(columns, rowText));
+Database.cs (297) : }
+Database.cs (299) : db.Tables.Add(newTable);
+Database.cs (300) : }
+Database.cs (301) : }
+Database.cs (303) : return db;
+Database.cs (304) : }
+Database.cs (305) : catch (Exception)
+Database.cs (306) : {
+Database.cs (307) : return null;
+Database.cs (308) : }
+Database.cs (309) : }
 Table.cs (4) : using System.Linq;
 Table.cs (18) : Name = name;
 Table.cs (19) : ColumnDefinitions = columns;
