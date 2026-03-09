@@ -344,7 +344,7 @@ MiniSQLParser.cs (20) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA
 MiniSQLParser.cs (24) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z0-9]+)\s+\(([a-zA-Z0-9,\s]*)\)$";
 MiniSQLParser.cs (26) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z0-9]+)\s+SET\s+([a-zA-Z0-9\s\=\,]+)\s+WHERE\s+(.+)$";
 MiniSQLParser.cs (28) : //punto para los int/double y comilla para los string 'x'
-MiniSQLParser.cs (29) : const string deletePattern = @"^\s*DELETE\s+FROM\s+([a-zA-Z0-9]+)\s+WHERE\s+([a-zA-Z0-9]+)\s*([<>=])\s*([a-zA-Z0-9\._']+)\s*$";
+MiniSQLParser.cs (29) : const string deletePattern = @"^\s*DELETE\s+FROM\s+([a-zA-Z0-9]+)\s+WHERE\s+([a-zA-Z0-9\s]+)\s*([<>=])\s*([a-zA-Z0-9\.\s']+)\s*$";
 MiniSQLParser.cs (32) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
 MiniSQLParser.cs (34) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
 MiniSQLParser.cs (36) : //Captura la tabla, el privilegio y el perfil
@@ -444,43 +444,48 @@ MiniSQLParser.cs (167) : Match matchDelete= Regex.Match(miniSQLQuery, deletePatt
 MiniSQLParser.cs (169) : if (matchDelete.Success)
 MiniSQLParser.cs (170) : {
 MiniSQLParser.cs (171) : //Mejor simplificar en cuatro grupos los operandos para no tener que hacer los if de =<>
-MiniSQLParser.cs (172) : string tableName= matchDelete.Groups[1].Value;
-MiniSQLParser.cs (173) : string column= matchDelete.Groups[2].Value;
-MiniSQLParser.cs (174) : string operador= matchDelete.Groups[3].Value;
-MiniSQLParser.cs (175) : string valor= matchDelete.Groups[4].Value;
-MiniSQLParser.cs (177) : Condition condicion= new Condition(column, operador, valor);
-MiniSQLParser.cs (178) : return new Delete(tableName, condicion);
-MiniSQLParser.cs (180) : }
-MiniSQLParser.cs (186) : Match matchCreateSecurityProfile= Regex.Match(miniSQLQuery, createSecurityProfilePattern);
-MiniSQLParser.cs (189) : if (matchCreateSecurityProfile.Success)
-MiniSQLParser.cs (190) : {
-MiniSQLParser.cs (191) : return new CreateSecurityProfile(matchCreateSecurityProfile.Groups[1].Value);
-MiniSQLParser.cs (192) : }
-MiniSQLParser.cs (195) : Match matchDropSecurityProfile= Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
-MiniSQLParser.cs (198) : if (matchDropSecurityProfile.Success)
-MiniSQLParser.cs (199) : {
-MiniSQLParser.cs (200) : return new DropSecurityProfile(matchDropSecurityProfile.Groups[1].Value);
-MiniSQLParser.cs (201) : }
-MiniSQLParser.cs (204) : Match matchGrant= Regex.Match(miniSQLQuery, grantPattern);
-MiniSQLParser.cs (207) : if (matchGrant.Success)
-MiniSQLParser.cs (208) : {
-MiniSQLParser.cs (209) : return new Grant(matchGrant.Groups[1].Value, matchGrant.Groups[2].Value, matchGrant.Groups[3].Value);
-MiniSQLParser.cs (210) : }
-MiniSQLParser.cs (213) : Match matchRevoke= Regex.Match(miniSQLQuery, revokePattern);
-MiniSQLParser.cs (216) : if (matchRevoke.Success)
-MiniSQLParser.cs (217) : {
-MiniSQLParser.cs (218) : return new Revoke(matchRevoke.Groups[1].Value, matchRevoke.Groups[2].Value, matchRevoke.Groups[3].Value);
-MiniSQLParser.cs (219) : }
-MiniSQLParser.cs (222) : Match matchAddUser= Regex.Match(miniSQLQuery, addUserPattern);
-MiniSQLParser.cs (225) : if (matchAddUser.Success)
-MiniSQLParser.cs (226) : {
-MiniSQLParser.cs (227) : return new AddUser(matchAddUser.Groups[1].Value, matchAddUser.Groups[2].Value, matchAddUser.Groups[3].Value);
-MiniSQLParser.cs (228) : }
-MiniSQLParser.cs (230) : Match matchDeleteUser= Regex.Match(miniSQLQuery, deleteUserPattern);
-MiniSQLParser.cs (232) : if (matchDeleteUser.Success)
+MiniSQLParser.cs (172) : string tableName= matchDelete.Groups[1].Value.Trim();
+MiniSQLParser.cs (173) : string column= matchDelete.Groups[2].Value.Trim();
+MiniSQLParser.cs (174) : string operador= matchDelete.Groups[3].Value.Trim();
+MiniSQLParser.cs (175) : string valor= matchDelete.Groups[4].Value.Trim();
+MiniSQLParser.cs (177) : if(column.Contains(" ") || (valor.Contains(" ") && !valor.StartsWith("'")))
+MiniSQLParser.cs (178) : {
+MiniSQLParser.cs (179) : return null;
+MiniSQLParser.cs (181) : }
+MiniSQLParser.cs (183) : //string limpiarV = valor.Trim('\'');
+MiniSQLParser.cs (185) : Condition condicion= new Condition(column, operador, valor);
+MiniSQLParser.cs (186) : return new Delete(tableName, condicion);
+MiniSQLParser.cs (188) : }
+MiniSQLParser.cs (193) : Match matchCreateSecurityProfile= Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (196) : if (matchCreateSecurityProfile.Success)
+MiniSQLParser.cs (197) : {
+MiniSQLParser.cs (198) : return new CreateSecurityProfile(matchCreateSecurityProfile.Groups[1].Value);
+MiniSQLParser.cs (199) : }
+MiniSQLParser.cs (202) : Match matchDropSecurityProfile= Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (205) : if (matchDropSecurityProfile.Success)
+MiniSQLParser.cs (206) : {
+MiniSQLParser.cs (207) : return new DropSecurityProfile(matchDropSecurityProfile.Groups[1].Value);
+MiniSQLParser.cs (208) : }
+MiniSQLParser.cs (211) : Match matchGrant= Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (214) : if (matchGrant.Success)
+MiniSQLParser.cs (215) : {
+MiniSQLParser.cs (216) : return new Grant(matchGrant.Groups[1].Value, matchGrant.Groups[2].Value, matchGrant.Groups[3].Value);
+MiniSQLParser.cs (217) : }
+MiniSQLParser.cs (220) : Match matchRevoke= Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (223) : if (matchRevoke.Success)
+MiniSQLParser.cs (224) : {
+MiniSQLParser.cs (225) : return new Revoke(matchRevoke.Groups[1].Value, matchRevoke.Groups[2].Value, matchRevoke.Groups[3].Value);
+MiniSQLParser.cs (226) : }
+MiniSQLParser.cs (229) : Match matchAddUser= Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (232) : if (matchAddUser.Success)
 MiniSQLParser.cs (233) : {
-MiniSQLParser.cs (234) : return new DeleteUser(matchDeleteUser.Groups[1].Value);
+MiniSQLParser.cs (234) : return new AddUser(matchAddUser.Groups[1].Value, matchAddUser.Groups[2].Value, matchAddUser.Groups[3].Value);
 MiniSQLParser.cs (235) : }
+MiniSQLParser.cs (237) : Match matchDeleteUser= Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (239) : if (matchDeleteUser.Success)
+MiniSQLParser.cs (240) : {
+MiniSQLParser.cs (241) : return new DeleteUser(matchDeleteUser.Groups[1].Value);
+MiniSQLParser.cs (242) : }
 Revoke.cs (18) : PrivilegeName= privilegeName;
 Revoke.cs (19) : TableName=tableName;
 Revoke.cs (20) : ProfileName=profileName;
