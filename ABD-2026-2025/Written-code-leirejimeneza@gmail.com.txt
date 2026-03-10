@@ -107,6 +107,30 @@ Table.cs (281) : return true;
 DropTable.cs (15) : Table = table;
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
+MiniSQLParser.cs (18) : //LEIRE --> #16
+MiniSQLParser.cs (19) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s*\(([^)]+)\)";
+MiniSQLParser.cs (51) : //Insert
+MiniSQLParser.cs (52) : Match matchInsert = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (53) : if (matchInsert.Success)
+MiniSQLParser.cs (54) : {
+MiniSQLParser.cs (55) : string table = matchInsert.Groups[1].Value;
+MiniSQLParser.cs (56) : string valores = matchInsert.Groups[2].Value;
+MiniSQLParser.cs (58) : //Valores sin comas
+MiniSQLParser.cs (59) : if (!valores.Contains(","))
+MiniSQLParser.cs (60) : {
+MiniSQLParser.cs (61) : return null;
+MiniSQLParser.cs (62) : }
+MiniSQLParser.cs (64) : string newPattern = @"'[^']+'|\d+\.\d+|\d+";
+MiniSQLParser.cs (65) : MatchCollection matchCollectionComillas = Regex.Matches(valores, newPattern);
+MiniSQLParser.cs (67) : List<string> values = new List<string>();
+MiniSQLParser.cs (69) : foreach (Match match in matchCollectionComillas)
+MiniSQLParser.cs (70) : {
+MiniSQLParser.cs (71) : string valor = match.Value;
+MiniSQLParser.cs (72) : valor = valor.Trim('\'');
+MiniSQLParser.cs (73) : values.Add(valor);
+MiniSQLParser.cs (74) : }
+MiniSQLParser.cs (76) : return new Insert(table, values);
+MiniSQLParser.cs (77) : }
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;
