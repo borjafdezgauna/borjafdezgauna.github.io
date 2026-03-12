@@ -122,3 +122,36 @@ Table.cs (326) : result += "}";
 Table.cs (327) : }
 Table.cs (329) : return result;
 Table.cs (330) : }
+MiniSQLParser.cs (22) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*(=|<>|<|>|<=|>=)\s*(.+))?$"; ;
+MiniSQLParser.cs (26) : Match match = Regex.Match(miniSQLQuery, updateTablePattern, RegexOptions.IgnoreCase);
+MiniSQLParser.cs (28) : if (match.Success)
+MiniSQLParser.cs (29) : {
+MiniSQLParser.cs (30) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (31) : string setText = match.Groups[2].Value;
+MiniSQLParser.cs (33) : List<SetValue> values = new List<SetValue>();
+MiniSQLParser.cs (34) : string[] assignments = setText.Split(",", System.StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (36) : foreach (string assignment in assignments)
+MiniSQLParser.cs (37) : {
+MiniSQLParser.cs (38) : string[] parts = assignment.Split("=");
+MiniSQLParser.cs (39) : string column = parts[0].Trim();
+MiniSQLParser.cs (40) : string value = parts[1].Trim();
+MiniSQLParser.cs (41) : values.Add(new SetValue(column, value));
+MiniSQLParser.cs (42) : }
+MiniSQLParser.cs (44) : Condition condition = null;
+MiniSQLParser.cs (46) : if (match.Groups[3].Success)
+MiniSQLParser.cs (47) : {
+MiniSQLParser.cs (48) : string column = match.Groups[3].Value;
+MiniSQLParser.cs (49) : string op = match.Groups[4].Value;
+MiniSQLParser.cs (50) : string value = match.Groups[5].Value;
+MiniSQLParser.cs (51) : condition = new Condition(column, op, value);
+MiniSQLParser.cs (52) : }
+MiniSQLParser.cs (54) : return new Update(table, values, condition);
+MiniSQLParser.cs (55) : }
+Update.cs (15) : this.Table = table;
+Update.cs (16) : this.Columns = columnNames;
+Update.cs (17) : this.Where = where;
+Update.cs (25) : bool result = database.Update(Table, Columns, Where);
+Update.cs (27) : if (result)
+Update.cs (28) : return Constants.UpdateSuccess;
+Update.cs (29) : else
+Update.cs (30) : return database.LastErrorMessage;

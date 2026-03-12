@@ -1,6 +1,7 @@
 Database.cs (7) : using System.Linq.Expressions;
 Database.cs (8) : using System.Reflection.Metadata;
 Database.cs (11) : using System.Xml.Linq;
+Database.cs (17) : public List<Table> Tables = new List<Table>();
 Database.cs (39) : if(table == null)
 Database.cs (42) : Tables.Add(table);
 Database.cs (44) : return true;
@@ -48,7 +49,7 @@ Database.cs (264) : for(int i = 0; i < table.NumColumns(); i++)
 Database.cs (265) : {
 Database.cs (266) : tr.WriteLine(table.GetColumn(i).AsText());
 Database.cs (267) : }
-Database.cs (269) : tr.WriteLine();
+Database.cs (269) : tr.WriteLine("");
 Database.cs (271) : for(int i = 0; i < table.NumRows(); i++)
 Database.cs (272) : {
 Database.cs (273) : tr.WriteLine(table.GetRow(i).AsText());
@@ -61,14 +62,14 @@ Database.cs (279) : catch(Exception ex)
 Database.cs (280) : {
 Database.cs (281) : LastErrorMessage = Constants.Error + ex.Message;
 Database.cs (283) : }
-Database.cs (294) : try
-Database.cs (295) : {
-Database.cs (296) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Database.cs (298) : if(!Directory.Exists(path))
-Database.cs (299) : {
-Database.cs (300) : return null;
-Database.cs (301) : }
-Database.cs (303) : Database database = new Database();
+Database.cs (294) : Database database = new Database();
+Database.cs (295) : try
+Database.cs (296) : {
+Database.cs (297) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Database.cs (299) : if(!Directory.Exists(path))
+Database.cs (300) : {
+Database.cs (301) : return null;
+Database.cs (302) : }
 Database.cs (304) : database.m_username = username;
 Database.cs (306) : string[] tableFile = Directory.GetFiles(path, "*.txt");
 Database.cs (308) : foreach(string file in tableFile)
@@ -77,7 +78,7 @@ Database.cs (310) : using(TextReader tr = File.OpenText(file))
 Database.cs (311) : {
 Database.cs (312) : List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
 Database.cs (313) : string line;
-Database.cs (315) : while((line = tr.ReadLine()) != null && !string.IsNullOrWhiteSpace(line))
+Database.cs (315) : while((line = tr.ReadLine()) != "")
 Database.cs (316) : {
 Database.cs (317) : ColumnDefinition col = ColumnDefinition.Parse(line);
 Database.cs (318) : if(col == null)
@@ -90,25 +91,29 @@ Database.cs (328) : database.CreateTable(tableName, columnDefinitions);
 Database.cs (329) : Table table = database.TableByName(tableName);
 Database.cs (331) : while((line = tr.ReadLine()) != null)
 Database.cs (332) : {
-Database.cs (333) : if (string.IsNullOrWhiteSpace(line))
-Database.cs (334) : {
-Database.cs (335) : continue;
-Database.cs (336) : }
-Database.cs (338) : Row row = Row.Parse(columnDefinitions, line);
-Database.cs (340) : if(row == null)
-Database.cs (341) : {
-Database.cs (342) : database.LastErrorMessage = Constants.Error;
-Database.cs (343) : return null;
+Database.cs (333) : Row row = Row.Parse(columnDefinitions, line);
+Database.cs (335) : if(row == null)
+Database.cs (336) : {
+Database.cs (337) : database.LastErrorMessage = Constants.Error;
+Database.cs (338) : return null;
+Database.cs (339) : }
+Database.cs (341) : table.Insert(row.Values);
+Database.cs (342) : }
+Database.cs (343) : }
 Database.cs (344) : }
-Database.cs (346) : table.Insert(row.Values);
-Database.cs (347) : }
-Database.cs (348) : }
-Database.cs (349) : }
-Database.cs (350) : return database;
-Database.cs (351) : }
-Database.cs (352) : catch
-Database.cs (353) : {
-Database.cs (356) : }
+Database.cs (345) : return database;
+Database.cs (346) : }
+Database.cs (347) : catch(Exception ex)
+Database.cs (348) : {
+Database.cs (349) : database.LastErrorMessage = ex.Message;
+Database.cs (352) : }
+Row.cs (128) : string[] separate = value.Split(Delimiter);
+Row.cs (130) : if(separate.Length != columns.Count)
+Row.cs (131) : {
+Row.cs (132) : return null;
+Row.cs (133) : }
+Row.cs (136) : foreach(string sep in separate)
+Row.cs (138) : values.Add(Decode(sep));
 Table.cs (19) : this.Name = name;
 Table.cs (20) : this.ColumnDefinitions = columns;
 Table.cs (27) : return Rows[i];

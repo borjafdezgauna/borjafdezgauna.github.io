@@ -55,13 +55,13 @@ Database.cs (281) : }
 Database.cs (283) : if (Tables != null && Tables.Count != 0)
 Database.cs (284) : {
 Database.cs (285) : String toSave;
-Database.cs (286) : List<ColumnDefinition> cd;
+Database.cs (286) : List<ColumnDefinition> cds;
 Database.cs (287) : ColumnDefinition c;
 Database.cs (288) : Row r;
 Database.cs (290) : foreach (Table t in Tables)
 Database.cs (291) : {
 Database.cs (292) : TextWriter writer = System.IO.File.CreateText(databaseName + "\\" + t.Name + ".txt"); //creates a new text file
-Database.cs (293) : cd = new List<ColumnDefinition>();
+Database.cs (293) : cds = new List<ColumnDefinition>();
 Database.cs (294) : for (int i = 0; i < t.NumColumns(); i++)
 Database.cs (295) : {
 Database.cs (296) : c = t.GetColumn(i);
@@ -80,72 +80,71 @@ Database.cs (308) : return true;
 Database.cs (309) : }
 Database.cs (310) : catch (Exception e)
 Database.cs (311) : {
-Database.cs (312) : Console.WriteLine(e.Message + "\n" + e.StackTrace);
-Database.cs (313) : return false;
-Database.cs (314) : }
-Database.cs (325) : try
-Database.cs (326) : {
-Database.cs (327) : if (databaseName != null && !databaseName.Equals(""))
-Database.cs (328) : {
-Database.cs (329) : string[] files = Directory.GetFiles(databaseName, "*.txt");
-Database.cs (330) : Database db = new Database();
-Database.cs (331) : String fileNoExtension;
-Database.cs (332) : foreach (string file in files)
-Database.cs (333) : {
-Database.cs (334) : fileNoExtension = System.IO.Path.GetFileNameWithoutExtension(file);
-Database.cs (335) : bool exists = System.IO.File.Exists(file); //checks that the file exists
-Database.cs (336) : if (!exists) { return null; }
-Database.cs (337) : List<ColumnDefinition> cd = new List<ColumnDefinition>();
-Database.cs (339) : TextReader reader = System.IO.File.OpenText(file); //opens an existing file
-Database.cs (340) : String line = reader.ReadLine();
-Database.cs (341) : while (line != null && !line.Equals(""))
-Database.cs (342) : {
-Database.cs (343) : cd.Add(ColumnDefinition.Parse(line));
-Database.cs (344) : line = reader.ReadLine();
-Database.cs (345) : }
-Database.cs (346) : Table t = new Table(fileNoExtension, cd);
-Database.cs (347) : line = reader.ReadLine();
-Database.cs (349) : while (line != null && !line.Equals(""))
-Database.cs (350) : {
-Database.cs (351) : t.AddRow(Row.Parse(cd, line));
-Database.cs (352) : line = reader.ReadLine();
-Database.cs (353) : }
-Database.cs (355) : db.AddTable(t);
-Database.cs (356) : reader.Close();
-Database.cs (357) : }
-Database.cs (358) : return db;
+Database.cs (312) : return false;
+Database.cs (313) : }
+Database.cs (324) : try
+Database.cs (325) : {
+Database.cs (326) : if (databaseName != null && !databaseName.Equals(""))
+Database.cs (327) : {
+Database.cs (328) : string[] files = Directory.GetFiles(databaseName, "*.txt");
+Database.cs (329) : Database db = new Database();
+Database.cs (330) : String fileNoExtension;
+Database.cs (331) : foreach (string file in files)
+Database.cs (332) : {
+Database.cs (333) : fileNoExtension = System.IO.Path.GetFileNameWithoutExtension(file);
+Database.cs (334) : bool exists = System.IO.File.Exists(file); //checks that the file exists
+Database.cs (335) : if (!exists) { return null; }
+Database.cs (336) : List<ColumnDefinition> cd = new List<ColumnDefinition>();
+Database.cs (338) : TextReader reader = System.IO.File.OpenText(file); //opens an existing file
+Database.cs (339) : String line = reader.ReadLine();
+Database.cs (340) : while (line != null && !line.Equals(""))
+Database.cs (341) : {
+Database.cs (342) : cd.Add(ColumnDefinition.Parse(line));
+Database.cs (343) : line = reader.ReadLine();
+Database.cs (344) : }
+Database.cs (345) : Table t = new Table(fileNoExtension, cd);
+Database.cs (346) : line = reader.ReadLine();
+Database.cs (348) : while (line != null && !line.Equals(""))
+Database.cs (349) : {
+Database.cs (350) : t.AddRow(Row.Parse(cd, line));
+Database.cs (351) : line = reader.ReadLine();
+Database.cs (352) : }
+Database.cs (354) : db.AddTable(t);
+Database.cs (355) : reader.Close();
+Database.cs (356) : }
+Database.cs (357) : return db;
+Database.cs (358) : }
 Database.cs (359) : }
-Database.cs (360) : }
-Database.cs (361) : catch (Exception e)
-Database.cs (362) : {
-Database.cs (363) : return null;
-Database.cs (364) : }
-Database.cs (422) : public static bool AreEqual(Database db1, Database db2)
-Database.cs (423) : {
-Database.cs (424) : if (db1 == null || db2 == null) { return false; }
-Database.cs (425) : if (db1.Tables.Count != db2.Tables.Count) { return false; }
-Database.cs (426) : for (int i = 0; i < db1.Tables.Count; i++) //IMPORTA EL ORDEN (para el save and load da igual, si se hace uso de este metodo comprobar ese matiz)
-Database.cs (427) : {
-Database.cs (428) : Table t1 = db1.Tables[i];
-Database.cs (429) : Table t2 = db2.Tables[i];
-Database.cs (431) : if (t1 == null || t2 == null) { return false; }
-Database.cs (432) : if (t1.NumColumns() != t2.NumColumns()) { return false; }
-Database.cs (433) : for (int j = 0; j < t1.NumColumns(); j++)
-Database.cs (434) : {
-Database.cs (435) : if (t1.GetColumn(j).AsText() != t2.GetColumn(j).AsText())
-Database.cs (436) : {
-Database.cs (437) : return false;
+Database.cs (360) : catch (Exception e)
+Database.cs (361) : {
+Database.cs (362) : return null;
+Database.cs (363) : }
+Database.cs (421) : public static bool AreEqual(Database db1, Database db2)
+Database.cs (422) : {
+Database.cs (423) : if (db1 == null || db2 == null) { return false; }
+Database.cs (424) : if (db1.Tables.Count != db2.Tables.Count) { return false; }
+Database.cs (425) : for (int i = 0; i < db1.Tables.Count; i++) //IMPORTA EL ORDEN (para el save and load da igual, si se hace uso de este metodo comprobar ese matiz)
+Database.cs (426) : {
+Database.cs (427) : Table t1 = db1.Tables[i];
+Database.cs (428) : Table t2 = db2.Tables[i];
+Database.cs (430) : if (t1 == null || t2 == null) { return false; }
+Database.cs (431) : if (t1.NumColumns() != t2.NumColumns()) { return false; }
+Database.cs (432) : for (int j = 0; j < t1.NumColumns(); j++)
+Database.cs (433) : {
+Database.cs (434) : if (t1.GetColumn(j).AsText() != t2.GetColumn(j).AsText())
+Database.cs (435) : {
+Database.cs (436) : return false;
+Database.cs (437) : }
 Database.cs (438) : }
-Database.cs (439) : }
-Database.cs (441) : if (t1.NumRows() != t2.NumRows()) { return false; }
-Database.cs (442) : for (int z = 0; z < t1.NumRows(); z++)
-Database.cs (443) : {
-Database.cs (444) : if (t1.GetRow(z).AsText() != t2.GetRow(z).AsText())
-Database.cs (445) : { return false; }
+Database.cs (440) : if (t1.NumRows() != t2.NumRows()) { return false; }
+Database.cs (441) : for (int z = 0; z < t1.NumRows(); z++)
+Database.cs (442) : {
+Database.cs (443) : if (t1.GetRow(z).AsText() != t2.GetRow(z).AsText())
+Database.cs (444) : { return false; }
+Database.cs (445) : }
 Database.cs (446) : }
-Database.cs (447) : }
-Database.cs (448) : return true;
-Database.cs (449) : }
+Database.cs (447) : return true;
+Database.cs (448) : }
 Table.cs (113) : if (ColumnDefinitions != null && ColumnDefinitions.Count > 0)
 Table.cs (114) : {
 Table.cs (116) : ColumnDefinition last = ColumnDefinitions[ColumnDefinitions.Count - 1];
@@ -196,37 +195,45 @@ Table.cs (192) : for (int i = num; i>=0; i--)
 Table.cs (193) : {
 Table.cs (194) : Rows.RemoveAt(toDelete[i]);
 Table.cs (195) : }
+Delete.cs (15) : Table = table;
+Delete.cs (16) : Where = where;
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
 MiniSQLParser.cs (2) : using System;
-MiniSQLParser.cs (13) : const string selectPattern = null; //mikel
-MiniSQLParser.cs (15) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s+\(((?:\s*'([^']*)'\s*,)*(?:\s*'([^']*)'\s*))\)\s*"; //kaiet
-MiniSQLParser.cs (17) : const string dropTablePattern = null; //fabian
-MiniSQLParser.cs (21) : const string createTablePattern = null; //fabian
-MiniSQLParser.cs (23) : const string updateTablePattern = null; //julen
-MiniSQLParser.cs (25) : const string deletePattern = null; //kaiet
-MiniSQLParser.cs (48) : Match match = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (49) : if (match.Success)
-MiniSQLParser.cs (50) : {
-MiniSQLParser.cs (51) : string toFilter, toSplit="";
-MiniSQLParser.cs (52) : bool copying = false;
-MiniSQLParser.cs (53) : toFilter = match.Groups[2].Value;
-MiniSQLParser.cs (54) : for(int i = 0; i < toFilter.Length; i++)
-MiniSQLParser.cs (55) : {
-MiniSQLParser.cs (56) : if (toFilter[i]=='\'')
-MiniSQLParser.cs (57) : {
-MiniSQLParser.cs (58) : copying = !copying;
-MiniSQLParser.cs (59) : }
-MiniSQLParser.cs (60) : else if (copying)
-MiniSQLParser.cs (61) : {
-MiniSQLParser.cs (62) : toSplit += toFilter[i];
-MiniSQLParser.cs (63) : }
-MiniSQLParser.cs (64) : else if (toFilter[i] == ',')
-MiniSQLParser.cs (65) : {
-MiniSQLParser.cs (66) : toSplit += ",";
-MiniSQLParser.cs (67) : }
-MiniSQLParser.cs (68) : }
-MiniSQLParser.cs (69) : List<string> values = new List<string>();
-MiniSQLParser.cs (70) : values = CommaSeparatedNames(toSplit);
-MiniSQLParser.cs (71) : return new Insert(match.Groups[1].Value, values);
-MiniSQLParser.cs (72) : }
+MiniSQLParser.cs (18) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s+\(((?:\s*'([^']*)'\s*,)*(?:\s*'([^']*)'\s*))\)"; //kaiet
+MiniSQLParser.cs (20) : const string dropTablePattern = null; //fabian
+MiniSQLParser.cs (24) : const string createTablePattern = null; //fabian
+MiniSQLParser.cs (26) : const string updateTablePattern = null; //julen
+MiniSQLParser.cs (28) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*(<|>|=)\s*'([^']*)'"; //kaiet
+MiniSQLParser.cs (74) : Match match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (77) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (78) : if (match.Success)
+MiniSQLParser.cs (79) : {
+MiniSQLParser.cs (80) : if(match.Length != miniSQLQuery.Length) { return null; }
+MiniSQLParser.cs (81) : string toFilter, toSplit="";
+MiniSQLParser.cs (82) : bool copying = false;
+MiniSQLParser.cs (83) : toFilter = match.Groups[2].Value;
+MiniSQLParser.cs (84) : for (int i = 0; i < toFilter.Length; i++)
+MiniSQLParser.cs (85) : {
+MiniSQLParser.cs (86) : if (toFilter[i] == '\'')
+MiniSQLParser.cs (87) : {
+MiniSQLParser.cs (88) : copying = !copying;
+MiniSQLParser.cs (89) : }
+MiniSQLParser.cs (90) : else if (copying)
+MiniSQLParser.cs (91) : {
+MiniSQLParser.cs (92) : toSplit += toFilter[i];
+MiniSQLParser.cs (93) : }
+MiniSQLParser.cs (94) : else if (toFilter[i] == ',')
+MiniSQLParser.cs (95) : {
+MiniSQLParser.cs (96) : toSplit += ",";
+MiniSQLParser.cs (97) : }
+MiniSQLParser.cs (98) : }
+MiniSQLParser.cs (99) : List<string> values = new List<string>();
+MiniSQLParser.cs (100) : values = CommaSeparatedNames(toSplit);
+MiniSQLParser.cs (101) : return new Insert(match.Groups[1].Value, values);
+MiniSQLParser.cs (112) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (113) : if (match.Success)
+MiniSQLParser.cs (114) : {
+MiniSQLParser.cs (115) : if (match.Length != miniSQLQuery.Length) { return null; }
+MiniSQLParser.cs (116) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
+MiniSQLParser.cs (117) : }

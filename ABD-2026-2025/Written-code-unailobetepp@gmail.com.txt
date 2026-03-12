@@ -30,29 +30,29 @@ Row.cs (17) : public Row(List<ColumnDefinition> columnDefinitions, List<string> 
 Row.cs (26) : public void SetValue(string columnName, string value) // Endika
 Row.cs (46) : public string GetValue(string columnName) // Endika
 Row.cs (66) : public bool IsTrue(Condition condition) // Aitana
-Row.cs (99) : private static string Encode(string value) // Maialen
-Row.cs (112) : private static string Decode(string value) // Maialen
-Row.cs (126) : public string AsText() // Unai
-Row.cs (129) : string result = "";
-Row.cs (131) : for (int i = 0; i < Values.Count; i++)
-Row.cs (132) : {
-Row.cs (133) : string encodedValue = Encode(Values[i]);
-Row.cs (135) : result += encodedValue;
-Row.cs (137) : if (i < Values.Count - 1)
-Row.cs (138) : {
-Row.cs (139) : result += Delimiter;
-Row.cs (140) : }
-Row.cs (141) : }
-Row.cs (143) : return result;
-Row.cs (147) : public static Row Parse(List<ColumnDefinition> columns, string value) // Unai
-Row.cs (150) : string[] parts = value.Split(Delimiter);
-Row.cs (152) : Row row = new(columns, []);
-Row.cs (154) : foreach (string part in parts)
-Row.cs (155) : {
-Row.cs (156) : string decoded = Decode(part);
-Row.cs (157) : row.Values.Add(decoded);
-Row.cs (158) : }
-Row.cs (160) : return row;
+Row.cs (95) : private static string Encode(string value) // Maialen
+Row.cs (108) : private static string Decode(string value) // Maialen
+Row.cs (122) : public string AsText() // Unai
+Row.cs (125) : string result = "";
+Row.cs (127) : for (int i = 0; i < Values.Count; i++)
+Row.cs (128) : {
+Row.cs (129) : string encodedValue = Encode(Values[i]);
+Row.cs (131) : result += encodedValue;
+Row.cs (133) : if (i < Values.Count - 1)
+Row.cs (134) : {
+Row.cs (135) : result += Delimiter;
+Row.cs (136) : }
+Row.cs (137) : }
+Row.cs (139) : return result;
+Row.cs (143) : public static Row Parse(List<ColumnDefinition> columns, string value) // Unai
+Row.cs (146) : string[] parts = value.Split(Delimiter);
+Row.cs (148) : Row row = new(columns, []);
+Row.cs (150) : foreach (string part in parts)
+Row.cs (151) : {
+Row.cs (152) : string decoded = Decode(part);
+Row.cs (153) : row.Values.Add(decoded);
+Row.cs (154) : }
+Row.cs (156) : return row;
 Table.cs (14) : public Table(string name, List<ColumnDefinition> columns) // Maialen
 Table.cs (22) : public Row GetRow(int i) // Maialen
 Table.cs (36) : public void AddRow(Row row) // Maialen
@@ -105,7 +105,7 @@ AddUser.cs (15) : // Unai
 AddUser.cs (19) : this.Username = username;
 AddUser.cs (20) : this.Password = password;
 AddUser.cs (21) : this.ProfileName = profileName;
-CreateSecurityProfile.cs (9) : // Aitana
+CreateSecurityProfile.cs (10) : // Aitana
 CreateTable.cs (9) : // Maialen
 Delete.cs (7) : // Endika
 DeleteUser.cs (9) : // Unai
@@ -120,7 +120,213 @@ Insert.cs (26) : if (database == null)
 Insert.cs (27) : return Constants.Error;
 Insert.cs (29) : database.Insert(Table, Values);
 Insert.cs (31) : return database.LastErrorMessage;
-MiniSQLParser.cs (9) : // Unai
+MiniSQLParser.cs (3) : using System.ComponentModel;
+MiniSQLParser.cs (4) : using System.ComponentModel.DataAnnotations;
+MiniSQLParser.cs (11) : // Unai
+MiniSQLParser.cs (15) : const string selectPattern = @"^SELECT\s+(?<columns>.+)\s+FROM\s+(?<table>\w+)(?:\s+WHERE\s+(?<condition>.+))?\s*$";
+MiniSQLParser.cs (17) : const string insertPattern = @"^INSERT\s+INTO\s+(?<table>\w+)\s+VALUES\s*\((?<values>'[^']*'(?:,\s*'[^']*')*)\)\s*$";
+MiniSQLParser.cs (19) : const string dropTablePattern = @"^DROP\s+TABLE\s+(?<table>\w+)\s*$";
+MiniSQLParser.cs (23) : const string createTablePattern = @"^CREATE\s+TABLE\s+(?<table>\w+)\s*\(\s*(?<columns>\w+\s+(?:INT|DOUBLE|STRING)(?:,\w+\s+(?:INT|DOUBLE|STRING))*)\s*\)\s*$";
+MiniSQLParser.cs (25) : const string updateTablePattern = @"^UPDATE\s+(?<table>\w+)\s+SET\s+(?<assignments>\w+\s*=\s*(?:'[^']*'|[^,\s]+)(?:,\s*\w+\s*=\s*(?:'[^']*'|[^,\s]+))*)\s+WHERE\s+(?<condition>.+)\s*$";
+MiniSQLParser.cs (27) : const string deletePattern = @"^DELETE\s+FROM\s+(?<table>\w+)\s+WHERE\s+(?<condition>.+)\s*$";
+MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+(?<secprofile>[a-zA-Z]+)\s*$";
+MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+(?<secprofile>[a-zA-Z]+)\s*$";
+MiniSQLParser.cs (35) : const string grantPattern = @"^GRANT\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>\w+)\s+TO\s+(?<secprofile>[a-zA-Z]+)\s*$";
+MiniSQLParser.cs (37) : const string revokePattern = @"^REVOKE\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>\w+)\s+TO\s+(?<secprofile>[a-zA-Z]+)\s*$";
+MiniSQLParser.cs (39) : const string addUserPattern = @"^ADD\s+USER\s+\((?<user>[a-zA-Z]+),(?<password>[^,]+),(?<secprofile>[a-zA-Z]+)\)\s*$";
+MiniSQLParser.cs (41) : const string deleteUserPattern = @"^DELETE\s+USER\s+(?<user>[a-zA-Z]+)\s*$";
+MiniSQLParser.cs (52) : const string conditionPattern = @"^(?<colname>.+)\s*(?<operator>[<> =])\s*(?<value>.+)\s*$";
+MiniSQLParser.cs (53) : const string columnDefinitionPattern = @"^(?<colname>.+)\s*(?<type>String|Int|Double)\s*$";
+MiniSQLParser.cs (54) : const string setValuePattern = @"^(?<colname>.+)\s*(?<value>.+)\s*$";
+MiniSQLParser.cs (56) : // SELECT
+MiniSQLParser.cs (57) : Match selectMatch = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (58) : if (selectMatch.Success)
+MiniSQLParser.cs (59) : {
+MiniSQLParser.cs (60) : string table = selectMatch.Groups["table"].Value;
+MiniSQLParser.cs (62) : List<string> columns = CommaSeparatedNames(selectMatch.Groups["columns"].Value);
+MiniSQLParser.cs (64) : string conditionString = selectMatch.Groups["condition"].Value;
+MiniSQLParser.cs (65) : Condition condition = null;
+MiniSQLParser.cs (67) : if (!string.IsNullOrEmpty(conditionString))
+MiniSQLParser.cs (68) : {
+MiniSQLParser.cs (69) : Match conditionMatch = Regex.Match(conditionString, conditionPattern);
+MiniSQLParser.cs (71) : if (conditionMatch.Success)
+MiniSQLParser.cs (72) : {
+MiniSQLParser.cs (73) : string colname = conditionMatch.Groups["colname"].Value;
+MiniSQLParser.cs (74) : string operatorString = conditionMatch.Groups["operator"].Value;
+MiniSQLParser.cs (75) : string valueString = conditionMatch.Groups["value"].Value;
+MiniSQLParser.cs (77) : condition = new Condition(colname, operatorString, valueString);
+MiniSQLParser.cs (78) : }
+MiniSQLParser.cs (79) : }
+MiniSQLParser.cs (81) : return new Select(table, columns, condition);
+MiniSQLParser.cs (82) : }
+MiniSQLParser.cs (84) : // INSERT
+MiniSQLParser.cs (85) : Match insertMatch = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (86) : if (insertMatch.Success)
+MiniSQLParser.cs (87) : {
+MiniSQLParser.cs (88) : string tableString = insertMatch.Groups["table"].Value;
+MiniSQLParser.cs (89) : List<string> values = CommaSeparatedNames(insertMatch.Groups["values"].Value);
+MiniSQLParser.cs (91) : return new Insert(tableString, values);
+MiniSQLParser.cs (92) : }
+MiniSQLParser.cs (94) : Match dropTableMatch = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (95) : if (dropTableMatch.Success)
+MiniSQLParser.cs (96) : {
+MiniSQLParser.cs (97) : string tableString = dropTableMatch.Groups["table"].Value;
+MiniSQLParser.cs (99) : return new DropTable(tableString);
+MiniSQLParser.cs (100) : }
+MiniSQLParser.cs (102) : // CREATE TABLE
+MiniSQLParser.cs (103) : Match createTableMatch = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (104) : if (createTableMatch.Success)
+MiniSQLParser.cs (105) : {
+MiniSQLParser.cs (106) : string tableString = createTableMatch.Groups["table"].Value;
+MiniSQLParser.cs (107) : List<string> columnsString = CommaSeparatedNames(createTableMatch.Groups["columns"].Value);
+MiniSQLParser.cs (108) : List<ColumnDefinition> columns = new();
+MiniSQLParser.cs (110) : foreach (string column in columnsString)
+MiniSQLParser.cs (111) : {
+MiniSQLParser.cs (112) : ColumnDefinition colDef = null;
+MiniSQLParser.cs (113) : Match columnDefMatch = Regex.Match(column, columnDefinitionPattern);
+MiniSQLParser.cs (115) : if (columnDefMatch.Success)
+MiniSQLParser.cs (116) : {
+MiniSQLParser.cs (117) : string colName = columnDefMatch.Groups["colname"].Value;
+MiniSQLParser.cs (118) : string colType = columnDefMatch.Groups["type"].Value;
+MiniSQLParser.cs (119) : ColumnDefinition.DataType colTypeEnum;
+MiniSQLParser.cs (121) : if (colType == "STRING")
+MiniSQLParser.cs (122) : {
+MiniSQLParser.cs (123) : colTypeEnum = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (124) : }
+MiniSQLParser.cs (125) : else if (colType == "DOUBLE")
+MiniSQLParser.cs (126) : {
+MiniSQLParser.cs (127) : colTypeEnum = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (128) : }
+MiniSQLParser.cs (129) : else if (colType == "INT")
+MiniSQLParser.cs (130) : {
+MiniSQLParser.cs (131) : colTypeEnum = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (132) : }
+MiniSQLParser.cs (133) : else
+MiniSQLParser.cs (134) : {
+MiniSQLParser.cs (135) : return null;
+MiniSQLParser.cs (136) : }
+MiniSQLParser.cs (138) : colDef = new ColumnDefinition(colTypeEnum, colName);
+MiniSQLParser.cs (140) : columns.Add(colDef);
+MiniSQLParser.cs (141) : }
+MiniSQLParser.cs (142) : }
+MiniSQLParser.cs (144) : return new CreateTable(tableString, columns);
+MiniSQLParser.cs (145) : }
+MiniSQLParser.cs (147) : // UPDATE TABLE
+MiniSQLParser.cs (148) : Match updateTableMatch = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (149) : if (updateTableMatch.Success)
+MiniSQLParser.cs (150) : {
+MiniSQLParser.cs (151) : string tableString = updateTableMatch.Groups["table"].Value;
+MiniSQLParser.cs (152) : List<string> assignmentsString = CommaSeparatedNames(updateTableMatch.Groups["assignments"].Value);
+MiniSQLParser.cs (153) : string conditionString = updateTableMatch.Groups["condition"].Value;
+MiniSQLParser.cs (155) : List<SetValue> assignmentsSetValue = new();
+MiniSQLParser.cs (157) : foreach (string assignment in assignmentsString)
+MiniSQLParser.cs (158) : {
+MiniSQLParser.cs (159) : SetValue setValue = null;
+MiniSQLParser.cs (160) : Match setValueMatch = Regex.Match(assignment, setValuePattern);
+MiniSQLParser.cs (162) : if (setValueMatch.Success)
+MiniSQLParser.cs (163) : {
+MiniSQLParser.cs (164) : string colName = setValueMatch.Groups["colname"].Value;
+MiniSQLParser.cs (165) : string value = setValueMatch.Groups["value"].Value;
+MiniSQLParser.cs (167) : setValue = new SetValue(colName, value);
+MiniSQLParser.cs (169) : assignmentsSetValue.Add(setValue);
+MiniSQLParser.cs (170) : }
+MiniSQLParser.cs (171) : }
+MiniSQLParser.cs (173) : Condition condition = null;
+MiniSQLParser.cs (175) : if (!string.IsNullOrEmpty(conditionString))
+MiniSQLParser.cs (176) : {
+MiniSQLParser.cs (177) : Match conditionMatch = Regex.Match(conditionString, conditionPattern);
+MiniSQLParser.cs (179) : if (conditionMatch.Success)
+MiniSQLParser.cs (180) : {
+MiniSQLParser.cs (181) : string colname = conditionMatch.Groups["colname"].Value;
+MiniSQLParser.cs (182) : string operatorString = conditionMatch.Groups["operator"].Value;
+MiniSQLParser.cs (183) : string valueString = conditionMatch.Groups["value"].Value;
+MiniSQLParser.cs (185) : condition = new Condition(colname, operatorString, valueString);
+MiniSQLParser.cs (186) : }
+MiniSQLParser.cs (187) : }
+MiniSQLParser.cs (189) : return new Update(tableString, assignmentsSetValue, condition);
+MiniSQLParser.cs (190) : }
+MiniSQLParser.cs (192) : // DELETE
+MiniSQLParser.cs (193) : Match deleteMatch = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (194) : if (deleteMatch.Success)
+MiniSQLParser.cs (195) : {
+MiniSQLParser.cs (196) : string tableString = deleteMatch.Groups["table"].Value;
+MiniSQLParser.cs (197) : string conditionString = deleteMatch.Groups["condition"].Value;
+MiniSQLParser.cs (199) : Condition condition = null;
+MiniSQLParser.cs (201) : if (!string.IsNullOrEmpty(conditionString))
+MiniSQLParser.cs (202) : {
+MiniSQLParser.cs (203) : Match conditionMatch = Regex.Match(conditionString, conditionPattern);
+MiniSQLParser.cs (205) : if (conditionMatch.Success)
+MiniSQLParser.cs (206) : {
+MiniSQLParser.cs (207) : string colname = conditionMatch.Groups["colname"].Value;
+MiniSQLParser.cs (208) : string operatorString = conditionMatch.Groups["operator"].Value;
+MiniSQLParser.cs (209) : string valueString = conditionMatch.Groups["value"].Value;
+MiniSQLParser.cs (211) : condition = new Condition(colname, operatorString, valueString);
+MiniSQLParser.cs (212) : }
+MiniSQLParser.cs (213) : }
+MiniSQLParser.cs (215) : return new Delete(tableString, condition);
+MiniSQLParser.cs (216) : }
+MiniSQLParser.cs (218) : // CREATE SECURITY PROFILE
+MiniSQLParser.cs (219) : Match createSecProfileMatch = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (220) : if (createSecProfileMatch.Success)
+MiniSQLParser.cs (221) : {
+MiniSQLParser.cs (222) : string secProfile = createSecProfileMatch.Groups["secprofile"].Value;
+MiniSQLParser.cs (224) : return new CreateSecurityProfile(secProfile);
+MiniSQLParser.cs (225) : }
+MiniSQLParser.cs (227) : // DROP SECURITY PROFILE
+MiniSQLParser.cs (228) : Match dropSecProfileMatch = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (229) : if (dropSecProfileMatch.Success)
+MiniSQLParser.cs (230) : {
+MiniSQLParser.cs (231) : string secProfile = dropSecProfileMatch.Groups["secprofile"].Value;
+MiniSQLParser.cs (233) : return new DropSecurityProfile(secProfile);
+MiniSQLParser.cs (234) : }
+MiniSQLParser.cs (236) : // GRANT
+MiniSQLParser.cs (237) : Match grantMatch = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (238) : if (grantMatch.Success)
+MiniSQLParser.cs (239) : {
+MiniSQLParser.cs (240) : string privilegeString = grantMatch.Groups["privilege"].Value;
+MiniSQLParser.cs (241) : string tableString = grantMatch.Groups["value"].Value;
+MiniSQLParser.cs (242) : string secprofileString = grantMatch.Groups["secprofile"].Value;
+MiniSQLParser.cs (244) : return new Grant(privilegeString, tableString, secprofileString);
+MiniSQLParser.cs (245) : }
+MiniSQLParser.cs (247) : // REVOKE
+MiniSQLParser.cs (248) : Match revokeMatch = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (249) : if (revokeMatch.Success)
+MiniSQLParser.cs (250) : {
+MiniSQLParser.cs (251) : string privilegeString = revokeMatch.Groups["privilege"].Value;
+MiniSQLParser.cs (252) : string tableString = revokeMatch.Groups["value"].Value;
+MiniSQLParser.cs (253) : string secprofileString = revokeMatch.Groups["secprofile"].Value;
+MiniSQLParser.cs (255) : return new Revoke(privilegeString, tableString, secprofileString);
+MiniSQLParser.cs (256) : }
+MiniSQLParser.cs (258) : // ADD USER
+MiniSQLParser.cs (259) : Match addUserMatch = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (260) : if (addUserMatch.Success)
+MiniSQLParser.cs (261) : {
+MiniSQLParser.cs (262) : string userString = addUserMatch.Groups["user"].Value;
+MiniSQLParser.cs (263) : string passString = addUserMatch.Groups["password"].Value;
+MiniSQLParser.cs (264) : string secprofileString = addUserMatch.Groups["secprofile"].Value;
+MiniSQLParser.cs (266) : return new AddUser(userString, passString, secprofileString);
+MiniSQLParser.cs (267) : }
+MiniSQLParser.cs (269) : // DELETE USER
+MiniSQLParser.cs (270) : Match deleteUserMatch = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (271) : if (deleteUserMatch.Success)
+MiniSQLParser.cs (272) : {
+MiniSQLParser.cs (273) : string userString = deleteUserMatch.Groups["user"].Value;
+MiniSQLParser.cs (275) : return new DeleteUser(userString);
+MiniSQLParser.cs (276) : }
+MiniSQLParser.cs (278) : return null;
 Revoke.cs (9) : // Aitana
-Select.cs (9) : // Maialen
+Select.cs (10) : // Maialen
 Update.cs (8) : // Endika
+Manager.cs (21) : // Aitana
+Manager.cs (29) : // Maialen
+Manager.cs (38) : // Endika
+Manager.cs (46) : // Endika
+Manager.cs (54) : // Unai
+Manager.cs (63) : // Aitana
+Manager.cs (70) : // Maialen
+Manager.cs (79) : // Maialen
+Manager.cs (88) : // Unai
+Manager.cs (97) : // Aitana
+Manager.cs (105) : // Unai
+Manager.cs (114) : // Endika
+Profile.cs (17) : // Aitana

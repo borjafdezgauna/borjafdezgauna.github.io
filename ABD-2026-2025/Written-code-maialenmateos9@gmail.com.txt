@@ -183,16 +183,16 @@ Database.cs (328) : }
 Database.cs (340) : return db;
 Database.cs (341) : }
 Database.cs (346) : }
-Row.cs (103) : if (string.IsNullOrEmpty(value))
-Row.cs (104) : {
-Row.cs (105) : return value;
-Row.cs (106) : }
-Row.cs (107) : return value.Replace(Delimiter,DelimiterEncoded);
-Row.cs (115) : if (string.IsNullOrEmpty(value))
-Row.cs (116) : {
-Row.cs (117) : return value;
-Row.cs (118) : }
-Row.cs (119) : return value.Replace(DelimiterEncoded,Delimiter);
+Row.cs (99) : if (string.IsNullOrEmpty(value))
+Row.cs (100) : {
+Row.cs (101) : return value;
+Row.cs (102) : }
+Row.cs (103) : return value.Replace(Delimiter,DelimiterEncoded);
+Row.cs (111) : if (string.IsNullOrEmpty(value))
+Row.cs (112) : {
+Row.cs (113) : return value;
+Row.cs (114) : }
+Row.cs (115) : return value.Replace(DelimiterEncoded,Delimiter);
 Table.cs (17) : this.Name=name;
 Table.cs (18) : this.ColumnDefinitions = columns;
 Table.cs (19) : this.Rows = new List<Row> ();
@@ -217,3 +217,32 @@ CreateTable.cs (35) : return Constants.DatabaseCreatedWithoutColumnsError;
 CreateTable.cs (37) : if(database.CreateTable(Table,ColumnsParameters))
 CreateTable.cs (38) : return Constants.CreateTableSuccess;
 CreateTable.cs (40) : return Constants.Error;
+Select.cs (4) : using System.Runtime.CompilerServices;
+Select.cs (20) : this.Table = table;
+Select.cs (21) : this.Columns = columns ?? new List<string> ();
+Select.cs (22) : this.Where = condition;
+Select.cs (28) : Table table = database.TableByName(Table);
+Select.cs (30) : if(table==null)
+Select.cs (31) : {
+Select.cs (32) : return Constants.TableDoesNotExistError;
+Select.cs (33) : }
+Select.cs (35) : foreach(string column in Columns)
+Select.cs (36) : {
+Select.cs (37) : if(table.ColumnByName(column)==null)
+Select.cs (38) : {
+Select.cs (39) : return Constants.ColumnDoesNotExistError;
+Select.cs (40) : }
+Select.cs (41) : }
+Select.cs (42) : if(Where!=null)
+Select.cs (43) : {
+Select.cs (44) : if (Where.ColumnName==null||(table.ColumnByName(Where.ColumnName)==null))
+Select.cs (45) : {
+Select.cs (46) : return Constants.ColumnDoesNotExistError;
+Select.cs (47) : }
+Select.cs (48) : }
+Select.cs (49) : Table resTable = database.Select(Table, Columns, Where);
+Select.cs (51) : if (resTable == null)
+Select.cs (52) : {
+Select.cs (53) : return database.LastErrorMessage;
+Select.cs (55) : }
+Select.cs (56) : return resTable.ToString();
