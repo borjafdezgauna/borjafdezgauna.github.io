@@ -138,3 +138,52 @@ Delete.cs (32) : //como no se ha eliminado correctamente devolvemos el error
 Delete.cs (33) : return database.LastErrorMessage;
 Delete.cs (34) : }
 MiniSQLParser.cs (24) : const string createTablePattern = @"CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s*\(\s*(.*?)\s*\)";
+MiniSQLParser.cs (81) : //create table
+MiniSQLParser.cs (82) : Match createMatch = Regex.Match(miniSQLQuery,createTablePattern);
+MiniSQLParser.cs (84) : //CREATE TABLE v�lido
+MiniSQLParser.cs (85) : if (createMatch.Success)
+MiniSQLParser.cs (86) : {
+MiniSQLParser.cs (87) : string nombreTabla = createMatch.Groups[1].Value;
+MiniSQLParser.cs (88) : string columnas = createMatch.Groups[2].Value;
+MiniSQLParser.cs (90) : //lista para guardar las columnas
+MiniSQLParser.cs (91) : List<ColumnDefinition> crearColumnas = new List<ColumnDefinition>();
+MiniSQLParser.cs (93) : if (!string.IsNullOrWhiteSpace(columnas))
+MiniSQLParser.cs (94) : {
+MiniSQLParser.cs (95) : //separamos las distintas columnas
+MiniSQLParser.cs (96) : string[] columnaSep = columnas.Split(',');
+MiniSQLParser.cs (98) : //para cada columnas
+MiniSQLParser.cs (99) : foreach (string parte in columnaSep)
+MiniSQLParser.cs (100) : {
+MiniSQLParser.cs (101) : //separar nombre y tipo
+MiniSQLParser.cs (102) : string[] columna = Regex.Split(parte, @"\s+");
+MiniSQLParser.cs (103) : if (columna.Length == 2)
+MiniSQLParser.cs (104) : {
+MiniSQLParser.cs (105) : string name = columna[0];
+MiniSQLParser.cs (106) : string tipo = columna[1];
+MiniSQLParser.cs (108) : ColumnDefinition.DataType columnType;
+MiniSQLParser.cs (109) : if (tipo.Equals("INT"))
+MiniSQLParser.cs (110) : {
+MiniSQLParser.cs (111) : columnType = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (112) : }
+MiniSQLParser.cs (113) : else if (tipo.Equals("TEXT"))
+MiniSQLParser.cs (114) : {
+MiniSQLParser.cs (115) : columnType = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (116) : }
+MiniSQLParser.cs (117) : else if (tipo.Equals("DOUBLE"))
+MiniSQLParser.cs (118) : {
+MiniSQLParser.cs (119) : columnType = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (120) : }
+MiniSQLParser.cs (121) : else
+MiniSQLParser.cs (122) : {
+MiniSQLParser.cs (123) : return null;
+MiniSQLParser.cs (124) : }
+MiniSQLParser.cs (126) : crearColumnas.Add(new ColumnDefinition(columnType, name));
+MiniSQLParser.cs (127) : }
+MiniSQLParser.cs (128) : else
+MiniSQLParser.cs (129) : {
+MiniSQLParser.cs (130) : return null;
+MiniSQLParser.cs (131) : }
+MiniSQLParser.cs (132) : }
+MiniSQLParser.cs (133) : }
+MiniSQLParser.cs (134) : return new CreateTable(nombreTabla, crearColumnas);
+MiniSQLParser.cs (135) : }

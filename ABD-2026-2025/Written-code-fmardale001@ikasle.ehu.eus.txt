@@ -27,14 +27,14 @@ Table.cs (4) : using System.Data.Common;
 Table.cs (5) : using System.Security.Cryptography;
 Table.cs (19) : ColumnDefinitions = columns;
 Table.cs (20) : Name = name;
-Table.cs (26) : if(i> NumRows() - 1 || i<0) { return null; }
+Table.cs (26) : if (i > NumRows() - 1 || i < 0) { return null; }
 Table.cs (27) : return Rows[i];
 Table.cs (35) : Rows.Add(row);
 Table.cs (43) : return Rows.Count;
-Table.cs (50) : if(i> NumColumns() - 1 || i < 0) { return null; }
+Table.cs (50) : if (i > NumColumns() - 1 || i < 0) { return null; }
 Table.cs (51) : return ColumnDefinitions[i];
 Table.cs (59) : return ColumnDefinitions.Count;
-Table.cs (66) : if (ColumnDefinitions==null || column == null)
+Table.cs (66) : if (ColumnDefinitions == null || column == null)
 Table.cs (67) : {
 Table.cs (68) : return null;
 Table.cs (69) : }
@@ -56,74 +56,127 @@ Table.cs (93) : {
 Table.cs (94) : return i;
 Table.cs (95) : }
 Table.cs (96) : }
-Table.cs (204) : if(columnNames== null)
-Table.cs (205) : {
-Table.cs (207) : }
-Table.cs (209) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Table.cs (210) : foreach (String i in columnNames)
+Table.cs (204) : if (columnNames == null) { return null; }
+Table.cs (206) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Table.cs (207) : List<int> indices = new List<int>();
+Table.cs (208) : foreach (String col in columnNames)
+Table.cs (209) : {
+Table.cs (210) : for (int i = 0; i < ColumnDefinitions.Count; i++)
 Table.cs (211) : {
-Table.cs (212) : foreach (ColumnDefinition c in ColumnDefinitions)
+Table.cs (212) : if (ColumnDefinitions[i].Name.Equals(col))
 Table.cs (213) : {
-Table.cs (214) : if (c.Name == i)
-Table.cs (215) : {
-Table.cs (216) : columns.Add(c);
-Table.cs (217) : break;
+Table.cs (214) : columns.Add(ColumnDefinitions[i]);
+Table.cs (215) : indices.Add(i);
+Table.cs (216) : break;
+Table.cs (217) : }
 Table.cs (218) : }
 Table.cs (219) : }
-Table.cs (220) : }
-Table.cs (221) : Table Result = new Table("Result", columns);
-Table.cs (224) : if (condition != null)
-Table.cs (225) : {
-Table.cs (226) : List<int> resultRows = new List<int>();
-Table.cs (227) : resultRows = RowIndicesWhereConditionIsTrue(condition);
-Table.cs (228) : Row row;
-Table.cs (229) : foreach (int j in resultRows)
+Table.cs (220) : Table Result = new Table("Result", columns);
+Table.cs (222) : List<int> resultRowsInd = new List<int>();
+Table.cs (223) : if (condition != null)
+Table.cs (224) : {
+Table.cs (225) : resultRowsInd = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (226) : }
+Table.cs (227) : else
+Table.cs (228) : {
+Table.cs (229) : for (int i = 0; i < Rows.Count; i++)
 Table.cs (230) : {
-Table.cs (231) : List<String> values = new List<String>();
-Table.cs (232) : row = Rows[j];
-Table.cs (233) : foreach (ColumnDefinition c in columns)
-Table.cs (234) : {
-Table.cs (235) : values.Add(row.GetValue(c.Name));
-Table.cs (236) : }
-Table.cs (237) : Result.AddRow(new Row(columns, values));
-Table.cs (238) : }
-Table.cs (240) : }
-Table.cs (241) : else
-Table.cs (242) : {
-Table.cs (243) : foreach (Row r in Rows)
-Table.cs (244) : {
-Table.cs (245) : List<String> values = new List<String>();
-Table.cs (246) : foreach (ColumnDefinition c in columns)
-Table.cs (247) : {
-Table.cs (248) : values.Add(r.GetValue(c.Name));
-Table.cs (249) : }
-Table.cs (250) : Result.AddRow(new Row(columns, values));
-Table.cs (251) : }
-Table.cs (252) : }
-Table.cs (253) : return Result;
-Table.cs (261) : if (values!= null && NumColumns() == values.Count)
-Table.cs (262) : {
-Table.cs (263) : Row inserting = new Row(ColumnDefinitions, values);
-Table.cs (264) : this.AddRow(inserting);
-Table.cs (265) : return true;
-Table.cs (266) : }
-Table.cs (276) : List<String> columnas = new List<String>();
-Table.cs (278) : for (int i=0; i<setValues.Count; i++)
-Table.cs (279) : {
-Table.cs (280) : columnas.Add(setValues[i].ColumnName);
-Table.cs (281) : }
-Table.cs (283) : if (condition != null)
-Table.cs (284) : {
-Table.cs (285) : List<int> resultRows = new List<int>();
-Table.cs (286) : resultRows = RowIndicesWhereConditionIsTrue(condition);
-Table.cs (287) : foreach (int i in resultRows)
-Table.cs (288) : {
-Table.cs (289) : for(int j=0; j<columnas.Count; j++)
-Table.cs (290) : {
-Table.cs (291) : Rows[i].SetValue(columnas[j], setValues[j].Value);
-Table.cs (292) : }
-Table.cs (294) : }
-Table.cs (295) : return true;
-Table.cs (297) : }
+Table.cs (231) : resultRowsInd.Add(i);
+Table.cs (232) : }
+Table.cs (233) : }
+Table.cs (235) : foreach (int indice in resultRowsInd)
+Table.cs (236) : {
+Table.cs (237) : List<String> valuesOrd = new List<String>();
+Table.cs (238) : Row r = Rows[indice];
+Table.cs (239) : foreach (int indiceCol in indices)
+Table.cs (240) : {
+Table.cs (241) : valuesOrd.Add(r.Values[indiceCol]);
+Table.cs (242) : }
+Table.cs (243) : Result.AddRow(new Row(columns, valuesOrd));
+Table.cs (244) : }
+Table.cs (245) : return Result;
+Table.cs (253) : if (values != null && NumColumns() == values.Count)
+Table.cs (254) : {
+Table.cs (255) : Row inserting = new Row(ColumnDefinitions, values);
+Table.cs (256) : this.AddRow(inserting);
+Table.cs (257) : return true;
+Table.cs (258) : }
+Table.cs (268) : List<String> columnas = new List<String>();
+Table.cs (270) : for (int i = 0; i < setValues.Count; i++)
+Table.cs (271) : {
+Table.cs (272) : columnas.Add(setValues[i].ColumnName);
+Table.cs (273) : }
+Table.cs (275) : if (condition != null)
+Table.cs (276) : {
+Table.cs (277) : List<int> resultRows = new List<int>();
+Table.cs (278) : resultRows = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (279) : foreach (int i in resultRows)
+Table.cs (280) : {
+Table.cs (281) : for (int j = 0; j < columnas.Count; j++)
+Table.cs (282) : {
+Table.cs (283) : Rows[i].SetValue(columnas[j], setValues[j].Value);
+Table.cs (284) : }
+Table.cs (286) : }
+Table.cs (287) : return true;
+Table.cs (289) : }
+CreateTable.cs (17) : Table = table;
+CreateTable.cs (18) : ColumnsParameters = columns;
+MiniSQLParser.cs (2) : using System;
+MiniSQLParser.cs (24) : const string createTablePattern = @"CREATE TABLE (\w+) \((\w+\s(?:String|Int|Double)(?:,\w+\s(?:String|Int|Double))*)?\)";//fabian
+MiniSQLParser.cs (32) : //TODO DEADLINE 4
+MiniSQLParser.cs (33) : const string createSecurityProfilePattern = null;
+MiniSQLParser.cs (35) : const string dropSecurityProfilePattern = null;
+MiniSQLParser.cs (37) : const string grantPattern = null;
+MiniSQLParser.cs (39) : const string revokePattern = null;
+MiniSQLParser.cs (41) : const string addUserPattern = null;
+MiniSQLParser.cs (43) : const string deleteUserPattern = null;
+MiniSQLParser.cs (46) : //TODO DEADLINE 2
+MiniSQLParser.cs (47) : //Parse query using the regular expressions above one by one. If there is a match, create an instance of the query with the parsed parameters
+MiniSQLParser.cs (48) : //For example, if the query is a "SELECT ...", there should be a match with selectPattern. We would create and return an instance of Select
+MiniSQLParser.cs (49) : //initialized with the table name, the columns, and (possibly) an instance of Condition.
+MiniSQLParser.cs (50) : //If there is no match, it means there is a syntax error. We will return null.
+MiniSQLParser.cs (51) : Match match;
+MiniSQLParser.cs (52) : match = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (53) : if (match.Success) //Has there been a match?
+MiniSQLParser.cs (54) : {
+MiniSQLParser.cs (55) : if (match.Length != miniSQLQuery.Length) { return null; }
+MiniSQLParser.cs (56) : List<ColumnDefinition> columnas = new List<ColumnDefinition>();
+MiniSQLParser.cs (57) : if (match.Groups[2].Value.Length == 0 || match.Groups[2].Value.Length == 1)
+MiniSQLParser.cs (58) : {
+MiniSQLParser.cs (59) : //PREGUNTAR QUÉ HACER SI LAS COLUMNAS ESTÁN NULL
+MiniSQLParser.cs (60) : return new CreateTable(match.Groups[1].Value, columnas);
+MiniSQLParser.cs (61) : }
+MiniSQLParser.cs (62) : else
+MiniSQLParser.cs (63) : {
+MiniSQLParser.cs (64) : String[] cols = match.Groups[2].Value.Split(',');
+MiniSQLParser.cs (65) : foreach (String s in cols)
+MiniSQLParser.cs (66) : {
+MiniSQLParser.cs (67) : String[] separados = s.Split(' ');
+MiniSQLParser.cs (68) : String nombre = separados[0];
+MiniSQLParser.cs (69) : String tipo = separados[1];
+MiniSQLParser.cs (70) : ColumnDefinition rcol = null;
+MiniSQLParser.cs (71) : if (tipo.Equals("String"))
+MiniSQLParser.cs (72) : {
+MiniSQLParser.cs (73) : rcol = new ColumnDefinition(ColumnDefinition.DataType.String, nombre);
+MiniSQLParser.cs (74) : }
+MiniSQLParser.cs (75) : if (tipo.Equals("Int"))
+MiniSQLParser.cs (76) : {
+MiniSQLParser.cs (77) : rcol = new ColumnDefinition(ColumnDefinition.DataType.Int, nombre);
+MiniSQLParser.cs (78) : }
+MiniSQLParser.cs (79) : if (tipo.Equals("Double"))
+MiniSQLParser.cs (80) : {
+MiniSQLParser.cs (81) : rcol = new ColumnDefinition(ColumnDefinition.DataType.Double, nombre);
+MiniSQLParser.cs (82) : }
+MiniSQLParser.cs (83) : columnas.Add(rcol);
+MiniSQLParser.cs (85) : }
+MiniSQLParser.cs (86) : return new CreateTable(match.Groups[1].Value, columnas);
+MiniSQLParser.cs (87) : }
+MiniSQLParser.cs (88) : }
+MiniSQLParser.cs (89) : else
+MiniSQLParser.cs (90) : {
+MiniSQLParser.cs (91) : Console.WriteLine("No matches found");
+MiniSQLParser.cs (92) : }
+MiniSQLParser.cs (117) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (120) : match = Regex.Match(miniSQLQuery, insertPattern);
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
