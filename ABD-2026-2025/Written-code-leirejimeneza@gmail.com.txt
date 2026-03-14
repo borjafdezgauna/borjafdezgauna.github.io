@@ -109,28 +109,30 @@ Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
 MiniSQLParser.cs (18) : //LEIRE --> #16
 MiniSQLParser.cs (19) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s*\(([^)]+)\)";
-MiniSQLParser.cs (51) : //Insert
-MiniSQLParser.cs (52) : Match matchInsert = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (53) : if (matchInsert.Success)
-MiniSQLParser.cs (54) : {
-MiniSQLParser.cs (55) : string table = matchInsert.Groups[1].Value;
-MiniSQLParser.cs (56) : string valores = matchInsert.Groups[2].Value;
-MiniSQLParser.cs (58) : //Valores sin comas
-MiniSQLParser.cs (59) : if (!valores.Contains(","))
-MiniSQLParser.cs (60) : {
-MiniSQLParser.cs (61) : return null;
-MiniSQLParser.cs (62) : }
-MiniSQLParser.cs (64) : string newPattern = @"'[^']+'";
-MiniSQLParser.cs (65) : MatchCollection matchCollectionComillas = Regex.Matches(valores, newPattern);
-MiniSQLParser.cs (67) : List<string> values = new List<string>();
-MiniSQLParser.cs (69) : foreach (Match match in matchCollectionComillas)
-MiniSQLParser.cs (70) : {
-MiniSQLParser.cs (71) : string valor = match.Value;
-MiniSQLParser.cs (72) : valor = valor.Trim('\'');
-MiniSQLParser.cs (73) : values.Add(valor);
-MiniSQLParser.cs (74) : }
-MiniSQLParser.cs (76) : return new Insert(table, values);
-MiniSQLParser.cs (77) : }
+MiniSQLParser.cs (87) : //Insert
+MiniSQLParser.cs (88) : Match matchInsert = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (89) : if (matchInsert.Success)
+MiniSQLParser.cs (90) : {
+MiniSQLParser.cs (91) : string table = matchInsert.Groups[1].Value;
+MiniSQLParser.cs (92) : string valores = matchInsert.Groups[2].Value;
+MiniSQLParser.cs (94) : string newPattern = @"'[^']+'";
+MiniSQLParser.cs (95) : MatchCollection matchCollectionComillas = Regex.Matches(valores, newPattern);
+MiniSQLParser.cs (97) : //Contar cuantas comas hay
+MiniSQLParser.cs (98) : int commaCount = valores.Split(',').Length - 1;
+MiniSQLParser.cs (100) : //Ver si hay los mismos valores que comas +1
+MiniSQLParser.cs (101) : if (matchCollectionComillas.Count == 0 || matchCollectionComillas.Count != commaCount + 1)
+MiniSQLParser.cs (102) : {
+MiniSQLParser.cs (103) : return null;
+MiniSQLParser.cs (104) : }
+MiniSQLParser.cs (106) : List<string> values = new List<string>();
+MiniSQLParser.cs (108) : foreach (Match match in matchCollectionComillas)
+MiniSQLParser.cs (109) : {
+MiniSQLParser.cs (110) : string valor = match.Value;
+MiniSQLParser.cs (111) : valor = valor.Trim('\'');
+MiniSQLParser.cs (112) : values.Add(valor);
+MiniSQLParser.cs (113) : }
+MiniSQLParser.cs (115) : return new Insert(table, values);
+MiniSQLParser.cs (116) : }
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;

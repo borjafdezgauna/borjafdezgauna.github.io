@@ -85,3 +85,43 @@ CreateTable.cs (18) : ColumnsParameters = columns;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
 MiniSQLParser.cs (12) : const string selectPattern = @"/^SELECT\s+(\*|[a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*)\sFROM\s([a-zA-Z0-9]+)\sWHERE\s([a-zA-Z0-9]+\s(>|<|=)\s'([-]*[a-zA-Z0-9]+([.]*[a-zA-Z0-9]+)*)')$";
+MiniSQLParser.cs (51) : //Select
+MiniSQLParser.cs (52) : Match matchSelect = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (53) : if (matchSelect.Success)
+MiniSQLParser.cs (54) : {
+MiniSQLParser.cs (55) : //Colmunas del select
+MiniSQLParser.cs (56) : string columnas = matchSelect.Groups[1].Value;
+MiniSQLParser.cs (57) : string table = matchSelect.Groups[2].Value;
+MiniSQLParser.cs (58) : //Condicion del select
+MiniSQLParser.cs (59) : string condicion = matchSelect.Groups[3].Value;
+MiniSQLParser.cs (60) : string columna = condicion.Split(' ')[0];
+MiniSQLParser.cs (61) : // Simbolo y comparando por ejemplo:
+MiniSQLParser.cs (62) : // simbolo = "<"
+MiniSQLParser.cs (63) : //comparando = "28"
+MiniSQLParser.cs (64) : string simbolo = matchSelect.Groups[4].Value;
+MiniSQLParser.cs (65) : string comparando = matchSelect.Groups[5].Value;
+MiniSQLParser.cs (66) : comparando = comparando.Trim('\'');
+MiniSQLParser.cs (68) : List<string> columns = new List<string>();
+MiniSQLParser.cs (69) : string[] cols = columnas.Split(',');
+MiniSQLParser.cs (70) : //Nunca deber�a entrar por aqu� ya que la regex no lo permite.
+MiniSQLParser.cs (71) : if (cols.Length == 0)
+MiniSQLParser.cs (72) : {
+MiniSQLParser.cs (73) : return null;
+MiniSQLParser.cs (74) : }
+MiniSQLParser.cs (76) : foreach (string col in cols)
+MiniSQLParser.cs (77) : {
+MiniSQLParser.cs (78) : columns.Add(col.Trim());
+MiniSQLParser.cs (79) : }
+MiniSQLParser.cs (81) : Condition condition = new Condition(columna, simbolo, comparando);
+MiniSQLParser.cs (82) : Select select = new Select(table, columns, condition);
+MiniSQLParser.cs (84) : return select;
+MiniSQLParser.cs (85) : }
+Select.cs (26) : /*
+Select.cs (27) : if ()
+Select.cs (28) : {
+Select.cs (29) : database.ToString();
+Select.cs (30) : }else
+Select.cs (31) : {
+Select.cs (32) : return database.LastErrorMessage;
+Select.cs (33) : }
+Select.cs (34) : */
