@@ -162,3 +162,17 @@ Table.cs (217) : int index = ColumnIndexByName(name);
 Table.cs (218) : if (index != -1)
 Table.cs (220) : values.Add(row.Values[index]);
 Table.cs (221) : }
+MiniSQLParser.cs (12) : const string selectPattern =  @"^SELECT\s+(?<columns>(\*|\w+(?:\s*,\s*\w+)*))\s+FROM\s+(?<table>\w+)(\s+WHERE\s+(?<column>\w+)\s*(?<op><=|>=|!=|=|<|>)\s*(?<value>[\w\.]+))?$";
+MiniSQLParser.cs (46) : if (miniSQLQuery == null)
+MiniSQLParser.cs (47) : return null;
+MiniSQLParser.cs (49) : Match match = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (51) : if (match.Success)
+MiniSQLParser.cs (52) : {
+MiniSQLParser.cs (53) : var table = match.Groups["table"].Value;
+MiniSQLParser.cs (54) : var columns = CommaSeparatedNames(match.Groups["columns"].Value);
+MiniSQLParser.cs (55) : Condition condition = null;
+MiniSQLParser.cs (57) : if (match.Groups["column"].Success)
+MiniSQLParser.cs (58) : condition = new Condition(match.Groups["column"].Value, match.Groups["op"].Value, match.Groups["value"].Value);
+MiniSQLParser.cs (60) : return new Select(table, columns, condition);
+MiniSQLParser.cs (61) : }
+Select.cs (22) : Table result = database.Select(Table, Columns, Where);

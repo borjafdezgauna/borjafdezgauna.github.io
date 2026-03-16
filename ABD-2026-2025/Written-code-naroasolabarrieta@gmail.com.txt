@@ -122,29 +122,30 @@ Table.cs (326) : result += "}";
 Table.cs (327) : }
 Table.cs (329) : return result;
 Table.cs (330) : }
+MiniSQLParser.cs (22) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*(=|<>|<|>|<=|>=)\s*(.+))?\s*$";
 MiniSQLParser.cs (65) : if (match.Success)
 MiniSQLParser.cs (66) : {
 MiniSQLParser.cs (67) : string table = match.Groups[1].Value;
 MiniSQLParser.cs (68) : string setText = match.Groups[2].Value;
 MiniSQLParser.cs (70) : List<SetValue> values = new List<SetValue>();
-MiniSQLParser.cs (71) : string[] assignments = setText.Split(",", System.StringSplitOptions.RemoveEmptyEntries);
-MiniSQLParser.cs (73) : foreach (string assignment in assignments)
-MiniSQLParser.cs (74) : {
-MiniSQLParser.cs (75) : string[] parts = assignment.Split("=");
-MiniSQLParser.cs (76) : string column = parts[0].Trim();
-MiniSQLParser.cs (77) : string value = parts[1].Trim();
-MiniSQLParser.cs (78) : values.Add(new SetValue(column, value));
-MiniSQLParser.cs (79) : }
-MiniSQLParser.cs (81) : Condition condition = null;
-MiniSQLParser.cs (83) : if (match.Groups[3].Success)
-MiniSQLParser.cs (84) : {
-MiniSQLParser.cs (85) : string column = match.Groups[3].Value;
-MiniSQLParser.cs (86) : string op = match.Groups[4].Value;
-MiniSQLParser.cs (87) : string value = match.Groups[5].Value;
-MiniSQLParser.cs (88) : condition = new Condition(column, op, value);
-MiniSQLParser.cs (89) : }
-MiniSQLParser.cs (91) : return new Update(table, values, condition);
-MiniSQLParser.cs (92) : }
+MiniSQLParser.cs (71) : var assignmentMatches = Regex.Matches(setText, @"(\w+)\s*=\s*('[^']*'|[^,]+)");
+MiniSQLParser.cs (72) : foreach (Match am in assignmentMatches)
+MiniSQLParser.cs (73) : {
+MiniSQLParser.cs (74) : string column = am.Groups[1].Value.Trim();
+MiniSQLParser.cs (75) : string value = am.Groups[2].Value.Trim().Trim('\'');
+MiniSQLParser.cs (76) : values.Add(new SetValue(column, value));
+MiniSQLParser.cs (77) : }
+MiniSQLParser.cs (79) : Condition condition = null;
+MiniSQLParser.cs (81) : if (match.Groups[3].Success)
+MiniSQLParser.cs (82) : {
+MiniSQLParser.cs (83) : string column = match.Groups[3].Value;
+MiniSQLParser.cs (84) : string op = match.Groups[4].Value;
+MiniSQLParser.cs (85) : string value = match.Groups[5].Value;
+MiniSQLParser.cs (86) : condition = new Condition(column, op, value);
+MiniSQLParser.cs (87) : }
+MiniSQLParser.cs (89) : return new Update(table, values, condition);
+MiniSQLParser.cs (90) : }
+SetValue.cs (18) : this.Value = value;
 Update.cs (15) : this.Table = table;
 Update.cs (16) : this.Columns = columnNames;
 Update.cs (17) : this.Where = where;
