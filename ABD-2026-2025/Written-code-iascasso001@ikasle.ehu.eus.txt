@@ -110,42 +110,45 @@ Row.cs (188) : {
 Row.cs (189) : val.Add(Decode(valuesToArray[i]));
 Row.cs (191) : }
 Row.cs (193) : return new Row(columns, val);
-Delete.cs (27) : public override bool Equals(Object obj)
+Delete.cs (25) : bool result = database.DeleteWhere(Table,Where);
+Delete.cs (27) : if(result == true)
 Delete.cs (28) : {
-Delete.cs (29) : Delete other = (Delete)obj;
-Delete.cs (30) : //First we compare extreme cases where 'WHERE' clause is null in one side (we also discard different table names)
-Delete.cs (31) : if(Table != other.Table || (Where!=null&&other.Where==null || Where==null&&other.Where!=null))
+Delete.cs (29) : return "DeleteSuccess";
+Delete.cs (30) : }
+Delete.cs (31) : else
 Delete.cs (32) : {
-Delete.cs (33) : return false;
+Delete.cs (33) : return database.LastErrorMessage;
 Delete.cs (34) : }
-Delete.cs (35) : //Then, we compare both null case -> true
-Delete.cs (36) : else if (other.Where==null&&Where==null)
-Delete.cs (37) : {
-Delete.cs (38) : return true;
-Delete.cs (39) : }
-Delete.cs (40) : //Last, with both null cases ruled out, we can compare Where clauses one by one
-Delete.cs (41) : else if(Where.ColumnName == other.Where.ColumnName && Where.LiteralValue == other.Where.LiteralValue &&
-Delete.cs (42) : Where.Operator == other.Where.Operator)
-Delete.cs (43) : {
-Delete.cs (44) : return true;
-Delete.cs (45) : }
-Delete.cs (46) : //Code didn't found a match, thus they are not equal
-Delete.cs (47) : else
-Delete.cs (48) : {
-Delete.cs (49) : return false;
-Delete.cs (50) : }
+Delete.cs (39) : public override bool Equals(Object obj)
+Delete.cs (40) : {
+Delete.cs (41) : Delete other = (Delete)obj;
+Delete.cs (42) : //First we compare extreme cases where 'WHERE' clause is null in one side (we also discard different table names)
+Delete.cs (43) : if(Table != other.Table || (Where!=null&&other.Where==null || Where==null&&other.Where!=null))
+Delete.cs (44) : {
+Delete.cs (45) : return false;
+Delete.cs (46) : }
+Delete.cs (47) : //Then, we compare both null case -> true
+Delete.cs (48) : else if (other.Where==null&&Where==null)
+Delete.cs (49) : {
+Delete.cs (50) : return true;
 Delete.cs (51) : }
+Delete.cs (52) : //Last, with both null cases ruled out, we can compare Where clauses one by one
+Delete.cs (53) : else if(Where.ColumnName == other.Where.ColumnName && Where.LiteralValue == other.Where.LiteralValue &&
+Delete.cs (54) : Where.Operator == other.Where.Operator)
+Delete.cs (55) : {
+Delete.cs (56) : return true;
+Delete.cs (57) : }
+Delete.cs (58) : //Code didn't found a match, thus they are not equal
+Delete.cs (59) : else
+Delete.cs (60) : {
+Delete.cs (61) : return false;
+Delete.cs (62) : }
+Delete.cs (63) : }
 Insert.cs (17) : Values = values;
-MiniSQLParser.cs (25) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)(=|<|>)'(-?\d+|-?\d+\.\d+|\w+)')?";
-MiniSQLParser.cs (38) : const string deleteUserPattern = null;
-MiniSQLParser.cs (125) : //delete case
-MiniSQLParser.cs (127) : if(match.Success && match.Length == miniSQLQuery.Length)
-MiniSQLParser.cs (128) : {
-MiniSQLParser.cs (129) : if (match.Groups[2].Value == "" && match.Groups[3].Value == "" && match.Groups[4].Value=="")
+MiniSQLParser.cs (27) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)'(-?\d+|-?\d+\.\d+|\w+)'";
+MiniSQLParser.cs (40) : const string deleteUserPattern = null;
+MiniSQLParser.cs (127) : //delete case
+MiniSQLParser.cs (128) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (129) : if(match.Success && match.Length == miniSQLQuery.Length)
 MiniSQLParser.cs (130) : {
-MiniSQLParser.cs (131) : return new Delete(match.Groups[1].Value, null);
-MiniSQLParser.cs (132) : }
-MiniSQLParser.cs (133) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
-MiniSQLParser.cs (136) : {
-MiniSQLParser.cs (137) : return null;
-MiniSQLParser.cs (138) : }
+MiniSQLParser.cs (131) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
