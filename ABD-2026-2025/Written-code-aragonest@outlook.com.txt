@@ -77,55 +77,71 @@ Update.cs (15) : Table = table;
 Update.cs (16) : Columns = columnNames;
 Update.cs (17) : Where = where;
 Update.cs (23) : database.Update(Table,Columns,Where);
-Manager.cs (24) : Profile p = ProfileByName(m_username);
+Manager.cs (24) : Profile p = ProfileByUser(m_username);
 Manager.cs (25) : if (p == null) { return false; }
 Manager.cs (27) : return p.Name == Profile.AdminProfileName;
-Manager.cs (33) : User u = UserByName(m_username);
+Manager.cs (33) : User u = UserByName(username);
 Manager.cs (34) : if (u == null) { return false; }
 Manager.cs (35) : string contraseña = Encryption.Encrypt(password);
 Manager.cs (37) : return u.EncryptedPassword == contraseña;
-Manager.cs (46) : Profile p = ProfileByName(m_username);
+Manager.cs (46) : Profile p = ProfileByName(profileName);
 Manager.cs (47) : if (p == null) { return; }
 Manager.cs (48) : if (table == null) { return; }
 Manager.cs (49) : p.GrantPrivilege(table, privilege);
-Manager.cs (58) : Profile p = ProfileByName(m_username);
+Manager.cs (58) : Profile p = ProfileByName(profileName);
 Manager.cs (59) : if (p == null) { return; }
 Manager.cs (60) : if (table == null) { return; }
-Manager.cs (61) : p.GrantPrivilege(table, privilege);
-Manager.cs (69) : Profile p = ProfileByName(m_username);
-Manager.cs (70) : if (p == null) { return false; }
-Manager.cs (71) : if (table == null) { return false; }
-Manager.cs (72) : return p.IsGrantedPrivilege(table, privilege);
-Manager.cs (80) : if (profile != null)
-Manager.cs (81) : {
-Manager.cs (82) : if (ProfileByName(profile.Name) != null) { Profiles.Add(profile); }
-Manager.cs (84) : }
-Manager.cs (93) : foreach (var p in Profiles)
-Manager.cs (94) : {
-Manager.cs (95) : foreach (User u in p.Users)
-Manager.cs (96) : {
-Manager.cs (97) : if (u.Username == username)
-Manager.cs (98) : {
-Manager.cs (99) : return u;
-Manager.cs (100) : }
-Manager.cs (101) : }
-Manager.cs (102) : }
-Manager.cs (111) : foreach (var Usser in Profiles)
-Manager.cs (112) : {
-Manager.cs (113) : if (Usser.Name == m_username)
-Manager.cs (114) : {
-Manager.cs (115) : return Usser;
-Manager.cs (116) : }
-Manager.cs (117) : }
-Manager.cs (125) : User user = UserByName(username);
-Manager.cs (126) : return ProfileByName(user.Username);
-Manager.cs (134) : Profile p = ProfileByName(profileName);
-Manager.cs (135) : if (p == null) { return false; }
-Manager.cs (136) : Profiles.Remove(p);
-Profile.cs (21) : List<Privilege> privileges=new List<Privilege>();
+Manager.cs (61) : p.RevokePrivilege(table, privilege);
+Manager.cs (69) : Profile p = ProfileByUser(username);
+Manager.cs (70) : if (p == null)
+Manager.cs (71) : {
+Manager.cs (72) : return false;
+Manager.cs (73) : }
+Manager.cs (74) : if (table == null)
+Manager.cs (75) : {
+Manager.cs (76) : return false;
+Manager.cs (77) : }
+Manager.cs (78) : return p.IsGrantedPrivilege(table, privilege);
+Manager.cs (86) : if (profile != null)
+Manager.cs (87) : {
+Manager.cs (88) : if (ProfileByName(profile.Name) == null)
+Manager.cs (89) : {
+Manager.cs (90) : Profiles.Add(profile);
+Manager.cs (91) : }
+Manager.cs (93) : }
+Manager.cs (102) : foreach (var p in Profiles)
+Manager.cs (103) : {
+Manager.cs (104) : foreach (User u in p.Users)
+Manager.cs (105) : {
+Manager.cs (106) : if (u.Username == username)
+Manager.cs (107) : {
+Manager.cs (108) : return u;
+Manager.cs (109) : }
+Manager.cs (110) : }
+Manager.cs (111) : }
+Manager.cs (120) : foreach (var Profile in Profiles)
+Manager.cs (121) : {
+Manager.cs (122) : if (Profile.Name == profileName)
+Manager.cs (123) : {
+Manager.cs (124) : return Profile;
+Manager.cs (125) : }
+Manager.cs (126) : }
+Manager.cs (135) : foreach (var p in Profiles)
+Manager.cs (136) : {
+Manager.cs (137) : foreach (User u in p.Users)
+Manager.cs (138) : {
+Manager.cs (139) : if (username == u.Username) { return p; }
+Manager.cs (140) : }
+Manager.cs (141) : }
+Manager.cs (143) : return null;
+Manager.cs (151) : Profile p = ProfileByName(profileName);
+Manager.cs (152) : if (p == null) { return false; }
+Manager.cs (153) : Profiles.Remove(p);
+Manager.cs (154) : return true;
+Profile.cs (21) : List<Privilege> privileges = new List<Privilege>();
 Profile.cs (22) : if (!PrivilegesOn.ContainsKey(table))
 Profile.cs (23) : {
-Profile.cs (24) : PrivilegesOn[table]=new List<Privilege>();
+Profile.cs (24) : PrivilegesOn[table] = new List<Privilege>();
 Profile.cs (25) : }
 Profile.cs (26) : if (!PrivilegesOn[table].Contains(privilege))
 Profile.cs (27) : {
