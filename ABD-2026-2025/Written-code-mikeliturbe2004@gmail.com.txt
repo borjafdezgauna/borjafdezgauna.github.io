@@ -1,10 +1,12 @@
 ColumnDefinition.cs (18) : this.Type = type;
 ColumnDefinition.cs (19) : this.Name = name;
-ColumnDefinition.cs (51) : return Name + "->" + Type;
+ColumnDefinition.cs (51) : return Encode(Name) + "->" + Type;
 ColumnDefinition.cs (59) : string[] parts = value.Split("->");
-ColumnDefinition.cs (61) : string name = Decode(parts[0]);
-ColumnDefinition.cs (63) : DataType type = (DataType)Enum.Parse(typeof(DataType), parts[1]);
-ColumnDefinition.cs (65) : return new ColumnDefinition(type, name);
+ColumnDefinition.cs (61) : if (parts.Length != 2)
+ColumnDefinition.cs (62) : return null;
+ColumnDefinition.cs (64) : string name = Decode(parts[0]);
+ColumnDefinition.cs (66) : DataType type = (DataType)Enum.Parse(typeof(DataType), parts[1], true);
+ColumnDefinition.cs (68) : return new ColumnDefinition(type, name);
 Database.cs (71) : if (ColumnDefinition == null || ColumnDefinition.Count == 0)
 Database.cs (72) : {
 Database.cs (73) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
@@ -54,10 +56,19 @@ Row.cs (65) : ColumnDefinition.DataType type = ColumnDefinitions[i].Type;
 Row.cs (67) : return condition.IsTrue(value, type);
 Row.cs (68) : }
 Row.cs (69) : }
-Row.cs (102) : return string.Join(":", Values);
-Row.cs (110) : string[] parts = value.Split(':');
-Row.cs (111) : List<string> values = new List<string>(parts);
-Row.cs (113) : return new Row(columns, values);
+Row.cs (102) : List<string> result = new List<string>();
+Row.cs (104) : foreach (string v in Values)
+Row.cs (105) : {
+Row.cs (106) : result.Add(Encode(v));
+Row.cs (107) : }
+Row.cs (109) : return string.Join(":", result);
+Row.cs (117) : string[] parts = value.Split(':');
+Row.cs (118) : List<string> values = new List<string>();
+Row.cs (120) : foreach (string p in parts)
+Row.cs (121) : {
+Row.cs (122) : values.Add(Decode(p));
+Row.cs (123) : }
+Row.cs (125) : return new Row(columns, values);
 CreateTable.cs (17) : Table = table;
 CreateTable.cs (18) : ColumnsParameters = columns;
 CreateTable.cs (26) : database.CreateTable(Table, ColumnsParameters);
@@ -99,15 +110,25 @@ MiniSQLParser.cs (67) : {
 MiniSQLParser.cs (68) : string[] parts = columnsText.Split(',');
 MiniSQLParser.cs (70) : foreach (string part in parts)
 MiniSQLParser.cs (71) : {
-MiniSQLParser.cs (72) : string[] columnParts = part.Split(':');
-MiniSQLParser.cs (73) : string columnName = columnParts[0].Trim();
-MiniSQLParser.cs (74) : string columnType = columnParts[1].Trim();
-MiniSQLParser.cs (76) : ColumnDefinition.DataType type = (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), columnType, true);
-MiniSQLParser.cs (78) : columns.Add(new ColumnDefinition(type, columnName));
-MiniSQLParser.cs (79) : }
-MiniSQLParser.cs (80) : }
-MiniSQLParser.cs (82) : return new CreateTable(table, columns);
-MiniSQLParser.cs (83) : }
-MiniSQLParser.cs (85) : // UPDATETABLE
-MiniSQLParser.cs (86) : match = Regex.Match(miniSQLQuery, updateTablePattern, RegexOptions.IgnoreCase);
+MiniSQLParser.cs (72) : string[] columnParts = Regex.Split(part.Trim(), @"\s+");
+MiniSQLParser.cs (74) : if (columnParts.Length != 2)
+MiniSQLParser.cs (75) : return null;
+MiniSQLParser.cs (77) : string columnName = columnParts[0].Trim();
+MiniSQLParser.cs (78) : string columnType = columnParts[1].Trim();
+MiniSQLParser.cs (80) : ColumnDefinition.DataType type;
+MiniSQLParser.cs (82) : if (columnType.Equals("TEXT", StringComparison.OrdinalIgnoreCase))
+MiniSQLParser.cs (83) : type = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (84) : else if (columnType.Equals("INT", StringComparison.OrdinalIgnoreCase))
+MiniSQLParser.cs (85) : type = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (86) : else if (columnType.Equals("DOUBLE", StringComparison.OrdinalIgnoreCase))
+MiniSQLParser.cs (87) : type = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (88) : else
+MiniSQLParser.cs (89) : return null;
+MiniSQLParser.cs (91) : columns.Add(new ColumnDefinition(type, columnName));
+MiniSQLParser.cs (92) : }
+MiniSQLParser.cs (93) : }
+MiniSQLParser.cs (95) : return new CreateTable(table, columns);
+MiniSQLParser.cs (96) : }
+MiniSQLParser.cs (98) : // UPDATETABLE
+MiniSQLParser.cs (99) : match = Regex.Match(miniSQLQuery, updateTablePattern, RegexOptions.IgnoreCase);
 SetValue.cs (17) : this.ColumnName = column;

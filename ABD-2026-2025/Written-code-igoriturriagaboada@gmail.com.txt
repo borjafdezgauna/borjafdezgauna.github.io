@@ -182,15 +182,15 @@ Insert.cs (26) : return Constants.InsertSuccess;
 Insert.cs (27) : }
 Insert.cs (28) : return database.LastErrorMessage;
 MiniSQLParser.cs (5) : using System.Linq;
-MiniSQLParser.cs (17) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s*\(\s*('?\w+'?(?:\s*,\s*'?\w+'?\s*)*)\s*\)";
-MiniSQLParser.cs (128) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (17) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s*\(\s*((?:'[^']*'|""[^""]*""|[\w.-]+)(?:\s*,\s*(?:'[^']*'|""[^""]*""|[\w.-]+))*)\s*\)";
+MiniSQLParser.cs (128) : match = Regex.Match(miniSQLQuery, insertPattern, RegexOptions.IgnoreCase);
 MiniSQLParser.cs (129) : if(match.Success)
 MiniSQLParser.cs (130) : {
 MiniSQLParser.cs (131) : List<string> valores1 = match.Groups[2].Value.Split(",").ToList();
 MiniSQLParser.cs (132) : List<string> valores2 = new List<string>();
 MiniSQLParser.cs (133) : foreach (string texto in valores1)
 MiniSQLParser.cs (134) : {
-MiniSQLParser.cs (135) : string textoLimpio = texto.Replace("\'", "").Trim();
+MiniSQLParser.cs (135) : string textoLimpio = texto.Replace("\'", "").Replace("\"", "").Trim();
 MiniSQLParser.cs (136) : valores2.Add(textoLimpio);
 MiniSQLParser.cs (137) : }
 MiniSQLParser.cs (138) : return new Insert(match.Groups[1].Value, valores2);
