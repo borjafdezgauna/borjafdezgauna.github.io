@@ -238,7 +238,24 @@ Table.cs (222) : }
 Table.cs (225) : }
 CreateTable.cs (17) : Table = table;
 CreateTable.cs (18) : ColumnsParameters = columns;
-MiniSQLParser.cs (21) : const string createTablePattern = @"^CREATE\s+TABLE\s+(?<table>[a-zA-Z0-9]+)\s+\((?<columns>[a-zA-Z0-9]+\s+(?:INT|DOUBLE|TEXT)(?:,[a-zA-Z0-9]+\s+(?:INT|DOUBLE|TEXT))*)\)\s*;?\s*$";
+CreateTable.cs (24) : if (ColumnsParameters==null || ColumnsParameters.Count==0)
+CreateTable.cs (25) : {
+CreateTable.cs (26) : return Constants.DatabaseCreatedWithoutColumnsError;
+CreateTable.cs (27) : }
+CreateTable.cs (28) : else
+CreateTable.cs (29) : {
+CreateTable.cs (30) : database.CreateTable(Table,ColumnsParameters);
+CreateTable.cs (32) : if (string.IsNullOrEmpty(database.LastErrorMessage))
+CreateTable.cs (33) : {
+CreateTable.cs (34) : return Constants.CreateTableSuccess;
+CreateTable.cs (37) : return database.LastErrorMessage;
+CreateTable.cs (38) : }
+CreateTable.cs (39) : }
+Insert.cs (21) : if (string.IsNullOrEmpty(database.LastErrorMessage))
+Insert.cs (22) : {
+Insert.cs (23) : return Constants.InsertSuccess;
+Insert.cs (24) : }
+MiniSQLParser.cs (21) : const string createTablePattern = @"^CREATE\s+TABLE\s+(?<table>[a-zA-Z0-9]+)\s+\((?<columns>[a-zA-Z0-9]+\s+(?:INT|DOUBLE|TEXT)(?:,[a-zA-Z0-9]+\s+(?:INT|DOUBLE|TEXT))*)?\)\s*;?\s*$";
 MiniSQLParser.cs (23) : const string updateTablePattern = @"^UPDATE\s+(?<table>[a-zA-Z0-9]+)\s+SET\s+(?<assignments>[a-zA-Z0-9]+='[^']*'(?:,[a-zA-Z0-9]+='[^']*')*)(?:\s+WHERE\s+(?<column>[a-zA-Z0-9]+)(?<op>[<>=])(?<value>'[^']*'))?\s*;?\s*$";
 MiniSQLParser.cs (83) : match = Regex.Match(miniSQLQuery, createTablePattern);
 MiniSQLParser.cs (85) : if (match.Success)
@@ -289,3 +306,7 @@ MiniSQLParser.cs (141) : }
 MiniSQLParser.cs (142) : }
 MiniSQLParser.cs (143) : return new Update(table, columnsToUpdate, condition);
 MiniSQLParser.cs (144) : }
+Update.cs (25) : if (string.IsNullOrEmpty(database.LastErrorMessage))
+Update.cs (26) : {
+Update.cs (27) : return Constants.UpdateSuccess;
+Update.cs (28) : }

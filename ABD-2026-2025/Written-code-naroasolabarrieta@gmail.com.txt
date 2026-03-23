@@ -141,9 +141,31 @@ AddUser.cs (40) : User user = new User(Username, Password);
 AddUser.cs (41) : profile.Users.Add(user);
 AddUser.cs (43) : return Constants.AddUserSuccess;
 DeleteUser.cs (16) : this.Username = username;
-Grant.cs (18) : this.PrivilegeName = privilegeName;
-Grant.cs (19) : this.TableName = tableName;
-Grant.cs (20) : this.ProfileName = profileName;
+Grant.cs (1) : using DbManager.Parser;
+Grant.cs (2) : using DbManager.Security;
+Grant.cs (19) : this.PrivilegeName = privilegeName;
+Grant.cs (20) : this.TableName = tableName;
+Grant.cs (21) : this.ProfileName= profileName;
+Grant.cs (28) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (29) : if (profile == null)
+Grant.cs (30) : {
+Grant.cs (31) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (32) : }
+Grant.cs (33) : var table = database.TableByName(TableName);
+Grant.cs (34) : if (table == null)
+Grant.cs (35) : {
+Grant.cs (36) : return Constants.TableDoesNotExistError;
+Grant.cs (37) : }
+Grant.cs (38) : if (!Enum.TryParse<Privilege>(PrivilegeName, out var privilege))
+Grant.cs (39) : {
+Grant.cs (40) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (41) : }
+Grant.cs (42) : if (database.SecurityManager.IsGrantedPrivilege(ProfileName, TableName, privilege))
+Grant.cs (43) : {
+Grant.cs (44) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (45) : }
+Grant.cs (46) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
+Grant.cs (48) : return Constants.GrantPrivilegeSuccess;
 MiniSQLParser.cs (23) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*(=|<>|<|>|<=|>=)\s*(.+))?\s*$";
 MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(([a-zA-Z]+),([^,]+),([a-zA-Z]+)\)\s*$";
 MiniSQLParser.cs (100) : if (match.Success)

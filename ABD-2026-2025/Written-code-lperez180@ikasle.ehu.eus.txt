@@ -380,191 +380,194 @@ Insert.cs (30) : return database.LastErrorMessage;
 Insert.cs (31) : }
 Insert.cs (33) : return "Tuple added";
 MiniSQLParser.cs (2) : using System;
-MiniSQLParser.cs (15) : //SELECT columnas FROM tabla patrón
-MiniSQLParser.cs (16) : const string selectPattern = @"^SELECT\s+([a-zA-Z0-9\*,]+)\s+FROM\s+([a-zA-Z0-9]+)$";
-MiniSQLParser.cs (18) : //SELECT WHERE
-MiniSQLParser.cs (19) : const string selectWherePattern = @"^SELECT\s+([a-zA-Z0-9\*,]+)\s+FROM\s+([a-zA-Z0-9]+)\s+WHERE\s+([a-zA-Z0-9]+)\s*(<|>|=)\s*(.+)";
-MiniSQLParser.cs (21) : //INSERT INTO tabla VALUES columnas patrón
-MiniSQLParser.cs (24) : //DROP TABLE tabla patrón
-MiniSQLParser.cs (25) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z0-9]+)$";
-MiniSQLParser.cs (29) : const string createTablePattern = @"^CREATE\s+TABLE\s+(\w+)\s+\(\s*(\w+\s+(?:INT|DOUBLE|TEXT)(?:\s*,\s*\w+\s+(?:INT|DOUBLE|TEXT))*)\s*\)$";
-MiniSQLParser.cs (31) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(\w+=('[-]?\d+(\.\d+)?'|'[^']+')(?:,(\w+=('[-]?\d+(\.\d+)?'|'[^']+'))*)?)\s+WHERE\s+(\w+)(=|<|>)('[-]?\d+(\.\d+)?'|'[^']+')$";
-MiniSQLParser.cs (34) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)('-?\d+(\.\d+)?'|'[^']+')$";
-MiniSQLParser.cs (38) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
-MiniSQLParser.cs (40) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
-MiniSQLParser.cs (42) : //Captura la tabla, el privilegio y el perfil
-MiniSQLParser.cs (43) : const string grantPattern = @"^GRANT\s+(SELECT|INSERT|UPDATE|DELETE)\s+ON\s+([a-zA-Z0-9]+)\s+TO\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (17) : //SELECT columnas FROM tabla patrón
+MiniSQLParser.cs (18) : //Test con select (algo,   ) ERROR
+MiniSQLParser.cs (19) : const string selectPattern = @"^SELECT\s+([a-zA-Z0-9\*,]+)\s+FROM\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (21) : //SELECT WHERE
+MiniSQLParser.cs (22) : const string selectWherePattern= @"^SELECT\s+([a-zA-Z0-9\*,]+)\s+FROM\s+([a-zA-Z0-9]+)\s+WHERE\s+([a-zA-Z0-9]+)\s*(<|>|=)\s*(.+)";
+MiniSQLParser.cs (24) : //INSERT INTO tabla VALUES columnas patrón
+MiniSQLParser.cs (25) : const string insertPattern= @"^INSERT\s+INTO\s+(\w+)\s+VALUES\s*\((('[-]?\d+(\.\d+)?'|'[^']+')(?:,('[-]?\d+(\.\d+)?'|'[^']+'))*)\)$";
+MiniSQLParser.cs (27) : //DROP TABLE tabla patrón
+MiniSQLParser.cs (28) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (32) : const string createTablePattern = @"^CREATE\s+TABLE\s+(\w+)\s+\((\w+\s+(?:INT|DOUBLE|TEXT)(?:,\w+\s+(?:INT|DOUBLE|TEXT))*)?\)$";
+MiniSQLParser.cs (34) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(\w+=('[-]?\d+(\.\d+)?'|'[^']+')(?:,(\w+=('[-]?\d+(\.\d+)?'|'[^']+'))*)?)\s+WHERE\s+(\w+)(=|<|>)('[-]?\d+(\.\d+)?'|'[^']+')$";
+MiniSQLParser.cs (36) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)('-?\d+(\.\d+)?'|'[^']+')$";
+MiniSQLParser.cs (39) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (41) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (43) : //Captura la tabla, el privilegio y el perfil
+MiniSQLParser.cs (44) : const string grantPattern = @"^GRANT\s+(SELECT|INSERT|UPDATE|DELETE)\s+ON\s+([a-zA-Z0-9]+)\s+TO\s+([a-zA-Z0-9]+)$";
 MiniSQLParser.cs (46) : const string revokePattern = @"^REVOKE\s+(SELECT|INSERT|UPDATE|DELETE)\s+ON\s+([a-zA-Z0-9]+)\s+TO\s+([a-zA-Z0-9]+)$";
 MiniSQLParser.cs (48) : //Patrón para obtener ADD USER (usuario)(contraseña)(perfil) con espacio entre add y user y los paréntesis de luego
 MiniSQLParser.cs (49) : const string addUserPattern = @"^ADD\s+USER\s+\(([a-zA-Z0-9]+),\s*([a-zA-Z0-9]+),\s*([a-zA-Z0-9]+)\)$";
-MiniSQLParser.cs (51) : const string deleteUserPattern = @"^DELETE\s+USER\s+([a-zA-Z0-9]+)$";
-MiniSQLParser.cs (60) : if (miniSQLQuery == null)
-MiniSQLParser.cs (61) : {
-MiniSQLParser.cs (62) : return null;
-MiniSQLParser.cs (63) : }
-MiniSQLParser.cs (65) : Match matchSelect = Regex.Match(miniSQLQuery, selectPattern);
-MiniSQLParser.cs (68) : if (matchSelect.Success)
-MiniSQLParser.cs (69) : {
-MiniSQLParser.cs (70) : //Los group corresponden al grupo de paréntesis de la expresión regular de arriba
-MiniSQLParser.cs (71) : return new Select(matchSelect.Groups[2].Value, CommaSeparatedNames(matchSelect.Groups[1].Value));
-MiniSQLParser.cs (72) : }
-MiniSQLParser.cs (75) : Match matchSelectWhere = Regex.Match(miniSQLQuery, selectWherePattern);
-MiniSQLParser.cs (78) : if (matchSelectWhere.Success)
-MiniSQLParser.cs (79) : {
-MiniSQLParser.cs (80) : string tableName = matchSelectWhere.Groups[2].Value;
-MiniSQLParser.cs (81) : List<string> columns = CommaSeparatedNames(matchSelectWhere.Groups[1].Value);
-MiniSQLParser.cs (82) : string operador = matchSelectWhere.Groups[4].Value;
-MiniSQLParser.cs (83) : string col = matchSelectWhere.Groups[3].Value;
-MiniSQLParser.cs (84) : string valor = matchSelectWhere.Groups[5].Value;
-MiniSQLParser.cs (87) : if (valor.Contains(" ") && !valor.StartsWith("'"))
-MiniSQLParser.cs (88) : {
-MiniSQLParser.cs (89) : return null;
-MiniSQLParser.cs (91) : }
-MiniSQLParser.cs (92) : string valorLimpio = valor.Trim('\'');
-MiniSQLParser.cs (95) : Condition condicion = new Condition(col, operador, valorLimpio);
-MiniSQLParser.cs (96) : return new Select(tableName, columns, condicion);
-MiniSQLParser.cs (98) : }
-MiniSQLParser.cs (100) : Match matchInsert = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (102) : if (matchInsert.Success)
-MiniSQLParser.cs (103) : {
-MiniSQLParser.cs (104) : string tableName = matchInsert.Groups[1].Value.Trim();
-MiniSQLParser.cs (105) : string valores = matchInsert.Groups[2].Value;
-MiniSQLParser.cs (108) : List<string> valoresSucio = CommaSeparatedNames(valores);
-MiniSQLParser.cs (109) : List<string> valoresLimpio = new List<string>();
-MiniSQLParser.cs (111) : foreach (string v in valoresSucio)
-MiniSQLParser.cs (112) : {
-MiniSQLParser.cs (115) : {
-MiniSQLParser.cs (116) : return null;
-MiniSQLParser.cs (117) : }
-MiniSQLParser.cs (120) : {
-MiniSQLParser.cs (121) : return null;
-MiniSQLParser.cs (122) : }
-MiniSQLParser.cs (124) : }
-MiniSQLParser.cs (125) : return new Insert(tableName, valoresLimpio);
-MiniSQLParser.cs (126) : }
-MiniSQLParser.cs (129) : Match matchCreateTable = Regex.Match(miniSQLQuery, createTablePattern);
-MiniSQLParser.cs (131) : if (matchCreateTable.Success)
-MiniSQLParser.cs (132) : {
-MiniSQLParser.cs (133) : string tableName = matchCreateTable.Groups[1].Value;
-MiniSQLParser.cs (135) : string stringColumns = matchCreateTable.Groups[2].Value;
-MiniSQLParser.cs (137) : List<string> columnParts = CommaSeparatedNames(stringColumns);
-MiniSQLParser.cs (139) : List<ColumnDefinition> columnDefinitions = new List<ColumnDefinition>();
-MiniSQLParser.cs (141) : foreach (string s in columnParts)
-MiniSQLParser.cs (142) : {
-MiniSQLParser.cs (143) : string[] parts = s.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-MiniSQLParser.cs (145) : //Solo nombre y tipo
-MiniSQLParser.cs (146) : if (parts.Length == 2)
-MiniSQLParser.cs (147) : {
-MiniSQLParser.cs (148) : string name = parts[0];
-MiniSQLParser.cs (149) : string typeInt = "INT";
-MiniSQLParser.cs (150) : string typeDouble = "DOUBLE";
-MiniSQLParser.cs (151) : string typeTxt = "TEXT";
-MiniSQLParser.cs (153) : string type = parts[1];
-MiniSQLParser.cs (154) : if (type == typeInt)
-MiniSQLParser.cs (155) : {
-MiniSQLParser.cs (156) : type = "Int";
-MiniSQLParser.cs (157) : ColumnDefinition.DataType Rtype = (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), type, false);
-MiniSQLParser.cs (158) : columnDefinitions.Add(new ColumnDefinition(Rtype, name));
-MiniSQLParser.cs (159) : }
-MiniSQLParser.cs (160) : else if (type == typeDouble)
-MiniSQLParser.cs (161) : {
-MiniSQLParser.cs (162) : type = "Double";
-MiniSQLParser.cs (163) : ColumnDefinition.DataType Rtype = (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), type, false);
-MiniSQLParser.cs (164) : columnDefinitions.Add(new ColumnDefinition(Rtype, name));
-MiniSQLParser.cs (167) : {
-MiniSQLParser.cs (168) : type = "String";
-MiniSQLParser.cs (169) : ColumnDefinition.DataType Rtype = (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), type, false);
-MiniSQLParser.cs (170) : columnDefinitions.Add(new ColumnDefinition(Rtype, name));
-MiniSQLParser.cs (172) : }
-MiniSQLParser.cs (173) : else
-MiniSQLParser.cs (174) : {
-MiniSQLParser.cs (175) : return null;
-MiniSQLParser.cs (176) : }
-MiniSQLParser.cs (177) : //Aquí faltaría una parte pero habría algo, así que es error
-MiniSQLParser.cs (178) : }
-MiniSQLParser.cs (179) : else if (parts.Length != 0)
-MiniSQLParser.cs (180) : {
-MiniSQLParser.cs (181) : return null;
-MiniSQLParser.cs (182) : }
-MiniSQLParser.cs (183) : }
-MiniSQLParser.cs (185) : return new CreateTable(tableName, columnDefinitions);
-MiniSQLParser.cs (186) : }
-MiniSQLParser.cs (188) : //A ver si esto arregla el IncorrectCapitalization
-MiniSQLParser.cs (189) : Match matchDrop = Regex.Match(miniSQLQuery, dropTablePattern);
-MiniSQLParser.cs (192) : if (matchDrop.Success)
-MiniSQLParser.cs (193) : {
-MiniSQLParser.cs (194) : return new DropTable(matchDrop.Groups[1].Value);
-MiniSQLParser.cs (195) : }
-MiniSQLParser.cs (198) : Match matchUpdate = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (201) : if (matchUpdate.Success)
-MiniSQLParser.cs (202) : {
-MiniSQLParser.cs (203) : string tableName = matchUpdate.Groups[1].Value;
-MiniSQLParser.cs (205) : List<SetValue> setValues = new List<SetValue>();
-MiniSQLParser.cs (207) : foreach (string p in parts)
-MiniSQLParser.cs (208) : {
-MiniSQLParser.cs (209) : string[] v = p.Split('=');
-MiniSQLParser.cs (213) : {
-MiniSQLParser.cs (215) : }
-MiniSQLParser.cs (226) : if (startsWith != endsWith)
-MiniSQLParser.cs (227) : {
-MiniSQLParser.cs (228) : return null;
-MiniSQLParser.cs (229) : }
-MiniSQLParser.cs (230) : if (!startsWith && valores.Contains(" "))
-MiniSQLParser.cs (231) : {
-MiniSQLParser.cs (232) : return null;
-MiniSQLParser.cs (233) : }
-MiniSQLParser.cs (241) : string column = matchUpdate.Groups[8].Value;
-MiniSQLParser.cs (242) : string operador = matchUpdate.Groups[9].Value;
-MiniSQLParser.cs (243) : string value = matchUpdate.Groups[10].Value.Trim('\'');
-MiniSQLParser.cs (244) : Condition condicion = new Condition(column, operador, value);
-MiniSQLParser.cs (245) : return new Update(tableName, setValues, condicion);
-MiniSQLParser.cs (248) : }
-MiniSQLParser.cs (251) : Match matchDelete = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (254) : if (matchDelete.Success)
-MiniSQLParser.cs (255) : {
-MiniSQLParser.cs (256) : //Mejor simplificar en cuatro grupos los operandos para no tener que hacer los if de =<>
-MiniSQLParser.cs (257) : string tableName = matchDelete.Groups[1].Value.Trim();
-MiniSQLParser.cs (258) : string column = matchDelete.Groups[2].Value.Trim();
-MiniSQLParser.cs (259) : string operador = matchDelete.Groups[3].Value.Trim();
-MiniSQLParser.cs (260) : string valor = matchDelete.Groups[4].Value.Trim();
-MiniSQLParser.cs (263) : if (valor.Contains(" ") && !valor.StartsWith("'"))
-MiniSQLParser.cs (264) : {
-MiniSQLParser.cs (265) : return null;
-MiniSQLParser.cs (267) : }
-MiniSQLParser.cs (268) : string valorLimpio = valor.Trim('\'');
-MiniSQLParser.cs (271) : Condition condicion = new Condition(column, operador, valorLimpio);
-MiniSQLParser.cs (272) : return new Delete(tableName, condicion);
-MiniSQLParser.cs (274) : }
-MiniSQLParser.cs (278) : Match matchCreateSecurityProfile = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
-MiniSQLParser.cs (280) : if (matchCreateSecurityProfile.Success)
+MiniSQLParser.cs (50) : const string deleteUserPattern = @"^DELETE\s+USER\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (62) : if (miniSQLQuery==null)
+MiniSQLParser.cs (63) : {
+MiniSQLParser.cs (64) : return null;
+MiniSQLParser.cs (65) : }
+MiniSQLParser.cs (69) : Match matchSelect= Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (74) : if (matchSelect.Success)
+MiniSQLParser.cs (75) : {
+MiniSQLParser.cs (76) : //Los group corresponden al grupo de paréntesis de la expresión regular de arriba
+MiniSQLParser.cs (77) : return new Select(matchSelect.Groups[2].Value, CommaSeparatedNames(matchSelect.Groups[1].Value));
+MiniSQLParser.cs (78) : }
+MiniSQLParser.cs (83) : Match matchSelectWhere= Regex.Match(miniSQLQuery, selectWherePattern);
+MiniSQLParser.cs (88) : if(matchSelectWhere.Success)
+MiniSQLParser.cs (89) : {
+MiniSQLParser.cs (90) : string tableName= matchSelectWhere.Groups[2].Value;
+MiniSQLParser.cs (91) : List<string> columns= CommaSeparatedNames(matchSelectWhere.Groups[1].Value);
+MiniSQLParser.cs (92) : string operador= matchSelectWhere.Groups[4].Value;
+MiniSQLParser.cs (93) : string col= matchSelectWhere.Groups[3].Value;
+MiniSQLParser.cs (94) : string valor= matchSelectWhere.Groups[5].Value;
+MiniSQLParser.cs (99) : if (valor.Contains(" ") && !valor.StartsWith("'"))
+MiniSQLParser.cs (100) : {
+MiniSQLParser.cs (101) : return null;
+MiniSQLParser.cs (103) : }
+MiniSQLParser.cs (104) : string valorLimpio= valor.Trim('\'');
+MiniSQLParser.cs (109) : Condition condicion= new Condition(col, operador, valorLimpio);
+MiniSQLParser.cs (110) : return new Select(tableName, columns, condicion);
+MiniSQLParser.cs (113) : }
+MiniSQLParser.cs (118) : Match matchInsert= Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (123) : if (matchInsert.Success)
+MiniSQLParser.cs (124) : {
+MiniSQLParser.cs (129) : string tableName= matchInsert.Groups[1].Value.Trim();
+MiniSQLParser.cs (130) : string valores= matchInsert.Groups[2].Value;
+MiniSQLParser.cs (135) : List<string> valoresSucio= CommaSeparatedNames(valores);
+MiniSQLParser.cs (136) : List<string> valoresLimpio= new List<string>();
+MiniSQLParser.cs (145) : foreach (string v in valoresSucio)
+MiniSQLParser.cs (146) : {
+MiniSQLParser.cs (149) : {
+MiniSQLParser.cs (150) : return null;
+MiniSQLParser.cs (151) : }
+MiniSQLParser.cs (154) : {
+MiniSQLParser.cs (155) : return null;
+MiniSQLParser.cs (156) : }
+MiniSQLParser.cs (158) : }
+MiniSQLParser.cs (159) : return new Insert(tableName, valoresLimpio);
+MiniSQLParser.cs (160) : }
+MiniSQLParser.cs (165) : Match matchCreateTable= Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (170) : if (matchCreateTable.Success)
+MiniSQLParser.cs (171) : {
+MiniSQLParser.cs (172) : string tableName= matchCreateTable.Groups[1].Value;
+MiniSQLParser.cs (174) : string stringColumns= matchCreateTable.Groups[2].Value;
+MiniSQLParser.cs (176) : List<string> columnParts= CommaSeparatedNames(stringColumns);
+MiniSQLParser.cs (178) : List<ColumnDefinition> columnDefinitions= new List<ColumnDefinition>();
+MiniSQLParser.cs (180) : foreach(string s in columnParts)
+MiniSQLParser.cs (181) : {
+MiniSQLParser.cs (182) : string[] parts= s.Split(new[]{ ' ' }, StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (184) : //Solo nombre y tipo
+MiniSQLParser.cs (185) : if (parts.Length==2)
+MiniSQLParser.cs (186) : {
+MiniSQLParser.cs (188) : string name= parts[0];
+MiniSQLParser.cs (189) : string typeInt= "INT";
+MiniSQLParser.cs (190) : string typeDouble= "DOUBLE";
+MiniSQLParser.cs (191) : string typeTxt= "TEXT";
+MiniSQLParser.cs (193) : string type= parts[1];
+MiniSQLParser.cs (194) : if (type==typeInt)
+MiniSQLParser.cs (195) : {
+MiniSQLParser.cs (196) : type= "Int";
+MiniSQLParser.cs (197) : ColumnDefinition.DataType Rtype= (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), type, false);
+MiniSQLParser.cs (198) : columnDefinitions.Add(new ColumnDefinition(Rtype, name));
+MiniSQLParser.cs (199) : }
+MiniSQLParser.cs (200) : else if (type==typeDouble)
+MiniSQLParser.cs (201) : {
+MiniSQLParser.cs (202) : type="Double";
+MiniSQLParser.cs (203) : ColumnDefinition.DataType Rtype= (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), type, false);
+MiniSQLParser.cs (204) : columnDefinitions.Add(new ColumnDefinition(Rtype, name));
+MiniSQLParser.cs (206) : }else if (type== typeTxt)
+MiniSQLParser.cs (207) : {
+MiniSQLParser.cs (208) : type="String";
+MiniSQLParser.cs (209) : ColumnDefinition.DataType Rtype= (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), type, false);
+MiniSQLParser.cs (210) : columnDefinitions.Add(new ColumnDefinition(Rtype, name));
+MiniSQLParser.cs (212) : }
+MiniSQLParser.cs (213) : else
+MiniSQLParser.cs (214) : {
+MiniSQLParser.cs (215) : return null;
+MiniSQLParser.cs (216) : }
+MiniSQLParser.cs (217) : //Aquí faltaría una parte pero habría algo, así que es error
+MiniSQLParser.cs (218) : }
+MiniSQLParser.cs (219) : else if (parts.Length!=0)
+MiniSQLParser.cs (220) : {
+MiniSQLParser.cs (221) : return null;
+MiniSQLParser.cs (222) : }
+MiniSQLParser.cs (223) : }
+MiniSQLParser.cs (225) : return  new CreateTable(tableName, columnDefinitions);
+MiniSQLParser.cs (226) : }
+MiniSQLParser.cs (228) : //A ver si esto arregla el IncorrectCapitalization
+MiniSQLParser.cs (229) : Match matchDrop= Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (234) : if (matchDrop.Success)
+MiniSQLParser.cs (235) : {
+MiniSQLParser.cs (236) : return new DropTable(matchDrop.Groups[1].Value);
+MiniSQLParser.cs (237) : }
+MiniSQLParser.cs (242) : Match matchUpdate = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (247) : if (matchUpdate.Success)
+MiniSQLParser.cs (248) : {
+MiniSQLParser.cs (249) : string tableName= matchUpdate.Groups[1].Value;
+MiniSQLParser.cs (251) : List<SetValue> setValues= new List<SetValue>();
+MiniSQLParser.cs (253) : foreach(string p in parts)
+MiniSQLParser.cs (254) : {
+MiniSQLParser.cs (255) : string[] v= p.Split('=');
+MiniSQLParser.cs (261) : {
+MiniSQLParser.cs (263) : }
+MiniSQLParser.cs (280) : if (startsWith!=endsWith)
 MiniSQLParser.cs (281) : {
-MiniSQLParser.cs (282) : return new CreateSecurityProfile(matchCreateSecurityProfile.Groups[1].Value);
+MiniSQLParser.cs (282) : return null;
 MiniSQLParser.cs (283) : }
-MiniSQLParser.cs (285) : Match matchDropSecurityProfile = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
-MiniSQLParser.cs (287) : if (matchDropSecurityProfile.Success)
-MiniSQLParser.cs (288) : {
-MiniSQLParser.cs (289) : return new DropSecurityProfile(matchDropSecurityProfile.Groups[1].Value);
-MiniSQLParser.cs (290) : }
-MiniSQLParser.cs (292) : Match matchGrant = Regex.Match(miniSQLQuery, grantPattern);
-MiniSQLParser.cs (294) : if (matchGrant.Success)
-MiniSQLParser.cs (295) : {
-MiniSQLParser.cs (296) : return new Grant(matchGrant.Groups[1].Value, matchGrant.Groups[2].Value, matchGrant.Groups[3].Value);
-MiniSQLParser.cs (297) : }
-MiniSQLParser.cs (299) : Match matchRevoke = Regex.Match(miniSQLQuery, revokePattern);
-MiniSQLParser.cs (301) : if (matchRevoke.Success)
-MiniSQLParser.cs (302) : {
-MiniSQLParser.cs (303) : return new Revoke(matchRevoke.Groups[1].Value, matchRevoke.Groups[2].Value, matchRevoke.Groups[3].Value);
-MiniSQLParser.cs (304) : }
-MiniSQLParser.cs (306) : Match matchAddUser = Regex.Match(miniSQLQuery, addUserPattern);
-MiniSQLParser.cs (308) : if (matchAddUser.Success)
-MiniSQLParser.cs (309) : {
-MiniSQLParser.cs (310) : return new AddUser(matchAddUser.Groups[1].Value, matchAddUser.Groups[2].Value, matchAddUser.Groups[3].Value);
-MiniSQLParser.cs (311) : }
-MiniSQLParser.cs (314) : Match matchDeleteUser = Regex.Match(miniSQLQuery, deleteUserPattern);
-MiniSQLParser.cs (317) : if (matchDeleteUser.Success)
-MiniSQLParser.cs (318) : {
-MiniSQLParser.cs (319) : return new DeleteUser(matchDeleteUser.Groups[1].Value);
-MiniSQLParser.cs (320) : }
+MiniSQLParser.cs (284) : if (!startsWith && valores.Contains(" "))
+MiniSQLParser.cs (285) : {
+MiniSQLParser.cs (286) : return null;
+MiniSQLParser.cs (287) : }
+MiniSQLParser.cs (299) : string column= matchUpdate.Groups[8].Value;
+MiniSQLParser.cs (300) : string operador= matchUpdate.Groups[9].Value;
+MiniSQLParser.cs (301) : string value= matchUpdate.Groups[10].Value.Trim('\'');
+MiniSQLParser.cs (302) : Condition condicion= new Condition(column, operador, value);
+MiniSQLParser.cs (303) : return new Update(tableName, setValues, condicion);
+MiniSQLParser.cs (308) : }
+MiniSQLParser.cs (313) : Match matchDelete = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (318) : if (matchDelete.Success)
+MiniSQLParser.cs (319) : {
+MiniSQLParser.cs (320) : //Mejor simplificar en cuatro grupos los operandos para no tener que hacer los if de =<>
+MiniSQLParser.cs (321) : string tableName= matchDelete.Groups[1].Value.Trim();
+MiniSQLParser.cs (322) : string column= matchDelete.Groups[2].Value.Trim();
+MiniSQLParser.cs (323) : string operador= matchDelete.Groups[3].Value.Trim();
+MiniSQLParser.cs (324) : string valor= matchDelete.Groups[4].Value.Trim();
+MiniSQLParser.cs (329) : if (valor.Contains(" ") && !valor.StartsWith("'"))
+MiniSQLParser.cs (330) : {
+MiniSQLParser.cs (331) : return null;
+MiniSQLParser.cs (333) : }
+MiniSQLParser.cs (334) : string valorLimpio= valor.Trim('\'');
+MiniSQLParser.cs (339) : Condition condicion= new Condition(column, operador, valorLimpio);
+MiniSQLParser.cs (340) : return new Delete(tableName, condicion);
+MiniSQLParser.cs (342) : }
+MiniSQLParser.cs (347) : Match matchCreateSecurityProfile= Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (350) : if (matchCreateSecurityProfile.Success)
+MiniSQLParser.cs (351) : {
+MiniSQLParser.cs (352) : return new CreateSecurityProfile(matchCreateSecurityProfile.Groups[1].Value);
+MiniSQLParser.cs (353) : }
+MiniSQLParser.cs (356) : Match matchDropSecurityProfile= Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (359) : if (matchDropSecurityProfile.Success)
+MiniSQLParser.cs (360) : {
+MiniSQLParser.cs (361) : return new DropSecurityProfile(matchDropSecurityProfile.Groups[1].Value);
+MiniSQLParser.cs (362) : }
+MiniSQLParser.cs (365) : Match matchGrant= Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (368) : if (matchGrant.Success)
+MiniSQLParser.cs (369) : {
+MiniSQLParser.cs (370) : return new Grant(matchGrant.Groups[1].Value, matchGrant.Groups[2].Value, matchGrant.Groups[3].Value);
+MiniSQLParser.cs (371) : }
+MiniSQLParser.cs (374) : Match matchRevoke= Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (377) : if (matchRevoke.Success)
+MiniSQLParser.cs (378) : {
+MiniSQLParser.cs (379) : return new Revoke(matchRevoke.Groups[1].Value, matchRevoke.Groups[2].Value, matchRevoke.Groups[3].Value);
+MiniSQLParser.cs (380) : }
+MiniSQLParser.cs (383) : Match matchAddUser= Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (386) : if (matchAddUser.Success)
+MiniSQLParser.cs (387) : {
+MiniSQLParser.cs (388) : return new AddUser(matchAddUser.Groups[1].Value, matchAddUser.Groups[2].Value, matchAddUser.Groups[3].Value);
+MiniSQLParser.cs (389) : }
+MiniSQLParser.cs (394) : Match matchDeleteUser= Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (399) : if (matchDeleteUser.Success)
+MiniSQLParser.cs (400) : {
+MiniSQLParser.cs (401) : return new DeleteUser(matchDeleteUser.Groups[1].Value);
+MiniSQLParser.cs (402) : }
 Revoke.cs (5) : using DbManager.Security;
 Revoke.cs (19) : PrivilegeName= privilegeName;
 Revoke.cs (20) : TableName=tableName;
