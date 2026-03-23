@@ -356,33 +356,15 @@ MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (17) : if (string.IsNullOrWhiteSpace(miniSQLQuery))
 MiniSQLParser.cs (18) : return null;
 MiniSQLParser.cs (21) : const string selectPattern =
-MiniSQLParser.cs (22) : @"^\s*SELECT\s+(?<cols>\*|[A-Za-z][A-Za-z0-9_]*(\s*,\s*[A-Za-z][A-Za-z0-9_]*)*)\s+" +
-MiniSQLParser.cs (23) : @"FROM\s+(?<table>[A-Za-z][A-Za-z0-9_]*)\s*" +
-MiniSQLParser.cs (24) : @"(?:(?:WHERE\s+(?<wcol>[A-Za-z][A-Za-z0-9_]*)\s*(?<wop>=|!=|<=|>=|<|>)\s*(?<wval>'[^']*'|[^;\s]+)\s*))?" +
-MiniSQLParser.cs (25) : @";?\s*$";
 MiniSQLParser.cs (28) : const string insertPattern =
-MiniSQLParser.cs (29) : @"^\s*INSERT\s+INTO\s+(?<table>[A-Za-z][A-Za-z0-9_]*)\s+" +
-MiniSQLParser.cs (30) : @"VALUES\s*\(\s*(?<vals>.*)\s*\)\s*;?\s*$";
 MiniSQLParser.cs (33) : const string dropTablePattern =
-MiniSQLParser.cs (34) : @"^\s*DROP\s+TABLE\s+(?<table>[A-Za-z][A-Za-z0-9_]*)\s*;?\s*$";
 MiniSQLParser.cs (36) : const string createTablePattern =
-MiniSQLParser.cs (37) : @"^\s*CREATE\s+TABLE\s+(?<table>[A-Za-z][A-Za-z0-9_]*)\s*" +
-MiniSQLParser.cs (38) : @"\(\s*(?<cols>.+?)\s*\)\s*;?\s*$";
 MiniSQLParser.cs (41) : const string updateTablePattern =
-MiniSQLParser.cs (42) : @"^\s*UPDATE\s+(?<table>[A-Za-z][A-Za-z0-9_]*)\s+" +
-MiniSQLParser.cs (43) : @"SET\s+(?<set>.+?)\s+" +
-MiniSQLParser.cs (44) : @"WHERE\s+(?<wcol>[A-Za-z][A-Za-z0-9_]*)\s*(?<wop>=|!=|<=|>=|<|>)\s*(?<wval>'[^']*'|[^;\s]+)\s*;?\s*$";
 MiniSQLParser.cs (47) : const string deletePattern =
-MiniSQLParser.cs (48) : @"^\s*DELETE\s+FROM\s+(?<table>[A-Za-z][A-Za-z0-9_]*)\s+" +
-MiniSQLParser.cs (49) : @"WHERE\s+(?<wcol>[A-Za-z][A-Za-z0-9_]*)\s*(?<wop>=|!=|<=|>=|<|>)\s*(?<wval>'[^']*'|[^;\s]+)\s*;?\s*$";
 MiniSQLParser.cs (52) : const string createSecurityProfilePattern =
-MiniSQLParser.cs (53) : @"^\s*CREATE\s+SECURITY\s+PROFILE\s+(?<profile>[A-Za-z][A-Za-z0-9_]*)\s*;?\s*$";
 MiniSQLParser.cs (55) : const string dropSecurityProfilePattern =
-MiniSQLParser.cs (56) : @"^\s*DROP\s+SECURITY\s+PROFILE\s+(?<profile>[A-Za-z][A-Za-z0-9_]*)\s*;?\s*$";
 MiniSQLParser.cs (58) : const string grantPattern =
-MiniSQLParser.cs (59) : @"^\s*GRANT\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[A-Za-z][A-Za-z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (61) : const string revokePattern =
-MiniSQLParser.cs (62) : @"^\s*REVOKE\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[A-Za-z][A-Za-z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (65) : const string addUserPattern =
 MiniSQLParser.cs (66) : @"^\s*ADD\s+USER\s*\(\s*(?<username>[A-Za-z][A-Za-z0-9]*)\s*,\s*(?<password>[^,\)\s]+)\s*,\s*(?<profile>[A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$";
 MiniSQLParser.cs (69) : const string deleteUserPattern =
@@ -561,14 +543,12 @@ MiniSQLParser.cs (309) : if (string.IsNullOrEmpty(item))
 MiniSQLParser.cs (310) : continue;
 MiniSQLParser.cs (312) : // "TYPE NAME"
 MiniSQLParser.cs (313) : string[] tokens = Regex.Split(item, @"\s+");
-MiniSQLParser.cs (314) : if (tokens.Length < 2)
 MiniSQLParser.cs (315) : return null;
-MiniSQLParser.cs (317) : string typeText = tokens[0].Trim();
 MiniSQLParser.cs (318) : string nameText = tokens[1].Trim();
 MiniSQLParser.cs (320) : ColumnDefinition.DataType dt;
 MiniSQLParser.cs (324) : else return null;
 MiniSQLParser.cs (326) : cols.Add(new ColumnDefinition(dt, nameText));
-MiniSQLParser.cs (329) : return cols;
+MiniSQLParser.cs (331) : return cols;
 Revoke.cs (3) : using DbManager.Security;
 Revoke.cs (9) : public string PrivilegeName { get; private set; }
 Revoke.cs (10) : public string TableName { get; private set; }
@@ -691,15 +671,5 @@ Profile.cs (52) : if (string.IsNullOrWhiteSpace(table))
 Profile.cs (53) : return false;
 Profile.cs (55) : if (!PrivilegesOn.TryGetValue(table, out List<Privilege> list) || list == null)
 Profile.cs (58) : return list.Contains(privilege);
-User.cs (14) : Username = username;
-User.cs (16) : using (SHA256 sha256 = SHA256.Create())
-User.cs (17) : {
-User.cs (18) : byte[] bytes = Encoding.UTF8.GetBytes(password ?? string.Empty);
-User.cs (19) : byte[] hash = sha256.ComputeHash(bytes);
-User.cs (21) : StringBuilder sb = new StringBuilder(hash.Length * 2);
-User.cs (22) : for (int i = 0; i < hash.Length; i++)
-User.cs (23) : {
-User.cs (24) : sb.Append(hash[i].ToString("x2"));
-User.cs (25) : }
-User.cs (27) : EncryptedPassword = sb.ToString();
-User.cs (28) : }
+User.cs (15) : {
+User.cs (20) : {
