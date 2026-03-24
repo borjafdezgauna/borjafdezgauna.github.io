@@ -210,17 +210,40 @@ Table.cs (41) : Rows.Add(row);
 Table.cs (42) : }
 Table.cs (50) : return Rows.Count;
 CreateTable.cs (18) : this.Table= table;
-CreateTable.cs (19) : this.ColumnsParameters=columns;
-CreateTable.cs (27) : if(database== null)
-CreateTable.cs (28) : return Constants.Error;
-CreateTable.cs (29) : Table tabla = database.TableByName(Table);
-CreateTable.cs (31) : if(tabla!=null)
-CreateTable.cs (32) : return Constants.TableAlreadyExistsError;
-CreateTable.cs (34) : if(ColumnsParameters==null||ColumnsParameters.Count==0)
-CreateTable.cs (35) : return Constants.DatabaseCreatedWithoutColumnsError;
-CreateTable.cs (37) : if(database.CreateTable(Table,ColumnsParameters))
-CreateTable.cs (38) : return Constants.CreateTableSuccess;
-CreateTable.cs (40) : return Constants.Error;
+CreateTable.cs (20) : if (columns == null)
+CreateTable.cs (21) : {
+CreateTable.cs (22) : this.ColumnsParameters = new List<ColumnDefinition>();
+CreateTable.cs (23) : }
+CreateTable.cs (24) : else
+CreateTable.cs (25) : {
+CreateTable.cs (26) : this.ColumnsParameters = columns;
+CreateTable.cs (27) : }
+CreateTable.cs (35) : if (database == null)
+CreateTable.cs (36) : {
+CreateTable.cs (37) : return Constants.Error;
+CreateTable.cs (38) : }
+CreateTable.cs (40) : if (database.TableByName(Table) != null)
+CreateTable.cs (41) : {
+CreateTable.cs (42) : return Constants.TableAlreadyExistsError;
+CreateTable.cs (43) : }
+CreateTable.cs (45) : if (ColumnsParameters == null || ColumnsParameters.Count == 0)
+CreateTable.cs (46) : {
+CreateTable.cs (47) : return Constants.DatabaseCreatedWithoutColumnsError;
+CreateTable.cs (48) : }
+CreateTable.cs (50) : List<string> names = new List<string>();
+CreateTable.cs (51) : foreach (ColumnDefinition col in ColumnsParameters)
+CreateTable.cs (52) : {
+CreateTable.cs (53) : if (names.Contains(col.Name))
+CreateTable.cs (54) : {
+CreateTable.cs (55) : return Constants.Error + ": Column name dup: " + col.Name;
+CreateTable.cs (56) : }
+CreateTable.cs (57) : names.Add(col.Name);
+CreateTable.cs (58) : }
+CreateTable.cs (60) : if (database.CreateTable(Table, ColumnsParameters))
+CreateTable.cs (61) : {
+CreateTable.cs (62) : return Constants.CreateTableSuccess;
+CreateTable.cs (63) : }
+CreateTable.cs (65) : return Constants.Error;
 DropTable.cs (16) : this.Table = table;
 DropTable.cs (24) : if(database == null)
 DropTable.cs (25) : {
@@ -247,14 +270,14 @@ Select.cs (32) : return Constants.TableDoesNotExistError;
 Select.cs (33) : }
 Select.cs (35) : foreach(string column in Columns)
 Select.cs (36) : {
-Select.cs (37) : if(table.ColumnByName(column)==null)
+Select.cs (37) : if(column != "*" && table.ColumnByName(column)==null)
 Select.cs (38) : {
 Select.cs (39) : return Constants.ColumnDoesNotExistError;
 Select.cs (40) : }
 Select.cs (41) : }
 Select.cs (42) : if(Where!=null)
 Select.cs (43) : {
-Select.cs (44) : if (Where.ColumnName==null||(table.ColumnByName(Where.ColumnName)==null))
+Select.cs (44) : if (string.IsNullOrEmpty(Where.ColumnName) || table.ColumnByName(Where.ColumnName) == null)
 Select.cs (45) : {
 Select.cs (46) : return Constants.ColumnDoesNotExistError;
 Select.cs (47) : }
