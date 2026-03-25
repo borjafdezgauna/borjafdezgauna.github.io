@@ -319,248 +319,240 @@ DeleteUser.cs (51) : return Constants.UserDoesNotExistError;
 DeleteUser.cs (53) : return Constants.DeleteUserSuccess;
 DeleteUser.cs (54) : }
 DropSecurityProfile.cs (14) : ProfileName = profileName;
-DropSecurityProfile.cs (19) : if (!database.IsUserAdmin())
-DropSecurityProfile.cs (20) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-DropSecurityProfile.cs (22) : bool removed = database.SecurityManager.RemoveProfile(ProfileName);
-DropSecurityProfile.cs (24) : if (!removed)
-DropSecurityProfile.cs (25) : return Constants.SecurityProfileDoesNotExistError;
-DropSecurityProfile.cs (27) : return Constants.DropSecurityProfileSuccess;
-DropSecurityProfile.cs (28) : }
-DropTable.cs (14) : Table = table;
-DropTable.cs (19) : bool result = database.DropTable(Table);
-DropTable.cs (21) : if (!result)
-DropTable.cs (22) : return database.LastErrorMessage;
-DropTable.cs (24) : return Constants.DropTableSuccess;
-Grant.cs (5) : using DbManager.Security;
-Grant.cs (17) : PrivilegeName = privilegeName;
-Grant.cs (18) : TableName = tableName;
-Grant.cs (19) : ProfileName = profileName;
-Grant.cs (24) : if (!database.IsUserAdmin())
-Grant.cs (25) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Grant.cs (27) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
-Grant.cs (28) : if (profile == null)
-Grant.cs (29) : return Constants.SecurityProfileDoesNotExistError;
-Grant.cs (31) : if (!Enum.TryParse(PrivilegeName, true, out Privilege privilege))
-Grant.cs (32) : return Constants.PrivilegeDoesNotExistError;
-Grant.cs (34) : if (!profile.GrantPrivilege(TableName, privilege))
-Grant.cs (35) : return Constants.ProfileAlreadyHasPrivilege;
-Grant.cs (37) : return Constants.GrantPrivilegeSuccess;
-Grant.cs (38) : }
-MiniSQLParser.cs (2) : using System;
+DropSecurityProfile.cs (19) : if (database == null)
+DropSecurityProfile.cs (20) : {
+DropSecurityProfile.cs (21) : return Constants.Error;
+DropSecurityProfile.cs (22) : }
+DropSecurityProfile.cs (24) : if (!database.IsUserAdmin())
+DropSecurityProfile.cs (25) : {
+DropSecurityProfile.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (27) : }
+DropSecurityProfile.cs (29) : bool removed = database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (31) : if (!removed)
+DropSecurityProfile.cs (32) : {
+DropSecurityProfile.cs (33) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (34) : }
+DropSecurityProfile.cs (36) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (37) : }
+DropTable.cs (2) : using DbManager.Parser;
+DropTable.cs (12) : Table = table;
+DropTable.cs (17) : if (database == null)
+DropTable.cs (18) : {
+DropTable.cs (19) : throw new NullReferenceException();
+DropTable.cs (20) : }
+DropTable.cs (22) : bool result = database.DropTable(Table);
+DropTable.cs (24) : if (!result)
+DropTable.cs (25) : {
+DropTable.cs (26) : return database.LastErrorMessage;
+DropTable.cs (27) : }
+DropTable.cs (29) : return Constants.DropTableSuccess;
+Grant.cs (3) : using DbManager.Security;
+Grant.cs (15) : PrivilegeName = privilegeName;
+Grant.cs (16) : TableName = tableName;
+Grant.cs (17) : ProfileName = profileName;
+Grant.cs (22) : if (database == null)
+Grant.cs (23) : {
+Grant.cs (24) : return Constants.Error;
+Grant.cs (25) : }
+Grant.cs (27) : if (!database.IsUserAdmin())
+Grant.cs (28) : {
+Grant.cs (29) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (30) : }
+Grant.cs (32) : if (database.TableByName(TableName) == null)
+Grant.cs (33) : {
+Grant.cs (34) : return Constants.TableDoesNotExistError;
+Grant.cs (35) : }
+Grant.cs (37) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (38) : if (profile == null)
+Grant.cs (39) : {
+Grant.cs (40) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (41) : }
+Grant.cs (43) : if (!Enum.TryParse(PrivilegeName, true, out Privilege privilege))
+Grant.cs (44) : {
+Grant.cs (45) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (46) : }
+Grant.cs (48) : profile.GrantPrivilege(TableName, privilege);
+Grant.cs (50) : return Constants.GrantPrivilegeSuccess;
+Grant.cs (51) : }
+MiniSQLParser.cs (1) : using System;
+MiniSQLParser.cs (4) : using DbManager.Parser;
 MiniSQLParser.cs (17) : if (string.IsNullOrWhiteSpace(miniSQLQuery))
 MiniSQLParser.cs (18) : return null;
-MiniSQLParser.cs (21) : const string selectPattern =
-MiniSQLParser.cs (28) : const string insertPattern =
-MiniSQLParser.cs (33) : const string dropTablePattern =
-MiniSQLParser.cs (36) : const string createTablePattern =
-MiniSQLParser.cs (41) : const string updateTablePattern =
-MiniSQLParser.cs (47) : const string deletePattern =
-MiniSQLParser.cs (52) : const string createSecurityProfilePattern =
-MiniSQLParser.cs (55) : const string dropSecurityProfilePattern =
-MiniSQLParser.cs (58) : const string grantPattern =
-MiniSQLParser.cs (61) : const string revokePattern =
-MiniSQLParser.cs (65) : const string addUserPattern =
-MiniSQLParser.cs (66) : @"^\s*ADD\s+USER\s*\(\s*(?<username>[A-Za-z][A-Za-z0-9]*)\s*,\s*(?<password>[^,\)\s]+)\s*,\s*(?<profile>[A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$";
-MiniSQLParser.cs (69) : const string deleteUserPattern =
-MiniSQLParser.cs (70) : @"^\s*DELETE\s+USER\s+(?<username>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
-MiniSQLParser.cs (73) : var mCreate = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
-MiniSQLParser.cs (74) : if (mCreate.Success)
-MiniSQLParser.cs (75) : return new CreateSecurityProfile(mCreate.Groups["profile"].Value);
-MiniSQLParser.cs (77) : var mDrop = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
-MiniSQLParser.cs (78) : if (mDrop.Success)
-MiniSQLParser.cs (79) : return new DropSecurityProfile(mDrop.Groups["profile"].Value);
-MiniSQLParser.cs (81) : var mGrant = Regex.Match(miniSQLQuery, grantPattern);
-MiniSQLParser.cs (82) : if (mGrant.Success)
-MiniSQLParser.cs (83) : return new Grant(
-MiniSQLParser.cs (84) : mGrant.Groups["privilege"].Value,
-MiniSQLParser.cs (85) : mGrant.Groups["table"].Value,
-MiniSQLParser.cs (86) : mGrant.Groups["profile"].Value
-MiniSQLParser.cs (87) : );
-MiniSQLParser.cs (89) : var mRevoke = Regex.Match(miniSQLQuery, revokePattern);
-MiniSQLParser.cs (90) : if (mRevoke.Success)
-MiniSQLParser.cs (91) : return new Revoke(
-MiniSQLParser.cs (92) : mRevoke.Groups["privilege"].Value,
-MiniSQLParser.cs (93) : mRevoke.Groups["table"].Value,
-MiniSQLParser.cs (94) : mRevoke.Groups["profile"].Value
-MiniSQLParser.cs (95) : );
-MiniSQLParser.cs (97) : var mAddUser = Regex.Match(miniSQLQuery, addUserPattern);
-MiniSQLParser.cs (98) : if (mAddUser.Success)
-MiniSQLParser.cs (99) : return new AddUser(
-MiniSQLParser.cs (100) : mAddUser.Groups["username"].Value,
-MiniSQLParser.cs (101) : mAddUser.Groups["password"].Value,
-MiniSQLParser.cs (102) : mAddUser.Groups["profile"].Value
-MiniSQLParser.cs (103) : );
-MiniSQLParser.cs (105) : var mDeleteUser = Regex.Match(miniSQLQuery, deleteUserPattern);
-MiniSQLParser.cs (106) : if (mDeleteUser.Success)
-MiniSQLParser.cs (107) : return new DeleteUser(mDeleteUser.Groups["username"].Value);
-MiniSQLParser.cs (110) : var mSelect = Regex.Match(miniSQLQuery, selectPattern);
-MiniSQLParser.cs (111) : if (mSelect.Success)
-MiniSQLParser.cs (112) : {
-MiniSQLParser.cs (113) : string table = mSelect.Groups["table"].Value;
-MiniSQLParser.cs (115) : List<string> columns;
-MiniSQLParser.cs (116) : string colsText = mSelect.Groups["cols"].Value.Trim();
-MiniSQLParser.cs (118) : {
-MiniSQLParser.cs (120) : columns = new List<string> { "*" };
+MiniSQLParser.cs (20) : string input = miniSQLQuery.Trim();
+MiniSQLParser.cs (22) : const string selectPattern =
+MiniSQLParser.cs (29) : const string insertPattern =
+MiniSQLParser.cs (34) : const string dropTablePattern =
+MiniSQLParser.cs (37) : const string createTablePattern =
+MiniSQLParser.cs (42) : const string updateTablePattern =
+MiniSQLParser.cs (48) : const string deletePattern =
+MiniSQLParser.cs (53) : const string createSecurityProfilePattern =
+MiniSQLParser.cs (56) : const string dropSecurityProfilePattern =
+MiniSQLParser.cs (59) : const string grantPattern =
+MiniSQLParser.cs (62) : const string revokePattern =
+MiniSQLParser.cs (66) : const string addUserPattern =
+MiniSQLParser.cs (67) : @"^\s*ADD\s+USER\s*\(\s*(?<username>[A-Za-z][A-Za-z0-9]*)\s*,\s*(?<password>[^,\)\s]+)\s*,\s*(?<profile>[A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$";
+MiniSQLParser.cs (70) : const string deleteUserPattern =
+MiniSQLParser.cs (71) : @"^\s*DELETE\s+USER\s+(?<username>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (74) : var mCreate = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (75) : if (mCreate.Success)
+MiniSQLParser.cs (76) : return new CreateSecurityProfile(mCreate.Groups["profile"].Value);
+MiniSQLParser.cs (78) : var mDrop = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (79) : if (mDrop.Success)
+MiniSQLParser.cs (80) : return new DropSecurityProfile(mDrop.Groups["profile"].Value);
+MiniSQLParser.cs (82) : var mGrant = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (83) : if (mGrant.Success)
+MiniSQLParser.cs (84) : return new Grant(
+MiniSQLParser.cs (85) : mGrant.Groups["privilege"].Value,
+MiniSQLParser.cs (86) : mGrant.Groups["table"].Value,
+MiniSQLParser.cs (87) : mGrant.Groups["profile"].Value
+MiniSQLParser.cs (88) : );
+MiniSQLParser.cs (90) : var mRevoke = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (91) : if (mRevoke.Success)
+MiniSQLParser.cs (92) : return new Revoke(
+MiniSQLParser.cs (93) : mRevoke.Groups["privilege"].Value,
+MiniSQLParser.cs (94) : mRevoke.Groups["table"].Value,
+MiniSQLParser.cs (95) : mRevoke.Groups["profile"].Value
+MiniSQLParser.cs (96) : );
+MiniSQLParser.cs (98) : var mAddUser = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (99) : if (mAddUser.Success)
+MiniSQLParser.cs (100) : return new AddUser(
+MiniSQLParser.cs (101) : mAddUser.Groups["username"].Value,
+MiniSQLParser.cs (102) : mAddUser.Groups["password"].Value,
+MiniSQLParser.cs (103) : mAddUser.Groups["profile"].Value
+MiniSQLParser.cs (104) : );
+MiniSQLParser.cs (106) : var mDeleteUser = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (107) : if (mDeleteUser.Success)
+MiniSQLParser.cs (108) : return new DeleteUser(mDeleteUser.Groups["username"].Value);
+MiniSQLParser.cs (111) : var mSelect = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (112) : if (mSelect.Success)
+MiniSQLParser.cs (113) : {
+MiniSQLParser.cs (114) : string table = mSelect.Groups["table"].Value;
+MiniSQLParser.cs (115) : string colsText = mSelect.Groups["cols"].Value.Trim();
+MiniSQLParser.cs (116) : List<string> columns = (colsText == Asterisk) ? new List<string> { "*" } : CommaSeparatedNames(colsText);
+MiniSQLParser.cs (117) : Condition condition = null;
+MiniSQLParser.cs (118) : if (mSelect.Groups["wcol"].Success)
+MiniSQLParser.cs (119) : condition = new Condition(mSelect.Groups["wcol"].Value, mSelect.Groups["wop"].Value, Unquote(mSelect.Groups["wval"].Value));
+MiniSQLParser.cs (120) : return new Select(table, columns, condition);
 MiniSQLParser.cs (121) : }
-MiniSQLParser.cs (122) : else
-MiniSQLParser.cs (123) : {
-MiniSQLParser.cs (124) : columns = CommaSeparatedNames(colsText);
-MiniSQLParser.cs (125) : }
-MiniSQLParser.cs (127) : Condition condition = null;
-MiniSQLParser.cs (128) : if (mSelect.Groups["wcol"].Success)
-MiniSQLParser.cs (129) : {
-MiniSQLParser.cs (130) : condition = new Condition(
-MiniSQLParser.cs (131) : mSelect.Groups["wcol"].Value,
-MiniSQLParser.cs (132) : mSelect.Groups["wop"].Value,
-MiniSQLParser.cs (133) : Unquote(mSelect.Groups["wval"].Value)
-MiniSQLParser.cs (134) : );
+MiniSQLParser.cs (123) : var mInsert = Regex.Match(input, insertPattern);
+MiniSQLParser.cs (124) : if (mInsert.Success)
+MiniSQLParser.cs (125) : return new Insert(mInsert.Groups["table"].Value, CommaSeparatedValues(mInsert.Groups["vals"].Value));
+MiniSQLParser.cs (127) : var mDropTable = Regex.Match(input, dropTablePattern);
+MiniSQLParser.cs (128) : if (mDropTable.Success) return new DropTable(mDropTable.Groups["table"].Value);
+MiniSQLParser.cs (130) : var mCreateTable = Regex.Match(input, createTablePattern);
+MiniSQLParser.cs (131) : if (mCreateTable.Success)
+MiniSQLParser.cs (132) : {
+MiniSQLParser.cs (133) : var columns = ParseCreateTableColumns(mCreateTable.Groups["cols"].Value);
+MiniSQLParser.cs (134) : return columns == null ? null : new CreateTable(mCreateTable.Groups["table"].Value, columns);
 MiniSQLParser.cs (135) : }
-MiniSQLParser.cs (137) : return new Select(table, columns, condition);
-MiniSQLParser.cs (138) : }
-MiniSQLParser.cs (141) : var mInsert = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (142) : if (mInsert.Success)
-MiniSQLParser.cs (143) : {
-MiniSQLParser.cs (144) : string table = mInsert.Groups["table"].Value;
-MiniSQLParser.cs (145) : List<string> values = CommaSeparatedValues(mInsert.Groups["vals"].Value);
-MiniSQLParser.cs (146) : return new Insert(table, values);
-MiniSQLParser.cs (147) : }
-MiniSQLParser.cs (150) : var mDropTable = Regex.Match(miniSQLQuery, dropTablePattern);
-MiniSQLParser.cs (151) : if (mDropTable.Success)
-MiniSQLParser.cs (152) : {
-MiniSQLParser.cs (153) : return new DropTable(mDropTable.Groups["table"].Value);
-MiniSQLParser.cs (154) : }
-MiniSQLParser.cs (157) : var mCreateTable = Regex.Match(miniSQLQuery, createTablePattern);
-MiniSQLParser.cs (158) : if (mCreateTable.Success)
-MiniSQLParser.cs (159) : {
-MiniSQLParser.cs (160) : string table = mCreateTable.Groups["table"].Value;
-MiniSQLParser.cs (161) : string colsRaw = mCreateTable.Groups["cols"].Value;
-MiniSQLParser.cs (163) : List<ColumnDefinition> columns = ParseCreateTableColumns(colsRaw);
-MiniSQLParser.cs (164) : if (columns == null)
-MiniSQLParser.cs (165) : return null;
-MiniSQLParser.cs (167) : return new CreateTable(table, columns);
-MiniSQLParser.cs (168) : }
-MiniSQLParser.cs (171) : var mUpdate = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (172) : if (mUpdate.Success)
+MiniSQLParser.cs (137) : var mUpdate = Regex.Match(input, updateTablePattern);
+MiniSQLParser.cs (138) : if (mUpdate.Success)
+MiniSQLParser.cs (139) : {
+MiniSQLParser.cs (140) : var setValues = ParseSetValues(mUpdate.Groups["set"].Value);
+MiniSQLParser.cs (141) : if (setValues == null || setValues.Count == 0) return null;
+MiniSQLParser.cs (142) : var condition = new Condition(mUpdate.Groups["wcol"].Value, mUpdate.Groups["wop"].Value, Unquote(mUpdate.Groups["wval"].Value));
+MiniSQLParser.cs (143) : return new Update(mUpdate.Groups["table"].Value, setValues, condition);
+MiniSQLParser.cs (144) : }
+MiniSQLParser.cs (146) : var mDelete = Regex.Match(input, deletePattern);
+MiniSQLParser.cs (147) : if (mDelete.Success)
+MiniSQLParser.cs (148) : return new Delete(mDelete.Groups["table"].Value, new Condition(mDelete.Groups["wcol"].Value, mDelete.Groups["wop"].Value, Unquote(mDelete.Groups["wval"].Value)));
+MiniSQLParser.cs (150) : return null;
+MiniSQLParser.cs (151) : }
+MiniSQLParser.cs (153) : static List<string> CommaSeparatedNames(string text)
+MiniSQLParser.cs (154) : {
+MiniSQLParser.cs (155) : if (string.IsNullOrWhiteSpace(text)) return new List<string>();
+MiniSQLParser.cs (156) : string[] parts = text.Split(',', StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (157) : List<string> result = new List<string>();
+MiniSQLParser.cs (158) : foreach (var p in parts) result.Add(p.Trim());
+MiniSQLParser.cs (159) : return result;
+MiniSQLParser.cs (160) : }
+MiniSQLParser.cs (162) : static List<string> CommaSeparatedValues(string text)
+MiniSQLParser.cs (163) : {
+MiniSQLParser.cs (164) : List<string> values = new List<string>();
+MiniSQLParser.cs (165) : if (text == null) return values;
+MiniSQLParser.cs (166) : bool inQuotes = false;
+MiniSQLParser.cs (168) : for (int i = 0; i < text.Length; i++)
+MiniSQLParser.cs (169) : {
+MiniSQLParser.cs (170) : char ch = text[i];
+MiniSQLParser.cs (171) : if (ch == '\'') inQuotes = !inQuotes;
+MiniSQLParser.cs (172) : if (ch == ',' && !inQuotes)
 MiniSQLParser.cs (173) : {
-MiniSQLParser.cs (174) : string table = mUpdate.Groups["table"].Value;
-MiniSQLParser.cs (175) : string setRaw = mUpdate.Groups["set"].Value;
-MiniSQLParser.cs (177) : List<SetValue> setValues = ParseSetValues(setRaw);
-MiniSQLParser.cs (178) : if (setValues == null)
-MiniSQLParser.cs (179) : return null;
-MiniSQLParser.cs (181) : Condition condition = new Condition(
-MiniSQLParser.cs (182) : mUpdate.Groups["wcol"].Value,
-MiniSQLParser.cs (183) : mUpdate.Groups["wop"].Value,
-MiniSQLParser.cs (184) : Unquote(mUpdate.Groups["wval"].Value)
-MiniSQLParser.cs (185) : );
-MiniSQLParser.cs (187) : return new Update(table, setValues, condition);
-MiniSQLParser.cs (188) : }
-MiniSQLParser.cs (191) : var mDelete = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (192) : if (mDelete.Success)
+MiniSQLParser.cs (176) : }
+MiniSQLParser.cs (177) : else current += ch;
+MiniSQLParser.cs (178) : }
+MiniSQLParser.cs (179) : if (!string.IsNullOrWhiteSpace(current)) values.Add(Unquote(current.Trim()));
+MiniSQLParser.cs (180) : return values;
+MiniSQLParser.cs (181) : }
+MiniSQLParser.cs (183) : static string Unquote(string value)
+MiniSQLParser.cs (184) : {
+MiniSQLParser.cs (185) : if (string.IsNullOrWhiteSpace(value)) return value;
+MiniSQLParser.cs (186) : value = value.Trim();
+MiniSQLParser.cs (187) : if (value.Length >= 2 && value.StartsWith("'") && value.EndsWith("'"))
+MiniSQLParser.cs (188) : return value.Substring(1, value.Length - 2);
+MiniSQLParser.cs (189) : return value;
+MiniSQLParser.cs (190) : }
+MiniSQLParser.cs (192) : static List<SetValue> ParseSetValues(string setRaw)
 MiniSQLParser.cs (193) : {
-MiniSQLParser.cs (194) : string table = mDelete.Groups["table"].Value;
-MiniSQLParser.cs (196) : Condition condition = new Condition(
-MiniSQLParser.cs (197) : mDelete.Groups["wcol"].Value,
-MiniSQLParser.cs (198) : mDelete.Groups["wop"].Value,
-MiniSQLParser.cs (199) : Unquote(mDelete.Groups["wval"].Value)
-MiniSQLParser.cs (200) : );
-MiniSQLParser.cs (202) : return new Delete(table, condition);
-MiniSQLParser.cs (203) : }
-MiniSQLParser.cs (206) : return null;
+MiniSQLParser.cs (194) : if (string.IsNullOrWhiteSpace(setRaw)) return null;
+MiniSQLParser.cs (195) : List<SetValue> list = new List<SetValue>();
+MiniSQLParser.cs (196) : bool inQuotes = false;
+MiniSQLParser.cs (197) : string current = "";
+MiniSQLParser.cs (198) : List<string> pairs = new List<string>();
+MiniSQLParser.cs (199) : for (int i = 0; i < setRaw.Length; i++)
+MiniSQLParser.cs (200) : {
+MiniSQLParser.cs (201) : char ch = setRaw[i];
+MiniSQLParser.cs (202) : if (ch == '\'') inQuotes = !inQuotes;
+MiniSQLParser.cs (203) : if (ch == ',' && !inQuotes)
+MiniSQLParser.cs (204) : {
+MiniSQLParser.cs (205) : pairs.Add(current.Trim());
+MiniSQLParser.cs (206) : current = "";
 MiniSQLParser.cs (207) : }
-MiniSQLParser.cs (210) : static List<string> CommaSeparatedNames(string text)
-MiniSQLParser.cs (211) : {
-MiniSQLParser.cs (212) : if (string.IsNullOrWhiteSpace(text))
-MiniSQLParser.cs (213) : return new List<string>();
-MiniSQLParser.cs (215) : string[] parts = text.Split(",", StringSplitOptions.RemoveEmptyEntries);
-MiniSQLParser.cs (216) : List<string> result = new List<string>();
-MiniSQLParser.cs (218) : for (int i = 0; i < parts.Length; i++)
-MiniSQLParser.cs (219) : {
-MiniSQLParser.cs (220) : string name = parts[i].Trim();
-MiniSQLParser.cs (221) : if (!string.IsNullOrEmpty(name))
-MiniSQLParser.cs (222) : result.Add(name);
-MiniSQLParser.cs (223) : }
-MiniSQLParser.cs (225) : return result;
-MiniSQLParser.cs (226) : }
-MiniSQLParser.cs (229) : static List<string> CommaSeparatedValues(string text)
-MiniSQLParser.cs (230) : {
-MiniSQLParser.cs (231) : List<string> values = new List<string>();
-MiniSQLParser.cs (232) : if (text == null) return values;
-MiniSQLParser.cs (235) : bool inQuotes = false;
-MiniSQLParser.cs (238) : for (int i = 0; i < text.Length; i++)
-MiniSQLParser.cs (239) : {
-MiniSQLParser.cs (240) : char ch = text[i];
-MiniSQLParser.cs (242) : if (ch == '\'')
-MiniSQLParser.cs (243) : {
-MiniSQLParser.cs (244) : inQuotes = !inQuotes;
-MiniSQLParser.cs (246) : continue;
-MiniSQLParser.cs (247) : }
-MiniSQLParser.cs (249) : if (ch == ',' && !inQuotes)
-MiniSQLParser.cs (250) : {
-MiniSQLParser.cs (253) : continue;
-MiniSQLParser.cs (254) : }
-MiniSQLParser.cs (257) : }
-MiniSQLParser.cs (259) : if (current.Length > 0)
-MiniSQLParser.cs (262) : return values;
-MiniSQLParser.cs (263) : }
-MiniSQLParser.cs (265) : static string Unquote(string value)
-MiniSQLParser.cs (266) : {
-MiniSQLParser.cs (267) : if (value == null) return null;
-MiniSQLParser.cs (268) : value = value.Trim();
-MiniSQLParser.cs (269) : if (value.Length >= 2 && value.StartsWith("'") && value.EndsWith("'"))
-MiniSQLParser.cs (270) : return value.Substring(1, value.Length - 2);
-MiniSQLParser.cs (271) : return value;
-MiniSQLParser.cs (272) : }
-MiniSQLParser.cs (274) : static List<SetValue> ParseSetValues(string setRaw)
-MiniSQLParser.cs (275) : {
-MiniSQLParser.cs (276) : if (string.IsNullOrWhiteSpace(setRaw))
-MiniSQLParser.cs (277) : return null;
-MiniSQLParser.cs (279) : List<SetValue> list = new List<SetValue>();
-MiniSQLParser.cs (280) : List<string> pairs = CommaSeparatedValues(setRaw);
-MiniSQLParser.cs (282) : for (int i = 0; i < pairs.Count; i++)
-MiniSQLParser.cs (283) : {
-MiniSQLParser.cs (284) : string p = pairs[i];
-MiniSQLParser.cs (285) : int eq = p.IndexOf('=');
-MiniSQLParser.cs (286) : if (eq <= 0) return null;
-MiniSQLParser.cs (288) : string col = p.Substring(0, eq).Trim();
-MiniSQLParser.cs (289) : string val = p.Substring(eq + 1).Trim();
-MiniSQLParser.cs (291) : list.Add(new SetValue(col, Unquote(val)));
-MiniSQLParser.cs (294) : return list;
-MiniSQLParser.cs (295) : }
-MiniSQLParser.cs (297) : static List<ColumnDefinition> ParseCreateTableColumns(string colsRaw)
-MiniSQLParser.cs (299) : if (string.IsNullOrWhiteSpace(colsRaw))
-MiniSQLParser.cs (300) : return null;
-MiniSQLParser.cs (302) : string[] parts = colsRaw.Split(",", StringSplitOptions.RemoveEmptyEntries);
-MiniSQLParser.cs (304) : List<ColumnDefinition> cols = new List<ColumnDefinition>();
-MiniSQLParser.cs (306) : for (int i = 0; i < parts.Length; i++)
-MiniSQLParser.cs (308) : string item = parts[i].Trim();
-MiniSQLParser.cs (309) : if (string.IsNullOrEmpty(item))
-MiniSQLParser.cs (310) : continue;
-MiniSQLParser.cs (312) : // "TYPE NAME"
-MiniSQLParser.cs (313) : string[] tokens = Regex.Split(item, @"\s+");
-MiniSQLParser.cs (315) : return null;
-MiniSQLParser.cs (318) : string nameText = tokens[1].Trim();
-MiniSQLParser.cs (320) : ColumnDefinition.DataType dt;
-MiniSQLParser.cs (324) : else return null;
-MiniSQLParser.cs (326) : cols.Add(new ColumnDefinition(dt, nameText));
-MiniSQLParser.cs (331) : return cols;
+MiniSQLParser.cs (208) : else current += ch;
+MiniSQLParser.cs (209) : }
+MiniSQLParser.cs (210) : if (!string.IsNullOrWhiteSpace(current)) pairs.Add(current.Trim());
+MiniSQLParser.cs (212) : foreach (var p in pairs)
+MiniSQLParser.cs (213) : {
+MiniSQLParser.cs (214) : int eq = p.IndexOf('=');
+MiniSQLParser.cs (215) : if (eq <= 0) return null;
+MiniSQLParser.cs (216) : list.Add(new SetValue(p.Substring(0, eq).Trim(), Unquote(p.Substring(eq + 1).Trim())));
+MiniSQLParser.cs (218) : return list;
+MiniSQLParser.cs (219) : }
+MiniSQLParser.cs (221) : static List<ColumnDefinition> ParseCreateTableColumns(string colsRaw)
+MiniSQLParser.cs (223) : if (string.IsNullOrWhiteSpace(colsRaw)) return null;
+MiniSQLParser.cs (224) : string[] parts = colsRaw.Split(',', StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (225) : List<ColumnDefinition> cols = new List<ColumnDefinition>();
+MiniSQLParser.cs (226) : foreach (var item in parts)
+MiniSQLParser.cs (228) : string item = parts[i].Trim();
+MiniSQLParser.cs (229) : if (string.IsNullOrEmpty(item))
+MiniSQLParser.cs (230) : continue;
+MiniSQLParser.cs (232) : // "TYPE NAME"
+MiniSQLParser.cs (233) : string[] tokens = Regex.Split(item, @"\s+");
+MiniSQLParser.cs (235) : return null;
+MiniSQLParser.cs (238) : string nameText = tokens[1].Trim();
+MiniSQLParser.cs (240) : ColumnDefinition.DataType dt;
+MiniSQLParser.cs (244) : else return null;
+MiniSQLParser.cs (246) : cols.Add(new ColumnDefinition(dt, nameText));
+MiniSQLParser.cs (251) : return cols;
 Revoke.cs (3) : using DbManager.Security;
-Revoke.cs (9) : public string PrivilegeName { get; private set; }
-Revoke.cs (10) : public string TableName { get; private set; }
-Revoke.cs (11) : public string ProfileName { get; private set; }
+Revoke.cs (9) : public string PrivilegeName { get; set; }
+Revoke.cs (10) : public string TableName { get; set; }
+Revoke.cs (11) : public string ProfileName { get; set; }
 Revoke.cs (15) : PrivilegeName = privilegeName;
 Revoke.cs (16) : TableName = tableName;
 Revoke.cs (17) : ProfileName = profileName;
-Revoke.cs (22) : if (database == null || !database.IsUserAdmin())
-Revoke.cs (23) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Revoke.cs (25) : // Profil var m�?
-Revoke.cs (26) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
-Revoke.cs (27) : return Constants.SecurityProfileDoesNotExistError;
-Revoke.cs (29) : // Privilege d�n���m�: enum ad�n� bilmeye gerek yok
-Revoke.cs (30) : Privilege privilege = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
-Revoke.cs (32) : // Yetkiyi geri al
-Revoke.cs (33) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, privilege);
-Revoke.cs (35) : return Constants.RevokePrivilegeSuccess;
-Revoke.cs (36) : }
+Revoke.cs (22) : if (database == null) return Constants.Error;
+Revoke.cs (24) : if (!database.IsUserAdmin())
+Revoke.cs (25) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (27) : if (database.TableByName(TableName) == null)
+Revoke.cs (28) : return Constants.TableDoesNotExistError;
+Revoke.cs (30) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Revoke.cs (31) : if (profile == null)
+Revoke.cs (32) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (34) : if (!Enum.TryParse(PrivilegeName, true, out Privilege privilege))
+Revoke.cs (35) : return Constants.PrivilegeDoesNotExistError;
+Revoke.cs (37) : profile.RevokePrivilege(TableName, privilege);
+Revoke.cs (39) : return Constants.RevokePrivilegeSuccess;
+Revoke.cs (40) : }
 Manager.cs (5) : using System.Security.Cryptography;
 Manager.cs (63) : return null;
 Manager.cs (70) : return null;
