@@ -144,10 +144,42 @@ Delete.cs (60) : {
 Delete.cs (61) : return false;
 Delete.cs (62) : }
 Delete.cs (63) : }
-Insert.cs (17) : Values = values;
-MiniSQLParser.cs (28) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)'(-?\d+|-?\d+\.\d+|\w+)'";
-MiniSQLParser.cs (142) : //delete case
-MiniSQLParser.cs (144) : if(match.Success && match.Length == miniSQLQuery.Length)
-MiniSQLParser.cs (145) : {
-MiniSQLParser.cs (146) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
-MiniSQLParser.cs (147) : }
+Insert.cs (1) : using DbManager.Parser;
+Insert.cs (18) : Values = values;
+Insert.cs (31) : public override bool Equals(Object obj)
+Insert.cs (32) : {
+Insert.cs (33) : Insert other = (Insert)obj;
+Insert.cs (34) : //First we compare extreme cases where 'WHERE' clause is null in one side (we also discard different table names)
+Insert.cs (35) : if (Table != other.Table || (Values != null && other.Values == null || Values == null && other.Values != null))
+Insert.cs (36) : {
+Insert.cs (37) : return false;
+Insert.cs (38) : }
+Insert.cs (39) : //Then, we compare both null case -> true
+Insert.cs (40) : else if (other.Values == null && Values == null)
+Insert.cs (41) : {
+Insert.cs (42) : return true;
+Insert.cs (43) : }
+Insert.cs (44) : //Last, with both null cases ruled out, we can compare Where clauses one by one
+Insert.cs (45) : else
+Insert.cs (46) : {
+Insert.cs (47) : for(int i = 0; i<Values.Count;i++)
+Insert.cs (48) : {
+Insert.cs (49) : if (Values[i] != other.Values[i])
+Insert.cs (50) : {
+Insert.cs (51) : return false;
+Insert.cs (52) : }
+Insert.cs (53) : }
+Insert.cs (54) : return true;
+Insert.cs (55) : }
+Insert.cs (56) : }
+MiniSQLParser.cs (17) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s*\('(-?\d+|-?\d+\.\d+|(?:\w+(?:\s+\w+)*))'(?:,'(-?\d+|-?\d+\.\d+|\w+(\s+\w+)*)')*\)";
+MiniSQLParser.cs (28) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)'(-?\d+|-?\d+\.\d+|(?:\w+(?:\s+\w+)*))'";
+MiniSQLParser.cs (128) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (129) : if(match.Success && match.Length == miniSQLQuery.Length)
+MiniSQLParser.cs (132) : for (int i=2;i<match.Groups.Count;i++)
+MiniSQLParser.cs (135) : valores2.Add(match.Groups[i].Value);
+MiniSQLParser.cs (141) : //delete case
+MiniSQLParser.cs (143) : if(match.Success && match.Length == miniSQLQuery.Length)
+MiniSQLParser.cs (144) : {
+MiniSQLParser.cs (145) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
+MiniSQLParser.cs (146) : }
