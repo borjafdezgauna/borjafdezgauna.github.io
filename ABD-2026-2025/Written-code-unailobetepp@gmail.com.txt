@@ -123,12 +123,12 @@ MiniSQLParser.cs (3) : using System.ComponentModel;
 MiniSQLParser.cs (4) : using System.ComponentModel.DataAnnotations;
 MiniSQLParser.cs (11) : // Unai
 MiniSQLParser.cs (16) : RegexOptions options = RegexOptions.Singleline;
-MiniSQLParser.cs (18) : const string selectPattern = @"^SELECT\s+(?<columns>(?:\w+|\*)(?:,(?:\w+|\*))*)\s+FROM\s+(?<table>\w+)(?:\s+WHERE\s+(?<condition>.+))?\s*$";
+MiniSQLParser.cs (18) : const string selectPattern = @"^SELECT\s+(?<columns>(?:\w+|\*)(?:,(?:\w+|\*))*)\s+FROM\s+(?<table>\w+)(?:\s+WHERE\s+(?<condition>\S.+))?\s*$";
 MiniSQLParser.cs (20) : const string insertPattern = @"^INSERT\s+INTO\s+(?<table>\w+)\s+VALUES\s*\(\s*(?<values>(?:'[^']*'|-?[0-9]+(?:\.[0-9]+)?)(?:,(?:'[^']*'|-?[0-9]+(?:\.[0-9]+)?))*)\s*\)\s*$";
 MiniSQLParser.cs (22) : const string dropTablePattern = @"^DROP\s+TABLE\s+(?<table>\w+)\s*$";
-MiniSQLParser.cs (24) : const string createTablePattern = @"^CREATE\s+TABLE\s+(?<table>\w+)\s*\(\s*(?<columns>\w+\s+(?i:INT|DOUBLE|STRING)(?:\s*,\s*\w+\s+(?i:INT|DOUBLE|STRING))*)\s*\)\s*$";
-MiniSQLParser.cs (26) : const string updateTablePattern = @"^UPDATE\s+(?<table>\w+)\s+SET\s+(?<assignments>\w+=(?:'[^']*'|-?[0-9]+(?:\.[0-9]+)?)(?:,\w+=(?:'[^']*'|-?[0-9]+(?:\.[0-9]+)?))*)\s+WHERE\s+(?<condition>.+)\s*$";
-MiniSQLParser.cs (28) : const string deletePattern = @"^DELETE\s+FROM\s+(?<table>\w+)\s+WHERE\s+(?<condition>.+)\s*$";
+MiniSQLParser.cs (24) : const string createTablePattern = @"^CREATE\s+TABLE\s+(?<table>\w+)\s+\(\s*(?<columns>\w+\s+(?:INT|DOUBLE|STRING)(?:,\w+\s+(?:INT|DOUBLE|STRING))*)\)\s*$";
+MiniSQLParser.cs (26) : const string updateTablePattern = @"^UPDATE\s+(?<table>\w+)\s+SET\s+(?<assignments>\w+=(?:'[^']*'|-?[0-9]+(?:\.[0-9]+)?)(?:,\w+=(?:'[^']*'|-?[0-9]+(?:\.[0-9]+)?))*)\s+WHERE\s+(?<condition>\S.+)\s*$";
+MiniSQLParser.cs (28) : const string deletePattern = @"^DELETE\s+FROM\s+(?<table>\w+)\s+WHERE\s+(?<condition>\S.+)\s*$";
 MiniSQLParser.cs (32) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+(?<secprofile>[a-zA-Z]+)\s*$";
 MiniSQLParser.cs (34) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+(?<secprofile>[a-zA-Z]+)\s*$";
 MiniSQLParser.cs (36) : const string grantPattern = @"^GRANT\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>\w+)\s+TO\s+(?<secprofile>[a-zA-Z]+)\s*$";
@@ -155,7 +155,7 @@ MiniSQLParser.cs (74) : {
 MiniSQLParser.cs (75) : string colname = conditionMatch.Groups["colname"].Value;
 MiniSQLParser.cs (76) : string operatorString = conditionMatch.Groups["operator"].Value;
 MiniSQLParser.cs (77) : string valueString = conditionMatch.Groups["value"].Value;
-MiniSQLParser.cs (79) : condition = new Condition(colname, operatorString, StripQuotes(valueString));
+MiniSQLParser.cs (79) : condition = new Condition(colname, operatorString, StripQuote(valueString));
 MiniSQLParser.cs (80) : }
 MiniSQLParser.cs (81) : else return null;
 MiniSQLParser.cs (82) : }
@@ -170,7 +170,7 @@ MiniSQLParser.cs (92) : List<string> values = CommaSeparatedNames(insertMatch.Gr
 MiniSQLParser.cs (93) : if (values == null) return null;
 MiniSQLParser.cs (95) : for (int i = 0; i < values.Count; i++)
 MiniSQLParser.cs (96) : {
-MiniSQLParser.cs (97) : values[i] = StripQuotes(values[i]);
+MiniSQLParser.cs (97) : values[i] = StripQuote(values[i]);
 MiniSQLParser.cs (98) : }
 MiniSQLParser.cs (100) : return new Insert(tableString, values);
 MiniSQLParser.cs (101) : }
@@ -242,7 +242,7 @@ MiniSQLParser.cs (178) : Match setValueMatch = Regex.Match(assignment, setValueP
 MiniSQLParser.cs (180) : if (setValueMatch.Success)
 MiniSQLParser.cs (181) : {
 MiniSQLParser.cs (182) : string colName = setValueMatch.Groups["colname"].Value;
-MiniSQLParser.cs (183) : string value = StripQuotes(setValueMatch.Groups["value"].Value);
+MiniSQLParser.cs (183) : string value = StripQuote(setValueMatch.Groups["value"].Value);
 MiniSQLParser.cs (185) : setValue = new SetValue(colName, value);
 MiniSQLParser.cs (187) : assignmentsSetValue.Add(setValue);
 MiniSQLParser.cs (188) : }
@@ -261,7 +261,7 @@ MiniSQLParser.cs (204) : if (valueString.StartsWith("'") && !valueString.EndsWit
 MiniSQLParser.cs (205) : {
 MiniSQLParser.cs (206) : return null;
 MiniSQLParser.cs (207) : }
-MiniSQLParser.cs (209) : condition = new Condition(colname, operatorString, StripQuotes(valueString));
+MiniSQLParser.cs (209) : condition = new Condition(colname, operatorString, StripQuote(valueString));
 MiniSQLParser.cs (210) : }
 MiniSQLParser.cs (211) : else return null;
 MiniSQLParser.cs (212) : }
@@ -286,7 +286,7 @@ MiniSQLParser.cs (236) : if (valueString.StartsWith("'") && !valueString.EndsWit
 MiniSQLParser.cs (237) : {
 MiniSQLParser.cs (238) : return null;
 MiniSQLParser.cs (239) : }
-MiniSQLParser.cs (241) : condition = new Condition(colname, operatorString, StripQuotes(valueString));
+MiniSQLParser.cs (241) : condition = new Condition(colname, operatorString, StripQuote(valueString));
 MiniSQLParser.cs (242) : }
 MiniSQLParser.cs (243) : else return null;
 MiniSQLParser.cs (244) : }
@@ -342,7 +342,7 @@ MiniSQLParser.cs (306) : return new DeleteUser(userString);
 MiniSQLParser.cs (307) : }
 MiniSQLParser.cs (309) : return null;
 MiniSQLParser.cs (318) : commaSeparator.Add(textParts[i].Trim());
-MiniSQLParser.cs (323) : static string StripQuotes(string value)
+MiniSQLParser.cs (323) : static string StripQuote(string value)
 MiniSQLParser.cs (324) : {
 MiniSQLParser.cs (325) : if (value != null && value.StartsWith("'") && value.EndsWith("'") && value.Length >= 2)
 MiniSQLParser.cs (326) : {
@@ -354,15 +354,13 @@ Revoke.cs (9) : // Aitana
 Select.cs (10) : // Maialen
 Update.cs (8) : // Endika
 Manager.cs (21) : // Aitana
-Manager.cs (29) : // Maialen
-Manager.cs (38) : // Endika
-Manager.cs (46) : // Endika
-Manager.cs (54) : // Unai
-Manager.cs (64) : // Aitana
-Manager.cs (71) : // Maialen
-Manager.cs (80) : // Maialen
-Manager.cs (89) : // Unai
-Manager.cs (98) : // Aitana
-Manager.cs (106) : // Unai
-Manager.cs (115) : // Endika
+Manager.cs (41) : // Maialen
+Manager.cs (50) : // Endika
+Manager.cs (93) : // Aitana
+Manager.cs (113) : // Maialen
+Manager.cs (122) : // Maialen
+Manager.cs (131) : // Unai
+Manager.cs (140) : // Aitana
+Manager.cs (163) : // Unai
+Manager.cs (172) : // Endika
 Profile.cs (17) : // Aitana

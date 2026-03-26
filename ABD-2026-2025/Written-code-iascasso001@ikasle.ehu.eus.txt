@@ -149,7 +149,7 @@ Insert.cs (18) : Values = values;
 Insert.cs (31) : public override bool Equals(Object obj)
 Insert.cs (32) : {
 Insert.cs (33) : Insert other = (Insert)obj;
-Insert.cs (34) : //First we compare extreme cases where 'WHERE' clause is null in one side (we also discard different table names)
+Insert.cs (34) : //First we compare extreme cases where 'VALUES' clause is null in one side (we also discard different table names)
 Insert.cs (35) : if (Table != other.Table || (Values != null && other.Values == null || Values == null && other.Values != null))
 Insert.cs (36) : {
 Insert.cs (37) : return false;
@@ -172,14 +172,18 @@ Insert.cs (53) : }
 Insert.cs (54) : return true;
 Insert.cs (55) : }
 Insert.cs (56) : }
-MiniSQLParser.cs (17) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s*\('(-?\d+|-?\d+\.\d+|(?:\w+(?:\s+\w+)*))'(?:,'(-?\d+|-?\d+\.\d+|\w+(\s+\w+)*)')*\)";
+MiniSQLParser.cs (17) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s*\(('(?:-?\d+|-?\d+\.\d+|\w+(?:\s+\w+)*)'(?:,'(?:-?\d+|-?\d+\.\d+|\w+(?:\s+\w+)*)')*)\)";
 MiniSQLParser.cs (28) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)'(-?\d+|-?\d+\.\d+|(?:\w+(?:\s+\w+)*))'";
 MiniSQLParser.cs (128) : match = Regex.Match(miniSQLQuery, insertPattern);
 MiniSQLParser.cs (129) : if(match.Success && match.Length == miniSQLQuery.Length)
-MiniSQLParser.cs (132) : for (int i=2;i<match.Groups.Count;i++)
-MiniSQLParser.cs (135) : valores2.Add(match.Groups[i].Value);
-MiniSQLParser.cs (141) : //delete case
-MiniSQLParser.cs (143) : if(match.Success && match.Length == miniSQLQuery.Length)
-MiniSQLParser.cs (144) : {
-MiniSQLParser.cs (145) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
-MiniSQLParser.cs (146) : }
+MiniSQLParser.cs (131) : string valueBlock = match.Groups[2].Value;
+MiniSQLParser.cs (132) : List<string> rawValues = CommaSeparatedNames(valueBlock);
+MiniSQLParser.cs (133) : List<string> cleanValues = new List<string>();
+MiniSQLParser.cs (134) : foreach (String s in rawValues)
+MiniSQLParser.cs (136) : cleanValues.Add(s.Trim('\''));
+MiniSQLParser.cs (139) : return new Insert(match.Groups[1].Value, cleanValues);
+MiniSQLParser.cs (143) : //delete case
+MiniSQLParser.cs (145) : if(match.Success && match.Length == miniSQLQuery.Length)
+MiniSQLParser.cs (146) : {
+MiniSQLParser.cs (147) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
+MiniSQLParser.cs (148) : }

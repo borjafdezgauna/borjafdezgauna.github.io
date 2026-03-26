@@ -206,30 +206,30 @@ Insert.cs (27) : return database.LastErrorMessage;
 MiniSQLParser.cs (13) : const string selectPattern = @"SELECT\s+(\w+(?:,\w+)*)\s+FROM\s+(\w+)(\s+WHERE\s+(\w+)([=<>])('([^']*)'))?"; //Mikel
 MiniSQLParser.cs (15) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s+\(((?:'([^']*)',)*(?:'([^']*)'))\)"; //kaiet
 MiniSQLParser.cs (26) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(<|>|=)'([^']*)'"; //kaiet
+MiniSQLParser.cs (131) : {
+MiniSQLParser.cs (132) : if (match.Length != miniSQLQuery.Length) { return null; }
+MiniSQLParser.cs (133) : string toFilter, toSplit = "";
+MiniSQLParser.cs (134) : bool copying = false;
+MiniSQLParser.cs (135) : toFilter = match.Groups[2].Value;
+MiniSQLParser.cs (136) : for (int i = 0; i < toFilter.Length; i++)
 MiniSQLParser.cs (137) : {
-MiniSQLParser.cs (138) : if (match.Length != miniSQLQuery.Length) { return null; }
-MiniSQLParser.cs (139) : string toFilter, toSplit = "";
-MiniSQLParser.cs (140) : bool copying = false;
-MiniSQLParser.cs (141) : toFilter = match.Groups[2].Value;
-MiniSQLParser.cs (142) : for (int i = 0; i < toFilter.Length; i++)
+MiniSQLParser.cs (138) : if (toFilter[i] == '\'')
+MiniSQLParser.cs (139) : {
+MiniSQLParser.cs (140) : copying = !copying;
+MiniSQLParser.cs (141) : }
 MiniSQLParser.cs (143) : {
-MiniSQLParser.cs (144) : if (toFilter[i] == '\'')
-MiniSQLParser.cs (145) : {
-MiniSQLParser.cs (146) : copying = !copying;
-MiniSQLParser.cs (147) : }
-MiniSQLParser.cs (149) : {
-MiniSQLParser.cs (150) : toSplit += toFilter[i];
-MiniSQLParser.cs (151) : }
-MiniSQLParser.cs (152) : else if (toFilter[i] == ',')
-MiniSQLParser.cs (153) : {
-MiniSQLParser.cs (154) : toSplit += ",";
-MiniSQLParser.cs (155) : }
+MiniSQLParser.cs (144) : toSplit += toFilter[i];
+MiniSQLParser.cs (145) : }
+MiniSQLParser.cs (146) : else if (toFilter[i] == ',')
+MiniSQLParser.cs (147) : {
+MiniSQLParser.cs (148) : toSplit += ",";
+MiniSQLParser.cs (149) : }
+MiniSQLParser.cs (150) : }
+MiniSQLParser.cs (151) : List<string> values = new List<string>();
+MiniSQLParser.cs (152) : values = CommaSeparatedNames(toSplit);
+MiniSQLParser.cs (153) : return new Insert(match.Groups[1].Value, values);
 MiniSQLParser.cs (156) : }
-MiniSQLParser.cs (157) : List<string> values = new List<string>();
-MiniSQLParser.cs (158) : values = CommaSeparatedNames(toSplit);
-MiniSQLParser.cs (159) : return new Insert(match.Groups[1].Value, values);
-MiniSQLParser.cs (162) : }
-MiniSQLParser.cs (164) : match = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (166) : {
-MiniSQLParser.cs (171) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
-MiniSQLParser.cs (172) : }
+MiniSQLParser.cs (158) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (160) : {
+MiniSQLParser.cs (165) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
+MiniSQLParser.cs (166) : }
