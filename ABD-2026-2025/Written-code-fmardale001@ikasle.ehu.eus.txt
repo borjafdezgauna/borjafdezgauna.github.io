@@ -133,72 +133,70 @@ CreateTable.cs (22) : else
 CreateTable.cs (23) : {
 CreateTable.cs (24) : ColumnsParameters = new List<ColumnDefinition>();
 CreateTable.cs (25) : }
+CreateTable.cs (33) : database.CreateTable(Table, ColumnsParameters);
+CreateTable.cs (34) : return database.LastErrorMessage;
 DropTable.cs (15) : Table = table;
+DropTable.cs (23) : database.DropTable(Table);
+DropTable.cs (24) : return database.LastErrorMessage;
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (17) : const string dropTablePattern = @"DROP\s+TABLE\s+(\w+)"; //fabian
 MiniSQLParser.cs (24) : const string createTablePattern = @"CREATE\s+TABLE\s+(\w+)\s+\((\w+\s+(?:TEXT|INT|DOUBLE)(?:,\w+\s+(?:TEXT|INT|DOUBLE))*)?\)"; //fabian
 MiniSQLParser.cs (30) : //TODO DEADLINE 4
-MiniSQLParser.cs (31) : const string createSecurityProfilePattern = null;
-MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = null;
-MiniSQLParser.cs (35) : const string grantPattern = null;
-MiniSQLParser.cs (37) : const string revokePattern = null;
-MiniSQLParser.cs (39) : const string addUserPattern = null;
-MiniSQLParser.cs (41) : const string deleteUserPattern = null;
 MiniSQLParser.cs (44) : //TODO DEADLINE 2
 MiniSQLParser.cs (45) : //Parse query using the regular expressions above one by one. If there is a match, create an instance of the query with the parsed parameters
 MiniSQLParser.cs (46) : //For example, if the query is a "SELECT ...", there should be a match with selectPattern. We would create and return an instance of Select
 MiniSQLParser.cs (47) : //initialized with the table name, the columns, and (possibly) an instance of Condition.
 MiniSQLParser.cs (48) : //If there is no match, it means there is a syntax error. We will return null.
-MiniSQLParser.cs (49) : Match match;
-MiniSQLParser.cs (50) : match = Regex.Match(miniSQLQuery, createTablePattern);
-MiniSQLParser.cs (52) : {
-MiniSQLParser.cs (53) : if (match.Length != miniSQLQuery.Length) { return null; }
-MiniSQLParser.cs (54) : List<ColumnDefinition> columnas = new List<ColumnDefinition>();
-MiniSQLParser.cs (55) : if (match.Groups[2].Value == null || match.Groups[2].Value.Length == 0 || match.Groups[2].Value.Length == 1)
-MiniSQLParser.cs (56) : {
-MiniSQLParser.cs (57) : //PREGUNTAR QUÉ HACER SI LAS COLUMNAS ESTÁN NULL
-MiniSQLParser.cs (58) : return new CreateTable(match.Groups[1].Value, columnas);
-MiniSQLParser.cs (59) : }
-MiniSQLParser.cs (60) : else
-MiniSQLParser.cs (61) : {
-MiniSQLParser.cs (62) : String[] cols = match.Groups[2].Value.Split(',');
-MiniSQLParser.cs (63) : foreach (String s in cols)
+MiniSQLParser.cs (50) : Match match;
+MiniSQLParser.cs (52) : match = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (54) : {
+MiniSQLParser.cs (55) : if (match.Length != miniSQLQuery.Length) { return null; }
+MiniSQLParser.cs (57) : List<ColumnDefinition> columnas = new List<ColumnDefinition>();
+MiniSQLParser.cs (58) : if (match.Groups[2].Value == null || match.Groups[2].Value.Length == 0 || match.Groups[2].Value.Length == 1)
+MiniSQLParser.cs (59) : {
+MiniSQLParser.cs (60) : //PREGUNTAR QUÉ HACER SI LAS COLUMNAS ESTÁN NULL
+MiniSQLParser.cs (61) : return new CreateTable(match.Groups[1].Value, columnas);
+MiniSQLParser.cs (62) : }
+MiniSQLParser.cs (63) : else
 MiniSQLParser.cs (64) : {
-MiniSQLParser.cs (65) : String[] separados = s.Split(' ');
-MiniSQLParser.cs (66) : String nombre = separados[0];
-MiniSQLParser.cs (67) : String tipo = separados[separados.Length-1];
-MiniSQLParser.cs (68) : ColumnDefinition rcol = null;
-MiniSQLParser.cs (69) : if (tipo.Equals("TEXT"))
-MiniSQLParser.cs (70) : {
-MiniSQLParser.cs (71) : rcol = new ColumnDefinition(ColumnDefinition.DataType.String, nombre);
-MiniSQLParser.cs (72) : }
-MiniSQLParser.cs (73) : if (tipo.Equals("INT"))
-MiniSQLParser.cs (74) : {
-MiniSQLParser.cs (75) : rcol = new ColumnDefinition(ColumnDefinition.DataType.Int, nombre);
-MiniSQLParser.cs (76) : }
-MiniSQLParser.cs (77) : if (tipo.Equals("DOUBLE"))
-MiniSQLParser.cs (78) : {
-MiniSQLParser.cs (79) : rcol = new ColumnDefinition(ColumnDefinition.DataType.Double, nombre);
-MiniSQLParser.cs (80) : }
-MiniSQLParser.cs (81) : columnas.Add(rcol);
+MiniSQLParser.cs (65) : String[] cols = match.Groups[2].Value.Split(',');
+MiniSQLParser.cs (66) : foreach (String s in cols)
+MiniSQLParser.cs (67) : {
+MiniSQLParser.cs (68) : String[] separados = s.Split(' ');
+MiniSQLParser.cs (69) : String nombre = separados[0];
+MiniSQLParser.cs (70) : String tipo = separados[separados.Length-1];
+MiniSQLParser.cs (71) : ColumnDefinition rcol = null;
+MiniSQLParser.cs (72) : if (tipo.Equals("TEXT"))
+MiniSQLParser.cs (73) : {
+MiniSQLParser.cs (74) : rcol = new ColumnDefinition(ColumnDefinition.DataType.String, nombre);
+MiniSQLParser.cs (75) : }
+MiniSQLParser.cs (76) : if (tipo.Equals("INT"))
+MiniSQLParser.cs (77) : {
+MiniSQLParser.cs (78) : rcol = new ColumnDefinition(ColumnDefinition.DataType.Int, nombre);
+MiniSQLParser.cs (79) : }
+MiniSQLParser.cs (80) : if (tipo.Equals("DOUBLE"))
+MiniSQLParser.cs (81) : {
+MiniSQLParser.cs (82) : rcol = new ColumnDefinition(ColumnDefinition.DataType.Double, nombre);
 MiniSQLParser.cs (83) : }
-MiniSQLParser.cs (84) : return new CreateTable(match.Groups[1].Value, columnas);
+MiniSQLParser.cs (84) : columnas.Add(rcol);
 MiniSQLParser.cs (85) : }
-MiniSQLParser.cs (86) : }
-MiniSQLParser.cs (89) : match = Regex.Match(miniSQLQuery, dropTablePattern);
-MiniSQLParser.cs (90) : if (match.Success)
-MiniSQLParser.cs (91) : {
-MiniSQLParser.cs (92) : if (match.Length != miniSQLQuery.Length) { return null; }
-MiniSQLParser.cs (94) : if (match.Groups[1].Value.Length == 0 || match.Groups[1].Value.Length == 1)
-MiniSQLParser.cs (95) : {
-MiniSQLParser.cs (96) : return null;
-MiniSQLParser.cs (97) : }
-MiniSQLParser.cs (98) : else
-MiniSQLParser.cs (99) : {
-MiniSQLParser.cs (100) : String nombreTabla = match.Groups[1].Value;
-MiniSQLParser.cs (101) : return new DropTable(match.Groups[1].Value);
-MiniSQLParser.cs (102) : }
-MiniSQLParser.cs (103) : }
-MiniSQLParser.cs (129) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (86) : return new CreateTable(match.Groups[1].Value, columnas);
+MiniSQLParser.cs (87) : }
+MiniSQLParser.cs (88) : }
+MiniSQLParser.cs (91) : match = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (92) : if (match.Success)
+MiniSQLParser.cs (93) : {
+MiniSQLParser.cs (94) : if (match.Length != miniSQLQuery.Length) { return null; }
+MiniSQLParser.cs (96) : if (match.Groups[1].Value.Length == 0 || match.Groups[1].Value.Length == 1)
+MiniSQLParser.cs (97) : {
+MiniSQLParser.cs (98) : return null;
+MiniSQLParser.cs (99) : }
+MiniSQLParser.cs (100) : else
+MiniSQLParser.cs (101) : {
+MiniSQLParser.cs (102) : String nombreTabla = match.Groups[1].Value;
+MiniSQLParser.cs (103) : return new DropTable(match.Groups[1].Value);
+MiniSQLParser.cs (104) : }
+MiniSQLParser.cs (105) : }
+MiniSQLParser.cs (130) : match = Regex.Match(miniSQLQuery, insertPattern);
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
