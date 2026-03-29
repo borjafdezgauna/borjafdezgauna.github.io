@@ -6,122 +6,125 @@ Database.cs (23) : get;
 Database.cs (24) : private set;
 Database.cs (25) : }
 Database.cs (36) : m_username = adminUsername;
-Database.cs (49) : return true;
-Database.cs (56) : for (int i = 0; i < Tables.Count; i++)
-Database.cs (57) : {
-Database.cs (58) : if (Tables[i].Name == tableName)
-Database.cs (59) : {
-Database.cs (60) : return Tables[i];
-Database.cs (61) : }
-Database.cs (62) : }
-Database.cs (69) : //DEADLINE 1.B: Create a new table with the given name and columns. If there is already a table with that name,
-Database.cs (76) : {
-Database.cs (77) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (78) : return false;
-Database.cs (79) : }
-Database.cs (81) : {
-Database.cs (84) : }
-Database.cs (85) : else
-Database.cs (86) : {
-Database.cs (87) : Table newTable = new Table(tableName, ColumnDefinition);
-Database.cs (91) : }
+Database.cs (39) : //Esto es para crear el perfil de admin con su usuario y contraseña para luego poder cargar la bd bien.
+Database.cs (40) : //Si no, al cargar la bd el manager no tendría ni perfil ni usuario para comprobar la contraseña
+Database.cs (41) : Profile adminProfile = new Profile{Name=Profile.AdminProfileName};
+Database.cs (42) : User adminUser = new User { Username = adminUsername, EncryptedPassword = Encryption.Encrypt(adminPassword) };
+Database.cs (43) : adminProfile.Users.Add(adminUser);
+Database.cs (45) : //Añadimos el perfil a manager
+Database.cs (46) : SecurityManager.Profiles.Add(adminProfile);
+Database.cs (58) : return true;
+Database.cs (65) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (66) : {
+Database.cs (67) : if (Tables[i].Name == tableName)
+Database.cs (68) : {
+Database.cs (69) : return Tables[i];
+Database.cs (70) : }
+Database.cs (71) : }
+Database.cs (78) : //DEADLINE 1.B: Create a new table with the given name and columns. If there is already a table with that name,
+Database.cs (85) : {
+Database.cs (86) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (87) : return false;
+Database.cs (88) : }
+Database.cs (90) : {
 Database.cs (93) : }
-Database.cs (101) : {
-Database.cs (102) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (157) : return null;
-Database.cs (173) : {
-Database.cs (196) : {
-Database.cs (206) : {
-Database.cs (207) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (208) : return false;
-Database.cs (209) : }
-Database.cs (223) : try
-Database.cs (224) : {
-Database.cs (225) : using (FileStream fs = new FileStream(databaseName, FileMode.Create))
-Database.cs (226) : using (BinaryWriter writer = new BinaryWriter(fs))
-Database.cs (227) : {
-Database.cs (228) : writer.Write(m_username);
-Database.cs (230) : writer.Write(Tables.Count);
-Database.cs (232) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (94) : else
+Database.cs (95) : {
+Database.cs (96) : Table newTable = new Table(tableName, ColumnDefinition);
+Database.cs (100) : }
+Database.cs (102) : }
+Database.cs (110) : {
+Database.cs (111) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (166) : return null;
+Database.cs (182) : {
+Database.cs (205) : {
+Database.cs (215) : {
+Database.cs (216) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (217) : return false;
+Database.cs (218) : }
+Database.cs (232) : try
 Database.cs (233) : {
-Database.cs (234) : Table table = Tables[i];
-Database.cs (236) : writer.Write(table.Name);
-Database.cs (238) : writer.Write(table.NumColumns());
-Database.cs (240) : for (int c = 0; c < table.NumColumns(); c++)
-Database.cs (241) : {
-Database.cs (242) : ColumnDefinition col = table.GetColumn(c);
-Database.cs (244) : writer.Write(col.Name);
-Database.cs (245) : writer.Write(col.Type.ToString());
-Database.cs (247) : }
-Database.cs (249) : writer.Write(table.NumRows());
-Database.cs (250) : for (int r = 0; r < table.NumRows(); r++)
-Database.cs (251) : {
-Database.cs (252) : Row row = table.GetRow(r);
-Database.cs (253) : List<string> rowValues = row.Values;
-Database.cs (254) : writer.Write(rowValues.Count);
-Database.cs (256) : for (int v = 0; v < rowValues.Count; v++)
-Database.cs (257) : {
-Database.cs (258) : writer.Write(rowValues[v]);
-Database.cs (259) : }
-Database.cs (260) : }
-Database.cs (261) : }
-Database.cs (262) : }
-Database.cs (263) : SecurityManager.Save(databaseName);
-Database.cs (264) : return true;
-Database.cs (266) : }
-Database.cs (267) : catch
-Database.cs (268) : {
+Database.cs (234) : using (FileStream fs = new FileStream(databaseName, FileMode.Create))
+Database.cs (235) : using (BinaryWriter writer = new BinaryWriter(fs))
+Database.cs (236) : {
+Database.cs (237) : writer.Write(m_username);
+Database.cs (239) : writer.Write(Tables.Count);
+Database.cs (241) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (242) : {
+Database.cs (243) : Table table = Tables[i];
+Database.cs (245) : writer.Write(table.Name);
+Database.cs (247) : writer.Write(table.NumColumns());
+Database.cs (249) : for (int c = 0; c < table.NumColumns(); c++)
+Database.cs (250) : {
+Database.cs (251) : ColumnDefinition col = table.GetColumn(c);
+Database.cs (253) : writer.Write(col.Name);
+Database.cs (254) : writer.Write(col.Type.ToString());
+Database.cs (256) : }
+Database.cs (258) : writer.Write(table.NumRows());
+Database.cs (259) : for (int r = 0; r < table.NumRows(); r++)
+Database.cs (260) : {
+Database.cs (261) : Row row = table.GetRow(r);
+Database.cs (262) : List<string> rowValues = row.Values;
+Database.cs (263) : writer.Write(rowValues.Count);
+Database.cs (265) : for (int v = 0; v < rowValues.Count; v++)
+Database.cs (266) : {
+Database.cs (267) : writer.Write(rowValues[v]);
+Database.cs (268) : }
+Database.cs (269) : }
 Database.cs (270) : }
-Database.cs (284) : try
-Database.cs (285) : {
-Database.cs (287) : Database db = new Database();
-Database.cs (288) : using (FileStream fs = new FileStream(databaseName, FileMode.Open))
-Database.cs (289) : using (BinaryReader reader = new BinaryReader(fs))
-Database.cs (290) : {
-Database.cs (292) : db.m_username = reader.ReadString();
-Database.cs (294) : int numTables = reader.ReadInt32();
-Database.cs (296) : for (int i = 0; i < numTables; i++)
-Database.cs (297) : {
-Database.cs (298) : string tableName = reader.ReadString();
-Database.cs (300) : int columnCount = reader.ReadInt32();
-Database.cs (302) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (304) : for (int c = 0; c < columnCount; c++)
+Database.cs (271) : }
+Database.cs (272) : SecurityManager.Save(databaseName);
+Database.cs (273) : return true;
+Database.cs (275) : }
+Database.cs (276) : catch
+Database.cs (277) : {
+Database.cs (279) : }
+Database.cs (293) : try
+Database.cs (294) : {
+Database.cs (296) : Manager manager = Manager.Load(databaseName, username);
+Database.cs (297) : if (manager == null || !manager.IsPasswordCorrect(username, password))
+Database.cs (298) : {
+Database.cs (299) : return null;
+Database.cs (300) : }
+Database.cs (302) : Database db = new Database();
+Database.cs (303) : using (FileStream fs = new FileStream(databaseName, FileMode.Open))
+Database.cs (304) : using (BinaryReader reader = new BinaryReader(fs))
 Database.cs (305) : {
-Database.cs (307) : string columnName = reader.ReadString();
-Database.cs (308) : string columnTypeString = reader.ReadString();
-Database.cs (310) : ColumnDefinition.DataType type = (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), columnTypeString);
-Database.cs (311) : columns.Add(new ColumnDefinition(type, columnName));
-Database.cs (312) : }
-Database.cs (314) : Table table = new Table(tableName, columns);
-Database.cs (316) : int rowCount = reader.ReadInt32();
-Database.cs (318) : for (int r = 0; r < rowCount; r++)
-Database.cs (319) : {
-Database.cs (320) : int valueCount = reader.ReadInt32();
-Database.cs (322) : List<string> values = new List<string>();
-Database.cs (324) : for (int v = 0; v < valueCount; v++)
-Database.cs (325) : {
-Database.cs (326) : values.Add(reader.ReadString());
-Database.cs (328) : }
-Database.cs (329) : table.Insert(values);
-Database.cs (330) : }
-Database.cs (332) : db.Tables.Add(table);
-Database.cs (334) : }
-Database.cs (336) : }
-Database.cs (338) : Manager manager= Manager.Load(databaseName, username);
-Database.cs (340) : if(manager==null)
-Database.cs (341) : {
-Database.cs (342) : return null;
+Database.cs (307) : db.m_username = reader.ReadString();
+Database.cs (309) : int numTables = reader.ReadInt32();
+Database.cs (311) : for (int i = 0; i < numTables; i++)
+Database.cs (312) : {
+Database.cs (313) : string tableName = reader.ReadString();
+Database.cs (315) : int columnCount = reader.ReadInt32();
+Database.cs (317) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (319) : for (int c = 0; c < columnCount; c++)
+Database.cs (320) : {
+Database.cs (322) : string columnName = reader.ReadString();
+Database.cs (323) : string columnTypeString = reader.ReadString();
+Database.cs (325) : ColumnDefinition.DataType type = (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), columnTypeString);
+Database.cs (326) : columns.Add(new ColumnDefinition(type, columnName));
+Database.cs (327) : }
+Database.cs (329) : Table table = new Table(tableName, columns);
+Database.cs (331) : int rowCount = reader.ReadInt32();
+Database.cs (333) : for (int r = 0; r < rowCount; r++)
+Database.cs (334) : {
+Database.cs (335) : int valueCount = reader.ReadInt32();
+Database.cs (337) : List<string> values = new List<string>();
+Database.cs (339) : for (int v = 0; v < valueCount; v++)
+Database.cs (340) : {
+Database.cs (341) : values.Add(reader.ReadString());
 Database.cs (343) : }
-Database.cs (345) : if(!manager.IsPasswordCorrect(username, password))
-Database.cs (346) : {
-Database.cs (347) : return null;
-Database.cs (348) : }
-Database.cs (350) : db.SecurityManager=manager;
-Database.cs (352) : return db;
-Database.cs (355) : }
-Database.cs (356) : catch
-Database.cs (357) : {
-Database.cs (361) : }
+Database.cs (344) : table.Insert(values);
+Database.cs (345) : }
+Database.cs (347) : db.Tables.Add(table);
+Database.cs (349) : }
+Database.cs (351) : }
+Database.cs (353) : db.SecurityManager=manager;
+Database.cs (355) : return db;
+Database.cs (358) : }
+Database.cs (359) : catch
+Database.cs (360) : {
+Database.cs (364) : }
 Row.cs (59) : i++;
 Table.cs (15) : get;
 Table.cs (17) : private set;
@@ -246,25 +249,23 @@ AddUser.cs (5) : using DbManager.Security;
 AddUser.cs (20) : Username= username;
 AddUser.cs (21) : Password=password;
 AddUser.cs (22) : ProfileName=profileName;
-AddUser.cs (29) : Profile profile= database.SecurityManager.ProfileByName(Username);
-AddUser.cs (31) : if(profile==null)
-AddUser.cs (32) : {
-AddUser.cs (33) : return "Error: Security profile does not exist";
-AddUser.cs (34) : }
-AddUser.cs (36) : User user= new User();
-AddUser.cs (37) : user.Username= Username;
-AddUser.cs (38) : user.EncryptedPassword=Password;
-AddUser.cs (40) : profile.Users.Add(user);
-AddUser.cs (42) : database.SecurityManager.AddProfile(profile);
-AddUser.cs (44) : if (!database.SecurityManager.IsUserAdmin())
-AddUser.cs (45) : {
-AddUser.cs (46) : return "Error: The security profile of the user does not have the required privilege to perform the operation";
-AddUser.cs (47) : }
-AddUser.cs (49) : if(database.LastErrorMessage!=null)
-AddUser.cs (50) : {
-AddUser.cs (51) : return database.LastErrorMessage;
-AddUser.cs (52) : }
-AddUser.cs (55) : return "User added";
+AddUser.cs (30) : if (!database.SecurityManager.IsUserAdmin())
+AddUser.cs (31) : {
+AddUser.cs (32) : return "Error: The security profile of the user does not have the required privilege to perform the operation";
+AddUser.cs (33) : }
+AddUser.cs (35) : Profile profile= database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (37) : if(profile==null)
+AddUser.cs (38) : {
+AddUser.cs (39) : return "Error: Security profile does not exist";
+AddUser.cs (40) : }
+AddUser.cs (42) : User user= new User();
+AddUser.cs (43) : profile.Users.Add(user);
+AddUser.cs (45) : database.SecurityManager.AddProfile(profile);
+AddUser.cs (48) : if(database.LastErrorMessage!=null)
+AddUser.cs (49) : {
+AddUser.cs (50) : return database.LastErrorMessage;
+AddUser.cs (51) : }
+AddUser.cs (54) : return "User added";
 CreateSecurityProfile.cs (5) : using DbManager.Security;
 CreateSecurityProfile.cs (17) : ProfileName=profileName;
 CreateSecurityProfile.cs (25) : Profile profile= new Profile();
@@ -595,3 +596,58 @@ Update.cs (27) : {
 Update.cs (28) : return database.LastErrorMessage;
 Update.cs (30) : }
 Update.cs (31) : return "Tuple(s) updated";
+Manager.cs (7) : using System.Text.Json;
+Manager.cs (8) : using System.Text.Json.Serialization;
+Manager.cs (175) : string filePath= databaseName+ "_Security.json";
+Manager.cs (177) : Manager manager = new Manager(username);
+Manager.cs (179) : if (File.Exists(filePath))
+Manager.cs (180) : {
+Manager.cs (181) : try
+Manager.cs (182) : {
+Manager.cs (183) : string jsonString= File.ReadAllText(filePath);
+Manager.cs (184) : var options= new JsonSerializerOptions
+Manager.cs (185) : {
+Manager.cs (186) : IncludeFields = true,
+Manager.cs (187) : PropertyNameCaseInsensitive = true
+Manager.cs (188) : };
+Manager.cs (190) : var Listprofiles= JsonSerializer.Deserialize<List<Profile>>(jsonString, options);
+Manager.cs (191) : if(Listprofiles != null)
+Manager.cs (192) : {
+Manager.cs (193) : manager.Profiles.Clear();
+Manager.cs (194) : //AddRange añade a la lista del perfil concreto todos los perfiles ya deserializados
+Manager.cs (195) : manager.Profiles.AddRange(Listprofiles);
+Manager.cs (196) : }
+Manager.cs (198) : }
+Manager.cs (199) : catch (Exception ex)
+Manager.cs (200) : {
+Manager.cs (201) : Console.WriteLine("Error al cargar la información de seguridad: " + ex.Message);
+Manager.cs (202) : }
+Manager.cs (203) : }
+Manager.cs (204) : else
+Manager.cs (205) : {
+Manager.cs (206) : Console.WriteLine("No se encontró el archivo de seguridad para la base de datos: " + databaseName);
+Manager.cs (207) : }
+Manager.cs (208) : return manager;
+Manager.cs (215) : try
+Manager.cs (216) : {
+Manager.cs (217) : string filePath= databaseName+ "_Security.json";
+Manager.cs (219) : var options= new JsonSerializerOptions
+Manager.cs (220) : {
+Manager.cs (221) : //Para que el json sea legible añadiendo espacios y saltos de línea
+Manager.cs (222) : WriteIndented = true,
+Manager.cs (223) : //Para incluir los campos privados y que no se pierda ningún dato
+Manager.cs (224) : IncludeFields = true,
+Manager.cs (225) : //Para mayúsculas y minúsculas sin que importe
+Manager.cs (226) : PropertyNameCaseInsensitive = true
+Manager.cs (227) : };
+Manager.cs (229) : //JsonSerializer.Serialize se encarga de recorrer la lista de perfiles y sus usuarios
+Manager.cs (230) : //y transforma toda la información de nombres, constraseñas etc en formato json
+Manager.cs (231) : string jsonString= JsonSerializer.Serialize(this.Profiles, options);
+Manager.cs (232) : File.WriteAllText(filePath, jsonString);
+Manager.cs (233) : }
+Manager.cs (234) : catch (Exception ex)
+Manager.cs (235) : {
+Manager.cs (236) : Console.WriteLine("Error al guardar la información de seguridad: " + ex.Message);
+Manager.cs (237) : }
+Profile.cs (5) : using System.Text.Json.Serialization;
+Profile.cs (16) : [JsonInclude]
