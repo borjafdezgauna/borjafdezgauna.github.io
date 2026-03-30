@@ -248,14 +248,16 @@ Table.cs (306) : return update;
 AddUser.cs (21) : Username = username;
 AddUser.cs (22) : Password = password;
 AddUser.cs (23) : ProfileName = profileName;
-AddUser.cs (31) : if (!database.SecurityManager.IsUserAdmin())
-AddUser.cs (32) : {
-AddUser.cs (34) : }
-AddUser.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
-AddUser.cs (37) : if (profile == null)
-AddUser.cs (38) : {
-AddUser.cs (40) : }
-AddUser.cs (43) : profile.Users.Add(user);
+AddUser.cs (29) : //UsersProfileIsNotGrantedRequiredPrivilege, SecurityProfileDoesNotExistError, AddUserSuccessç
+AddUser.cs (31) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (33) : if (profile == null)
+AddUser.cs (34) : {
+AddUser.cs (36) : }
+AddUser.cs (38) : if (!database.SecurityManager.IsUserAdmin())
+AddUser.cs (39) : {
+AddUser.cs (40) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (41) : }
+AddUser.cs (44) : profile.Users.Add(user);
 CreateSecurityProfile.cs (5) : using DbManager.Security;
 CreateSecurityProfile.cs (17) : ProfileName = profileName;
 CreateSecurityProfile.cs (25) : Profile profile = new Profile();
@@ -332,7 +334,7 @@ Grant.cs (48) : if (profile.IsGrantedPrivilege(TableName, grantprivilege))
 Grant.cs (49) : {
 Grant.cs (50) : return Constants.ProfileAlreadyHasPrivilege;
 Grant.cs (51) : }
-Grant.cs (53) : database.SecurityManager.GrantPrivilege(PrivilegeName, TableName,grantprivilege);
+Grant.cs (53) : database.SecurityManager.GrantPrivilege(ProfileName, TableName,grantprivilege);
 Grant.cs (56) : return Constants.GrantPrivilegeSuccess;
 Insert.cs (16) : Table= table;
 Insert.cs (17) : Values= values;
@@ -540,7 +542,7 @@ Revoke.cs (39) : if (!profile.IsGrantedPrivilege(TableName, revokePrivilege))
 Revoke.cs (40) : {
 Revoke.cs (41) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Revoke.cs (42) : }
-Revoke.cs (44) : database.SecurityManager.RevokePrivilege(PrivilegeName, TableName, revokePrivilege);
+Revoke.cs (44) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, revokePrivilege);
 Revoke.cs (47) : return Constants.RevokePrivilegeSuccess;
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
