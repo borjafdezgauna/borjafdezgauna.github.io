@@ -8,84 +8,52 @@ Database.cs (96) : Tables.Remove(table);
 Database.cs (99) : LastErrorMessage = Constants.DropTableSuccess;
 Database.cs (100) : return true;
 Database.cs (101) : }
-Database.cs (219) : //DEADLINE 1.C + DEADLINE 5
-Database.cs (220) : try
-Database.cs (221) : {
-Database.cs (223) : string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-Database.cs (225) : string dbPath = Path.Combine(baseDir, $"{databaseName}.db");
-Database.cs (226) : string secPath = Path.Combine(baseDir, $"{databaseName}.sec");
-Database.cs (228) : #pragma warning disable SYSLIB0011
-Database.cs (229) : BinaryFormatter formatter = new BinaryFormatter();
-Database.cs (232) : using (FileStream fs = new FileStream(dbPath, FileMode.Create, FileAccess.Write, FileShare.None))
-Database.cs (233) : {
-Database.cs (234) : formatter.Serialize(fs, Tables);
+Database.cs (223) : try
+Database.cs (224) : {
+Database.cs (228) : {
 Database.cs (235) : }
-Database.cs (238) : using (FileStream fs = new FileStream(secPath, FileMode.Create, FileAccess.Write, FileShare.None))
-Database.cs (239) : {
-Database.cs (240) : formatter.Serialize(fs, SecurityManager);
-Database.cs (241) : }
-Database.cs (242) : #pragma warning restore SYSLIB0011
+Database.cs (238) : {
+Database.cs (240) : }
 Database.cs (244) : return true;
 Database.cs (245) : }
-Database.cs (246) : catch
 Database.cs (247) : {
-Database.cs (248) : return false;
-Database.cs (249) : }
-Database.cs (255) : try
-Database.cs (256) : {
-Database.cs (257) : string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-Database.cs (259) : string dbPath = Path.Combine(baseDir, $"{databaseName}.db");
-Database.cs (260) : string secPath = Path.Combine(baseDir, $"{databaseName}.sec");
-Database.cs (262) : if (!File.Exists(dbPath) || !File.Exists(secPath))
-Database.cs (265) : List<Table> loadedTables;
-Database.cs (266) : Manager loadedSecurity;
-Database.cs (268) : #pragma warning disable SYSLIB0011
-Database.cs (269) : BinaryFormatter formatter = new BinaryFormatter();
-Database.cs (272) : using (FileStream fs = new FileStream(dbPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-Database.cs (273) : {
-Database.cs (274) : loadedTables = (List<Table>)formatter.Deserialize(fs);
-Database.cs (278) : using (FileStream fs = new FileStream(secPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-Database.cs (279) : {
-Database.cs (280) : loadedSecurity = (Manager)formatter.Deserialize(fs);
-Database.cs (281) : }
-Database.cs (282) : #pragma warning restore SYSLIB0011
-Database.cs (285) : Database db = new Database();
-Database.cs (288) : db.Tables = loadedTables ?? new List<Table>();
-Database.cs (289) : db.SecurityManager = loadedSecurity;
-Database.cs (292) : db.m_username = username;
-Database.cs (295) : if (db.SecurityManager == null)
-Database.cs (296) : return null;
-Database.cs (298) : if (!TryVerifyPassword(db.SecurityManager, username, password))
-Database.cs (299) : return null;
-Database.cs (301) : return db;
-Database.cs (302) : }
-Database.cs (303) : catch
-Database.cs (304) : {
-Database.cs (305) : return null;
-Database.cs (306) : }
-Database.cs (307) : }
-Database.cs (309) : // Tries common method names in Manager without you needing to know the exact API.
-Database.cs (310) : // Returns true only if a known method exists AND it returns true.
-Database.cs (311) : private static bool TryVerifyPassword(Manager manager, string username, string password)
-Database.cs (312) : {
-Database.cs (313) : // Try: bool Login(string user, string pass)
-Database.cs (314) : // Try: bool CheckPassword(string user, string pass)
-Database.cs (315) : // Try: bool Authenticate(string user, string pass)
-Database.cs (316) : // Try: bool CheckUserPassword(string user, string pass)
-Database.cs (317) : string[] methodNames = { "Login", "CheckPassword", "Authenticate", "CheckUserPassword" };
-Database.cs (319) : Type t = manager.GetType();
-Database.cs (321) : foreach (string name in methodNames)
-Database.cs (322) : {
-Database.cs (323) : MethodInfo mi = t.GetMethod(name, new Type[] { typeof(string), typeof(string) });
-Database.cs (324) : if (mi != null && mi.ReturnType == typeof(bool))
-Database.cs (325) : {
-Database.cs (326) : object result = mi.Invoke(manager, new object[] { username, password });
-Database.cs (327) : return result is bool b && b;
-Database.cs (328) : }
-Database.cs (329) : }
-Database.cs (331) : // If no known method exists, safest is to fail auth.
-Database.cs (332) : return false;
-Database.cs (333) : }
+Database.cs (249) : return false;
+Database.cs (250) : }
+Database.cs (260) : try
+Database.cs (261) : {
+Database.cs (266) : {
+Database.cs (270) : {
+Database.cs (278) : }
+Database.cs (285) : return null;
+Database.cs (306) : return null;
+Database.cs (308) : return db;
+Database.cs (309) : }
+Database.cs (311) : {
+Database.cs (312) : return null;
+Database.cs (313) : }
+Database.cs (314) : }
+Database.cs (316) : // Tries common method names in Manager without you needing to know the exact API.
+Database.cs (317) : // Returns true only if a known method exists AND it returns true.
+Database.cs (318) : private static bool TryVerifyPassword(Manager manager, string username, string password)
+Database.cs (319) : {
+Database.cs (320) : // Try: bool Login(string user, string pass)
+Database.cs (321) : // Try: bool CheckPassword(string user, string pass)
+Database.cs (322) : // Try: bool Authenticate(string user, string pass)
+Database.cs (323) : // Try: bool CheckUserPassword(string user, string pass)
+Database.cs (324) : string[] methodNames = { "Login", "CheckPassword", "Authenticate", "CheckUserPassword" };
+Database.cs (326) : Type t = manager.GetType();
+Database.cs (328) : foreach (string name in methodNames)
+Database.cs (329) : {
+Database.cs (330) : MethodInfo mi = t.GetMethod(name, new Type[] { typeof(string), typeof(string) });
+Database.cs (331) : if (mi != null && mi.ReturnType == typeof(bool))
+Database.cs (332) : {
+Database.cs (333) : object result = mi.Invoke(manager, new object[] { username, password });
+Database.cs (334) : return result is bool b && b;
+Database.cs (335) : }
+Database.cs (336) : }
+Database.cs (338) : // If no known method exists, safest is to fail auth.
+Database.cs (339) : return false;
+Database.cs (340) : }
 Row.cs (11) : public List<string> Values { get; set; } = new List<string>();
 Row.cs (15) : // E�er null gelirse bo� listeye �ek
 Row.cs (16) : ColumnDefinitions = columnDefinitions ?? new List<ColumnDefinition>();

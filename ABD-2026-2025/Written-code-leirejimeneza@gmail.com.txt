@@ -27,17 +27,25 @@ Database.cs (233) : {
 Database.cs (234) : LastErrorMessage = Constants.TableDoesNotExistError;
 Database.cs (235) : return false;
 Database.cs (236) : }
-Database.cs (238) : //Column in the condition exist?
-Database.cs (239) : if (columnCondition != null)
-Database.cs (240) : {
-Database.cs (241) : if (table.ColumnIndexByName(columnCondition.ColumnName) == -1)
-Database.cs (242) : {
-Database.cs (243) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (238) : foreach (SetValue setValue in columnNames)
+Database.cs (239) : {
+Database.cs (240) : if (table.ColumnIndexByName(setValue.ColumnName) == -1)
+Database.cs (241) : {
+Database.cs (242) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (243) : return false;
+Database.cs (244) : }
 Database.cs (245) : }
-Database.cs (246) : }
-Database.cs (248) : table.Update(columnNames, columnCondition);
-Database.cs (249) : return true;
-Database.cs (250) : }
+Database.cs (247) : //Column in the condition exist?
+Database.cs (248) : if (columnCondition != null)
+Database.cs (249) : {
+Database.cs (250) : if (table.ColumnIndexByName(columnCondition.ColumnName) == -1)
+Database.cs (251) : {
+Database.cs (252) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (254) : }
+Database.cs (255) : }
+Database.cs (257) : table.Update(columnNames, columnCondition);
+Database.cs (258) : return true;
+Database.cs (259) : }
 Row.cs (8) : using System.Xml.Schema;
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
@@ -200,3 +208,22 @@ SetValue.cs (18) : this.Value = value;
 Update.cs (15) : Table = table;
 Update.cs (16) : Columns = columnNames;
 Update.cs (17) : Where = where;
+Update.cs (25) : if (database == null)
+Update.cs (26) : {
+Update.cs (27) : return Constants.Error;
+Update.cs (28) : }
+Update.cs (30) : Table tableToUpdate = database.TableByName(Table);
+Update.cs (32) : if (tableToUpdate == null)
+Update.cs (33) : {
+Update.cs (34) : return Constants.TableDoesNotExistError;
+Update.cs (37) : if (Columns.Count == 0)
+Update.cs (38) : {
+Update.cs (39) : return Constants.ColumnCountsDontMatch;
+Update.cs (40) : }
+Update.cs (42) : bool result = database.Update(Table, Columns, Where);
+Update.cs (44) : if (result)
+Update.cs (45) : {
+Update.cs (46) : return Constants.UpdateSuccess;
+Update.cs (47) : }
+Update.cs (49) : return database.LastErrorMessage;
+Update.cs (50) : }

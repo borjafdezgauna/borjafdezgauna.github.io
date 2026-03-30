@@ -182,8 +182,25 @@ Grant.cs (19) : this.TableName = tableName;
 Grant.cs (20) : this.ProfileName = profileName;
 MiniSQLParser.cs (36) : const string grantPattern = @"^GRANT\s+(?<PrivilegeType>SELECT|INSERT|UPDATE|DELETE)\s+ON\s+(?<TableName>[A-Za-z][A-Za-z0-9]*)\s+TO\s+(?<SecurityProfile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (38) : const string revokePattern = @"^REVOKE\s+(?<PrivilegeType>SELECT|INSERT|UPDATE|DELETE)\s+ON\s+(?<TableName>[A-Za-z][A-Za-z0-9]*)\s+FROM\s+(?<SecurityProfile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (201) : else if (Regex.IsMatch(miniSQLQuery, grantPattern))
+MiniSQLParser.cs (202) : {
+MiniSQLParser.cs (203) : Match match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (204) : string privilegeType = match.Groups["PrivilegeType"].Value;
+MiniSQLParser.cs (205) : string tableName = match.Groups["TableName"].Value;
+MiniSQLParser.cs (206) : string securityProfile = match.Groups["SecurityProfile"].Value;
+MiniSQLParser.cs (208) : return new Grant(privilegeType, tableName, securityProfile);
+MiniSQLParser.cs (209) : }
+MiniSQLParser.cs (210) : else if (Regex.IsMatch(miniSQLQuery, revokePattern))
+MiniSQLParser.cs (211) : {
+MiniSQLParser.cs (212) : Match match = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (213) : string privilegeType = match.Groups["PrivilegeType"].Value;
+MiniSQLParser.cs (214) : string tableName = match.Groups["TableName"].Value;
+MiniSQLParser.cs (215) : string securityProfile = match.Groups["SecurityProfile"].Value;
+MiniSQLParser.cs (217) : return new Revoke(privilegeType, tableName, securityProfile);
+MiniSQLParser.cs (218) : }
 Revoke.cs (18) : this.PrivilegeName = privilegeName;
 Revoke.cs (19) : this.TableName = tableName;
+Revoke.cs (20) : this.ProfileName = profileName;
 Select.cs (27) : Table tabla = database.TableByName(Table);
 Select.cs (29) : if (database == null)
 Select.cs (30) : return Constants.Error;

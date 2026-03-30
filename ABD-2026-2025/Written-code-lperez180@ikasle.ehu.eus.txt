@@ -317,27 +317,23 @@ Grant.cs (21) : ProfileName= profileName;
 Grant.cs (29) : Profile profile= database.SecurityManager.ProfileByName(ProfileName);
 Grant.cs (31) : if (!database.SecurityManager.IsUserAdmin())
 Grant.cs (32) : {
-Grant.cs (33) : return "Error: The security profile of the user does not have the required privilege to perform the operation";
+Grant.cs (33) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Grant.cs (34) : }
 Grant.cs (36) : if (profile==null)
 Grant.cs (37) : {
-Grant.cs (38) : return "Error: Security profile does not exist";
+Grant.cs (38) : return Constants.SecurityProfileDoesNotExistError;
 Grant.cs (39) : }
 Grant.cs (41) : Privilege grantprivilege= PrivilegeUtils.FromPrivilegeName(PrivilegeName);
 Grant.cs (43) : if (grantprivilege==null)
 Grant.cs (44) : {
-Grant.cs (45) : return "Error: Privilege does not exist";
+Grant.cs (45) : return Constants.PrivilegeDoesNotExistError;
 Grant.cs (46) : }
 Grant.cs (48) : if (profile.IsGrantedPrivilege(TableName, grantprivilege))
 Grant.cs (49) : {
-Grant.cs (50) : return "Error: Profile already has privilege";
+Grant.cs (50) : return Constants.ProfileAlreadyHasPrivilege;
 Grant.cs (51) : }
 Grant.cs (53) : database.SecurityManager.GrantPrivilege(PrivilegeName, TableName,grantprivilege);
-Grant.cs (55) : if(database.LastErrorMessage!=null)
-Grant.cs (56) : {
-Grant.cs (57) : return database.LastErrorMessage;
-Grant.cs (58) : }
-Grant.cs (60) : return "Security privilege granted";
+Grant.cs (56) : return Constants.GrantPrivilegeSuccess;
 Insert.cs (16) : Table= table;
 Insert.cs (17) : Values= values;
 Insert.cs (26) : database.Insert(Table, Values);
@@ -529,26 +525,23 @@ MiniSQLParser.cs (292) : if (matchDeleteUser.Success)
 MiniSQLParser.cs (293) : {
 MiniSQLParser.cs (294) : return new DeleteUser(matchDeleteUser.Groups[1].Value);
 MiniSQLParser.cs (295) : }
-Revoke.cs (5) : using DbManager.Security;
-Revoke.cs (19) : PrivilegeName= privilegeName;
-Revoke.cs (20) : TableName=tableName;
-Revoke.cs (21) : ProfileName=profileName;
-Revoke.cs (29) : Profile profile= database.SecurityManager.ProfileByName(ProfileName);
-Revoke.cs (31) : if (profile==null)
-Revoke.cs (32) : {
-Revoke.cs (33) : return "Error: Security profile does not exist";
-Revoke.cs (34) : }
-Revoke.cs (36) : Privilege revokePrivilege= PrivilegeUtils.FromPrivilegeName(PrivilegeName);
-Revoke.cs (38) : if (!profile.IsGrantedPrivilege(TableName, revokePrivilege))
-Revoke.cs (39) : {
-Revoke.cs (40) : return "Error: The security profile of the user does not have the required privilege to perform the operation";
-Revoke.cs (41) : }
-Revoke.cs (43) : database.SecurityManager.RevokePrivilege(PrivilegeName, TableName, revokePrivilege);
-Revoke.cs (45) : if(database.LastErrorMessage!=null)
-Revoke.cs (46) : {
-Revoke.cs (47) : return database.LastErrorMessage;
-Revoke.cs (49) : }
-Revoke.cs (51) : return "Security privilege revoked";
+Revoke.cs (3) : using System.Reflection.Metadata;
+Revoke.cs (6) : using DbManager.Security;
+Revoke.cs (20) : PrivilegeName= privilegeName;
+Revoke.cs (21) : TableName=tableName;
+Revoke.cs (22) : ProfileName=profileName;
+Revoke.cs (30) : Profile profile= database.SecurityManager.ProfileByName(ProfileName);
+Revoke.cs (32) : if (profile==null)
+Revoke.cs (33) : {
+Revoke.cs (34) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (35) : }
+Revoke.cs (37) : Privilege revokePrivilege= PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Revoke.cs (39) : if (!profile.IsGrantedPrivilege(TableName, revokePrivilege))
+Revoke.cs (40) : {
+Revoke.cs (41) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (42) : }
+Revoke.cs (44) : database.SecurityManager.RevokePrivilege(PrivilegeName, TableName, revokePrivilege);
+Revoke.cs (47) : return Constants.RevokePrivilegeSuccess;
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;
