@@ -44,8 +44,8 @@ Database.cs (160) : }
 Database.cs (161) : Table result = table.Select(columns, condition);
 Database.cs (162) : //LastErrorMessage = Constants.success;
 Database.cs (163) : return result;
-Row.cs (81) : if (value == null)
-Row.cs (84) : return value.Replace(Delimiter, DelimiterEncoded);
+Row.cs (90) : if (value == null)
+Row.cs (93) : return value.Replace(Delimiter, DelimiterEncoded);
 Table.cs (3) : using System.Data.Common;
 Table.cs (4) : using System.Xml.Linq;
 Table.cs (5) : using DbManager.Parser;
@@ -139,38 +139,43 @@ Insert.cs (22) : {
 Insert.cs (23) : Values = new List<string>();
 MiniSQLParser.cs (4) : using System.Linq;
 MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+(.+?)\s+FROM\s+(\w+)(?:\s+WHERE\s+(.*)\s*)?$";
-MiniSQLParser.cs (16) : const string insertPattern = @"^INSERT\s+INTO\s+(\w+)\s+VALUES\s+\(\s?('[^']*'(?:\s+,\s+'[^']*')*)\s+\)\s?$";
+MiniSQLParser.cs (16) : const string insertPattern = @"^INSERT\s+INTO\s+(\w+)\s+VALUES\s+\(\s*('[^']*'(?:\s*,\s*'[^']*')*)\s*\)\s?$";
 MiniSQLParser.cs (50) : //SELECT
-MiniSQLParser.cs (51) : match = Regex.Match(miniSQLQuery, selectPattern, RegexOptions.IgnoreCase);
-MiniSQLParser.cs (52) : if (match.Success)
-MiniSQLParser.cs (53) : {
-MiniSQLParser.cs (54) : string columnNames = match.Groups[1].Value;
-MiniSQLParser.cs (55) : string[] columns = columnNames.Split(',').Select(c => c.Trim()).ToArray();
-MiniSQLParser.cs (57) : string table = match.Groups[2].Value;
-MiniSQLParser.cs (59) : if (match.Groups[3].Success && !string.IsNullOrWhiteSpace(match.Groups[3].Value))
-MiniSQLParser.cs (60) : {
-MiniSQLParser.cs (61) : string conditions = match.Groups[3].Value;
-MiniSQLParser.cs (62) : string[] eachCondition = conditions.Split(",");
-MiniSQLParser.cs (63) : foreach(var condition in eachCondition)
-MiniSQLParser.cs (64) : {
-MiniSQLParser.cs (65) : var conditionMatch = Regex.Match(condition.Trim(), @"(\w+)\s*(<=|>=|=|<|>)\s*['""]?([^'""]+)['""]?$");
-MiniSQLParser.cs (66) : if (conditionMatch.Success)
-MiniSQLParser.cs (67) : {
-MiniSQLParser.cs (68) : string col = conditionMatch.Groups[1].Value;
-MiniSQLParser.cs (69) : string op = conditionMatch.Groups[2].Value;
-MiniSQLParser.cs (70) : string val = conditionMatch.Groups[3].Value;
-MiniSQLParser.cs (71) : }
-MiniSQLParser.cs (72) : }
-MiniSQLParser.cs (73) : }
-MiniSQLParser.cs (74) : }
-MiniSQLParser.cs (76) : //INSERT
-MiniSQLParser.cs (77) : match = Regex.Match(miniSQLQuery, insertPattern, RegexOptions.IgnoreCase);
-MiniSQLParser.cs (78) : if (match.Success)
-MiniSQLParser.cs (79) : {
-MiniSQLParser.cs (80) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (82) : string literalValues = match.Groups[2].Value;
-MiniSQLParser.cs (83) : string[] values = literalValues.Split(",").Select(v => v.Trim().Trim('\'')).ToArray();
-MiniSQLParser.cs (84) : }
+MiniSQLParser.cs (51) : match = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (52) : var newSelect = new Select();
+MiniSQLParser.cs (53) : if (match.Success)
+MiniSQLParser.cs (54) : {
+MiniSQLParser.cs (55) : string columnNames = match.Groups[1].Value;
+MiniSQLParser.cs (56) : string[] columnsSelect = columnNames.Split(',').Select(c => c.Trim()).ToArray();
+MiniSQLParser.cs (58) : string tableSelect = match.Groups[2].Value;
+MiniSQLParser.cs (60) : Condition conditionsParse = null;
+MiniSQLParser.cs (62) : if (match.Groups[3].Success && !string.IsNullOrWhiteSpace(match.Groups[3].Value))
+MiniSQLParser.cs (63) : {
+MiniSQLParser.cs (64) : string conditions = match.Groups[3].Value;
+MiniSQLParser.cs (65) : string[] eachCondition = conditions.Split(",");
+MiniSQLParser.cs (67) : foreach (var condition in eachCondition)
+MiniSQLParser.cs (68) : {
+MiniSQLParser.cs (69) : var conditionMatch = Regex.Match(condition.Trim(), @"(\w+)\s*(<=|>=|=|<|>)\s*['""]?([^'""]+)['""]?$");
+MiniSQLParser.cs (70) : if (conditionMatch.Success)
+MiniSQLParser.cs (71) : {
+MiniSQLParser.cs (72) : string col = conditionMatch.Groups[1].Value;
+MiniSQLParser.cs (73) : string op = conditionMatch.Groups[2].Value;
+MiniSQLParser.cs (74) : string val = conditionMatch.Groups[3].Value;
+MiniSQLParser.cs (76) : conditionsParse = new Condition(col, op, val);
+MiniSQLParser.cs (77) : }
+MiniSQLParser.cs (78) : }
+MiniSQLParser.cs (79) : }
+MiniSQLParser.cs (80) : return new Select(tableSelect, columnsSelect.ToList(), conditionsParse);
+MiniSQLParser.cs (81) : }
+MiniSQLParser.cs (83) : //INSERT
+MiniSQLParser.cs (84) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (85) : if (match.Success)
+MiniSQLParser.cs (86) : {
+MiniSQLParser.cs (87) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (89) : string literalValues = match.Groups[2].Value;
+MiniSQLParser.cs (90) : string[] values = literalValues.Split(",").Select(v => v.Trim().Trim('\'')).ToArray();
+MiniSQLParser.cs (92) : return new Insert(tableName, values.ToList());
+MiniSQLParser.cs (93) : }
 Select.cs (18) : this.Table = table;
 Select.cs (19) : this.Columns = columns ?? new List<string>();
 Select.cs (20) : this.Where = condition;
