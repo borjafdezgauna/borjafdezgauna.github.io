@@ -85,6 +85,7 @@ MiniSQLParser.cs (18) : const string insertPattern = @"^INSERT\s+INTO\s+(?<table
 MiniSQLParser.cs (20) : const string dropTablePattern = @"^DROP\s+TABLE\s+(?<table>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (26) : const string updateTablePattern = @"^UPDATE\s+(?<table>\w+)\s+SET\s+(?<set_columns>(\w+)(=)(\'-?\d+(\.\d+)?\'|'[^']+')(,(\w+)(=)(\'-?\d+(\.\d+)?\'|'[^']+'))*)*\s+WHERE\s+(?<columnName>\w+)(?<operator>=|<|>)(?<value>\'-?\d+(?<decimals>\.\d+)?\'|'[^']+')$";
 MiniSQLParser.cs (28) : const string deletePattern = @"^DELETE\s+FROM\s+(?<table>\w+)\s+WHERE\s+(?<columnName>\w+)(?<operator>=|<|>)(?<literalValue>\'-?\d+(?<values>\.\d+)?\'|'[^']+')$";
+MiniSQLParser.cs (42) : const string deleteUserPattern = @"^DELETE\s+USER\s+(?<user>[A-Za-z]+)\s*;?\s*$";
 MiniSQLParser.cs (50) : if (Regex.IsMatch(miniSQLQuery, selectPattern))
 MiniSQLParser.cs (51) : {
 MiniSQLParser.cs (52) : Match match = Regex.Match(miniSQLQuery, selectPattern);
@@ -197,6 +198,12 @@ MiniSQLParser.cs (193) : literalValue = literalValue.Trim('\'');
 MiniSQLParser.cs (194) : }
 MiniSQLParser.cs (196) : return new Delete(tableName, new Condition(column, op, literalValue));
 MiniSQLParser.cs (198) : }
+MiniSQLParser.cs (219) : else if (Regex.IsMatch(miniSQLQuery,deleteUserPattern))
+MiniSQLParser.cs (220) : {
+MiniSQLParser.cs (221) : Match match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (222) : string user = match.Groups["user"].Value;
+MiniSQLParser.cs (223) : return new DeleteUser(user);
+MiniSQLParser.cs (224) : }
 Update.cs (15) : Table = table ;
 Update.cs (16) : Columns =columnNames ;
 Update.cs (17) : Where = where;
