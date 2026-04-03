@@ -174,7 +174,37 @@ Table.cs (137) : if (i < row.Values.Count - 1)
 Table.cs (139) : result = result + ",";
 Table.cs (142) : result = result + "}";
 Table.cs (145) : return result;
+Grant.cs (5) : using DbManager.Security;
+Grant.cs (19) : PrivilegeName = privilegeName;
+Grant.cs (20) : TableName = tableName;
+Grant.cs (21) : ProfileName = profileName;
+Grant.cs (29) : Privilege privilegeEnum;
+Grant.cs (30) : bool isValidPrivilege = Enum.TryParse<Privilege>(PrivilegeName, true, out privilegeEnum);
+Grant.cs (32) : if (isValidPrivilege == false)
+Grant.cs (33) : {
+Grant.cs (34) : return "PrivilegeDoesNotExistError";
+Grant.cs (37) : // 2. Comprobamos si el usuario actual tiene permisos de Administrador
+Grant.cs (38) : if (database.SecurityManager.IsUserAdmin() == false)
+Grant.cs (39) : {
+Grant.cs (40) : return "UsersProfileIsNotGrantedRequiredPrivilege";
+Grant.cs (44) : Profile targetProfile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (46) : if (targetProfile == null)
+Grant.cs (47) : {
+Grant.cs (48) : return "SecurityProfileDoesNotExistError";
+Grant.cs (52) : bool success = targetProfile.GrantPrivilege(TableName, privilegeEnum);
+Grant.cs (54) : if (success == true)
+Grant.cs (55) : {
+Grant.cs (56) : return "GrantPrivilegeSuccess";
+Grant.cs (57) : }
+Grant.cs (58) : else
+Grant.cs (59) : {
+Grant.cs (60) : return "ProfileAlreadyHasPrivilege";
+Grant.cs (61) : }
+Grant.cs (62) : }
+Grant.cs (64) : }
+Grant.cs (66) : }
 MiniSQLParser.cs (22) : const string updateTablePattern = @"UPDATE\s+(\w+)\s+SET\s+((?:\w+='[^']*')(?:,\w+='[^']*')*)\s+WHERE\s+(\w+)(=|<|>)'([^']*)'"; //Julen
+MiniSQLParser.cs (35) : const string grantPattern = @"GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+(\w+)"; //julen
 MiniSQLParser.cs (53) : if (match.Success)
 MiniSQLParser.cs (131) : if (match.Success == true)
 MiniSQLParser.cs (143) : else if (copying == true)
@@ -251,8 +281,22 @@ MiniSQLParser.cs (243) : return consultaUpdate;
 MiniSQLParser.cs (244) : }
 MiniSQLParser.cs (247) : //TODO DEADLINE 4
 MiniSQLParser.cs (248) : //Do the same for the security queries (CREATE SECURITY PROFILE, ...)
-MiniSQLParser.cs (280) : return null;
-MiniSQLParser.cs (281) : }
+MiniSQLParser.cs (249) : match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (250) : if (match.Success == true)
+MiniSQLParser.cs (251) : {
+MiniSQLParser.cs (252) : if (match.Length != miniSQLQuery.Length)
+MiniSQLParser.cs (253) : {
+MiniSQLParser.cs (254) : return null;
+MiniSQLParser.cs (255) : }
+MiniSQLParser.cs (257) : Grant consultaGrant = new Grant(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value);
+MiniSQLParser.cs (259) : return consultaGrant;
+MiniSQLParser.cs (260) : }
+MiniSQLParser.cs (278) : return null;
+MiniSQLParser.cs (279) : }
+MiniSQLParser.cs (292) : return null;
+MiniSQLParser.cs (293) : }
+Select.cs (39) : }
+Select.cs (40) : else {
 Update.cs (15) : this.Table = table;
 Update.cs (16) : this.Columns = columnNames;
 Update.cs (17) : this.Where = where;
@@ -265,3 +309,20 @@ Update.cs (29) : else
 Update.cs (30) : {
 Update.cs (31) : return database.LastErrorMessage;
 Update.cs (32) : }
+Manager.cs (40) : Profile perfilBuscado = ProfileByName(profileName);
+Manager.cs (42) : if (perfilBuscado != null)
+Manager.cs (43) : {
+Manager.cs (44) : perfilBuscado.GrantPrivilege(table, privilege);
+Manager.cs (45) : }
+Profile.cs (21) : if (PrivilegesOn.ContainsKey(table) == false)
+Profile.cs (22) : {
+Profile.cs (23) : PrivilegesOn.Add(table, new List<Privilege>());
+Profile.cs (24) : }
+Profile.cs (26) : if (PrivilegesOn[table].Contains(privilege) == false)
+Profile.cs (27) : {
+Profile.cs (28) : PrivilegesOn[table].Add(privilege);
+Profile.cs (29) : return true;
+Profile.cs (30) : }
+Profile.cs (31) : else
+Profile.cs (32) : {
+Profile.cs (35) : }
