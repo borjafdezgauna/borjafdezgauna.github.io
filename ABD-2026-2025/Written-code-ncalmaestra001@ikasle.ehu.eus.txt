@@ -95,42 +95,20 @@ MiniSQLParser.cs (96) : if (match.Success)
 MiniSQLParser.cs (97) : {
 MiniSQLParser.cs (98) : string tableName = match.Groups[1].Value;
 MiniSQLParser.cs (99) : string valuesText = match.Groups[2].Value;
-MiniSQLParser.cs (100) : List<string> values = ParseInsertValues(valuesText);
-MiniSQLParser.cs (102) : if (values == null)
-MiniSQLParser.cs (103) : {
-MiniSQLParser.cs (104) : return null;
+MiniSQLParser.cs (101) : List<string> valuesComma = CommaSeparatedNames(valuesText);
+MiniSQLParser.cs (102) : List<String> values = RemoveComillas(valuesComma);
+MiniSQLParser.cs (104) : return new Insert(tableName, values);
 MiniSQLParser.cs (105) : }
-MiniSQLParser.cs (106) : return new Insert(tableName, values);
-MiniSQLParser.cs (107) : }
-MiniSQLParser.cs (149) : static List<string> ParseInsertValues(string text)
-MiniSQLParser.cs (150) : {
-MiniSQLParser.cs (151) : List<string> values = new List<string>();
-MiniSQLParser.cs (152) : bool dentroComillas = false;
-MiniSQLParser.cs (153) : string x = "";
-MiniSQLParser.cs (155) : for (int i = 0; i < text.Length; i++)
-MiniSQLParser.cs (156) : {
-MiniSQLParser.cs (157) : if (text[i] == '\'')
-MiniSQLParser.cs (158) : {
-MiniSQLParser.cs (159) : dentroComillas = !dentroComillas;
-MiniSQLParser.cs (160) : }
-MiniSQLParser.cs (161) : else if (text[i] == ',' && !dentroComillas)
-MiniSQLParser.cs (162) : {
-MiniSQLParser.cs (163) : values.Add(x); x = "";
-MiniSQLParser.cs (164) : }
-MiniSQLParser.cs (165) : else if (text[i] != ' ' || dentroComillas)
-MiniSQLParser.cs (166) : {
-MiniSQLParser.cs (167) : x += text[i];
-MiniSQLParser.cs (168) : }
-MiniSQLParser.cs (169) : }
-MiniSQLParser.cs (170) : if (dentroComillas)
-MiniSQLParser.cs (171) : {
-MiniSQLParser.cs (172) : return null;
-MiniSQLParser.cs (173) : }
-MiniSQLParser.cs (174) : if (x != "")
-MiniSQLParser.cs (175) : {
-MiniSQLParser.cs (176) : values.Add(x);
-MiniSQLParser.cs (177) : }
-MiniSQLParser.cs (178) : return values;
-MiniSQLParser.cs (179) : }
+MiniSQLParser.cs (147) : static List<String> RemoveComillas(List<string> values)
+MiniSQLParser.cs (148) : {
+MiniSQLParser.cs (149) : List<string> result = new List<string>();
+MiniSQLParser.cs (151) : foreach (string value in values)
+MiniSQLParser.cs (152) : {
+MiniSQLParser.cs (153) : string i = value.Substring(1, value.Length - 2);
+MiniSQLParser.cs (154) : i = i.Trim();
+MiniSQLParser.cs (155) : result.Add(i);
+MiniSQLParser.cs (156) : }
+MiniSQLParser.cs (157) : return result;
+MiniSQLParser.cs (158) : }
 Update.cs (16) : Columns = columnNames;
 Update.cs (17) : Where = where;

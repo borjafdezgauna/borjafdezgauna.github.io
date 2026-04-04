@@ -5,126 +5,150 @@ Database.cs (22) : {
 Database.cs (23) : get;
 Database.cs (24) : private set;
 Database.cs (25) : }
-Database.cs (36) : m_username = adminUsername;
-Database.cs (39) : //Esto es para crear el perfil de admin con su usuario y contraseña para luego poder cargar la bd bien.
-Database.cs (40) : //Si no, al cargar la bd el manager no tendría ni perfil ni usuario para comprobar la contraseña
-Database.cs (41) : Profile adminProfile = new Profile{Name=Profile.AdminProfileName};
-Database.cs (42) : User adminUser = new User { Username = adminUsername, EncryptedPassword = Encryption.Encrypt(adminPassword) };
-Database.cs (43) : adminProfile.Users.Add(adminUser);
-Database.cs (45) : //Añadimos el perfil a manager
-Database.cs (46) : SecurityManager.Profiles.Add(adminProfile);
-Database.cs (58) : return true;
-Database.cs (65) : for (int i = 0; i < Tables.Count; i++)
-Database.cs (66) : {
-Database.cs (67) : if (Tables[i].Name == tableName)
+Database.cs (30) : //Lo usa load en el test para crear la bd sin poner contraseña
+Database.cs (31) : //Tables no estaba aún inicializada (es para evitar el NullReferenceException al cargar la bd))
+Database.cs (32) : Tables = new List<Table>();
+Database.cs (38) : m_username = adminUsername;
+Database.cs (41) : //Esto es para crear el perfil de admin con su usuario y contraseña para luego poder cargar la bd bien.
+Database.cs (42) : //Si no, al cargar la bd el manager no tendría ni perfil ni usuario para comprobar la contraseña
+Database.cs (43) : Profile adminProfile = new Profile{Name=Profile.AdminProfileName};
+Database.cs (44) : User adminUser = new User { Username = adminUsername, EncryptedPassword = Encryption.Encrypt(adminPassword) };
+Database.cs (45) : adminProfile.Users.Add(adminUser);
+Database.cs (47) : //Añadimos el perfil a manager
+Database.cs (48) : SecurityManager.Profiles.Add(adminProfile);
+Database.cs (60) : return true;
+Database.cs (67) : for (int i = 0; i < Tables.Count; i++)
 Database.cs (68) : {
-Database.cs (69) : return Tables[i];
-Database.cs (70) : }
-Database.cs (71) : }
-Database.cs (78) : //DEADLINE 1.B: Create a new table with the given name and columns. If there is already a table with that name,
-Database.cs (85) : {
-Database.cs (86) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (87) : return false;
-Database.cs (88) : }
-Database.cs (90) : {
-Database.cs (93) : }
-Database.cs (94) : else
-Database.cs (95) : {
-Database.cs (96) : Table newTable = new Table(tableName, ColumnDefinition);
-Database.cs (100) : }
+Database.cs (69) : if (Tables[i].Name == tableName)
+Database.cs (70) : {
+Database.cs (71) : return Tables[i];
+Database.cs (72) : }
+Database.cs (73) : }
+Database.cs (80) : //DEADLINE 1.B: Create a new table with the given name and columns. If there is already a table with that name,
+Database.cs (87) : {
+Database.cs (88) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (89) : return false;
+Database.cs (90) : }
+Database.cs (92) : {
+Database.cs (95) : }
+Database.cs (96) : else
+Database.cs (97) : {
+Database.cs (98) : Table newTable = new Table(tableName, ColumnDefinition);
 Database.cs (102) : }
-Database.cs (110) : {
-Database.cs (111) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (104) : }
+Database.cs (112) : {
+Database.cs (113) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (134) : if (!SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Insert))
+Database.cs (135) : {
+Database.cs (136) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (137) : return false;
+Database.cs (138) : }
+Database.cs (163) : if (!SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Select))
+Database.cs (164) : {
+Database.cs (165) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Database.cs (166) : return null;
-Database.cs (182) : {
-Database.cs (205) : {
-Database.cs (215) : {
-Database.cs (216) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (217) : return false;
-Database.cs (218) : }
-Database.cs (232) : try
-Database.cs (233) : {
-Database.cs (234) : using (FileStream fs = new FileStream(databaseName, FileMode.Create))
-Database.cs (235) : using (BinaryWriter writer = new BinaryWriter(fs))
-Database.cs (236) : {
-Database.cs (237) : writer.Write(m_username);
-Database.cs (239) : writer.Write(Tables.Count);
-Database.cs (241) : for (int i = 0; i < Tables.Count; i++)
-Database.cs (242) : {
-Database.cs (243) : Table table = Tables[i];
-Database.cs (245) : writer.Write(table.Name);
-Database.cs (247) : writer.Write(table.NumColumns());
-Database.cs (249) : for (int c = 0; c < table.NumColumns(); c++)
-Database.cs (250) : {
-Database.cs (251) : ColumnDefinition col = table.GetColumn(c);
-Database.cs (253) : writer.Write(col.Name);
-Database.cs (254) : writer.Write(col.Type.ToString());
-Database.cs (256) : }
-Database.cs (258) : writer.Write(table.NumRows());
-Database.cs (259) : for (int r = 0; r < table.NumRows(); r++)
-Database.cs (260) : {
-Database.cs (261) : Row row = table.GetRow(r);
-Database.cs (262) : List<string> rowValues = row.Values;
-Database.cs (263) : writer.Write(rowValues.Count);
-Database.cs (265) : for (int v = 0; v < rowValues.Count; v++)
-Database.cs (266) : {
-Database.cs (267) : writer.Write(rowValues[v]);
-Database.cs (268) : }
-Database.cs (269) : }
-Database.cs (270) : }
-Database.cs (271) : }
-Database.cs (272) : SecurityManager.Save(databaseName);
-Database.cs (273) : return true;
-Database.cs (275) : }
-Database.cs (276) : catch
-Database.cs (277) : {
-Database.cs (279) : }
-Database.cs (293) : try
-Database.cs (294) : {
-Database.cs (296) : Manager manager = Manager.Load(databaseName, username);
-Database.cs (297) : if (manager == null || !manager.IsPasswordCorrect(username, password))
-Database.cs (298) : {
-Database.cs (299) : return null;
+Database.cs (167) : }
+Database.cs (180) : return null;
+Database.cs (195) : if (!SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Delete))
+Database.cs (196) : {
+Database.cs (197) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (198) : return false;
+Database.cs (199) : }
+Database.cs (202) : {
+Database.cs (224) : if (!SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Update))
+Database.cs (225) : {
+Database.cs (226) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (227) : return false;
+Database.cs (228) : }
+Database.cs (230) : {
+Database.cs (240) : {
+Database.cs (241) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (242) : return false;
+Database.cs (243) : }
+Database.cs (257) : try
+Database.cs (258) : {
+Database.cs (259) : using (FileStream fs = new FileStream(databaseName, FileMode.Create))
+Database.cs (260) : using (BinaryWriter writer = new BinaryWriter(fs))
+Database.cs (261) : {
+Database.cs (262) : writer.Write(m_username);
+Database.cs (264) : writer.Write(Tables.Count);
+Database.cs (266) : for (int i = 0; i < Tables.Count; i++)
+Database.cs (267) : {
+Database.cs (268) : Table table = Tables[i];
+Database.cs (270) : writer.Write(table.Name);
+Database.cs (272) : writer.Write(table.NumColumns());
+Database.cs (274) : for (int c = 0; c < table.NumColumns(); c++)
+Database.cs (275) : {
+Database.cs (276) : ColumnDefinition col = table.GetColumn(c);
+Database.cs (278) : writer.Write(col.Name);
+Database.cs (279) : writer.Write(col.Type.ToString());
+Database.cs (281) : }
+Database.cs (283) : writer.Write(table.NumRows());
+Database.cs (284) : for (int r = 0; r < table.NumRows(); r++)
+Database.cs (285) : {
+Database.cs (286) : Row row = table.GetRow(r);
+Database.cs (287) : List<string> rowValues = row.Values;
+Database.cs (288) : writer.Write(rowValues.Count);
+Database.cs (290) : for (int v = 0; v < rowValues.Count; v++)
+Database.cs (291) : {
+Database.cs (292) : writer.Write(rowValues[v]);
+Database.cs (293) : }
+Database.cs (294) : }
+Database.cs (295) : }
+Database.cs (296) : }
+Database.cs (297) : SecurityManager.Save(databaseName);
+Database.cs (298) : return true;
 Database.cs (300) : }
-Database.cs (302) : Database db = new Database();
-Database.cs (303) : using (FileStream fs = new FileStream(databaseName, FileMode.Open))
-Database.cs (304) : using (BinaryReader reader = new BinaryReader(fs))
-Database.cs (305) : {
-Database.cs (307) : db.m_username = reader.ReadString();
-Database.cs (309) : int numTables = reader.ReadInt32();
-Database.cs (311) : for (int i = 0; i < numTables; i++)
-Database.cs (312) : {
-Database.cs (313) : string tableName = reader.ReadString();
-Database.cs (315) : int columnCount = reader.ReadInt32();
-Database.cs (317) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (319) : for (int c = 0; c < columnCount; c++)
-Database.cs (320) : {
-Database.cs (322) : string columnName = reader.ReadString();
-Database.cs (323) : string columnTypeString = reader.ReadString();
-Database.cs (325) : ColumnDefinition.DataType type = (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), columnTypeString);
-Database.cs (326) : columns.Add(new ColumnDefinition(type, columnName));
-Database.cs (327) : }
-Database.cs (329) : Table table = new Table(tableName, columns);
-Database.cs (331) : int rowCount = reader.ReadInt32();
-Database.cs (333) : for (int r = 0; r < rowCount; r++)
-Database.cs (334) : {
-Database.cs (335) : int valueCount = reader.ReadInt32();
-Database.cs (337) : List<string> values = new List<string>();
-Database.cs (339) : for (int v = 0; v < valueCount; v++)
-Database.cs (340) : {
-Database.cs (341) : values.Add(reader.ReadString());
-Database.cs (343) : }
-Database.cs (344) : table.Insert(values);
-Database.cs (345) : }
-Database.cs (347) : db.Tables.Add(table);
-Database.cs (349) : }
-Database.cs (351) : }
-Database.cs (353) : db.SecurityManager=manager;
-Database.cs (355) : return db;
-Database.cs (358) : }
-Database.cs (359) : catch
+Database.cs (301) : catch
+Database.cs (302) : {
+Database.cs (304) : }
+Database.cs (317) : try
+Database.cs (318) : {
+Database.cs (320) : Manager manager = Manager.Load(databaseName, username);
+Database.cs (321) : if (manager == null || !manager.IsPasswordCorrect(username, password))
+Database.cs (322) : {
+Database.cs (323) : return null;
+Database.cs (324) : }
+Database.cs (326) : Database db = new Database();
+Database.cs (327) : using (FileStream fs = new FileStream(databaseName, FileMode.Open))
+Database.cs (328) : using (BinaryReader reader = new BinaryReader(fs))
+Database.cs (329) : {
+Database.cs (331) : string adminName = reader.ReadString();
+Database.cs (333) : db.m_username = username;
+Database.cs (335) : int numTables = reader.ReadInt32();
+Database.cs (337) : for (int i = 0; i < numTables; i++)
+Database.cs (338) : {
+Database.cs (339) : string tableName = reader.ReadString();
+Database.cs (341) : int columnCount = reader.ReadInt32();
+Database.cs (343) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (345) : for (int c = 0; c < columnCount; c++)
+Database.cs (346) : {
+Database.cs (348) : string columnName = reader.ReadString();
+Database.cs (349) : string columnTypeString = reader.ReadString();
+Database.cs (351) : ColumnDefinition.DataType type = (ColumnDefinition.DataType)Enum.Parse(typeof(ColumnDefinition.DataType), columnTypeString);
+Database.cs (352) : columns.Add(new ColumnDefinition(type, columnName));
+Database.cs (353) : }
+Database.cs (355) : Table table = new Table(tableName, columns);
+Database.cs (357) : int rowCount = reader.ReadInt32();
+Database.cs (359) : for (int r = 0; r < rowCount; r++)
 Database.cs (360) : {
-Database.cs (364) : }
+Database.cs (361) : int valueCount = reader.ReadInt32();
+Database.cs (363) : List<string> values = new List<string>();
+Database.cs (365) : for (int v = 0; v < valueCount; v++)
+Database.cs (366) : {
+Database.cs (367) : values.Add(reader.ReadString());
+Database.cs (369) : }
+Database.cs (370) : table.Insert(values);
+Database.cs (371) : }
+Database.cs (373) : db.Tables.Add(table);
+Database.cs (375) : }
+Database.cs (377) : }
+Database.cs (379) : db.SecurityManager=manager;
+Database.cs (381) : return db;
+Database.cs (384) : }
+Database.cs (385) : catch
+Database.cs (386) : {
+Database.cs (390) : }
 Row.cs (59) : i++;
 Table.cs (15) : get;
 Table.cs (17) : private set;
@@ -532,26 +556,30 @@ Revoke.cs (6) : using DbManager.Security;
 Revoke.cs (20) : PrivilegeName= privilegeName;
 Revoke.cs (21) : TableName=tableName;
 Revoke.cs (22) : ProfileName=profileName;
-Revoke.cs (30) : Profile profile= database.SecurityManager.ProfileByName(ProfileName);
-Revoke.cs (32) : if (profile==null)
-Revoke.cs (33) : {
-Revoke.cs (34) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (29) : Profile profile= database.SecurityManager.ProfileByName(ProfileName);
+Revoke.cs (31) : if(!database.SecurityManager.IsUserAdmin())
+Revoke.cs (32) : {
+Revoke.cs (33) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Revoke.cs (35) : }
-Revoke.cs (37) : Privilege revokePrivilege= PrivilegeUtils.FromPrivilegeName(PrivilegeName);
-Revoke.cs (39) : if (!profile.IsGrantedPrivilege(TableName, revokePrivilege))
-Revoke.cs (40) : {
-Revoke.cs (41) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Revoke.cs (42) : }
-Revoke.cs (44) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, revokePrivilege);
-Revoke.cs (47) : return Constants.RevokePrivilegeSuccess;
+Revoke.cs (37) : if (profile==null)
+Revoke.cs (38) : {
+Revoke.cs (39) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (40) : }
+Revoke.cs (42) : Privilege revokePrivilege= PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Revoke.cs (44) : if (!profile.IsGrantedPrivilege(TableName, revokePrivilege))
+Revoke.cs (45) : {
+Revoke.cs (46) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (47) : }
+Revoke.cs (49) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, revokePrivilege);
+Revoke.cs (52) : return Constants.RevokePrivilegeSuccess;
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;
-Select.cs (27) : Table result = database.Select(Table, Columns, Where);
-Select.cs (30) : {
-Select.cs (31) : return database.LastErrorMessage;
-Select.cs (32) : }
-Select.cs (34) : return result.ToString();
+Select.cs (28) : Table result = database.Select(Table, Columns, Where);
+Select.cs (31) : {
+Select.cs (32) : return database.LastErrorMessage;
+Select.cs (33) : }
+Select.cs (35) : return result.ToString();
 Update.cs (26) : if(database.LastErrorMessage!=null)
 Update.cs (27) : {
 Update.cs (28) : return database.LastErrorMessage;
