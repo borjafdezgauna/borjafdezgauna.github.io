@@ -54,35 +54,35 @@ Condition.cs (59) : case ">": return cmp > 0;
 Condition.cs (60) : case ">=": return cmp >= 0;
 Condition.cs (61) : default: return false;
 Condition.cs (62) : }
-Database.cs (88) : Table table = TableByName(tableName);
-Database.cs (89) : if (table == null)
-Database.cs (90) : {
-Database.cs (91) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (93) : }
-Database.cs (95) : bool ok = table.Insert(values);
-Database.cs (96) : if (!ok)
-Database.cs (97) : {
-Database.cs (98) : LastErrorMessage = Constants.ColumnCountsDontMatch;
-Database.cs (99) : return false;
-Database.cs (100) : }
-Database.cs (101) : LastErrorMessage = Constants.InsertSuccess;
-Database.cs (102) : return true;
-Database.cs (110) : Table table = TableByName(tableName);
-Database.cs (111) : if (table == null)
-Database.cs (112) : {
-Database.cs (113) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (114) : return null;
-Database.cs (115) : }
-Database.cs (118) : {
-Database.cs (123) : foreach (string colName in columns)
-Database.cs (124) : {
-Database.cs (125) : if (table.ColumnByName(colName) == null)
-Database.cs (126) : {
-Database.cs (128) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (129) : return null;
-Database.cs (131) : }
-Database.cs (133) : LastErrorMessage = null;
-Database.cs (134) : return table.Select(columns, condition);
+Database.cs (89) : Table table = TableByName(tableName);
+Database.cs (90) : if (table == null)
+Database.cs (91) : {
+Database.cs (92) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (94) : }
+Database.cs (96) : bool ok = table.Insert(values);
+Database.cs (97) : if (!ok)
+Database.cs (98) : {
+Database.cs (99) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (100) : return false;
+Database.cs (101) : }
+Database.cs (102) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (103) : return true;
+Database.cs (111) : Table table = TableByName(tableName);
+Database.cs (112) : if (table == null)
+Database.cs (113) : {
+Database.cs (114) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (115) : return null;
+Database.cs (116) : }
+Database.cs (119) : {
+Database.cs (124) : foreach (string colName in columns)
+Database.cs (125) : {
+Database.cs (126) : if (table.ColumnByName(colName) == null)
+Database.cs (127) : {
+Database.cs (129) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (130) : return null;
+Database.cs (132) : }
+Database.cs (134) : LastErrorMessage = null;
+Database.cs (135) : return table.Select(columns, condition);
 Table.cs (96) : // No columns => empty string (as in documentation examples)
 Table.cs (98) : if (NumColumns() == 0) { return ""; }
 Table.cs (100) : string result = "['";
@@ -121,53 +121,53 @@ Table.cs (143) : Rows = newRows;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
 MiniSQLParser.cs (2) : using System;
-MiniSQLParser.cs (21) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z]\w*)\s*\((.*)\)$";
-MiniSQLParser.cs (23) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z]\w*)\s+SET\s+(.+)\s+WHERE\s+(\w+)\s*([<=>])\s*(\w+|\d+(?:\.\d+)?|'[^']*')$";
-MiniSQLParser.cs (56) : // create table
-MiniSQLParser.cs (57) : match = Regex.Match(miniSQLQuery, createTablePattern);
-MiniSQLParser.cs (58) : if (match.Success)
-MiniSQLParser.cs (59) : {
-MiniSQLParser.cs (60) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (61) : string columnsText = match.Groups[2].Value;
-MiniSQLParser.cs (62) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-MiniSQLParser.cs (64) : if (columnsText != "")
-MiniSQLParser.cs (65) : {
-MiniSQLParser.cs (66) : List<string> columnParts = CommaSeparatedNames(columnsText);
-MiniSQLParser.cs (67) : foreach (string columnPart in columnParts)
-MiniSQLParser.cs (68) : {
-MiniSQLParser.cs (69) : Match columnMatch = Regex.Match(columnPart, @"^\s*([a-zA-Z]\w*)\s+(String|Int|Double)\s*$");
-MiniSQLParser.cs (70) : if (!columnMatch.Success)
-MiniSQLParser.cs (71) : {
-MiniSQLParser.cs (72) : return null;
-MiniSQLParser.cs (73) : }
-MiniSQLParser.cs (75) : string columnName = columnMatch.Groups[1].Value;
-MiniSQLParser.cs (76) : string typeText = columnMatch.Groups[2].Value;
-MiniSQLParser.cs (78) : ColumnDefinition.DataType type;
-MiniSQLParser.cs (79) : Enum.TryParse(typeText, out type);
-MiniSQLParser.cs (81) : columns.Add(new ColumnDefinition(type, columnName));
-MiniSQLParser.cs (82) : }
-MiniSQLParser.cs (83) : }
-MiniSQLParser.cs (84) : return new CreateTable(tableName, columns);
-MiniSQLParser.cs (85) : }
-MiniSQLParser.cs (107) : //update
-MiniSQLParser.cs (108) : match = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (109) : if (match.Success)
-MiniSQLParser.cs (110) : {
-MiniSQLParser.cs (111) : List<SetValue> setValues = new List<SetValue>();
-MiniSQLParser.cs (112) : List<string> setParts = CommaSeparatedNames(match.Groups[2].Value);
-MiniSQLParser.cs (114) : foreach (string setPart in setParts)
-MiniSQLParser.cs (115) : {
-MiniSQLParser.cs (116) : Match setMatch = Regex.Match(setPart, @"^\s*([a-zA-Z]\w*)\s*=\s*([a-zA-Z_]\w*|\d+(?:\.\d+)?|'[^']*')\s*$");
-MiniSQLParser.cs (117) : if (!setMatch.Success)
-MiniSQLParser.cs (118) : {
-MiniSQLParser.cs (119) : return null;
-MiniSQLParser.cs (120) : }
-MiniSQLParser.cs (121) : SetValue newValue = new SetValue(setMatch.Groups[1].Value, setMatch.Groups[2].Value);
-MiniSQLParser.cs (122) : setValues.Add(newValue);
-MiniSQLParser.cs (123) : }
-MiniSQLParser.cs (125) : Condition updateCondition = new Condition(match.Groups[3].Value, match.Groups[4].Value, match.Groups[5].Value);
-MiniSQLParser.cs (126) : return new Update(match.Groups[1].Value, setValues, updateCondition);
-MiniSQLParser.cs (127) : }
+MiniSQLParser.cs (22) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z]\w*)\s*\((.*)\)$";
+MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z]\w*)\s+SET\s+(.+)\s+WHERE\s+(\w+)\s*([<=>])\s*(\w+|\d+(?:\.\d+)?|'[^']*')$";
+MiniSQLParser.cs (71) : // create table
+MiniSQLParser.cs (72) : match = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (73) : if (match.Success)
+MiniSQLParser.cs (74) : {
+MiniSQLParser.cs (75) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (76) : string columnsText = match.Groups[2].Value;
+MiniSQLParser.cs (77) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+MiniSQLParser.cs (79) : if (columnsText != "")
+MiniSQLParser.cs (80) : {
+MiniSQLParser.cs (81) : List<string> columnParts = CommaSeparatedNames(columnsText);
+MiniSQLParser.cs (82) : foreach (string columnPart in columnParts)
+MiniSQLParser.cs (83) : {
+MiniSQLParser.cs (84) : Match columnMatch = Regex.Match(columnPart, @"^\s*([a-zA-Z]\w*)\s+(String|Int|Double)\s*$");
+MiniSQLParser.cs (85) : if (!columnMatch.Success)
+MiniSQLParser.cs (86) : {
+MiniSQLParser.cs (87) : return null;
+MiniSQLParser.cs (88) : }
+MiniSQLParser.cs (90) : string columnName = columnMatch.Groups[1].Value;
+MiniSQLParser.cs (91) : string typeText = columnMatch.Groups[2].Value;
+MiniSQLParser.cs (93) : ColumnDefinition.DataType type;
+MiniSQLParser.cs (94) : Enum.TryParse(typeText, out type);
+MiniSQLParser.cs (96) : columns.Add(new ColumnDefinition(type, columnName));
+MiniSQLParser.cs (97) : }
+MiniSQLParser.cs (98) : }
+MiniSQLParser.cs (99) : return new CreateTable(tableName, columns);
+MiniSQLParser.cs (100) : }
+MiniSQLParser.cs (122) : //update
+MiniSQLParser.cs (123) : match = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (124) : if (match.Success)
+MiniSQLParser.cs (125) : {
+MiniSQLParser.cs (126) : List<SetValue> setValues = new List<SetValue>();
+MiniSQLParser.cs (127) : List<string> setParts = CommaSeparatedNames(match.Groups[2].Value);
+MiniSQLParser.cs (129) : foreach (string setPart in setParts)
+MiniSQLParser.cs (130) : {
+MiniSQLParser.cs (131) : Match setMatch = Regex.Match(setPart, @"^\s*([a-zA-Z]\w*)\s*=\s*([a-zA-Z_]\w*|\d+(?:\.\d+)?|'[^']*')\s*$");
+MiniSQLParser.cs (132) : if (!setMatch.Success)
+MiniSQLParser.cs (133) : {
+MiniSQLParser.cs (134) : return null;
+MiniSQLParser.cs (135) : }
+MiniSQLParser.cs (136) : SetValue newValue = new SetValue(setMatch.Groups[1].Value, setMatch.Groups[2].Value);
+MiniSQLParser.cs (137) : setValues.Add(newValue);
+MiniSQLParser.cs (138) : }
+MiniSQLParser.cs (140) : Condition updateCondition = new Condition(match.Groups[3].Value, match.Groups[4].Value, match.Groups[5].Value);
+MiniSQLParser.cs (141) : return new Update(match.Groups[1].Value, setValues, updateCondition);
+MiniSQLParser.cs (142) : }
 SetValue.cs (17) : if (string.IsNullOrWhiteSpace(column)) { return; }
 SetValue.cs (18) : ColumnName = column;
 SetValue.cs (19) : Value = value;
