@@ -111,10 +111,6 @@ MiniSQLParser.cs (10) : private const string Asterisk = "*";
 MiniSQLParser.cs (11) : private const string StringType = "TEXT";
 MiniSQLParser.cs (13) : private const string IntType = "INT";
 MiniSQLParser.cs (14) : private const string DoubleType = "DOUBLE";
-MiniSQLParser.cs (24) : @"^\s*SELECT\s+(?<cols>\*|[a-zA-Z][a-zA-Z0-9_]*(?:,[a-zA-Z][a-zA-Z0-9_]*)*)\s+"
-MiniSQLParser.cs (25) : + @"FROM\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s*" +
-MiniSQLParser.cs (26) : @"(?:WHERE\s+(?<wcol>[a-zA-Z][a-zA-Z0-9_]*)\s*(?<wop>=|!=|<=|>=|<|>)\s*(?<wval>'[^']*'|-?[0-9.]+)\s*)?" +
-MiniSQLParser.cs (27) : @";?\s*\z";
 MiniSQLParser.cs (31) : @"^\s*INSERT\s+INTO\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+" +
 MiniSQLParser.cs (32) : @"VALUES\s*\(\s*(?<vals>('[^']*'|-?[0-9.]+)(?:\s*,\s*('[^']*'|-?[0-9.]+))*)\s*\)\s*;?\s*\z";
 MiniSQLParser.cs (36) : @"^\s*DROP\s+TABLE\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*\z";
@@ -129,17 +125,17 @@ MiniSQLParser.cs (53) : @"^\s*CREATE\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][
 MiniSQLParser.cs (56) : @"^\s*DROP\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
 MiniSQLParser.cs (59) : @"^\s*GRANT\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (62) : @"^\s*REVOKE\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
-MiniSQLParser.cs (166) : string current = "";
-MiniSQLParser.cs (173) : values.Add(Unquote(current.Trim()));
-MiniSQLParser.cs (174) : current = "";
-MiniSQLParser.cs (233) : if (tokens.Length != 2)
-MiniSQLParser.cs (236) : string nameText = tokens[0].Trim();
-MiniSQLParser.cs (237) : string typeText = tokens[1].Trim().ToUpper();
-MiniSQLParser.cs (240) : if (typeText == StringType) dt = ColumnDefinition.DataType.String;
-MiniSQLParser.cs (241) : else if (typeText == IntType) dt = ColumnDefinition.DataType.Int;
-MiniSQLParser.cs (242) : else if (typeText == DoubleType) dt = ColumnDefinition.DataType.Double;
-MiniSQLParser.cs (247) : if (cols.Count == 0)
-MiniSQLParser.cs (248) : return null;
+MiniSQLParser.cs (172) : string current = "";
+MiniSQLParser.cs (185) : values.Add(Unquote(current.Trim()));
+MiniSQLParser.cs (186) : current = "";
+MiniSQLParser.cs (252) : if (tokens.Length != 2)
+MiniSQLParser.cs (255) : string nameText = tokens[0].Trim();
+MiniSQLParser.cs (256) : string typeText = tokens[1].Trim().ToUpper();
+MiniSQLParser.cs (259) : if (typeText == StringType) dt = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (260) : else if (typeText == IntType) dt = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (261) : else if (typeText == DoubleType) dt = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (266) : if (cols.Count == 0)
+MiniSQLParser.cs (267) : return null;
 Select.cs (28) : Table result = database.Select(this.Table, this.Columns, this.Where);
 Select.cs (32) : return result.ToString();
 Update.cs (3) : using System.Data.Common;
@@ -169,11 +165,39 @@ Update.cs (47) : }
 Update.cs (48) : }
 Update.cs (49) : }
 Update.cs (51) : return Constants.UpdateSuccess;
-User.cs (11) : }
-User.cs (13) : namespace DbManager.Security
-User.cs (15) : public class User
-User.cs (17) : public string Username { get; set; }
-User.cs (18) : public string EncryptedPassword { get; set; }
-User.cs (20) : public User(string username, string password)
-User.cs (22) : //TODO DEADLINE 5: Initialize the member variables. We must encrypt the password
-User.cs (29) : }
+Manager.cs (90) : if (string.IsNullOrEmpty(username))
+Manager.cs (91) : {
+Manager.cs (92) : return null;
+Manager.cs (93) : }
+Manager.cs (95) : foreach (Profile profile in Profiles)
+Manager.cs (96) : {
+Manager.cs (97) : foreach (User u in profile.Users)
+Manager.cs (98) : if (u.Username == username)
+Manager.cs (99) : {
+Manager.cs (100) : return u;
+Manager.cs (101) : }
+Manager.cs (102) : }
+Manager.cs (152) : Profile profileToRemove = ProfileByName(profileName);
+Manager.cs (153) : if (profileToRemove == null)
+Manager.cs (154) : {
+Manager.cs (157) : Profiles.Remove(profileToRemove);
+Manager.cs (159) : return true;
+Manager.cs (160) : }
+Manager.cs (173) : string fileName = databaseName + ".sec";
+Manager.cs (174) : using (StreamWriter writer = new StreamWriter(fileName))
+Manager.cs (175) : {
+Manager.cs (176) : foreach (Profile p in Profiles)
+Manager.cs (177) : {
+Manager.cs (178) : writer.WriteLine("PROFILE:" + p.Name);
+Manager.cs (179) : foreach (User u in p.Users)
+Manager.cs (180) : {
+Manager.cs (181) : writer.WriteLine("USER:" + u.Username + "," + u.EncryptedPassword);
+Manager.cs (182) : }
+Manager.cs (183) : }
+Manager.cs (184) : }
+User.cs (6) : namespace DbManager.Security
+User.cs (8) : public class User
+User.cs (10) : public string Username { get; set; }
+User.cs (11) : public string EncryptedPassword { get; set; }
+User.cs (13) : public User(string username, string password)
+User.cs (15) : //TODO DEADLINE 5: Initialize the member variables. We must encrypt the password

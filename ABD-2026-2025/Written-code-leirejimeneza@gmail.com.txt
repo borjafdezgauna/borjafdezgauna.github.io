@@ -227,3 +227,68 @@ Update.cs (46) : return Constants.UpdateSuccess;
 Update.cs (47) : }
 Update.cs (49) : return database.LastErrorMessage;
 Update.cs (50) : }
+Manager.cs (108) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table) || privilege == null)
+Manager.cs (109) : {
+Manager.cs (110) : return false;
+Manager.cs (111) : }
+Manager.cs (113) : Profile profile = ProfileByUser(username);
+Manager.cs (115) : if (profile == null)
+Manager.cs (116) : {
+Manager.cs (118) : }
+Manager.cs (120) : if (profile.Name == Profile.AdminProfileName)
+Manager.cs (121) : {
+Manager.cs (122) : return true;
+Manager.cs (123) : }
+Manager.cs (125) : return profile.IsGrantedPrivilege(table, privilege);
+Manager.cs (254) : try
+Manager.cs (255) : {
+Manager.cs (256) : string managerDir = Path.Combine(databaseName, "managerData");
+Manager.cs (258) : if (Directory.Exists(managerDir))
+Manager.cs (259) : {
+Manager.cs (260) : //Borra datos antiguos
+Manager.cs (261) : Directory.Delete(managerDir, true);
+Manager.cs (262) : }
+Manager.cs (264) : Directory.CreateDirectory(managerDir);
+Manager.cs (266) : int index = 1;
+Manager.cs (267) : foreach (Profile profile in Profiles)
+Manager.cs (268) : {
+Manager.cs (269) : string profileFolder = Path.Combine(managerDir, index.ToString());
+Manager.cs (270) : Directory.CreateDirectory(profileFolder);
+Manager.cs (272) : string profileFile = Path.Combine(profileFolder, profile.Name + ".txt");
+Manager.cs (274) : using (StreamWriter writer = new StreamWriter(profileFile))
+Manager.cs (275) : {
+Manager.cs (276) : //Guarda el nombre del perfil
+Manager.cs (277) : writer.WriteLine(profile.Name);
+Manager.cs (279) : //Guarda los usuarios
+Manager.cs (280) : foreach (User user in profile.Users)
+Manager.cs (281) : {
+Manager.cs (282) : writer.WriteLine($"USER:{user.Username},{user.EncryptedPassword}");
+Manager.cs (283) : }
+Manager.cs (285) : //Guarda los privilegios
+Manager.cs (286) : foreach (var tablePrivileges in profile.PrivilegesOn)
+Manager.cs (287) : {
+Manager.cs (288) : string table = tablePrivileges.Key;
+Manager.cs (289) : foreach (Privilege privilege in tablePrivileges.Value)
+Manager.cs (290) : {
+Manager.cs (291) : writer.WriteLine($"PRIV:{table},{privilege}");
+Manager.cs (292) : }
+Manager.cs (293) : }
+Manager.cs (294) : }
+Manager.cs (296) : index++;
+Manager.cs (297) : }
+Manager.cs (298) : }
+Manager.cs (299) : catch (Exception ex)
+Manager.cs (300) : {
+Manager.cs (301) : Console.WriteLine("Error during save: " + ex.Message);
+Manager.cs (302) : }
+Profile.cs (72) : if (table == null || privilege == null)
+Profile.cs (73) : {
+Profile.cs (74) : return false;
+Profile.cs (75) : }
+Profile.cs (76) : if (PrivilegesOn.ContainsKey(table))
+Profile.cs (77) : {
+Profile.cs (78) : return PrivilegesOn[table].Contains(privilege);
+Profile.cs (80) : }
+Profile.cs (81) : else
+Profile.cs (82) : {
+Profile.cs (87) : }

@@ -7,6 +7,11 @@ ColumnDefinition.cs (62) : return null;
 ColumnDefinition.cs (64) : string name = Decode(parts[0]);
 ColumnDefinition.cs (66) : DataType type = (DataType)Enum.Parse(typeof(DataType), parts[1], true);
 ColumnDefinition.cs (68) : return new ColumnDefinition(type, name);
+Condition.cs (35) : return ComparaString(value, LiteralValue);
+Condition.cs (40) : return ComparaNumero(intValue, intLiteral);
+Condition.cs (45) : return ComparaNumero(doubleValue, doubleLiteral);
+Condition.cs (53) : private bool ComparaString(string a, string b)
+Condition.cs (69) : private bool ComparaNumero<T>(T a, T b) where T : IComparable<T>
 Database.cs (71) : if (ColumnDefinition == null || ColumnDefinition.Count == 0)
 Database.cs (72) : {
 Database.cs (73) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
@@ -69,14 +74,23 @@ Row.cs (113) : foreach (string v in Values)
 Row.cs (114) : {
 Row.cs (115) : result.Add(Encode(v));
 Row.cs (116) : }
-Row.cs (118) : return string.Join(":", result);
-Row.cs (126) : string[] parts = value.Split(':');
-Row.cs (127) : List<string> values = new List<string>();
-Row.cs (129) : foreach (string p in parts)
-Row.cs (130) : {
-Row.cs (131) : values.Add(Decode(p));
-Row.cs (132) : }
-Row.cs (134) : return new Row(columns, values);
+Row.cs (118) : string text = "";
+Row.cs (120) : for (int i = 0; i < result.Count; i++)
+Row.cs (121) : {
+Row.cs (122) : text += result[i];
+Row.cs (124) : if (i < result.Count - 1)
+Row.cs (125) : {
+Row.cs (126) : text += ":";
+Row.cs (127) : }
+Row.cs (128) : }
+Row.cs (130) : return text;
+Row.cs (138) : string[] parts = value.Split(':');
+Row.cs (139) : List<string> values = new List<string>();
+Row.cs (141) : foreach (string p in parts)
+Row.cs (142) : {
+Row.cs (143) : values.Add(Decode(p));
+Row.cs (144) : }
+Row.cs (146) : return new Row(columns, values);
 CreateTable.cs (17) : Table = table;
 CreateTable.cs (18) : ColumnsParameters = columns;
 CreateTable.cs (26) : database.CreateTable(Table, ColumnsParameters);
@@ -139,3 +153,4 @@ MiniSQLParser.cs (142) : }
 MiniSQLParser.cs (144) : // UPDATETABLE
 MiniSQLParser.cs (145) : match = Regex.Match(miniSQLQuery, updateTablePattern, RegexOptions.IgnoreCase);
 SetValue.cs (17) : this.ColumnName = column;
+User.cs (21) : public User() {}
