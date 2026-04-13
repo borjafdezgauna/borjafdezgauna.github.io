@@ -272,14 +272,14 @@ Table.cs (306) : return update;
 AddUser.cs (21) : Username = username;
 AddUser.cs (22) : Password = password;
 AddUser.cs (23) : ProfileName = profileName;
-AddUser.cs (29) : //UsersProfileIsNotGrantedRequiredPrivilege, SecurityProfileDoesNotExistError, AddUserSuccessç
-AddUser.cs (31) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
-AddUser.cs (33) : if (profile == null)
-AddUser.cs (34) : {
-AddUser.cs (36) : }
-AddUser.cs (38) : if (!database.SecurityManager.IsUserAdmin())
+AddUser.cs (29) : //UsersProfileIsNotGrantedRequiredPrivilege, SecurityProfileDoesNotExistError, AddUserSuccess
+AddUser.cs (31) : if (!database.SecurityManager.IsUserAdmin())
+AddUser.cs (32) : {
+AddUser.cs (33) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (34) : }
+AddUser.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (38) : if (profile == null)
 AddUser.cs (39) : {
-AddUser.cs (40) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 AddUser.cs (41) : }
 AddUser.cs (44) : profile.Users.Add(user);
 CreateSecurityProfile.cs (5) : using DbManager.Security;
@@ -292,12 +292,16 @@ CreateSecurityProfile.cs (31) : }
 CreateSecurityProfile.cs (33) : database.SecurityManager.AddProfile(profile);
 CreateTable.cs (17) : Table= table;
 CreateTable.cs (18) : ColumnsParameters= columns;
-CreateTable.cs (25) : database.CreateTable(Table, ColumnsParameters);
-CreateTable.cs (27) : if(database.LastErrorMessage!=null)
-CreateTable.cs (28) : {
-CreateTable.cs (29) : return database.LastErrorMessage;
-CreateTable.cs (30) : }
-CreateTable.cs (32) : return "Table created";
+CreateTable.cs (26) : if (!database.SecurityManager.IsUserAdmin())
+CreateTable.cs (27) : {
+CreateTable.cs (28) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateTable.cs (29) : }
+CreateTable.cs (31) : database.CreateTable(Table, ColumnsParameters);
+CreateTable.cs (34) : if(database.LastErrorMessage!=null)
+CreateTable.cs (35) : {
+CreateTable.cs (36) : return database.LastErrorMessage;
+CreateTable.cs (37) : }
+CreateTable.cs (39) : return "Table created";
 Delete.cs (15) : Table= table;
 Delete.cs (16) : Where= where;
 Delete.cs (25) : database.DeleteWhere(Table, Where);
@@ -367,12 +371,12 @@ Grant.cs (58) : database.SecurityManager.GrantPrivilege(ProfileName, TableName,g
 Grant.cs (61) : return Constants.GrantPrivilegeSuccess;
 Insert.cs (16) : Table= table;
 Insert.cs (17) : Values= values;
-Insert.cs (26) : database.Insert(Table, Values);
-Insert.cs (28) : if(database.LastErrorMessage!=null)
-Insert.cs (29) : {
-Insert.cs (30) : return database.LastErrorMessage;
-Insert.cs (31) : }
-Insert.cs (33) : return "Tuple added";
+Insert.cs (27) : database.Insert(Table, Values);
+Insert.cs (29) : if(database.LastErrorMessage!=null)
+Insert.cs (30) : {
+Insert.cs (31) : return database.LastErrorMessage;
+Insert.cs (32) : }
+Insert.cs (34) : return Constants.InsertSuccess;
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (14) : //SELECT columnas FROM tabla patrón
 MiniSQLParser.cs (17) : //SELECT WHERE
@@ -601,52 +605,57 @@ Update.cs (30) : }
 Update.cs (31) : return "Tuple(s) updated";
 Manager.cs (7) : using System.Text.Json;
 Manager.cs (8) : using System.Text.Json.Serialization;
-Manager.cs (175) : string filePath= databaseName+ "_Security.json";
-Manager.cs (177) : Manager manager = new Manager(username);
-Manager.cs (179) : if (File.Exists(filePath))
-Manager.cs (180) : {
-Manager.cs (181) : try
-Manager.cs (182) : {
-Manager.cs (183) : string jsonString= File.ReadAllText(filePath);
-Manager.cs (184) : var options= new JsonSerializerOptions
-Manager.cs (185) : {
-Manager.cs (186) : IncludeFields = true,
-Manager.cs (187) : PropertyNameCaseInsensitive = true
-Manager.cs (188) : };
-Manager.cs (190) : var Listprofiles= JsonSerializer.Deserialize<List<Profile>>(jsonString, options);
-Manager.cs (191) : if(Listprofiles != null)
-Manager.cs (192) : {
-Manager.cs (193) : manager.Profiles.Clear();
-Manager.cs (194) : //AddRange añade a la lista del perfil concreto todos los perfiles ya deserializados
-Manager.cs (195) : manager.Profiles.AddRange(Listprofiles);
-Manager.cs (196) : }
-Manager.cs (198) : }
-Manager.cs (199) : catch (Exception ex)
-Manager.cs (200) : {
-Manager.cs (201) : throw;
+Manager.cs (19) : //public string CurrentUsername { get; set; }
+Manager.cs (30) : if (p == null)
+Manager.cs (31) : {
+Manager.cs (32) : return false;
+Manager.cs (33) : }
+Manager.cs (181) : string filePath= databaseName+ "_Security.json";
+Manager.cs (183) : Manager manager = new Manager(username);
+Manager.cs (185) : if (File.Exists(filePath))
+Manager.cs (186) : {
+Manager.cs (187) : try
+Manager.cs (188) : {
+Manager.cs (189) : string jsonString= File.ReadAllText(filePath);
+Manager.cs (190) : var options= new JsonSerializerOptions
+Manager.cs (191) : {
+Manager.cs (192) : IncludeFields = true,
+Manager.cs (193) : PropertyNameCaseInsensitive = true
+Manager.cs (194) : };
+Manager.cs (196) : var Listprofiles= JsonSerializer.Deserialize<List<Profile>>(jsonString, options);
+Manager.cs (197) : if(Listprofiles != null)
+Manager.cs (198) : {
+Manager.cs (199) : manager.Profiles.Clear();
+Manager.cs (200) : //AddRange añade a la lista del perfil concreto todos los perfiles ya deserializados
+Manager.cs (201) : manager.Profiles.AddRange(Listprofiles);
 Manager.cs (202) : }
-Manager.cs (203) : }
-Manager.cs (205) : return manager;
-Manager.cs (212) : try
-Manager.cs (213) : {
-Manager.cs (214) : string filePath= databaseName+ "_Security.json";
-Manager.cs (216) : var options= new JsonSerializerOptions
-Manager.cs (217) : {
-Manager.cs (218) : //Para que el json sea legible añadiendo espacios y saltos de línea
-Manager.cs (219) : WriteIndented = true,
-Manager.cs (220) : //Para incluir los campos privados y que no se pierda ningún dato
-Manager.cs (221) : IncludeFields = true,
-Manager.cs (222) : //Para mayúsculas y minúsculas sin que importe
-Manager.cs (223) : PropertyNameCaseInsensitive = true
-Manager.cs (224) : };
-Manager.cs (226) : //JsonSerializer.Serialize se encarga de recorrer la lista de perfiles y sus usuarios
-Manager.cs (227) : //y transforma toda la información de nombres, constraseñas etc en formato json
-Manager.cs (228) : string jsonString= JsonSerializer.Serialize(this.Profiles, options);
-Manager.cs (229) : File.WriteAllText(filePath, jsonString);
-Manager.cs (230) : }
-Manager.cs (231) : catch (Exception ex)
-Manager.cs (232) : {
-Manager.cs (233) : throw;
-Manager.cs (234) : }
+Manager.cs (204) : }
+Manager.cs (205) : catch (Exception ex)
+Manager.cs (206) : {
+Manager.cs (207) : throw;
+Manager.cs (208) : }
+Manager.cs (209) : }
+Manager.cs (211) : return manager;
+Manager.cs (218) : try
+Manager.cs (219) : {
+Manager.cs (220) : string filePath= databaseName+ "_Security.json";
+Manager.cs (222) : var options= new JsonSerializerOptions
+Manager.cs (223) : {
+Manager.cs (224) : //Para que el json sea legible añadiendo espacios y saltos de línea
+Manager.cs (225) : WriteIndented = true,
+Manager.cs (226) : //Para incluir los campos privados y que no se pierda ningún dato
+Manager.cs (227) : IncludeFields = true,
+Manager.cs (228) : //Para mayúsculas y minúsculas sin que importe
+Manager.cs (229) : PropertyNameCaseInsensitive = true
+Manager.cs (230) : };
+Manager.cs (232) : //JsonSerializer.Serialize se encarga de recorrer la lista de perfiles y sus usuarios
+Manager.cs (233) : //y transforma toda la información de nombres, constraseñas etc en formato json
+Manager.cs (234) : string jsonString= JsonSerializer.Serialize(this.Profiles, options);
+Manager.cs (235) : File.WriteAllText(filePath, jsonString);
+Manager.cs (236) : }
+Manager.cs (237) : catch (Exception ex)
+Manager.cs (238) : {
+Manager.cs (239) : throw;
+Manager.cs (240) : }
 Profile.cs (5) : using System.Text.Json.Serialization;
 Profile.cs (16) : [JsonInclude]

@@ -235,6 +235,10 @@ Table.cs (213) : List<string> values = new List<string>();
 Table.cs (219) : {
 Table.cs (222) : }
 Table.cs (225) : }
+AddUser.cs (5) : using DbManager.Security;
+AddUser.cs (20) : Username = username;
+AddUser.cs (21) : Password = password;
+AddUser.cs (22) : ProfileName = profileName;
 CreateTable.cs (17) : Table = table;
 CreateTable.cs (18) : ColumnsParameters = columns;
 CreateTable.cs (24) : if (ColumnsParameters==null || ColumnsParameters.Count==0)
@@ -256,12 +260,21 @@ Delete.cs (28) : {
 Delete.cs (29) : return Constants.DeleteSuccess;
 Delete.cs (30) : }
 Delete.cs (31) : return database.LastErrorMessage;
+DeleteUser.cs (16) : Username = username;
+DropSecurityProfile.cs (16) : ProfileName = profileName;
+DropSecurityProfile.cs (23) : database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (25) : if (string.IsNullOrEmpty(database.LastErrorMessage))
+DropSecurityProfile.cs (26) : {
+DropSecurityProfile.cs (27) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (28) : }
+DropSecurityProfile.cs (30) : return database.LastErrorMessage;
 Insert.cs (21) : if (string.IsNullOrEmpty(database.LastErrorMessage))
 Insert.cs (22) : {
 Insert.cs (23) : return Constants.InsertSuccess;
 Insert.cs (24) : }
 MiniSQLParser.cs (21) : const string createTablePattern = @"^CREATE\s+TABLE\s+(?<table>[a-zA-Z0-9]+)\s+\((?<columns>[a-zA-Z0-9]+\s+(?:INT|DOUBLE|TEXT)(?:,[a-zA-Z0-9]+\s+(?:INT|DOUBLE|TEXT))*)?\)\s*;?\s*$";
 MiniSQLParser.cs (23) : const string updateTablePattern = @"^UPDATE\s+(?<table>[a-zA-Z0-9]+)\s+SET\s+(?<assignments>[a-zA-Z0-9]+='[^']*'(?:,[a-zA-Z0-9]+='[^']*')*)(?:\s+WHERE\s+(?<column>[a-zA-Z0-9]+)(?<op>[<>=])(?<value>'[^']*'))?\s*;?\s*$";
+MiniSQLParser.cs (31) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z0-9_]+)\s*;?\s*$";
 MiniSQLParser.cs (80) : match = Regex.Match(miniSQLQuery, createTablePattern);
 MiniSQLParser.cs (82) : if (match.Success)
 MiniSQLParser.cs (83) : {
@@ -311,6 +324,12 @@ MiniSQLParser.cs (138) : }
 MiniSQLParser.cs (139) : }
 MiniSQLParser.cs (140) : return new Update(table, columnsToUpdate, condition);
 MiniSQLParser.cs (141) : }
+MiniSQLParser.cs (201) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (203) : if (match.Success)
+MiniSQLParser.cs (204) : {
+MiniSQLParser.cs (205) : var profile = match.Groups["profile"].Value;
+MiniSQLParser.cs (207) : return new DropSecurityProfile(profile);
+MiniSQLParser.cs (208) : }
 Update.cs (25) : if (string.IsNullOrEmpty(database.LastErrorMessage))
 Update.cs (26) : {
 Update.cs (27) : return Constants.UpdateSuccess;

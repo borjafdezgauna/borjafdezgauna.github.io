@@ -163,10 +163,12 @@ Table.cs (217) : int index = ColumnIndexByName(name);
 Table.cs (218) : if (index != -1)
 Table.cs (220) : values.Add(row.Values[index]);
 Table.cs (221) : }
+CreateSecurityProfile.cs (16) : ProfileName = profileName;
 Delete.cs (5) : namespace DbManager
 MiniSQLParser.cs (12) : const string selectPattern = @"^SELECT\s+(?<columns>(\*|\w+(?:,\w+)*))\s+FROM\s+(?<table>\w+)(\s+WHERE\s+(?<column>\w+)\s*(?<op><=|>=|!=|=|<|>)\s*'(?<value>[\w\.\s]+)')?$";
 MiniSQLParser.cs (14) : const string insertPattern = @"^INSERT\s+INTO\s+(?<table>\w+)\s+VALUES\s*\(\s*(?<values>'[^']*'(?:,'[^']*')*)\s*\)$";
 MiniSQLParser.cs (18) : //Note: The parsing of CREATE TABLE should accept empty columns "()"`
+MiniSQLParser.cs (29) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z]+)\s*;?\s*$";
 MiniSQLParser.cs (47) : if (miniSQLQuery == null)
 MiniSQLParser.cs (48) : return null;
 MiniSQLParser.cs (50) : Match match = Regex.Match(miniSQLQuery, selectPattern);
@@ -190,6 +192,15 @@ MiniSQLParser.cs (74) : values[i] = values[i].Trim().Trim('\'', '"');
 MiniSQLParser.cs (75) : }
 MiniSQLParser.cs (77) : return new Insert(table, values);
 MiniSQLParser.cs (78) : }
+MiniSQLParser.cs (192) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (194) : if (match.Success)
+MiniSQLParser.cs (195) : {
+MiniSQLParser.cs (196) : var profile = match.Groups["profile"].Value;
+MiniSQLParser.cs (198) : return new CreateSecurityProfile(profile);
+MiniSQLParser.cs (199) : }
+Revoke.cs (18) : PrivilegeName = privilegeName;
+Revoke.cs (19) : TableName = tableName;
+Revoke.cs (20) : ProfileName = profileName;
 Select.cs (22) : Table result = database.Select(Table, Columns, Where);
 Profile.cs (16) : if (!PrivilegesOn.TryGetValue(table, out List<Privilege> privs))
 Profile.cs (17) : {

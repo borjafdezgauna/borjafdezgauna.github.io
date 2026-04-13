@@ -137,12 +137,79 @@ MiniSQLParser.cs (81) : Condition condition = new Condition(columna, simbolo, co
 MiniSQLParser.cs (82) : Select select = new Select(table, columns, condition);
 MiniSQLParser.cs (84) : return select;
 MiniSQLParser.cs (85) : }
-Select.cs (26) : /*
-Select.cs (27) : if ()
-Select.cs (28) : {
-Select.cs (29) : database.ToString();
-Select.cs (30) : }else
-Select.cs (31) : {
-Select.cs (32) : return database.LastErrorMessage;
-Select.cs (33) : }
-Select.cs (34) : */
+Select.cs (27) : //No existe database
+Select.cs (28) : if (database == null)
+Select.cs (29) : {
+Select.cs (30) : return Constants.Error;
+Select.cs (31) : }
+Select.cs (32) : //El nombre de la tabla no existe
+Select.cs (33) : Table t = database.TableByName(Table);
+Select.cs (35) : if (t != null)
+Select.cs (36) : {
+Select.cs (37) : return Constants.TableDoesNotExistError;
+Select.cs (38) : }
+Select.cs (40) : //No existe el nombre de la columna
+Select.cs (41) : foreach (string col in Columns)
+Select.cs (42) : {
+Select.cs (43) : if (t.ColumnByName(col) == null)
+Select.cs (44) : {
+Select.cs (45) : return Constants.ColumnDoesNotExistError;
+Select.cs (46) : }
+Select.cs (48) : }
+Select.cs (50) : //Columnas en condici�n incorrectas
+Select.cs (51) : if (Where != null)
+Select.cs (52) : {
+Select.cs (53) : string c = Where.ColumnName;
+Select.cs (54) : if (c == null || t.ColumnByName(c) == null)
+Select.cs (55) : {
+Select.cs (56) : return Constants.ColumnDoesNotExistError;
+Select.cs (57) : }
+Select.cs (58) : }
+Select.cs (60) : if (database.Select(Table, Columns, Where) == null)
+Select.cs (61) : {
+Select.cs (62) : return Constants.Error;
+Select.cs (63) : }
+Select.cs (64) : return Table.ToString();
+Manager.cs (88) : if (profileName == null || table == null)
+Manager.cs (89) : {
+Manager.cs (90) : return;
+Manager.cs (91) : }
+Manager.cs (93) : if (IsUserAdmin()){
+Manager.cs (95) : Profile profile = ProfileByName(profileName);
+Manager.cs (97) : if(profile != null)
+Manager.cs (98) : {
+Manager.cs (99) : profile.RevokePrivilege(table, privilege);
+Manager.cs (100) : }
+Manager.cs (101) : }
+Manager.cs (131) : if (username == null)
+Manager.cs (132) : {
+Manager.cs (134) : }
+Manager.cs (136) : foreach (Profile p in Profiles)
+Manager.cs (137) : {
+Manager.cs (138) : List<User> users = p.Users;
+Manager.cs (140) : foreach (User u in users)
+Manager.cs (141) : {
+Manager.cs (142) : if (u.Username == username)
+Manager.cs (143) : {
+Manager.cs (144) : return u;
+Manager.cs (145) : }
+Manager.cs (146) : }
+Manager.cs (147) : }
+Manager.cs (149) : return null;
+Profile.cs (47) : //datos no v�lidos
+Profile.cs (48) : if (table == null || privilege == null)
+Profile.cs (49) : {
+Profile.cs (50) : return false;
+Profile.cs (51) : }
+Profile.cs (52) : //tabla no existe
+Profile.cs (53) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (54) : {
+Profile.cs (55) : return false;
+Profile.cs (56) : }
+Profile.cs (58) : //tabla no tiene privilegio
+Profile.cs (59) : if (!PrivilegesOn[table].Contains(privilege))
+Profile.cs (60) : {
+Profile.cs (62) : }
+Profile.cs (64) : //tabla tiene privilegios, quitamos
+Profile.cs (65) : PrivilegesOn[table].Remove(privilege);
+Profile.cs (66) : return true;

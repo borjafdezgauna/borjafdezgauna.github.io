@@ -118,10 +118,31 @@ DropTable.cs (27) : {
 DropTable.cs (28) : return Constants.CreateTableSuccess;
 DropTable.cs (29) : }
 DropTable.cs (31) : return database.LastErrorMessage;
+Grant.cs (18) : PrivilegeName = privilegeName;
+Grant.cs (19) : TableName = tableName;
+Grant.cs (20) : ProfileName = profileName;
 MiniSQLParser.cs (16) : const string dropTablePattern = @"DROP\s+TABLE\s+(?<table>[a-zA-Z0-9_]+)\s*;?\s*$";
+MiniSQLParser.cs (33) : const string grantPattern = @"GRANT\s+(?<privilege>\w+)\s+ON\s+(?<table>\w+)\s+TO\s+(?<profile>\w+)";
+MiniSQLParser.cs (35) : const string revokePattern = @"REVOKE\s+(?<priType>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<tabName>[a-zA-Z0-9]+)\s+TO\s+(?<secProfile>[a-zA-Z]+)$";
 MiniSQLParser.cs (143) : match = Regex.Match(miniSQLQuery, dropTablePattern);
 MiniSQLParser.cs (145) : if (match.Success)
 MiniSQLParser.cs (146) : {
 MiniSQLParser.cs (147) : var table = match.Groups["table"].Value;
 MiniSQLParser.cs (148) : return new DropTable(table);
 MiniSQLParser.cs (149) : }
+MiniSQLParser.cs (154) : match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (156) : if (match.Success)
+MiniSQLParser.cs (157) : {
+MiniSQLParser.cs (158) : var privilege = match.Groups["privilege"].Value;
+MiniSQLParser.cs (159) : var table = match.Groups["table"].Value;
+MiniSQLParser.cs (160) : var profile = match.Groups["profile"].Value;
+MiniSQLParser.cs (162) : return new Grant(privilege, table, profile);
+MiniSQLParser.cs (163) : }
+MiniSQLParser.cs (165) : match = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (167) : if (match.Success)
+MiniSQLParser.cs (168) : {
+MiniSQLParser.cs (169) : var privilege = match.Groups["priType"].Value;
+MiniSQLParser.cs (170) : var table = match.Groups["tabName"].Value;
+MiniSQLParser.cs (171) : var profile = match.Groups["secProfile"].Value;
+MiniSQLParser.cs (173) : return new Revoke(privilege, table, profile);
+MiniSQLParser.cs (174) : }
