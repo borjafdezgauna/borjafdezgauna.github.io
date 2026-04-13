@@ -44,8 +44,8 @@ Database.cs (160) : }
 Database.cs (161) : Table result = table.Select(columns, condition);
 Database.cs (162) : //LastErrorMessage = Constants.success;
 Database.cs (163) : return result;
-Row.cs (90) : if (value == null)
-Row.cs (93) : return value.Replace(Delimiter, DelimiterEncoded);
+Row.cs (91) : if (value == null)
+Row.cs (94) : return value.Replace(Delimiter, DelimiterEncoded);
 Table.cs (3) : using System.Data.Common;
 Table.cs (4) : using System.Xml.Linq;
 Table.cs (5) : using DbManager.Parser;
@@ -81,7 +81,7 @@ Table.cs (118) : {
 Table.cs (120) : }
 Table.cs (155) : List<ColumnDefinition> selectedColumns = new List<ColumnDefinition>();
 Table.cs (156) : List<int> selectedIndex = new List<int>();
-Table.cs (157) : if (columnNames == null || columnNames.Count == 0)
+Table.cs (157) : if (columnNames == null)
 Table.cs (158) : {
 Table.cs (159) : for (int i = 0; i < ColumnDefinitions.Count; i++)
 Table.cs (160) : {
@@ -106,33 +106,35 @@ Table.cs (179) : Table table = new Table("Result", selectedColumns);
 Table.cs (181) : for (int z = 0; z < Rows.Count; z++)
 Table.cs (182) : {
 Table.cs (183) : Row row = Rows[z];
-Table.cs (184) : if (condition == null || row.IsTrue(condition))
-Table.cs (185) : {
-Table.cs (186) : //TODO DEADLINE 1.A: Insert a new row with the values given. If the number of values is not correct, return false.True otherwise
-Table.cs (187) : List<string> newValues = new List<string>();
-Table.cs (188) : for (int k = 0; k < selectedIndex.Count; k++)
-Table.cs (189) : {
-Table.cs (190) : if (selectedIndex[k] < row.Values.Count)
-Table.cs (191) : newValues.Add(row.Values[selectedIndex[k]]);
-Table.cs (192) : else
-Table.cs (193) : newValues.Add(null);
-Table.cs (194) : }
-Table.cs (195) : table.AddRow(new Row(selectedColumns, newValues));
+Table.cs (184) : if (row == null) continue;
+Table.cs (185) : if (condition == null || row.IsTrue(condition))
+Table.cs (186) : {
+Table.cs (187) : //TODO DEADLINE 1.A: Insert a new row with the values given. If the number of values is not correct, return false.True otherwise
+Table.cs (188) : List<string> newValues = new List<string>();
+Table.cs (189) : for (int k = 0; k < selectedIndex.Count; k++)
+Table.cs (190) : {
+Table.cs (191) : int colIndx = selectedIndex[k];
+Table.cs (192) : if (colIndx < row.Values.Count)
+Table.cs (193) : newValues.Add(row.Values[colIndx]);
+Table.cs (194) : else
+Table.cs (195) : newValues.Add(null);
 Table.cs (196) : }
-Table.cs (198) : return table;
-Table.cs (203) : //TODO DEADLINE 1.A: Insert a new row with the values given. If the number of values is not correct, return false.True otherwise
-Table.cs (204) : if (values == null) return false;
-Table.cs (205) : if (values.Count != ColumnDefinitions.Count)
-Table.cs (206) : return false;
-Table.cs (208) : Row row = new Row(ColumnDefinitions, values);
-Table.cs (209) : AddRow(row);
-Table.cs (235) : public const ColumnDefinition.DataType TestColumn1Type =
-Table.cs (236) : ColumnDefinition.DataType.String;
-Table.cs (237) : public const ColumnDefinition.DataType TestColumn2Type =
-Table.cs (238) : ColumnDefinition.DataType.Double;
-Table.cs (239) : public const ColumnDefinition.DataType TestColumn3Type =
-Table.cs (240) : ColumnDefinition.DataType.Int;
-Table.cs (258) : if (rows.Count != NumRows()) throw new Exception($"The table has {NumRows()} rows and {rows.Count} were expected");
+Table.cs (197) : table.AddRow(new Row(selectedColumns, newValues));
+Table.cs (198) : }
+Table.cs (200) : return table;
+Table.cs (205) : //TODO DEADLINE 1.A: Insert a new row with the values given. If the number of values is not correct, return false.True otherwise
+Table.cs (206) : if (values == null) return false;
+Table.cs (207) : if (values.Count != ColumnDefinitions.Count)
+Table.cs (208) : return false;
+Table.cs (210) : Row row = new Row(ColumnDefinitions, values);
+Table.cs (211) : AddRow(row);
+Table.cs (237) : public const ColumnDefinition.DataType TestColumn1Type =
+Table.cs (238) : ColumnDefinition.DataType.String;
+Table.cs (239) : public const ColumnDefinition.DataType TestColumn2Type =
+Table.cs (240) : ColumnDefinition.DataType.Double;
+Table.cs (241) : public const ColumnDefinition.DataType TestColumn3Type =
+Table.cs (242) : ColumnDefinition.DataType.Int;
+Table.cs (260) : if (rows.Count != NumRows()) throw new Exception($"The table has {NumRows()} rows and {rows.Count} were expected");
 Insert.cs (6) : using System.Xml.Linq;
 Insert.cs (17) : this.Table = table;
 Insert.cs (18) : this.Values = values ?? new List<string>();
@@ -168,17 +170,29 @@ MiniSQLParser.cs (76) : conditionsParse = new Condition(col, op, val);
 MiniSQLParser.cs (77) : }
 MiniSQLParser.cs (78) : }
 MiniSQLParser.cs (79) : }
-MiniSQLParser.cs (80) : return new Select(tableSelect, columnsSelect.ToList(), conditionsParse);
-MiniSQLParser.cs (81) : }
-MiniSQLParser.cs (83) : //INSERT
-MiniSQLParser.cs (84) : match = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (85) : if (match.Success)
-MiniSQLParser.cs (86) : {
-MiniSQLParser.cs (87) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (89) : string literalValues = match.Groups[2].Value;
-MiniSQLParser.cs (90) : string[] values = literalValues.Split(",").Select(v => v.Trim().Trim('\'')).ToArray();
-MiniSQLParser.cs (92) : return new Insert(tableName, values.ToList());
-MiniSQLParser.cs (93) : }
+MiniSQLParser.cs (81) : if (miniSQLQuery.Contains("  "))
+MiniSQLParser.cs (82) : {
+MiniSQLParser.cs (83) : return null;
+MiniSQLParser.cs (84) : }
+MiniSQLParser.cs (86) : return new Select(tableSelect, columnsSelect.ToList(), conditionsParse);
+MiniSQLParser.cs (87) : }
+MiniSQLParser.cs (89) : //INSERT
+MiniSQLParser.cs (90) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (91) : if (match.Success)
+MiniSQLParser.cs (92) : {
+MiniSQLParser.cs (93) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (95) : string literalValues = match.Groups[2].Value;
+MiniSQLParser.cs (96) : List<string> values = literalValues.Split(',').Select(v => v.Trim().Trim('\'')).ToList();
+MiniSQLParser.cs (97) : if(!literalValues.Contains("'"))
+MiniSQLParser.cs (98) : {
+MiniSQLParser.cs (99) : return null;
+MiniSQLParser.cs (100) : }
+MiniSQLParser.cs (102) : if (miniSQLQuery.Contains("  "))
+MiniSQLParser.cs (103) : {
+MiniSQLParser.cs (104) : return null;
+MiniSQLParser.cs (105) : }
+MiniSQLParser.cs (107) : return new Insert(tableName, values);
+MiniSQLParser.cs (108) : }
 Select.cs (18) : this.Table = table;
 Select.cs (19) : this.Columns = columns ?? new List<string>();
 Select.cs (20) : this.Where = condition;
