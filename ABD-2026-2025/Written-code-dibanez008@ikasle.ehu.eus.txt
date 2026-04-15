@@ -62,26 +62,16 @@ Insert.cs (32) : else
 Insert.cs (33) : {
 Insert.cs (34) : return database.LastErrorMessage;
 Insert.cs (35) : }
-MiniSQLParser.cs (24) : @"^\s*SELECT\s+(?<cols>\*|[a-zA-Z][a-zA-Z0-9_]*(?:\s*,\s*[a-zA-Z][a-zA-Z0-9_]*)*)\s+" +
-MiniSQLParser.cs (25) : @"FROM\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)" +
-MiniSQLParser.cs (26) : @"(?:\s+WHERE\s+(?<wcol>[a-zA-Z][a-zA-Z0-9_]*)\s*(?<wop>=|!=|<=|>=|<|>)\s*(?<wval>'[^']*'|-?[0-9.]+))?" +
-MiniSQLParser.cs (27) : @"\s*;\s*$";
-MiniSQLParser.cs (124) : {
-MiniSQLParser.cs (125) : var vals = CommaSeparatedValues(mInsert.Groups["vals"].Value);
-MiniSQLParser.cs (126) : if (vals == null) return null;
-MiniSQLParser.cs (127) : return new Insert(mInsert.Groups["table"].Value, vals);
-MiniSQLParser.cs (128) : }
-MiniSQLParser.cs (167) : if (string.IsNullOrWhiteSpace(text))
-MiniSQLParser.cs (168) : return null;
-MiniSQLParser.cs (182) : if (string.IsNullOrWhiteSpace(current))
-MiniSQLParser.cs (183) : return null;
-MiniSQLParser.cs (188) : else
-MiniSQLParser.cs (189) : {
-MiniSQLParser.cs (190) : current += ch;
-MiniSQLParser.cs (191) : }
-MiniSQLParser.cs (194) : if (string.IsNullOrWhiteSpace(current))
-MiniSQLParser.cs (195) : return null;
-MiniSQLParser.cs (197) : values.Add(Unquote(current.Trim()));
+MiniSQLParser.cs (23) : const string selectPattern = @"^\s*SELECT\s+(?<cols>\*|[a-zA-Z][a-zA-Z0-9_]*(?:,[a-zA-Z][a-zA-Z0-9_]*)*)\s+" +
+MiniSQLParser.cs (24) : @"FROM\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s*" +
+MiniSQLParser.cs (25) : @"(?:WHERE\s+(?<wcol>[a-zA-Z][a-zA-Z0-9_]*)\s*(?<wop>=|!=|<=|>=|<|>)\s*(?<wval>'[^']*'|-?[0-9.]+)\s*)?" +
+MiniSQLParser.cs (26) : @";?\s*\z";
+MiniSQLParser.cs (122) : return new Insert(mInsert.Groups["table"].Value, CommaSeparatedValues(mInsert.Groups["vals"].Value));
+MiniSQLParser.cs (162) : if (text == null) return values;
+MiniSQLParser.cs (163) : bool inQuotes = false; string current = "";
+MiniSQLParser.cs (173) : else current += ch;
+MiniSQLParser.cs (176) : if (!string.IsNullOrWhiteSpace(current))
+MiniSQLParser.cs (177) : values.Add(Unquote(current.Trim()));
 Select.cs (18) : this.Table = table;
 Select.cs (19) : this.Columns = columns;
 Select.cs (20) : this.Where = condition;
@@ -115,3 +105,34 @@ Manager.cs (119) : {
 Manager.cs (120) : return p;
 Manager.cs (121) : }
 Manager.cs (122) : }
+Manager.cs (166) : string fileName = databaseName + ".sec";
+Manager.cs (168) : Manager manager = new Manager(username);
+Manager.cs (170) : if (!File.Exists(fileName))
+Manager.cs (171) : return manager;
+Manager.cs (173) : Profile currentProfile = null;
+Manager.cs (175) : using (StreamReader reader = new StreamReader(fileName))
+Manager.cs (176) : {
+Manager.cs (177) : string line;
+Manager.cs (179) : while ((line = reader.ReadLine()) != null)
+Manager.cs (180) : {
+Manager.cs (181) : if (line.StartsWith("PROFILE:"))
+Manager.cs (182) : {
+Manager.cs (183) : string profileName = line.Substring("PROFILE:".Length);
+Manager.cs (185) : currentProfile = new Profile { Name = profileName };
+Manager.cs (186) : manager.AddProfile(currentProfile);
+Manager.cs (187) : }
+Manager.cs (188) : else if (line.StartsWith("USER:") && currentProfile != null)
+Manager.cs (189) : {
+Manager.cs (190) : string userData = line.Substring("USER:".Length);
+Manager.cs (191) : string[] parts = userData.Split(',');
+Manager.cs (193) : if (parts.Length == 2)
+Manager.cs (194) : {
+Manager.cs (195) : User user = new User();
+Manager.cs (196) : user.Username = parts[0];
+Manager.cs (197) : user.EncryptedPassword = parts[1];
+Manager.cs (199) : currentProfile.Users.Add(user);
+Manager.cs (200) : }
+Manager.cs (201) : }
+Manager.cs (202) : }
+Manager.cs (203) : }
+Manager.cs (205) : return manager;
