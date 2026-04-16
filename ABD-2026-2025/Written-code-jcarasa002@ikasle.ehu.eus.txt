@@ -234,97 +234,99 @@ Grant.cs (61) : }
 Grant.cs (62) : }
 Grant.cs (64) : }
 Grant.cs (66) : }
+MiniSQLParser.cs (13) : const string selectPattern = @"SELECT\s+([a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*)\s+FROM\s+([a-zA-Z0-9]+)(?:\s+WHERE\s+([a-zA-Z0-9]+)([=<>])'([^']*)')?"; //Mikel
+MiniSQLParser.cs (17) : const string dropTablePattern = @"DROP\s+TABLE\s+([a-zA-Z0-9]+)"; //fabian
 MiniSQLParser.cs (22) : const string updateTablePattern = @"UPDATE\s+(\w+)\s+SET\s+((?:\w+='[^']*')(?:,\w+='[^']*')*)\s+WHERE\s+(\w+)(=|<|>)'([^']*)'"; //Julen
 MiniSQLParser.cs (35) : const string grantPattern = @"GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+([A-Za-z]+)"; //julen
 MiniSQLParser.cs (53) : if (match.Success)
-MiniSQLParser.cs (131) : if (match.Success == true)
-MiniSQLParser.cs (143) : else if (copying == true)
-MiniSQLParser.cs (158) : if (match.Success == true)
-MiniSQLParser.cs (160) : if (match.Length != miniSQLQuery.Length)
+MiniSQLParser.cs (123) : if (match.Success == true)
+MiniSQLParser.cs (135) : else if (copying == true)
+MiniSQLParser.cs (150) : if (match.Success == true)
+MiniSQLParser.cs (152) : if (match.Length != miniSQLQuery.Length)
+MiniSQLParser.cs (153) : {
+MiniSQLParser.cs (154) : return null;
+MiniSQLParser.cs (155) : }
+MiniSQLParser.cs (159) : match = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (160) : if (match.Success == true)
 MiniSQLParser.cs (161) : {
-MiniSQLParser.cs (162) : return null;
-MiniSQLParser.cs (163) : }
-MiniSQLParser.cs (167) : match = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (168) : if (match.Success == true)
-MiniSQLParser.cs (169) : {
-MiniSQLParser.cs (170) : if (match.Length != miniSQLQuery.Length)
-MiniSQLParser.cs (171) : {
-MiniSQLParser.cs (175) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (176) : string setString = match.Groups[2].Value;
-MiniSQLParser.cs (177) : string condColumn = match.Groups[3].Value;
-MiniSQLParser.cs (178) : string conditionOperator = match.Groups[4].Value;
-MiniSQLParser.cs (179) : string conditionValue = match.Groups[5].Value;
-MiniSQLParser.cs (181) : string toFilter = setString;
-MiniSQLParser.cs (182) : string toSplit = "";
-MiniSQLParser.cs (183) : bool copying = false;
-MiniSQLParser.cs (185) : for (int i = 0; i < toFilter.Length; i++)
-MiniSQLParser.cs (186) : {
-MiniSQLParser.cs (187) : if (toFilter[i] == '\'')
-MiniSQLParser.cs (188) : {
-MiniSQLParser.cs (189) : toSplit += toFilter[i];
-MiniSQLParser.cs (190) : copying = !copying;
+MiniSQLParser.cs (162) : if (match.Length != miniSQLQuery.Length)
+MiniSQLParser.cs (163) : {
+MiniSQLParser.cs (167) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (168) : string setString = match.Groups[2].Value;
+MiniSQLParser.cs (169) : string condColumn = match.Groups[3].Value;
+MiniSQLParser.cs (170) : string conditionOperator = match.Groups[4].Value;
+MiniSQLParser.cs (171) : string conditionValue = match.Groups[5].Value;
+MiniSQLParser.cs (173) : string toFilter = setString;
+MiniSQLParser.cs (174) : string toSplit = "";
+MiniSQLParser.cs (175) : bool copying = false;
+MiniSQLParser.cs (177) : for (int i = 0; i < toFilter.Length; i++)
+MiniSQLParser.cs (178) : {
+MiniSQLParser.cs (179) : if (toFilter[i] == '\'')
+MiniSQLParser.cs (180) : {
+MiniSQLParser.cs (181) : toSplit += toFilter[i];
+MiniSQLParser.cs (182) : copying = !copying;
+MiniSQLParser.cs (183) : }
+MiniSQLParser.cs (184) : else if (copying == true)
+MiniSQLParser.cs (185) : {
+MiniSQLParser.cs (186) : toSplit += toFilter[i];
+MiniSQLParser.cs (187) : }
+MiniSQLParser.cs (188) : else if (toFilter[i] == ',')
+MiniSQLParser.cs (189) : {
+MiniSQLParser.cs (190) : toSplit += ",";
 MiniSQLParser.cs (191) : }
-MiniSQLParser.cs (192) : else if (copying == true)
+MiniSQLParser.cs (192) : else if (toFilter[i] == '=')
 MiniSQLParser.cs (193) : {
-MiniSQLParser.cs (194) : toSplit += toFilter[i];
+MiniSQLParser.cs (194) : toSplit += "=";
 MiniSQLParser.cs (195) : }
-MiniSQLParser.cs (196) : else if (toFilter[i] == ',')
+MiniSQLParser.cs (196) : else if (toFilter[i] != ' ')
 MiniSQLParser.cs (197) : {
-MiniSQLParser.cs (198) : toSplit += ",";
+MiniSQLParser.cs (198) : toSplit += toFilter[i];
 MiniSQLParser.cs (199) : }
-MiniSQLParser.cs (200) : else if (toFilter[i] == '=')
-MiniSQLParser.cs (201) : {
-MiniSQLParser.cs (202) : toSplit += "=";
-MiniSQLParser.cs (203) : }
-MiniSQLParser.cs (204) : else if (toFilter[i] != ' ')
-MiniSQLParser.cs (205) : {
-MiniSQLParser.cs (206) : toSplit += toFilter[i];
-MiniSQLParser.cs (207) : }
-MiniSQLParser.cs (208) : }
-MiniSQLParser.cs (210) : List<string> asignaciones = CommaSeparatedNames(toSplit);
-MiniSQLParser.cs (211) : List<SetValue> setValues = new List<SetValue>();
-MiniSQLParser.cs (213) : foreach (string asignacion in asignaciones)
-MiniSQLParser.cs (214) : {
-MiniSQLParser.cs (215) : string[] partes = asignacion.Split("=");
-MiniSQLParser.cs (217) : if (partes.Length == 2)
-MiniSQLParser.cs (218) : {
-MiniSQLParser.cs (219) : string columna = partes[0];
-MiniSQLParser.cs (220) : string valor = partes[1];
-MiniSQLParser.cs (222) : if (valor.StartsWith("'") && valor.EndsWith("'"))
-MiniSQLParser.cs (223) : {
-MiniSQLParser.cs (224) : string valorLimpio = valor.Substring(1, valor.Length - 2);
-MiniSQLParser.cs (225) : SetValue nuevo = new SetValue(columna, valorLimpio);
-MiniSQLParser.cs (226) : setValues.Add(nuevo);
-MiniSQLParser.cs (227) : }
-MiniSQLParser.cs (228) : else
-MiniSQLParser.cs (229) : {
-MiniSQLParser.cs (230) : return null;
-MiniSQLParser.cs (231) : }
-MiniSQLParser.cs (232) : }
-MiniSQLParser.cs (233) : else
-MiniSQLParser.cs (234) : {
-MiniSQLParser.cs (235) : return null;
+MiniSQLParser.cs (200) : }
+MiniSQLParser.cs (202) : List<string> asignaciones = CommaSeparatedNames(toSplit);
+MiniSQLParser.cs (203) : List<SetValue> setValues = new List<SetValue>();
+MiniSQLParser.cs (205) : foreach (string asignacion in asignaciones)
+MiniSQLParser.cs (206) : {
+MiniSQLParser.cs (207) : string[] partes = asignacion.Split("=");
+MiniSQLParser.cs (209) : if (partes.Length == 2)
+MiniSQLParser.cs (210) : {
+MiniSQLParser.cs (211) : string columna = partes[0];
+MiniSQLParser.cs (212) : string valor = partes[1];
+MiniSQLParser.cs (214) : if (valor.StartsWith("'") && valor.EndsWith("'"))
+MiniSQLParser.cs (215) : {
+MiniSQLParser.cs (216) : string valorLimpio = valor.Substring(1, valor.Length - 2);
+MiniSQLParser.cs (217) : SetValue nuevo = new SetValue(columna, valorLimpio);
+MiniSQLParser.cs (218) : setValues.Add(nuevo);
+MiniSQLParser.cs (219) : }
+MiniSQLParser.cs (220) : else
+MiniSQLParser.cs (221) : {
+MiniSQLParser.cs (222) : return null;
+MiniSQLParser.cs (223) : }
+MiniSQLParser.cs (224) : }
+MiniSQLParser.cs (225) : else
+MiniSQLParser.cs (226) : {
+MiniSQLParser.cs (227) : return null;
+MiniSQLParser.cs (228) : }
+MiniSQLParser.cs (229) : }
+MiniSQLParser.cs (232) : Condition condition = new Condition(condColumn, conditionOperator, conditionValue);
+MiniSQLParser.cs (233) : Update consultaUpdate = new Update(tableName, setValues, condition);
+MiniSQLParser.cs (235) : return consultaUpdate;
 MiniSQLParser.cs (236) : }
-MiniSQLParser.cs (237) : }
-MiniSQLParser.cs (240) : Condition condition = new Condition(condColumn, conditionOperator, conditionValue);
-MiniSQLParser.cs (241) : Update consultaUpdate = new Update(tableName, setValues, condition);
-MiniSQLParser.cs (243) : return consultaUpdate;
-MiniSQLParser.cs (244) : }
-MiniSQLParser.cs (247) : //TODO DEADLINE 4
-MiniSQLParser.cs (248) : //Do the same for the security queries (CREATE SECURITY PROFILE, ...)
-MiniSQLParser.cs (249) : match = Regex.Match(miniSQLQuery, grantPattern);
-MiniSQLParser.cs (250) : if (match.Success == true)
-MiniSQLParser.cs (251) : {
-MiniSQLParser.cs (252) : if (match.Length != miniSQLQuery.Length)
-MiniSQLParser.cs (253) : {
-MiniSQLParser.cs (254) : return null;
-MiniSQLParser.cs (255) : }
-MiniSQLParser.cs (257) : Grant consultaGrant = new Grant(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value);
-MiniSQLParser.cs (259) : return consultaGrant;
-MiniSQLParser.cs (260) : }
-MiniSQLParser.cs (292) : return null;
-MiniSQLParser.cs (293) : }
-MiniSQLParser.cs (298) : string[] textParts = text.Split(",");
+MiniSQLParser.cs (239) : //TODO DEADLINE 4
+MiniSQLParser.cs (240) : //Do the same for the security queries (CREATE SECURITY PROFILE, ...)
+MiniSQLParser.cs (241) : match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (242) : if (match.Success == true)
+MiniSQLParser.cs (243) : {
+MiniSQLParser.cs (244) : if (match.Length != miniSQLQuery.Length)
+MiniSQLParser.cs (245) : {
+MiniSQLParser.cs (246) : return null;
+MiniSQLParser.cs (247) : }
+MiniSQLParser.cs (249) : Grant consultaGrant = new Grant(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value);
+MiniSQLParser.cs (251) : return consultaGrant;
+MiniSQLParser.cs (252) : }
+MiniSQLParser.cs (306) : return null;
+MiniSQLParser.cs (307) : }
+MiniSQLParser.cs (312) : string[] textParts = text.Split(",");
 Update.cs (15) : this.Table = table;
 Update.cs (16) : this.Columns = columnNames;
 Update.cs (17) : this.Where = where;

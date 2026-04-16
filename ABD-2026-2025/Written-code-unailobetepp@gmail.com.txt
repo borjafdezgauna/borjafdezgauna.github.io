@@ -101,15 +101,59 @@ Table.cs (175) : public void DeleteWhere(Condition condition) // Endika
 Table.cs (186) : public Table Select(List<string> columnNames, Condition condition) // Aitana
 Table.cs (239) : public bool Insert(List<string> values) // Aitana
 Table.cs (256) : public bool Update(List<SetValue> setValues, Condition condition) // Aitana
-AddUser.cs (15) : // Unai
-AddUser.cs (19) : this.Username = username;
-AddUser.cs (20) : this.Password = password;
-AddUser.cs (21) : this.ProfileName = profileName;
+AddUser.cs (1) : using DbManager.Parser;
+AddUser.cs (2) : using DbManager.Security;
+AddUser.cs (16) : // Unai
+AddUser.cs (20) : this.Username = username;
+AddUser.cs (21) : this.Password = password;
+AddUser.cs (22) : this.ProfileName = profileName;
+AddUser.cs (28) : if (!database.SecurityManager.IsUserAdmin())
+AddUser.cs (29) : {
+AddUser.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (31) : }
+AddUser.cs (33) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (34) : if (profile == null)
+AddUser.cs (35) : {
+AddUser.cs (36) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (37) : }
+AddUser.cs (39) : if (database.SecurityManager.UserByName(Username) != null)
+AddUser.cs (40) : {
+AddUser.cs (41) : return Constants.Error + "User already exists";
+AddUser.cs (42) : }
+AddUser.cs (44) : User newUser = new User(Username, Password);
+AddUser.cs (45) : profile.Users.Add(newUser);
+AddUser.cs (47) : return Constants.AddUserSuccess;
 CreateSecurityProfile.cs (10) : // Aitana
 CreateTable.cs (9) : // Maialen
 Delete.cs (7) : // Endika
-DeleteUser.cs (9) : // Unai
-DeleteUser.cs (17) : this.Username = username;
+DeleteUser.cs (1) : using DbManager.Parser;
+DeleteUser.cs (2) : using DbManager.Security;
+DeleteUser.cs (10) : // Unai
+DeleteUser.cs (18) : this.Username = username;
+DeleteUser.cs (25) : if (!database.SecurityManager.IsUserAdmin())
+DeleteUser.cs (26) : {
+DeleteUser.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (28) : }
+DeleteUser.cs (30) : Profile profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (32) : if (profile == null)
+DeleteUser.cs (33) : {
+DeleteUser.cs (34) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (35) : }
+DeleteUser.cs (37) : User userToRemove = null;
+DeleteUser.cs (38) : foreach (User u in profile.Users)
+DeleteUser.cs (39) : {
+DeleteUser.cs (40) : if (u.Username == Username)
+DeleteUser.cs (41) : {
+DeleteUser.cs (42) : userToRemove = u;
+DeleteUser.cs (43) : break;
+DeleteUser.cs (44) : }
+DeleteUser.cs (45) : }
+DeleteUser.cs (47) : if (userToRemove != null)
+DeleteUser.cs (48) : {
+DeleteUser.cs (49) : profile.Users.Remove(userToRemove);
+DeleteUser.cs (50) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (51) : }
+DeleteUser.cs (53) : return Constants.UserDoesNotExistError;
 DropSecurityProfile.cs (9) : // Aitana
 Grant.cs (9) : // Endika
 Insert.cs (9) : // Unai

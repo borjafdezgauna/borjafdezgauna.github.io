@@ -269,6 +269,27 @@ Table.cs (303) : update = true;
 Table.cs (304) : }
 Table.cs (305) : }
 Table.cs (306) : return update;
+Client.cs (6) : using System.Linq.Expressions;
+Client.cs (25) : try
+Client.cs (26) : {
+Client.cs (27) : if (m_tcpClient.Connected)
+Client.cs (28) : {
+Client.cs (29) : m_tcpClient.Close();
+Client.cs (30) : TcpClient newClient = new TcpClient();
+Client.cs (31) : }
+Client.cs (32) : m_tcpClient.Connect(ipAddress, port);
+Client.cs (33) : return true;
+Client.cs (35) : }catch
+Client.cs (36) : {
+Client.cs (41) : }
+Client.cs (59) : string request= $"<Open Database=\"{database}\" User=\"{username}\" Password=\"{password}\"/>";
+Client.cs (60) : string response = SendString(request);
+Client.cs (62) : if (response==null)
+Client.cs (63) : {
+Client.cs (64) : error="An error message from Constants.cs";
+Client.cs (66) : }
+Client.cs (68) : bool success= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (70) : return success;
 AddUser.cs (21) : Username = username;
 AddUser.cs (22) : Password = password;
 AddUser.cs (23) : ProfileName = profileName;
@@ -338,13 +359,13 @@ DropTable.cs (15) : Table= table;
 DropTable.cs (23) : if (!database.SecurityManager.IsUserAdmin())
 DropTable.cs (24) : {
 DropTable.cs (25) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-DropTable.cs (26) : }
-DropTable.cs (27) : database.DropTable(Table);
-DropTable.cs (28) : if(database.LastErrorMessage!=null)
-DropTable.cs (29) : {
-DropTable.cs (30) : return database.LastErrorMessage;
-DropTable.cs (31) : }
-DropTable.cs (34) : return "Table dropped";
+DropTable.cs (27) : }
+DropTable.cs (28) : database.DropTable(Table);
+DropTable.cs (29) : if(database.LastErrorMessage!=null)
+DropTable.cs (30) : {
+DropTable.cs (31) : return database.LastErrorMessage;
+DropTable.cs (32) : }
+DropTable.cs (35) : return "Table dropped";
 Grant.cs (3) : using System.Linq.Expressions;
 Grant.cs (6) : using DbManager.Security;
 Grant.cs (20) : PrivilegeName= privilegeName;
@@ -609,57 +630,56 @@ Update.cs (30) : }
 Update.cs (31) : return "Tuple(s) updated";
 Manager.cs (7) : using System.Text.Json;
 Manager.cs (8) : using System.Text.Json.Serialization;
-Manager.cs (19) : //public string CurrentUsername { get; set; }
-Manager.cs (30) : if (p == null)
-Manager.cs (31) : {
-Manager.cs (32) : return false;
-Manager.cs (33) : }
-Manager.cs (181) : string filePath= databaseName+ "_Security.json";
-Manager.cs (183) : Manager manager = new Manager(username);
-Manager.cs (185) : if (File.Exists(filePath))
+Manager.cs (28) : if (p == null)
+Manager.cs (29) : {
+Manager.cs (30) : return false;
+Manager.cs (31) : }
+Manager.cs (179) : string filePath= databaseName+ "_Security.json";
+Manager.cs (181) : Manager manager = new Manager(username);
+Manager.cs (183) : if (File.Exists(filePath))
+Manager.cs (184) : {
+Manager.cs (185) : try
 Manager.cs (186) : {
-Manager.cs (187) : try
-Manager.cs (188) : {
-Manager.cs (189) : string jsonString= File.ReadAllText(filePath);
-Manager.cs (190) : var options= new JsonSerializerOptions
-Manager.cs (191) : {
-Manager.cs (192) : IncludeFields = true,
-Manager.cs (193) : PropertyNameCaseInsensitive = true
-Manager.cs (194) : };
-Manager.cs (196) : var Listprofiles= JsonSerializer.Deserialize<List<Profile>>(jsonString, options);
-Manager.cs (197) : if(Listprofiles != null)
-Manager.cs (198) : {
-Manager.cs (199) : manager.Profiles.Clear();
-Manager.cs (200) : //AddRange añade a la lista del perfil concreto todos los perfiles ya deserializados
-Manager.cs (201) : manager.Profiles.AddRange(Listprofiles);
+Manager.cs (187) : string jsonString= File.ReadAllText(filePath);
+Manager.cs (188) : var options= new JsonSerializerOptions
+Manager.cs (189) : {
+Manager.cs (190) : IncludeFields = true,
+Manager.cs (191) : PropertyNameCaseInsensitive = true
+Manager.cs (192) : };
+Manager.cs (194) : var Listprofiles= JsonSerializer.Deserialize<List<Profile>>(jsonString, options);
+Manager.cs (195) : if(Listprofiles != null)
+Manager.cs (196) : {
+Manager.cs (197) : manager.Profiles.Clear();
+Manager.cs (198) : //AddRange añade a la lista del perfil concreto todos los perfiles ya deserializados
+Manager.cs (199) : manager.Profiles.AddRange(Listprofiles);
+Manager.cs (200) : }
 Manager.cs (202) : }
-Manager.cs (204) : }
-Manager.cs (205) : catch (Exception ex)
-Manager.cs (206) : {
-Manager.cs (207) : throw;
-Manager.cs (208) : }
-Manager.cs (209) : }
-Manager.cs (211) : return manager;
-Manager.cs (218) : try
-Manager.cs (219) : {
-Manager.cs (220) : string filePath= databaseName+ "_Security.json";
-Manager.cs (222) : var options= new JsonSerializerOptions
-Manager.cs (223) : {
-Manager.cs (224) : //Para que el json sea legible añadiendo espacios y saltos de línea
-Manager.cs (225) : WriteIndented = true,
-Manager.cs (226) : //Para incluir los campos privados y que no se pierda ningún dato
-Manager.cs (227) : IncludeFields = true,
-Manager.cs (228) : //Para mayúsculas y minúsculas sin que importe
-Manager.cs (229) : PropertyNameCaseInsensitive = true
-Manager.cs (230) : };
-Manager.cs (232) : //JsonSerializer.Serialize se encarga de recorrer la lista de perfiles y sus usuarios
-Manager.cs (233) : //y transforma toda la información de nombres, constraseñas etc en formato json
-Manager.cs (234) : string jsonString= JsonSerializer.Serialize(this.Profiles, options);
-Manager.cs (235) : File.WriteAllText(filePath, jsonString);
-Manager.cs (236) : }
-Manager.cs (237) : catch (Exception ex)
-Manager.cs (238) : {
-Manager.cs (239) : throw;
-Manager.cs (240) : }
+Manager.cs (203) : catch (Exception ex)
+Manager.cs (204) : {
+Manager.cs (205) : throw;
+Manager.cs (206) : }
+Manager.cs (207) : }
+Manager.cs (209) : return manager;
+Manager.cs (216) : try
+Manager.cs (217) : {
+Manager.cs (218) : string filePath= databaseName+ "_Security.json";
+Manager.cs (220) : var options= new JsonSerializerOptions
+Manager.cs (221) : {
+Manager.cs (222) : //Para que el json sea legible añadiendo espacios y saltos de línea
+Manager.cs (223) : WriteIndented = true,
+Manager.cs (224) : //Para incluir los campos privados y que no se pierda ningún dato
+Manager.cs (225) : IncludeFields = true,
+Manager.cs (226) : //Para mayúsculas y minúsculas sin que importe
+Manager.cs (227) : PropertyNameCaseInsensitive = true
+Manager.cs (228) : };
+Manager.cs (230) : //JsonSerializer.Serialize se encarga de recorrer la lista de perfiles y sus usuarios
+Manager.cs (231) : //y transforma toda la información de nombres, constraseñas etc en formato json
+Manager.cs (232) : string jsonString= JsonSerializer.Serialize(this.Profiles, options);
+Manager.cs (233) : File.WriteAllText(filePath, jsonString);
+Manager.cs (234) : }
+Manager.cs (235) : catch (Exception ex)
+Manager.cs (236) : {
+Manager.cs (237) : throw;
+Manager.cs (238) : }
 Profile.cs (5) : using System.Text.Json.Serialization;
 Profile.cs (16) : [JsonInclude]

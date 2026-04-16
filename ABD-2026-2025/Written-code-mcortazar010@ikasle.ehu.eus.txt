@@ -72,27 +72,40 @@ Database.cs (180) : LastErrorMessage = Constants.ColumnDoesNotExistError;
 Database.cs (181) : return null;
 Database.cs (182) : }
 Database.cs (185) : return TablaRes;
-MiniSQLParser.cs (13) : const string selectPattern = @"SELECT\s+(\w+(?:,\w+)*)\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)([=<>])'([^']*)')?"; //Mikel
+CreateSecurityProfile.cs (16) : ProfileName = profileName;
+DropSecurityProfile.cs (16) : ProfileName = profileName;
+MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"CREATE\s+SECURITY\s+PROFILE\s+(\w+)\s*"; //mikel
+MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"DROP\s+SECURITY\s+PROFILE\s+(\w+)\s*"; //mikel
+MiniSQLParser.cs (103) : {
+MiniSQLParser.cs (107) : List<string> columnList = CommaSeparatedNames(columns);
+MiniSQLParser.cs (108) : Condition condition = null;
 MiniSQLParser.cs (111) : {
-MiniSQLParser.cs (115) : List<string> columnList = CommaSeparatedNames(columns);
-MiniSQLParser.cs (116) : Condition condition = null;
-MiniSQLParser.cs (119) : {
-MiniSQLParser.cs (124) : condition = new Condition(conditionColumn, conditionOperator, conditionValue);
-MiniSQLParser.cs (125) : }
-MiniSQLParser.cs (127) : return new Select(tableName, columnList, condition);
-MiniSQLParser.cs (128) : }
+MiniSQLParser.cs (116) : condition = new Condition(conditionColumn, conditionOperator, conditionValue);
+MiniSQLParser.cs (117) : }
+MiniSQLParser.cs (119) : return new Select(tableName, columnList, condition);
+MiniSQLParser.cs (120) : }
+MiniSQLParser.cs (284) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (286) : if (match.Success)
+MiniSQLParser.cs (287) : {
+MiniSQLParser.cs (289) : if (match.Length != miniSQLQuery.Length) { return null; }
+MiniSQLParser.cs (291) : string nombrePerfil = match.Groups[1].Value;
+MiniSQLParser.cs (293) : return new CreateSecurityProfile(nombrePerfil);
+MiniSQLParser.cs (294) : }
+MiniSQLParser.cs (296) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (298) : if (match.Success)
+MiniSQLParser.cs (299) : {
+MiniSQLParser.cs (301) : string nombrePerfil = match.Groups[1].Value;
+MiniSQLParser.cs (303) : return new DropSecurityProfile(nombrePerfil);
+MiniSQLParser.cs (304) : }
 Select.cs (19) : this.Table = table;
 Select.cs (20) : this.Columns = columns;
 Select.cs (21) : this.Where = condition;
-Select.cs (30) : Table table = database.TableByName(Table);
-Select.cs (33) : if (table == null)
-Select.cs (34) : {
-Select.cs (37) : return database.LastErrorMessage;
-Select.cs (39) : }
-Select.cs (41) : Table resultado = database.Select(Table, Columns, Where);
-Select.cs (44) : if (resultado != null)
-Select.cs (45) : {
-Select.cs (46) : return resultado.ToString();
-Select.cs (48) : } else {
-Select.cs (49) : return database.LastErrorMessage;
-Select.cs (50) : }
+Select.cs (30) : Table resultado = database.Select(Table, Columns, Where);
+Select.cs (32) : if (resultado != null)
+Select.cs (33) : {
+Select.cs (34) : return resultado.ToString();
+Select.cs (36) : }
+Select.cs (37) : else
+Select.cs (38) : {
+Select.cs (39) : return database.LastErrorMessage;
+Select.cs (40) : }
