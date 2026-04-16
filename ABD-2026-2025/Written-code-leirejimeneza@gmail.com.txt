@@ -242,37 +242,40 @@ Manager.cs (121) : {
 Manager.cs (122) : return true;
 Manager.cs (123) : }
 Manager.cs (125) : return profile.IsGrantedPrivilege(table, privilege);
-Manager.cs (254) : string managerDir = Path.Combine(databaseName, "managerData");
-Manager.cs (256) : if (Directory.Exists(managerDir))
-Manager.cs (257) : {
-Manager.cs (258) : Directory.Delete(managerDir, true);
-Manager.cs (259) : }
-Manager.cs (261) : Directory.CreateDirectory(managerDir);
-Manager.cs (263) : int index = 1;
-Manager.cs (264) : foreach (Profile profile in Profiles)
-Manager.cs (265) : {
-Manager.cs (266) : string profileFolder = Path.Combine(managerDir, index.ToString());
-Manager.cs (267) : Directory.CreateDirectory(profileFolder);
-Manager.cs (269) : string profileFile = Path.Combine(profileFolder, profile.Name + ".txt");
-Manager.cs (271) : using (StreamWriter writer = new StreamWriter(profileFile))
-Manager.cs (272) : {
-Manager.cs (273) : writer.WriteLine(profile.Name);
-Manager.cs (275) : foreach (User user in profile.Users)
-Manager.cs (276) : {
-Manager.cs (277) : writer.WriteLine($"USER:{user.Username},{user.EncryptedPassword}");
-Manager.cs (278) : }
-Manager.cs (280) : foreach (var tablePrivileges in profile.PrivilegesOn)
-Manager.cs (281) : {
-Manager.cs (282) : string table = tablePrivileges.Key;
-Manager.cs (283) : foreach (Privilege privilege in tablePrivileges.Value)
-Manager.cs (284) : {
-Manager.cs (285) : writer.WriteLine($"PRIV:{table},{privilege}");
-Manager.cs (286) : }
+Manager.cs (136) : if (profile != null && ProfileByName(profile.Name) == null)
+Manager.cs (141) : if (!IsUserAdmin()) return;
+Manager.cs (143) : //si no es administrados no hace nada
+Manager.cs (255) : string managerDir = Path.Combine(databaseName, "managerData");
+Manager.cs (257) : if (Directory.Exists(managerDir))
+Manager.cs (258) : {
+Manager.cs (259) : Directory.Delete(managerDir, true);
+Manager.cs (260) : }
+Manager.cs (262) : Directory.CreateDirectory(managerDir);
+Manager.cs (264) : int index = 1;
+Manager.cs (265) : foreach (Profile profile in Profiles)
+Manager.cs (266) : {
+Manager.cs (267) : string profileFolder = Path.Combine(managerDir, index.ToString());
+Manager.cs (268) : Directory.CreateDirectory(profileFolder);
+Manager.cs (270) : string profileFile = Path.Combine(profileFolder, profile.Name + ".txt");
+Manager.cs (272) : using (StreamWriter writer = new StreamWriter(profileFile))
+Manager.cs (273) : {
+Manager.cs (274) : writer.WriteLine(profile.Name);
+Manager.cs (276) : foreach (User user in profile.Users)
+Manager.cs (277) : {
+Manager.cs (278) : writer.WriteLine($"USER:{user.Username},{user.EncryptedPassword}");
+Manager.cs (279) : }
+Manager.cs (281) : foreach (var tablePrivileges in profile.PrivilegesOn)
+Manager.cs (282) : {
+Manager.cs (283) : string table = tablePrivileges.Key;
+Manager.cs (284) : foreach (Privilege privilege in tablePrivileges.Value)
+Manager.cs (285) : {
+Manager.cs (286) : writer.WriteLine($"PRIV:{table},{privilege}");
 Manager.cs (287) : }
 Manager.cs (288) : }
-Manager.cs (289) : index++;
-Manager.cs (290) : }
+Manager.cs (289) : }
+Manager.cs (290) : index++;
 Manager.cs (291) : }
+Manager.cs (292) : }
 Profile.cs (72) : if (table == null || privilege == null)
 Profile.cs (73) : {
 Profile.cs (74) : return false;
