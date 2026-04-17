@@ -124,32 +124,38 @@ MiniSQLParser.cs (108) : //CREATETABLE
 MiniSQLParser.cs (109) : match = Regex.Match(miniSQLQuery, createTablePattern);
 MiniSQLParser.cs (110) : if (match.Success)
 MiniSQLParser.cs (111) : {
-MiniSQLParser.cs (112) : string table = match.Groups[1].Value;
-MiniSQLParser.cs (113) : string columnsText = match.Groups[2].Value;
-MiniSQLParser.cs (115) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-MiniSQLParser.cs (117) : if (columnsText.Trim() != "")
-MiniSQLParser.cs (118) : {
-MiniSQLParser.cs (119) : string[] parts = columnsText.Split(',');
-MiniSQLParser.cs (121) : foreach (string part in parts)
+MiniSQLParser.cs (112) : const string textType = "TEXT";
+MiniSQLParser.cs (113) : const string intType = "INT";
+MiniSQLParser.cs (114) : const string doubleType = "DOUBLE";
+MiniSQLParser.cs (116) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (117) : string columnsText = match.Groups[2].Value;
+MiniSQLParser.cs (119) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+MiniSQLParser.cs (121) : if (columnsText.Trim() != "")
 MiniSQLParser.cs (122) : {
-MiniSQLParser.cs (123) : string[] columnParts = Regex.Split(part.Trim(), @"\s+");
-MiniSQLParser.cs (125) : if (columnParts.Length != 2)
-MiniSQLParser.cs (126) : return null;
-MiniSQLParser.cs (128) : string columnName = columnParts[0].Trim();
-MiniSQLParser.cs (129) : string columnType = columnParts[1].Trim();
-MiniSQLParser.cs (131) : ColumnDefinition.DataType type;
-MiniSQLParser.cs (133) : if (columnType == "TEXT")
-MiniSQLParser.cs (134) : type = ColumnDefinition.DataType.String;
-MiniSQLParser.cs (135) : else if (columnType == "INT")
-MiniSQLParser.cs (136) : type = ColumnDefinition.DataType.Int;
-MiniSQLParser.cs (137) : else if (columnType == "DOUBLE")
-MiniSQLParser.cs (138) : type = ColumnDefinition.DataType.Double;
-MiniSQLParser.cs (139) : else
-MiniSQLParser.cs (140) : return null;
-MiniSQLParser.cs (142) : columns.Add(new ColumnDefinition(type, columnName));
-MiniSQLParser.cs (143) : }
-MiniSQLParser.cs (144) : }
-MiniSQLParser.cs (146) : return new CreateTable(table, columns);
-MiniSQLParser.cs (147) : }
+MiniSQLParser.cs (123) : string[] parts = Regex.Split(columnsText, @"\s*,\s*");
+MiniSQLParser.cs (125) : foreach (string part in parts)
+MiniSQLParser.cs (126) : {
+MiniSQLParser.cs (127) : string trimmedPart = part.Trim();
+MiniSQLParser.cs (129) : if (trimmedPart == "")
+MiniSQLParser.cs (130) : return null;
+MiniSQLParser.cs (132) : Match columnMatch = Regex.Match(trimmedPart, @"^(\w+)\s+(TEXT|INT|DOUBLE)$");
+MiniSQLParser.cs (134) : if (!columnMatch.Success)
+MiniSQLParser.cs (135) : return null;
+MiniSQLParser.cs (137) : string columnName = columnMatch.Groups[1].Value;
+MiniSQLParser.cs (138) : string columnType = columnMatch.Groups[2].Value;
+MiniSQLParser.cs (140) : ColumnDefinition.DataType type;
+MiniSQLParser.cs (142) : if (columnType == textType)
+MiniSQLParser.cs (143) : type = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (144) : else if (columnType == intType)
+MiniSQLParser.cs (145) : type = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (146) : else if (columnType == doubleType)
+MiniSQLParser.cs (147) : type = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (148) : else
+MiniSQLParser.cs (149) : return null;
+MiniSQLParser.cs (151) : columns.Add(new ColumnDefinition(type, columnName));
+MiniSQLParser.cs (152) : }
+MiniSQLParser.cs (153) : }
+MiniSQLParser.cs (155) : return new CreateTable(table, columns);
+MiniSQLParser.cs (156) : }
 SetValue.cs (17) : this.ColumnName = column;
 User.cs (21) : public User() {}
