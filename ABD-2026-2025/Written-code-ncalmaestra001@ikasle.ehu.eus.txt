@@ -50,40 +50,40 @@ Database.cs (200) : return true;
 Row.cs (6) : using System.Threading;
 Row.cs (23) : ColumnDefinitions = columnDefinitions;
 Row.cs (24) : Values = values;
-Row.cs (30) : foreach (ColumnDefinition column in ColumnDefinitions)
+Row.cs (30) : for (int i=0; i< ColumnDefinitions.Count; i++)
 Row.cs (31) : {
-Row.cs (32) : if (column.Name == columnName)
+Row.cs (32) : if (ColumnDefinitions[i].Name == columnName)
 Row.cs (33) : {
-Row.cs (34) : int i = ColumnDefinitions.IndexOf(column);
-Row.cs (35) : Values[i] = value;
-Row.cs (37) : }
-Row.cs (38) : }
-Row.cs (44) : foreach (ColumnDefinition column in ColumnDefinitions){
-Row.cs (45) : if (column.Name == columnName)
-Row.cs (46) : {
-Row.cs (47) : int i = ColumnDefinitions.IndexOf(column);
-Row.cs (48) : return Values[i];
-Row.cs (49) : }
-Row.cs (50) : }
-Row.cs (86) : if (value == null)
-Row.cs (87) : {
-Row.cs (89) : }
-Row.cs (91) : return value.Replace(DelimiterEncoded, Delimiter);
-Row.cs (119) : if (value == null)
-Row.cs (120) : {
-Row.cs (121) : return new Row(columns, null);
-Row.cs (122) : }
-Row.cs (124) : string[] parts = value.Split(new[] { Delimiter }, StringSplitOptions.None);
-Row.cs (126) : if (parts.Length != columns.Count)
-Row.cs (127) : {
-Row.cs (128) : return new Row(columns, null);
-Row.cs (129) : }
-Row.cs (131) : List<String> decodedValues = new List<String>();
-Row.cs (133) : foreach (string part in parts)
-Row.cs (134) : {
-Row.cs (135) : decodedValues.Add(Decode(part));
-Row.cs (136) : }
-Row.cs (137) : return new Row(columns, decodedValues);
+Row.cs (34) : Values[i] = value;
+Row.cs (35) : }
+Row.cs (36) : }
+Row.cs (42) : string resultado = null;
+Row.cs (43) : for (int i=0; i< ColumnDefinitions.Count; i++){
+Row.cs (44) : if (ColumnDefinitions[i].Name == columnName)
+Row.cs (45) : {
+Row.cs (46) : resultado = Values[i];
+Row.cs (47) : }
+Row.cs (48) : }
+Row.cs (49) : return resultado;
+Row.cs (84) : if (value == null)
+Row.cs (85) : {
+Row.cs (87) : }
+Row.cs (89) : return value.Replace(DelimiterEncoded, Delimiter);
+Row.cs (117) : if (value == null)
+Row.cs (118) : {
+Row.cs (119) : return new Row(columns, null);
+Row.cs (120) : }
+Row.cs (122) : string[] parts = value.Split(new[] { Delimiter }, StringSplitOptions.None);
+Row.cs (124) : if (parts.Length != columns.Count)
+Row.cs (125) : {
+Row.cs (126) : return new Row(columns, null);
+Row.cs (127) : }
+Row.cs (129) : List<String> decodedValues = new List<String>();
+Row.cs (131) : foreach (string part in parts)
+Row.cs (132) : {
+Row.cs (133) : decodedValues.Add(Decode(part));
+Row.cs (134) : }
+Row.cs (135) : return new Row(columns, decodedValues);
 Table.cs (20) : Name = name;
 Table.cs (21) : ColumnDefinitions = columns;
 Table.cs (22) : Rows = new List<Row>();
@@ -97,28 +97,36 @@ MiniSQLParser.cs (112) : {
 MiniSQLParser.cs (113) : string tableName = match.Groups[1].Value;
 MiniSQLParser.cs (114) : string valuesText = match.Groups[2].Value;
 MiniSQLParser.cs (116) : List<string> valuesComma = CommaSeparatedNames(valuesText);
-MiniSQLParser.cs (117) : List<String> values = RemoveComillas(valuesComma);
-MiniSQLParser.cs (119) : return new Insert(tableName, values);
-MiniSQLParser.cs (120) : }
-MiniSQLParser.cs (126) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (127) : string valuesText = match.Groups[2].Value;
-MiniSQLParser.cs (131) : foreach (string setPart in CommaSeparatedNames(valuesText))
-MiniSQLParser.cs (138) : string columnName= setMatch.Groups[1].Value;
-MiniSQLParser.cs (139) : string value = RemoveComillas(new List<string> { setMatch.Groups[2].Value })[0];
-MiniSQLParser.cs (141) : setValues.Add(new SetValue(columnName, value));
-MiniSQLParser.cs (144) : string whereValue = RemoveComillas(new List<string> { match.Groups[5].Value })[0];
-MiniSQLParser.cs (145) : Condition updateCondition = new Condition(match.Groups[3].Value, match.Groups[4].Value, whereValue);
-MiniSQLParser.cs (146) : return new Update(tableName, setValues, updateCondition);
-MiniSQLParser.cs (167) : static List<String> RemoveComillas(List<string> values)
-MiniSQLParser.cs (168) : {
-MiniSQLParser.cs (169) : List<string> result = new List<string>();
-MiniSQLParser.cs (171) : foreach (string value in values)
-MiniSQLParser.cs (172) : {
-MiniSQLParser.cs (173) : string i = value.Substring(1, value.Length - 2);
-MiniSQLParser.cs (174) : i = i.Trim();
-MiniSQLParser.cs (175) : result.Add(i);
-MiniSQLParser.cs (176) : }
-MiniSQLParser.cs (177) : return result;
-MiniSQLParser.cs (178) : }
+MiniSQLParser.cs (117) : foreach (string value in valuesComma)
+MiniSQLParser.cs (118) : {
+MiniSQLParser.cs (119) : Match valueMatch = Regex.Match(value, @"^\s*'[^']*'\s*$");
+MiniSQLParser.cs (120) : if (!valueMatch.Success)
+MiniSQLParser.cs (121) : {
+MiniSQLParser.cs (122) : return null;
+MiniSQLParser.cs (123) : }
+MiniSQLParser.cs (124) : }
+MiniSQLParser.cs (125) : List<String> values = RemoveComillas(valuesComma);
+MiniSQLParser.cs (126) : return new Insert(tableName, values);
+MiniSQLParser.cs (127) : }
+MiniSQLParser.cs (133) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (134) : string valuesText = match.Groups[2].Value;
+MiniSQLParser.cs (138) : foreach (string setPart in CommaSeparatedNames(valuesText))
+MiniSQLParser.cs (145) : string columnName= setMatch.Groups[1].Value;
+MiniSQLParser.cs (146) : string value = RemoveComillas(new List<string> { setMatch.Groups[2].Value })[0];
+MiniSQLParser.cs (148) : setValues.Add(new SetValue(columnName, value));
+MiniSQLParser.cs (151) : string whereValue = RemoveComillas(new List<string> { match.Groups[5].Value })[0];
+MiniSQLParser.cs (152) : Condition updateCondition = new Condition(match.Groups[3].Value, match.Groups[4].Value, whereValue);
+MiniSQLParser.cs (153) : return new Update(tableName, setValues, updateCondition);
+MiniSQLParser.cs (174) : static List<String> RemoveComillas(List<string> values)
+MiniSQLParser.cs (175) : {
+MiniSQLParser.cs (176) : List<string> result = new List<string>();
+MiniSQLParser.cs (178) : foreach (string value in values)
+MiniSQLParser.cs (179) : {
+MiniSQLParser.cs (180) : string i = value.Substring(1, value.Length - 2);
+MiniSQLParser.cs (181) : i = i.Trim();
+MiniSQLParser.cs (182) : result.Add(i);
+MiniSQLParser.cs (183) : }
+MiniSQLParser.cs (184) : return result;
+MiniSQLParser.cs (185) : }
 Update.cs (16) : Columns = columnNames;
 Update.cs (17) : Where = where;
