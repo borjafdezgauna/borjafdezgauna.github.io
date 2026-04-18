@@ -262,12 +262,16 @@ Delete.cs (30) : }
 Delete.cs (31) : return database.LastErrorMessage;
 DeleteUser.cs (16) : Username = username;
 DropSecurityProfile.cs (15) : ProfileName = profileName;
-DropSecurityProfile.cs (23) : database.SecurityManager.RemoveProfile(ProfileName);
-DropSecurityProfile.cs (25) : if (string.IsNullOrEmpty(database.LastErrorMessage))
-DropSecurityProfile.cs (26) : {
-DropSecurityProfile.cs (27) : return Constants.DropSecurityProfileSuccess;
-DropSecurityProfile.cs (28) : }
-DropSecurityProfile.cs (30) : return database.LastErrorMessage;
+DropSecurityProfile.cs (23) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
+DropSecurityProfile.cs (24) : {
+DropSecurityProfile.cs (25) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (26) : }
+DropSecurityProfile.cs (28) : if (!database.IsUserAdmin())
+DropSecurityProfile.cs (29) : {
+DropSecurityProfile.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (31) : }
+DropSecurityProfile.cs (33) : database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (34) : return Constants.DropSecurityProfileSuccess;
 Insert.cs (21) : if (string.IsNullOrEmpty(database.LastErrorMessage))
 Insert.cs (22) : {
 Insert.cs (23) : return Constants.InsertSuccess;
@@ -275,61 +279,61 @@ Insert.cs (24) : }
 MiniSQLParser.cs (21) : const string createTablePattern = @"^CREATE\s+TABLE\s+(?<table>[a-zA-Z0-9]+)\s+\((?<columns>[a-zA-Z0-9]+\s+(?:INT|DOUBLE|TEXT)(?:,[a-zA-Z0-9]+\s+(?:INT|DOUBLE|TEXT))*)?\)\s*;?\s*$";
 MiniSQLParser.cs (23) : const string updateTablePattern = @"^UPDATE\s+(?<table>[a-zA-Z0-9]+)\s+SET\s+(?<assignments>[a-zA-Z0-9]+='[^']*'(?:,[a-zA-Z0-9]+='[^']*')*)(?:\s+WHERE\s+(?<column>[a-zA-Z0-9]+)(?<op>[<>=])(?<value>'[^']*'))?\s*;?\s*$";
 MiniSQLParser.cs (31) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z0-9_]+)\s*;?\s*$";
-MiniSQLParser.cs (80) : match = Regex.Match(miniSQLQuery, createTablePattern);
-MiniSQLParser.cs (82) : if (match.Success)
-MiniSQLParser.cs (83) : {
-MiniSQLParser.cs (84) : var table = match.Groups["table"].Value;
-MiniSQLParser.cs (85) : var columnsText = match.Groups["columns"].Value;
-MiniSQLParser.cs (86) : List<string> textosColumnas = new List<string>();
-MiniSQLParser.cs (88) : if (!string.IsNullOrWhiteSpace(columnsText))
-MiniSQLParser.cs (89) : {
-MiniSQLParser.cs (90) : textosColumnas = CommaSeparatedNames(columnsText);
-MiniSQLParser.cs (91) : }
-MiniSQLParser.cs (93) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-MiniSQLParser.cs (95) : foreach (string textoColumna in textosColumnas)
-MiniSQLParser.cs (96) : {
-MiniSQLParser.cs (97) : string[] partes = textoColumna.Split(new char[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
-MiniSQLParser.cs (99) : if (partes.Length >= 2)
-MiniSQLParser.cs (100) : {
-MiniSQLParser.cs (101) : string nombre = partes[0];
-MiniSQLParser.cs (102) : string tipoTexto = partes[1];
-MiniSQLParser.cs (104) : ColumnDefinition.DataType tipo = DataTypeUtils.FromMiniSQLName(tipoTexto);
-MiniSQLParser.cs (105) : columns.Add(new ColumnDefinition(tipo, nombre));
-MiniSQLParser.cs (106) : }
-MiniSQLParser.cs (107) : }
-MiniSQLParser.cs (108) : return new CreateTable(table, columns);
+MiniSQLParser.cs (82) : match = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (84) : if (match.Success)
+MiniSQLParser.cs (85) : {
+MiniSQLParser.cs (86) : var table = match.Groups["table"].Value;
+MiniSQLParser.cs (87) : var columnsText = match.Groups["columns"].Value;
+MiniSQLParser.cs (88) : List<string> textosColumnas = new List<string>();
+MiniSQLParser.cs (90) : if (!string.IsNullOrWhiteSpace(columnsText))
+MiniSQLParser.cs (91) : {
+MiniSQLParser.cs (92) : textosColumnas = CommaSeparatedNames(columnsText);
+MiniSQLParser.cs (93) : }
+MiniSQLParser.cs (95) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+MiniSQLParser.cs (97) : foreach (string textoColumna in textosColumnas)
+MiniSQLParser.cs (98) : {
+MiniSQLParser.cs (99) : string[] partes = textoColumna.Split(new char[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (101) : if (partes.Length >= 2)
+MiniSQLParser.cs (102) : {
+MiniSQLParser.cs (103) : string nombre = partes[0];
+MiniSQLParser.cs (104) : string tipoTexto = partes[1];
+MiniSQLParser.cs (106) : ColumnDefinition.DataType tipo = DataTypeUtils.FromMiniSQLName(tipoTexto);
+MiniSQLParser.cs (107) : columns.Add(new ColumnDefinition(tipo, nombre));
+MiniSQLParser.cs (108) : }
 MiniSQLParser.cs (109) : }
-MiniSQLParser.cs (111) : match = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (113) : if (match.Success)
-MiniSQLParser.cs (114) : {
-MiniSQLParser.cs (115) : var table = match.Groups["table"].Value;
-MiniSQLParser.cs (116) : var assignmentsText = match.Groups["assignments"].Value;
-MiniSQLParser.cs (117) : Condition condition = null;
-MiniSQLParser.cs (119) : if (match.Groups["column"].Success)
-MiniSQLParser.cs (120) : {
-MiniSQLParser.cs (121) : string whereValue = match.Groups["value"].Value.Trim('\'');
-MiniSQLParser.cs (122) : condition = new Condition(match.Groups["column"].Value, match.Groups["op"].Value, whereValue);
-MiniSQLParser.cs (123) : }
-MiniSQLParser.cs (125) : List<SetValue> columnsToUpdate = new List<SetValue>();
-MiniSQLParser.cs (126) : string[] asignaciones = assignmentsText.Split(new char[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
-MiniSQLParser.cs (128) : foreach (string asig in asignaciones)
-MiniSQLParser.cs (129) : {
-MiniSQLParser.cs (130) : string[] partes = asig.Split('=');
-MiniSQLParser.cs (132) : if (partes.Length == 2)
-MiniSQLParser.cs (133) : {
-MiniSQLParser.cs (134) : string colName = partes[0].Trim();
-MiniSQLParser.cs (135) : string colValue = partes[1].Trim(' ', '\'');
-MiniSQLParser.cs (137) : columnsToUpdate.Add(new SetValue(colName, colValue));
-MiniSQLParser.cs (138) : }
-MiniSQLParser.cs (139) : }
-MiniSQLParser.cs (140) : return new Update(table, columnsToUpdate, condition);
+MiniSQLParser.cs (110) : return new CreateTable(table, columns);
+MiniSQLParser.cs (111) : }
+MiniSQLParser.cs (113) : match = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (115) : if (match.Success)
+MiniSQLParser.cs (116) : {
+MiniSQLParser.cs (117) : var table = match.Groups["table"].Value;
+MiniSQLParser.cs (118) : var assignmentsText = match.Groups["assignments"].Value;
+MiniSQLParser.cs (119) : Condition condition = null;
+MiniSQLParser.cs (121) : if (match.Groups["column"].Success)
+MiniSQLParser.cs (122) : {
+MiniSQLParser.cs (123) : string whereValue = match.Groups["value"].Value.Trim('\'');
+MiniSQLParser.cs (124) : condition = new Condition(match.Groups["column"].Value, match.Groups["op"].Value, whereValue);
+MiniSQLParser.cs (125) : }
+MiniSQLParser.cs (127) : List<SetValue> columnsToUpdate = new List<SetValue>();
+MiniSQLParser.cs (128) : string[] asignaciones = assignmentsText.Split(new char[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (130) : foreach (string asig in asignaciones)
+MiniSQLParser.cs (131) : {
+MiniSQLParser.cs (132) : string[] partes = asig.Split('=');
+MiniSQLParser.cs (134) : if (partes.Length == 2)
+MiniSQLParser.cs (135) : {
+MiniSQLParser.cs (136) : string colName = partes[0].Trim();
+MiniSQLParser.cs (137) : string colValue = partes[1].Trim(' ', '\'');
+MiniSQLParser.cs (139) : columnsToUpdate.Add(new SetValue(colName, colValue));
+MiniSQLParser.cs (140) : }
 MiniSQLParser.cs (141) : }
-MiniSQLParser.cs (201) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
-MiniSQLParser.cs (203) : if (match.Success)
-MiniSQLParser.cs (204) : {
-MiniSQLParser.cs (205) : var profile = match.Groups["profile"].Value;
-MiniSQLParser.cs (207) : return new DropSecurityProfile(profile);
-MiniSQLParser.cs (208) : }
+MiniSQLParser.cs (142) : return new Update(table, columnsToUpdate, condition);
+MiniSQLParser.cs (143) : }
+MiniSQLParser.cs (203) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (205) : if (match.Success)
+MiniSQLParser.cs (206) : {
+MiniSQLParser.cs (207) : var profile = match.Groups["profile"].Value;
+MiniSQLParser.cs (209) : return new DropSecurityProfile(profile);
+MiniSQLParser.cs (210) : }
 Update.cs (25) : if (string.IsNullOrEmpty(database.LastErrorMessage))
 Update.cs (26) : {
 Update.cs (27) : return Constants.UpdateSuccess;
