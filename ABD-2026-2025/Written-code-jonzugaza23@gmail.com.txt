@@ -354,7 +354,7 @@ Update.cs (25) : if (string.IsNullOrEmpty(database.LastErrorMessage))
 Update.cs (26) : {
 Update.cs (27) : return Constants.UpdateSuccess;
 Update.cs (28) : }
-Manager.cs (25) : if ( ProfileByUser(m_username).Name == "Admin")
+Manager.cs (25) : if (ProfileByUser(m_username).Name == "Admin")
 Manager.cs (26) : {
 Manager.cs (27) : return true;
 Manager.cs (28) : }
@@ -376,3 +376,51 @@ Manager.cs (52) : else
 Manager.cs (53) : {
 Manager.cs (54) : return false;
 Manager.cs (55) : }
+Manager.cs (138) : Manager manager = new Manager(username);
+Manager.cs (139) : string filePath = databaseName + "_Security.txt";
+Manager.cs (141) : if (!File.Exists(filePath))
+Manager.cs (142) : {
+Manager.cs (143) : return manager;
+Manager.cs (144) : }
+Manager.cs (146) : try
+Manager.cs (147) : {
+Manager.cs (148) : using (StreamReader reader = new StreamReader(filePath))
+Manager.cs (149) : {
+Manager.cs (150) : int numProfiles = int.Parse(reader.ReadLine());
+Manager.cs (152) : for (int p = 0; p < numProfiles; p++)
+Manager.cs (153) : {
+Manager.cs (154) : Profile profile = new Profile();
+Manager.cs (155) : profile.Name = reader.ReadLine();
+Manager.cs (157) : int numUsers = int.Parse(reader.ReadLine());
+Manager.cs (159) : for (int u = 0; u < numUsers; u++)
+Manager.cs (160) : {
+Manager.cs (161) : string uname = reader.ReadLine();
+Manager.cs (162) : string encryptedPass = reader.ReadLine();
+Manager.cs (164) : User user = new User(uname, "");
+Manager.cs (165) : user.EncryptedPassword = encryptedPass;
+Manager.cs (167) : profile.Users.Add(user);
+Manager.cs (168) : }
+Manager.cs (169) : manager.Profiles.Add(profile);
+Manager.cs (170) : }
+Manager.cs (171) : }
+Manager.cs (172) : return manager;
+Manager.cs (173) : }
+Manager.cs (174) : catch (Exception)
+Manager.cs (175) : {
+Manager.cs (176) : return null;
+Manager.cs (177) : }
+Manager.cs (184) : string filePath = databaseName + "_Security.txt";
+Manager.cs (186) : using (StreamWriter writer = new StreamWriter(filePath))
+Manager.cs (187) : {
+Manager.cs (188) : writer.WriteLine(Profiles.Count);
+Manager.cs (190) : foreach (Profile profile in Profiles)
+Manager.cs (191) : {
+Manager.cs (192) : writer.WriteLine(profile.Name);
+Manager.cs (194) : writer.WriteLine(profile.Users.Count);
+Manager.cs (196) : foreach (User user in profile.Users)
+Manager.cs (197) : {
+Manager.cs (198) : writer.WriteLine(user.Username);
+Manager.cs (199) : writer.WriteLine(user.EncryptedPassword);
+Manager.cs (200) : }
+Manager.cs (201) : }
+Manager.cs (202) : }
