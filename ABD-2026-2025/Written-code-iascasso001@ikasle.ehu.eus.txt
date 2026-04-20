@@ -144,6 +144,40 @@ Delete.cs (60) : {
 Delete.cs (61) : return false;
 Delete.cs (62) : }
 Delete.cs (63) : }
+Grant.cs (1) : using DbManager.Parser;
+Grant.cs (2) : using DbManager.Security;
+Grant.cs (28) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
+Grant.cs (29) : {
+Grant.cs (31) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (32) : }
+Grant.cs (33) : Privilege privilegeObj;
+Grant.cs (34) : Profile profileObj = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (36) : switch (PrivilegeName)
+Grant.cs (37) : {
+Grant.cs (38) : case "Delete":
+Grant.cs (39) : privilegeObj = Privilege.Delete;
+Grant.cs (40) : break;
+Grant.cs (41) : case "Update":
+Grant.cs (42) : privilegeObj = Privilege.Update;
+Grant.cs (43) : break;
+Grant.cs (44) : case "Insert":
+Grant.cs (45) : privilegeObj = Privilege.Insert;
+Grant.cs (46) : break;
+Grant.cs (47) : default:
+Grant.cs (48) : privilegeObj = Privilege.Select;
+Grant.cs (49) : break;
+Grant.cs (50) : }
+Grant.cs (51) : if (profileObj.PrivilegesOn[TableName].Contains(privilegeObj))
+Grant.cs (52) : {
+Grant.cs (53) : //error 1
+Grant.cs (54) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (55) : }
+Grant.cs (56) : else
+Grant.cs (57) : {
+Grant.cs (58) : //Execute
+Grant.cs (59) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilegeObj);
+Grant.cs (60) : return Constants.GrantPrivilegeSuccess;
+Grant.cs (61) : }
 Insert.cs (1) : using DbManager.Parser;
 Insert.cs (18) : Values = values;
 Insert.cs (31) : public override bool Equals(Object obj)
@@ -187,6 +221,39 @@ MiniSQLParser.cs (149) : if(match.Success && match.Length == miniSQLQuery.Length
 MiniSQLParser.cs (150) : {
 MiniSQLParser.cs (151) : return new Delete(match.Groups[1].Value, new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value));
 MiniSQLParser.cs (152) : }
+Revoke.cs (5) : using DbManager.Security;
+Revoke.cs (27) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
+Revoke.cs (28) : {
+Revoke.cs (30) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (31) : }
+Revoke.cs (32) : Privilege privilegeObj;
+Revoke.cs (33) : Profile profileObj = database.SecurityManager.ProfileByName(ProfileName);
+Revoke.cs (35) : switch (PrivilegeName)
+Revoke.cs (36) : {
+Revoke.cs (37) : case "Delete":
+Revoke.cs (38) : privilegeObj = Privilege.Delete;
+Revoke.cs (39) : break;
+Revoke.cs (40) : case "Update":
+Revoke.cs (41) : privilegeObj = Privilege.Update;
+Revoke.cs (42) : break;
+Revoke.cs (43) : case "Insert":
+Revoke.cs (44) : privilegeObj = Privilege.Insert;
+Revoke.cs (45) : break;
+Revoke.cs (46) : default:
+Revoke.cs (47) : privilegeObj = Privilege.Select;
+Revoke.cs (48) : break;
+Revoke.cs (49) : }
+Revoke.cs (50) : if (profileObj.PrivilegesOn[TableName].Contains(privilegeObj))
+Revoke.cs (51) : {
+Revoke.cs (52) : //error 1
+Revoke.cs (53) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (54) : }
+Revoke.cs (55) : else
+Revoke.cs (56) : {
+Revoke.cs (57) : //Execute
+Revoke.cs (58) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, privilegeObj);
+Revoke.cs (59) : return Constants.RevokePrivilegeSuccess;
+Revoke.cs (60) : }
 Manager.cs (6) : using System.Security.Cryptography;
 Manager.cs (25) : if(ProfileByUser(m_username).Name == Profile.AdminProfileName)
 Manager.cs (26) : {
@@ -223,3 +290,5 @@ Manager.cs (108) : {
 Manager.cs (109) : return p;
 Manager.cs (110) : }
 Manager.cs (111) : }
+User.cs (16) : Username = username;
+User.cs (17) : EncryptedPassword = Encryption.Encrypt(password);

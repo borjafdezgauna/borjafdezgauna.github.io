@@ -1,3 +1,4 @@
+Database.cs (17) : public List<Table> Tables = new List<Table>();
 Database.cs (215) : private const string tbl = ".tbl";
 Database.cs (216) : private const string Delimiter = "--";
 Database.cs (220) : //DEADLINE 1.C: Save this database to disk with the given name
@@ -6,17 +7,17 @@ Database.cs (222) : //DEADLINE 5: Save the SecurityManager so that it can be loa
 Database.cs (225) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
 Database.cs (226) : Directory.CreateDirectory(path);
 Database.cs (227) : foreach (Table table in Tables)
+Database.cs (228) : {
 Database.cs (229) : string fileName = Path.Combine(path, table.Name + tbl);
 Database.cs (230) : using (TextWriter writer = File.CreateText(fileName))
 Database.cs (231) : {
 Database.cs (232) : for (int i = 0; i < table.NumColumns(); i++)
-Database.cs (233) : {
 Database.cs (234) : writer.WriteLine(table.GetColumn(i).AsText());
 Database.cs (236) : writer.WriteLine(Delimiter);
 Database.cs (237) : for (int i = 0; i < table.NumRows(); i++)
 Database.cs (239) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (240) : }
 Database.cs (241) : }
-Database.cs (242) : }
 Database.cs (243) : SecurityManager.Save(Path.Combine(path, "security.dat"));
 Database.cs (246) : catch (Exception ex)
 Database.cs (248) : LastErrorMessage = Constants.Error + ex.Message;
@@ -28,7 +29,8 @@ Database.cs (262) : Database db = new Database();
 Database.cs (263) : db.m_username = username;
 Database.cs (264) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
 Database.cs (265) : if (!Directory.Exists(path))
-Database.cs (267) : return null;
+Database.cs (266) : {
+Database.cs (268) : }
 Database.cs (269) : foreach (var filePath in Directory.GetFiles(path, "*" + tbl))
 Database.cs (271) : using (TextReader reader = File.OpenText(filePath))
 Database.cs (272) : {
@@ -41,9 +43,8 @@ Database.cs (279) : string tableName = Path.GetFileNameWithoutExtension(filePath
 Database.cs (280) : db.CreateTable(tableName, columns);
 Database.cs (281) : Table table = db.TableByName(tableName);
 Database.cs (282) : if (table == null)
-Database.cs (283) : {
 Database.cs (284) : db.LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (286) : }
+Database.cs (285) : return null;
 Database.cs (287) : if (line == Delimiter)
 Database.cs (288) : {
 Database.cs (289) : while ((line = reader.ReadLine()) != null)
@@ -124,6 +125,9 @@ Manager.cs (56) : {
 Manager.cs (57) : return;
 Manager.cs (58) : }
 Manager.cs (60) : profile.RevokePrivilege(table, privilege);
+Manager.cs (119) : {
+Manager.cs (124) : return null;
+Manager.cs (125) : }
 Manager.cs (130) : if (string.IsNullOrEmpty(username))
 Manager.cs (131) : {
 Manager.cs (132) : return null;

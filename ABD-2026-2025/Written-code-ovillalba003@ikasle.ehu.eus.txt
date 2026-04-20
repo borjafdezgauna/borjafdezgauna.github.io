@@ -222,24 +222,39 @@ Select.cs (49) : Table rTable = database.Select(Table, Columns, Where);
 Select.cs (51) : if(rTable == null)
 Select.cs (52) : return database.LastErrorMessage;
 Select.cs (54) : return rTable.ToString();
-Manager.cs (24) : if (m_username == "admin")
-Manager.cs (25) : return true;
-Manager.cs (47) : if(!IsUserAdmin())
-Manager.cs (48) : {
-Manager.cs (49) : return;
-Manager.cs (50) : }
-Manager.cs (52) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table) || privilege == null)
-Manager.cs (53) : {
-Manager.cs (54) : return;
-Manager.cs (55) : }
-Manager.cs (57) : if(IsUserAdmin() && IsGrantedPrivilege(profileName, table, privilege))
-Manager.cs (58) : {
-Manager.cs (59) : Profile profile = ProfileByName(profileName);
-Manager.cs (60) : if((profile != null) || (table != null))
-Manager.cs (61) : {
-Manager.cs (62) : profile.GrantPrivilege(table, privilege);
-Manager.cs (63) : }
+Manager.cs (24) : Profile profile = ProfileByUser(m_username);
+Manager.cs (25) : if(profile != null && profile.Name == Profile.AdminProfileName)
+Manager.cs (26) : {
+Manager.cs (27) : return true;
+Manager.cs (28) : }
+Manager.cs (50) : if(!IsUserAdmin())
+Manager.cs (51) : {
+Manager.cs (52) : return;
+Manager.cs (53) : }
+Manager.cs (55) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table) || privilege == null)
+Manager.cs (56) : {
+Manager.cs (57) : return;
+Manager.cs (58) : }
+Manager.cs (60) : Profile profile = ProfileByName(profileName);
+Manager.cs (62) : if (profile != null && table != null)
+Manager.cs (63) : {
+Manager.cs (64) : profile.GrantPrivilege(table, privilege);
 Manager.cs (65) : }
+Manager.cs (67) : }
+Manager.cs (98) : if(username == null || table == null || privilege == null)
+Manager.cs (102) : Profile profile = ProfileByUser(username);
+Manager.cs (104) : if(profile == null)
+Manager.cs (105) : return false;
+Manager.cs (107) : if(profile.Name == Profile.AdminProfileName)
+Manager.cs (108) : return true;
+Manager.cs (110) : return profile.IsGrantedPrivilege(table, privilege);
+Manager.cs (117) : if(IsUserAdmin())
+Manager.cs (118) : {
+Manager.cs (119) : if(profile != null)
+Manager.cs (120) : {
+Manager.cs (121) : Profiles.Add(profile);
+Manager.cs (122) : }
+Manager.cs (123) : }
 Profile.cs (20) : if(table == null)
 Profile.cs (21) : return false;
 Profile.cs (23) : if (!PrivilegesOn.ContainsKey(table))

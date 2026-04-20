@@ -169,22 +169,38 @@ MiniSQLParser.cs (34) : const string dropSecurityProfilePattern = @"^DROP\s+SECU
 MiniSQLParser.cs (40) : const string addUserPattern = @"^ADD\s+USER\s+\(\s*([A-Za-z][A-Za-z0-9]*)\s*,\s*([a-zA-Z0-9]+)\s*,\s*([A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$";
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
-Manager.cs (33) : User user = UserByName(username);
-Manager.cs (34) : if (user == null)
-Manager.cs (35) : return false;
-Manager.cs (36) : password = Encryption.Encrypt(password);
-Manager.cs (37) : if (user.EncryptedPassword == password)
-Manager.cs (38) : return true;
-Manager.cs (108) : foreach (Profile profile in Profiles)
-Manager.cs (109) : {
-Manager.cs (110) : foreach (User user in profile.Users)
-Manager.cs (111) : {
-Manager.cs (112) : if (user.Username.Equals(username))
-Manager.cs (113) : {
-Manager.cs (114) : return profile;
-Manager.cs (115) : }
-Manager.cs (116) : }
-Manager.cs (117) : }
+Manager.cs (36) : User user = UserByName(username);
+Manager.cs (37) : if (user == null)
+Manager.cs (38) : return false;
+Manager.cs (39) : password = Encryption.Encrypt(password);
+Manager.cs (40) : if (user.EncryptedPassword == password)
+Manager.cs (41) : return true;
+Manager.cs (73) : if(!IsUserAdmin())
+Manager.cs (74) : {
+Manager.cs (75) : return;
+Manager.cs (76) : }
+Manager.cs (78) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
+Manager.cs (79) : {
+Manager.cs (80) : return;
+Manager.cs (81) : }
+Manager.cs (83) : if(IsUserAdmin() && IsGrantedPrivilege(profileName, table, privilege))
+Manager.cs (84) : {
+Manager.cs (85) : Profile profile = ProfileByName(profileName);
+Manager.cs (86) : if((profile != null) || (table != null))
+Manager.cs (87) : {
+Manager.cs (88) : profile.RevokePrivilege(table, privilege);
+Manager.cs (89) : }
+Manager.cs (91) : }
+Manager.cs (159) : foreach (Profile profile in Profiles)
+Manager.cs (160) : {
+Manager.cs (161) : foreach (User user in profile.Users)
+Manager.cs (162) : {
+Manager.cs (163) : if (user.Username.Equals(username))
+Manager.cs (164) : {
+Manager.cs (165) : return profile;
+Manager.cs (166) : }
+Manager.cs (167) : }
+Manager.cs (168) : }
 Profile.cs (38) : if (table == null || privilege == null)
 Profile.cs (39) : {
 Profile.cs (41) : }

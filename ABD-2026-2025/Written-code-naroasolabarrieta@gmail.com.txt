@@ -167,59 +167,57 @@ Grant.cs (45) : }
 Grant.cs (46) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
 Grant.cs (48) : return Constants.GrantPrivilegeSuccess;
 MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)(=|<>|<|>|<=|>=)('[^']*'|\d+(?:\.\d+)?))?\s*$";
-MiniSQLParser.cs (33) : const string grantPattern = @"^GRANT\s+(\w+)\s+ON\s+(\w+)\s+TO\s+(\w+)\s*$";
-MiniSQLParser.cs (37) : const string addUserPattern = @"^ADD\s+USER\s*\(([a-zA-Z]+),([^,]+),([a-zA-Z]+)\)\s*$";
-MiniSQLParser.cs (154) : //UPDATE
-MiniSQLParser.cs (155) : match = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (156) : if (match.Success)
-MiniSQLParser.cs (157) : {
-MiniSQLParser.cs (158) : if (miniSQLQuery.Contains("  "))
-MiniSQLParser.cs (159) : return null;
-MiniSQLParser.cs (161) : string table = match.Groups[1].Value;
-MiniSQLParser.cs (162) : string setText = match.Groups[2].Value;
-MiniSQLParser.cs (164) : List<SetValue> values = new List<SetValue>();
-MiniSQLParser.cs (165) : string[] assignments = setText.Split(',');
-MiniSQLParser.cs (167) : foreach (string assignment in assignments)
-MiniSQLParser.cs (168) : {
-MiniSQLParser.cs (169) : var setMatch = Regex.Match(assignment.Trim(), @"^(\w+)=('[^']*'|\d+(?:\.\d+)?)$");
-MiniSQLParser.cs (171) : if (!setMatch.Success) return null;
-MiniSQLParser.cs (173) : string column = setMatch.Groups[1].Value;
-MiniSQLParser.cs (174) : string value = setMatch.Groups[2].Value.Trim('\'');
-MiniSQLParser.cs (176) : values.Add(new SetValue(column, value));
-MiniSQLParser.cs (177) : }
-MiniSQLParser.cs (179) : Condition condition = null;
-MiniSQLParser.cs (181) : if (match.Groups[3].Success)
-MiniSQLParser.cs (182) : {
-MiniSQLParser.cs (183) : string col = match.Groups[3].Value;
-MiniSQLParser.cs (184) : string op = match.Groups[4].Value;
-MiniSQLParser.cs (185) : string val = match.Groups[5].Value.Trim('\'');
-MiniSQLParser.cs (187) : condition = new Condition(col, op, val);
-MiniSQLParser.cs (188) : }
-MiniSQLParser.cs (190) : return new Update(table, values, condition);
-MiniSQLParser.cs (191) : }
-MiniSQLParser.cs (213) : //ADDUSER
-MiniSQLParser.cs (214) : match = Regex.Match(miniSQLQuery, addUserPattern, RegexOptions.IgnoreCase);
-MiniSQLParser.cs (215) : if (match.Success)
-MiniSQLParser.cs (216) : {
-MiniSQLParser.cs (217) : string user = match.Groups[1].Value;
-MiniSQLParser.cs (218) : string pass = match.Groups[2].Value;
-MiniSQLParser.cs (219) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (220) : return new AddUser(user, pass, profile);
-MiniSQLParser.cs (221) : }
-MiniSQLParser.cs (223) : //CREATESECURITYPROFILE
-MiniSQLParser.cs (225) : //DELETEUSER
-MiniSQLParser.cs (234) : //DROPSECURITYPROFILE
-MiniSQLParser.cs (236) : //GRANT
-MiniSQLParser.cs (237) : match = Regex.Match(miniSQLQuery, grantPattern, RegexOptions.IgnoreCase);
-MiniSQLParser.cs (238) : if (match.Success)
-MiniSQLParser.cs (239) : {
-MiniSQLParser.cs (240) : string privilege = match.Groups[1].Value;
-MiniSQLParser.cs (241) : string table = match.Groups[2].Value;
-MiniSQLParser.cs (242) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (244) : return new Grant(privilege, table, profile);
-MiniSQLParser.cs (245) : }
-MiniSQLParser.cs (247) : //REVOKE
-MiniSQLParser.cs (258) : return null;
+MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(\w+)\s+ON\s+(\w+)\s+TO\s+(\w+)\s*$";
+MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(([a-zA-Z]+),([^,]+),([a-zA-Z]+)\)\s*$";
+MiniSQLParser.cs (153) : //UPDATE
+MiniSQLParser.cs (154) : match = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (155) : if (match.Success)
+MiniSQLParser.cs (156) : {
+MiniSQLParser.cs (157) : if (miniSQLQuery.Contains("  "))
+MiniSQLParser.cs (158) : return null;
+MiniSQLParser.cs (160) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (161) : string setText = match.Groups[2].Value;
+MiniSQLParser.cs (163) : List<SetValue> values = new List<SetValue>();
+MiniSQLParser.cs (164) : string[] assignments = setText.Split(',');
+MiniSQLParser.cs (166) : foreach (string assignment in assignments)
+MiniSQLParser.cs (167) : {
+MiniSQLParser.cs (168) : var setMatch = Regex.Match(assignment.Trim(), @"^(\w+)=('[^']*'|\d+(?:\.\d+)?)$");
+MiniSQLParser.cs (170) : if (!setMatch.Success) return null;
+MiniSQLParser.cs (172) : string column = setMatch.Groups[1].Value;
+MiniSQLParser.cs (173) : string value = setMatch.Groups[2].Value.Trim('\'');
+MiniSQLParser.cs (175) : values.Add(new SetValue(column, value));
+MiniSQLParser.cs (176) : }
+MiniSQLParser.cs (178) : Condition condition = null;
+MiniSQLParser.cs (180) : if (match.Groups[3].Success)
+MiniSQLParser.cs (181) : {
+MiniSQLParser.cs (182) : string col = match.Groups[3].Value;
+MiniSQLParser.cs (183) : string op = match.Groups[4].Value;
+MiniSQLParser.cs (184) : string val = match.Groups[5].Value.Trim('\'');
+MiniSQLParser.cs (186) : condition = new Condition(col, op, val);
+MiniSQLParser.cs (187) : }
+MiniSQLParser.cs (189) : return new Update(table, values, condition);
+MiniSQLParser.cs (190) : }
+MiniSQLParser.cs (212) : //ADDUSER
+MiniSQLParser.cs (214) : if (match.Success)
+MiniSQLParser.cs (215) : {
+MiniSQLParser.cs (216) : string user = match.Groups[1].Value;
+MiniSQLParser.cs (217) : string pass = match.Groups[2].Value;
+MiniSQLParser.cs (218) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (219) : return new AddUser(user, pass, profile);
+MiniSQLParser.cs (220) : }
+MiniSQLParser.cs (222) : //CREATESECURITYPROFILE
+MiniSQLParser.cs (230) : //DELETEUSER
+MiniSQLParser.cs (239) : //DROPSECURITYPROFILE
+MiniSQLParser.cs (247) : //GRANT
+MiniSQLParser.cs (249) : if (match.Success)
+MiniSQLParser.cs (250) : {
+MiniSQLParser.cs (251) : string privilege = match.Groups[1].Value;
+MiniSQLParser.cs (252) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (253) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (255) : return new Grant(privilege, table, profile);
+MiniSQLParser.cs (256) : }
+MiniSQLParser.cs (258) : //REVOKE
+MiniSQLParser.cs (269) : return null;
 SetValue.cs (18) : this.Value = value;
 Update.cs (15) : this.Table = table;
 Update.cs (16) : this.Columns = columnNames;
