@@ -110,18 +110,17 @@ Delete.cs (16) : Where = where;
 DeleteUser.cs (16) : Username = username;
 MiniSQLParser.cs (3) : using System.Collections;
 MiniSQLParser.cs (15) : const string selectPattern = @"^SELECT\s+([a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*)\s+FROM\s+([a-zA-Z0-9]+)(\s+WHERE\s+([a-zA-Z0-9]+(>|<|=)'((-[0-9]+(\.[0-9]+)?)|([0-9]+(\.[0-9]+)?)|([a-zA-Z0-9]+(?:\s[a-zA-Z0-9]+)*))'))?$";
-MiniSQLParser.cs (52) : //droptable
-MiniSQLParser.cs (53) : Match dropMatch = Regex.Match(miniSQLQuery, dropTablePattern);
-MiniSQLParser.cs (54) : if (dropMatch.Success)
-MiniSQLParser.cs (55) : {
-MiniSQLParser.cs (56) : string tableName = dropMatch.Groups[1].Value;
-MiniSQLParser.cs (57) : return new DropTable(tableName);
-MiniSQLParser.cs (58) : }
-MiniSQLParser.cs (61) : //Select
-MiniSQLParser.cs (63) : Match matchSelect = Regex.Match(miniSQLQuery, selectPattern);
-MiniSQLParser.cs (65) : if (matchSelect.Success)
-MiniSQLParser.cs (66) : {
-MiniSQLParser.cs (91) : }
+MiniSQLParser.cs (55) : //droptable
+MiniSQLParser.cs (56) : Match dropMatch = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (57) : if (dropMatch.Success)
+MiniSQLParser.cs (58) : {
+MiniSQLParser.cs (59) : string tableName = dropMatch.Groups[1].Value;
+MiniSQLParser.cs (60) : return new DropTable(tableName);
+MiniSQLParser.cs (61) : }
+MiniSQLParser.cs (65) : Match matchSelect = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (67) : if (matchSelect.Success)
+MiniSQLParser.cs (68) : {
+MiniSQLParser.cs (93) : }
 Select.cs (27) : if (database == null)
 Select.cs (28) : {
 Select.cs (29) : return Constants.Error;
@@ -164,6 +163,84 @@ Manager.cs (162) : }
 Manager.cs (163) : }
 Manager.cs (164) : }
 Manager.cs (166) : return null;
+Manager.cs (246) : string managerDir = Path.Combine(databaseName, "managerData");
+Manager.cs (248) : Manager manager = new Manager(username);
+Manager.cs (249) : // Si no existe la carpeta, manager vac�o
+Manager.cs (250) : if (Directory.Exists(managerDir))
+Manager.cs (251) : {
+Manager.cs (252) : string[] folders = Directory.GetDirectories(managerDir);
+Manager.cs (254) : foreach (string folder in folders)
+Manager.cs (255) : {
+Manager.cs (256) : string[] files = Directory.GetFiles(folder, "*.txt");
+Manager.cs (258) : //Seguir solo si hay archivos en la carpeta
+Manager.cs (259) : if (files.Length > 0)
+Manager.cs (260) : {
+Manager.cs (261) : string[] lines = File.ReadAllLines(files[0]);
+Manager.cs (263) : //Seguir solo si el archivo no est� vac�o
+Manager.cs (264) : if (lines.Length > 0)
+Manager.cs (265) : {
+Manager.cs (266) : Profile profile = new Profile();
+Manager.cs (268) : int index = 0;
+Manager.cs (270) : foreach (string line in lines)
+Manager.cs (271) : {
+Manager.cs (272) : //La primera linea es el nombre de perfil, luego se actualiza el index
+Manager.cs (273) : if (index == 0)
+Manager.cs (274) : {
+Manager.cs (275) : profile.Name = line;
+Manager.cs (276) : }
+Manager.cs (277) : else
+Manager.cs (278) : {
+Manager.cs (279) : //Para usuarios
+Manager.cs (280) : if (line.StartsWith("USER:"))
+Manager.cs (281) : {
+Manager.cs (282) : string data = line.Substring(5);
+Manager.cs (283) : //Separar user y password
+Manager.cs (284) : string[] parts = data.Split(',');
+Manager.cs (286) : //Para que el formato sea correcto tiene que tener exactamente las 2 partes
+Manager.cs (287) : if (parts.Length == 2)
+Manager.cs (288) : {
+Manager.cs (289) : User user = new User();
+Manager.cs (290) : user.Username = parts[0];
+Manager.cs (291) : user.EncryptedPassword = parts[1];
+Manager.cs (293) : profile.Users.Add(user);
+Manager.cs (294) : }
+Manager.cs (295) : }
+Manager.cs (296) : //Para privilegios
+Manager.cs (297) : else if (line.StartsWith("PRIV:"))
+Manager.cs (298) : {
+Manager.cs (299) : string data = line.Substring(5);
+Manager.cs (300) : string[] parts = data.Split(',');
+Manager.cs (302) : if (parts.Length == 2)
+Manager.cs (303) : {
+Manager.cs (304) : string text = parts[1];
+Manager.cs (305) : //Privilege es un enumnerado, busca el privilegio
+Manager.cs (306) : Privilege privilege = Privilege.Select;
+Manager.cs (307) : bool found = false;
+Manager.cs (309) : foreach (Privilege p in Enum.GetValues(typeof(Privilege)))
+Manager.cs (310) : {
+Manager.cs (311) : if (p.ToString() == text)
+Manager.cs (312) : {
+Manager.cs (313) : privilege = p;
+Manager.cs (314) : found = true;
+Manager.cs (315) : break;
+Manager.cs (316) : }
+Manager.cs (317) : }
+Manager.cs (319) : if (found)
+Manager.cs (320) : {
+Manager.cs (321) : profile.GrantPrivilege(parts[0], privilege);
+Manager.cs (322) : }
+Manager.cs (323) : }
+Manager.cs (324) : }
+Manager.cs (325) : }
+Manager.cs (327) : index++;
+Manager.cs (328) : }
+Manager.cs (329) : //A�adir perfil a manager
+Manager.cs (330) : manager.Profiles.Add(profile);
+Manager.cs (331) : }
+Manager.cs (332) : }
+Manager.cs (333) : }
+Manager.cs (334) : }
+Manager.cs (336) : return manager;
 Profile.cs (47) : //datos no v�lidos
 Profile.cs (48) : if (table == null || privilege == null)
 Profile.cs (49) : {

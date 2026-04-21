@@ -91,60 +91,63 @@ Table.cs (22) : Rows = new List<Row>();
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
 MiniSQLParser.cs (16) : const string insertPattern = @"^INSERT\s+INTO\s+(?<table>[a-zA-Z]\w*)\s+VALUES\s*\((?<values>.*)\)\s*$";
-MiniSQLParser.cs (84) : Match columnMatch = Regex.Match(columnPart, @"^\s*([a-zA-Z]\w*)\s+(TEXT|INT|DOUBLE)\s*$");
-MiniSQLParser.cs (94) : if (typeText == "TEXT")
-MiniSQLParser.cs (95) : {
-MiniSQLParser.cs (96) : type = ColumnDefinition.DataType.String;
-MiniSQLParser.cs (97) : }
-MiniSQLParser.cs (98) : else if (typeText == "INT")
-MiniSQLParser.cs (99) : {
-MiniSQLParser.cs (100) : type = ColumnDefinition.DataType.Int;
-MiniSQLParser.cs (101) : }
-MiniSQLParser.cs (102) : else if (typeText == "DOUBLE")
-MiniSQLParser.cs (103) : {
-MiniSQLParser.cs (104) : type = ColumnDefinition.DataType.Double;
-MiniSQLParser.cs (105) : }
-MiniSQLParser.cs (106) : else
-MiniSQLParser.cs (107) : {
-MiniSQLParser.cs (108) : return null;
-MiniSQLParser.cs (109) : }
-MiniSQLParser.cs (124) : //insert
-MiniSQLParser.cs (125) : match = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (126) : if (match.Success)
-MiniSQLParser.cs (127) : {
-MiniSQLParser.cs (128) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (129) : string valuesText = match.Groups[2].Value;
-MiniSQLParser.cs (131) : List<string> valuesComma = CommaSeparatedNames(valuesText);
-MiniSQLParser.cs (132) : foreach (string value in valuesComma)
-MiniSQLParser.cs (133) : {
-MiniSQLParser.cs (134) : Match valueMatch = Regex.Match(value, @"^\s*'[^']*'\s*$");
-MiniSQLParser.cs (135) : if (!valueMatch.Success)
-MiniSQLParser.cs (136) : {
-MiniSQLParser.cs (137) : return null;
-MiniSQLParser.cs (138) : }
-MiniSQLParser.cs (139) : }
-MiniSQLParser.cs (140) : List<String> values = RemoveComillas(valuesComma);
-MiniSQLParser.cs (141) : return new Insert(tableName, values);
-MiniSQLParser.cs (142) : }
-MiniSQLParser.cs (148) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (149) : string valuesText = match.Groups[2].Value;
-MiniSQLParser.cs (153) : foreach (string setPart in CommaSeparatedNames(valuesText))
-MiniSQLParser.cs (160) : string columnName= setMatch.Groups[1].Value;
-MiniSQLParser.cs (161) : string value = RemoveComillas(new List<string> { setMatch.Groups[2].Value })[0];
-MiniSQLParser.cs (163) : setValues.Add(new SetValue(columnName, value));
-MiniSQLParser.cs (166) : string whereValue = RemoveComillas(new List<string> { match.Groups[5].Value })[0];
-MiniSQLParser.cs (167) : Condition updateCondition = new Condition(match.Groups[3].Value, match.Groups[4].Value, whereValue);
-MiniSQLParser.cs (168) : return new Update(tableName, setValues, updateCondition);
-MiniSQLParser.cs (189) : static List<String> RemoveComillas(List<string> values)
-MiniSQLParser.cs (190) : {
-MiniSQLParser.cs (191) : List<string> result = new List<string>();
-MiniSQLParser.cs (193) : foreach (string value in values)
-MiniSQLParser.cs (194) : {
-MiniSQLParser.cs (195) : string i = value.Substring(1, value.Length - 2);
-MiniSQLParser.cs (196) : i = i.Trim();
-MiniSQLParser.cs (197) : result.Add(i);
-MiniSQLParser.cs (198) : }
-MiniSQLParser.cs (199) : return result;
-MiniSQLParser.cs (200) : }
+MiniSQLParser.cs (75) : const string TYPE_TEXT = "TEXT";
+MiniSQLParser.cs (76) : const string TYPE_INT = "INT";
+MiniSQLParser.cs (77) : const string TYPE_DOUBLE = "DOUBLE";
+MiniSQLParser.cs (89) : Match columnMatch = Regex.Match(columnPart, @"^\s*([a-zA-Z]\w*)\s+(TEXT|INT|DOUBLE)\s*$");
+MiniSQLParser.cs (99) : if (typeText == TYPE_TEXT)
+MiniSQLParser.cs (100) : {
+MiniSQLParser.cs (101) : type = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (102) : }
+MiniSQLParser.cs (103) : else if (typeText == TYPE_INT)
+MiniSQLParser.cs (104) : {
+MiniSQLParser.cs (105) : type = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (106) : }
+MiniSQLParser.cs (107) : else if (typeText == TYPE_DOUBLE)
+MiniSQLParser.cs (108) : {
+MiniSQLParser.cs (109) : type = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (110) : }
+MiniSQLParser.cs (111) : else
+MiniSQLParser.cs (112) : {
+MiniSQLParser.cs (113) : return null;
+MiniSQLParser.cs (114) : }
+MiniSQLParser.cs (129) : //insert
+MiniSQLParser.cs (130) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (131) : if (match.Success)
+MiniSQLParser.cs (132) : {
+MiniSQLParser.cs (133) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (134) : string valuesText = match.Groups[2].Value;
+MiniSQLParser.cs (136) : List<string> valuesComma = CommaSeparatedNames(valuesText);
+MiniSQLParser.cs (137) : foreach (string value in valuesComma)
+MiniSQLParser.cs (138) : {
+MiniSQLParser.cs (139) : Match valueMatch = Regex.Match(value, @"^\s*'[^']*'\s*$");
+MiniSQLParser.cs (140) : if (!valueMatch.Success)
+MiniSQLParser.cs (141) : {
+MiniSQLParser.cs (142) : return null;
+MiniSQLParser.cs (143) : }
+MiniSQLParser.cs (144) : }
+MiniSQLParser.cs (145) : List<String> values = RemoveComillas(valuesComma);
+MiniSQLParser.cs (146) : return new Insert(tableName, values);
+MiniSQLParser.cs (147) : }
+MiniSQLParser.cs (153) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (154) : string valuesText = match.Groups[2].Value;
+MiniSQLParser.cs (158) : foreach (string setPart in CommaSeparatedNames(valuesText))
+MiniSQLParser.cs (165) : string columnName= setMatch.Groups[1].Value;
+MiniSQLParser.cs (166) : string value = RemoveComillas(new List<string> { setMatch.Groups[2].Value })[0];
+MiniSQLParser.cs (168) : setValues.Add(new SetValue(columnName, value));
+MiniSQLParser.cs (171) : string whereValue = RemoveComillas(new List<string> { match.Groups[5].Value })[0];
+MiniSQLParser.cs (172) : Condition updateCondition = new Condition(match.Groups[3].Value, match.Groups[4].Value, whereValue);
+MiniSQLParser.cs (173) : return new Update(tableName, setValues, updateCondition);
+MiniSQLParser.cs (194) : static List<String> RemoveComillas(List<string> values)
+MiniSQLParser.cs (195) : {
+MiniSQLParser.cs (196) : List<string> result = new List<string>();
+MiniSQLParser.cs (198) : foreach (string value in values)
+MiniSQLParser.cs (199) : {
+MiniSQLParser.cs (200) : string i = value.Substring(1, value.Length - 2);
+MiniSQLParser.cs (201) : i = i.Trim();
+MiniSQLParser.cs (202) : result.Add(i);
+MiniSQLParser.cs (203) : }
+MiniSQLParser.cs (204) : return result;
+MiniSQLParser.cs (205) : }
 Update.cs (16) : Columns = columnNames;
 Update.cs (17) : Where = where;

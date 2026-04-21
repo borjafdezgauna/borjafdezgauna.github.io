@@ -95,6 +95,8 @@ Row.cs (125) : result += Encode(Values[i]);
 Row.cs (126) : }
 Row.cs (127) : return result;
 Row.cs (135) : //de text a ColumnDefinition
+Table.cs (124) : //"[Name]" <- one column, no rows
+Table.cs (134) : res = res + ColumnDefinitions[i].Name;
 Table.cs (232) : values.Add(r.GetValue(columnName));
 Table.cs (262) : if(condition == null)
 Table.cs (263) : {
@@ -131,117 +133,118 @@ Insert.cs (41) : return database.LastErrorMessage;
 MiniSQLParser.cs (5) : using System.Data.Common;
 MiniSQLParser.cs (20) : //LEIRE --> #16
 MiniSQLParser.cs (21) : const string insertPattern = @"INSERT\s+INTO\s+([\w_]+)\s+VALUES\s+\(('[^',]*'(?:,'(?:[^',]*)')*)\)$";
-MiniSQLParser.cs (26) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s*\(([a-zA-Z][a-zA-Z0-9]*\s+(?:INT|TEXT)(?:,[a-zA-Z][a-zA-Z0-9]*\s+(?:INT|TEXT))*)?\)$";
-MiniSQLParser.cs (27) : //LEIRE --> #26
-MiniSQLParser.cs (28) : const string updateTablePattern = @"UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*([=<>])\s*('[^']*'))?$";
-MiniSQLParser.cs (62) : //select
-MiniSQLParser.cs (67) : string column = matchSelect.Groups[1].Value;
-MiniSQLParser.cs (68) : //Separar las columas
-MiniSQLParser.cs (69) : List<string> columns = CommaSeparatedNames(column);
-MiniSQLParser.cs (71) : string table = matchSelect.Groups[2].Value;
-MiniSQLParser.cs (73) : Condition cond = null;
-MiniSQLParser.cs (75) : //si hay where
-MiniSQLParser.cs (76) : if (matchSelect.Groups[3].Success)
-MiniSQLParser.cs (77) : {
-MiniSQLParser.cs (78) : string colum = matchSelect.Groups[3].Value;
-MiniSQLParser.cs (79) : string op = matchSelect.Groups[4].Value;
-MiniSQLParser.cs (80) : string valor = matchSelect.Groups[5].Value;
-MiniSQLParser.cs (82) : cond = new Condition(colum, op, valor);
-MiniSQLParser.cs (83) : }
-MiniSQLParser.cs (84) : if (cond != null)
-MiniSQLParser.cs (85) : {
-MiniSQLParser.cs (86) : return new Select(table, columns, cond);
-MiniSQLParser.cs (87) : }
-MiniSQLParser.cs (88) : else
-MiniSQLParser.cs (89) : {
-MiniSQLParser.cs (90) : return new Select(table, columns, null);
-MiniSQLParser.cs (92) : }
-MiniSQLParser.cs (95) : //Insert
-MiniSQLParser.cs (96) : Match matchInsert = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (97) : if (matchInsert.Success)
-MiniSQLParser.cs (98) : {
-MiniSQLParser.cs (99) : string table = matchInsert.Groups[1].Value;
-MiniSQLParser.cs (100) : string valores = matchInsert.Groups[2].Value;
-MiniSQLParser.cs (102) : string[] valoresArray = valores.Split(',');
-MiniSQLParser.cs (103) : List<string> values = new List<string>();
-MiniSQLParser.cs (105) : foreach (string valor in valoresArray)
-MiniSQLParser.cs (106) : {
-MiniSQLParser.cs (107) : // Quitar las comillas simples
-MiniSQLParser.cs (108) : string valorSinComillas = valor.Trim('\'');
-MiniSQLParser.cs (109) : values.Add(valorSinComillas);
-MiniSQLParser.cs (110) : }
-MiniSQLParser.cs (112) : return new Insert(table, values);
-MiniSQLParser.cs (113) : }
-MiniSQLParser.cs (116) : const string Int_Type = "INT";
-MiniSQLParser.cs (117) : const string Text_Type = "TEXT";
-MiniSQLParser.cs (118) : const string Double_Type = "DOUBLE";
-MiniSQLParser.cs (147) : if (tipo == Int_Type)
-MiniSQLParser.cs (151) : else if (tipo == Text_Type)
-MiniSQLParser.cs (155) : else if (tipo == Double_Type)
-MiniSQLParser.cs (175) : //Update
-MiniSQLParser.cs (176) : Match matchUpdate = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (177) : if (matchUpdate.Success)
-MiniSQLParser.cs (178) : {
-MiniSQLParser.cs (179) : string table = matchUpdate.Groups[1].Value;
-MiniSQLParser.cs (180) : string valores = matchUpdate.Groups[2].Value;
-MiniSQLParser.cs (181) : string whereColumn = null;
-MiniSQLParser.cs (182) : string whereOp = null;
-MiniSQLParser.cs (183) : string whereValue = null;
-MiniSQLParser.cs (185) : if (matchUpdate.Groups[3].Success)
-MiniSQLParser.cs (186) : {
-MiniSQLParser.cs (187) : whereColumn = matchUpdate.Groups[3].Value;
-MiniSQLParser.cs (188) : whereOp = matchUpdate.Groups[4].Value;
-MiniSQLParser.cs (189) : whereValue = matchUpdate.Groups[5].Value;
-MiniSQLParser.cs (190) : }
-MiniSQLParser.cs (192) : if (miniSQLQuery.ToUpper().Contains("WHERE") && (whereOp == null || whereValue == null))
-MiniSQLParser.cs (193) : {
-MiniSQLParser.cs (194) : return null;
-MiniSQLParser.cs (195) : }
-MiniSQLParser.cs (197) : string setPartSinComillas = Regex.Replace(valores, @"'[^']*'", "#");
-MiniSQLParser.cs (198) : if (setPartSinComillas.Contains(" ,") || setPartSinComillas.Contains(", "))
-MiniSQLParser.cs (199) : {
-MiniSQLParser.cs (200) : return null;
-MiniSQLParser.cs (201) : }
-MiniSQLParser.cs (203) : List<SetValue> setValues = new List<SetValue>();
-MiniSQLParser.cs (204) : string[] assignments = Regex.Split(valores, @",(?=(?:[^']*'[^']*')*[^']*$)");
-MiniSQLParser.cs (206) : foreach (string assignment in assignments)
-MiniSQLParser.cs (207) : {
-MiniSQLParser.cs (208) : if (!assignment.Contains("="))
-MiniSQLParser.cs (209) : {
-MiniSQLParser.cs (210) : return null;
-MiniSQLParser.cs (211) : }
-MiniSQLParser.cs (213) : string[] parts = assignment.Split('=');
-MiniSQLParser.cs (214) : if (parts.Length != 2)
-MiniSQLParser.cs (215) : {
-MiniSQLParser.cs (216) : return null;
-MiniSQLParser.cs (217) : }
-MiniSQLParser.cs (219) : string column = parts[0].Trim();
-MiniSQLParser.cs (220) : string value = parts[1].Trim();
-MiniSQLParser.cs (222) : if (!value.StartsWith("'") || !value.EndsWith("'"))
-MiniSQLParser.cs (223) : {
-MiniSQLParser.cs (224) : return null;
-MiniSQLParser.cs (225) : }
-MiniSQLParser.cs (227) : value = value.Substring(1, value.Length - 2);
-MiniSQLParser.cs (228) : setValues.Add(new SetValue(column, value));
-MiniSQLParser.cs (229) : }
-MiniSQLParser.cs (231) : if (setValues.Count == 0)
-MiniSQLParser.cs (232) : {
-MiniSQLParser.cs (233) : return null;
-MiniSQLParser.cs (234) : }
-MiniSQLParser.cs (236) : // Parsear WHERE
-MiniSQLParser.cs (237) : Condition condition = null;
-MiniSQLParser.cs (238) : if (whereColumn != null)
-MiniSQLParser.cs (239) : {
-MiniSQLParser.cs (240) : // Solo aceptar valores entre comillas simples
-MiniSQLParser.cs (241) : if (!whereValue.StartsWith("'") || !whereValue.EndsWith("'"))
+MiniSQLParser.cs (27) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s*\((\s*(?:[a-zA-Z][a-zA-Z0-9]*\s+(?:INT|TEXT)(?:,[a-zA-Z][a-zA-Z0-9]*\s+(?:INT|TEXT))*)?\s*)\)$";
+MiniSQLParser.cs (28) : /*const string createTablePattern = @"CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9])\s\((.*)\)";*/
+MiniSQLParser.cs (30) : //LEIRE --> #26
+MiniSQLParser.cs (31) : const string updateTablePattern = @"UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*([=<>])\s*('[^']*'))?$";
+MiniSQLParser.cs (64) : //select
+MiniSQLParser.cs (69) : string column = matchSelect.Groups[1].Value;
+MiniSQLParser.cs (70) : //Separar las columas
+MiniSQLParser.cs (71) : List<string> columns = CommaSeparatedNames(column);
+MiniSQLParser.cs (73) : string table = matchSelect.Groups[2].Value;
+MiniSQLParser.cs (75) : Condition cond = null;
+MiniSQLParser.cs (77) : //si hay where
+MiniSQLParser.cs (78) : if (matchSelect.Groups[3].Success)
+MiniSQLParser.cs (79) : {
+MiniSQLParser.cs (80) : string colum = matchSelect.Groups[3].Value;
+MiniSQLParser.cs (81) : string op = matchSelect.Groups[4].Value;
+MiniSQLParser.cs (82) : string valor = matchSelect.Groups[5].Value;
+MiniSQLParser.cs (84) : cond = new Condition(colum, op, valor);
+MiniSQLParser.cs (85) : }
+MiniSQLParser.cs (86) : if (cond != null)
+MiniSQLParser.cs (87) : {
+MiniSQLParser.cs (88) : return new Select(table, columns, cond);
+MiniSQLParser.cs (89) : }
+MiniSQLParser.cs (90) : else
+MiniSQLParser.cs (91) : {
+MiniSQLParser.cs (92) : return new Select(table, columns, null);
+MiniSQLParser.cs (94) : }
+MiniSQLParser.cs (97) : //Insert
+MiniSQLParser.cs (98) : Match matchInsert = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (99) : if (matchInsert.Success)
+MiniSQLParser.cs (100) : {
+MiniSQLParser.cs (101) : string table = matchInsert.Groups[1].Value;
+MiniSQLParser.cs (102) : string valores = matchInsert.Groups[2].Value;
+MiniSQLParser.cs (104) : string[] valoresArray = valores.Split(',');
+MiniSQLParser.cs (105) : List<string> values = new List<string>();
+MiniSQLParser.cs (107) : foreach (string valor in valoresArray)
+MiniSQLParser.cs (108) : {
+MiniSQLParser.cs (109) : // Quitar las comillas simples
+MiniSQLParser.cs (110) : string valorSinComillas = valor.Trim('\'');
+MiniSQLParser.cs (111) : values.Add(valorSinComillas);
+MiniSQLParser.cs (112) : }
+MiniSQLParser.cs (114) : return new Insert(table, values);
+MiniSQLParser.cs (115) : }
+MiniSQLParser.cs (118) : const string Int_Type = "INT";
+MiniSQLParser.cs (119) : const string Text_Type = "TEXT";
+MiniSQLParser.cs (120) : const string Double_Type = "DOUBLE";
+MiniSQLParser.cs (149) : if (tipo == Int_Type)
+MiniSQLParser.cs (153) : else if (tipo == Text_Type)
+MiniSQLParser.cs (157) : else if (tipo == Double_Type)
+MiniSQLParser.cs (178) : //Update
+MiniSQLParser.cs (179) : Match matchUpdate = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (180) : if (matchUpdate.Success)
+MiniSQLParser.cs (181) : {
+MiniSQLParser.cs (182) : string table = matchUpdate.Groups[1].Value;
+MiniSQLParser.cs (183) : string valores = matchUpdate.Groups[2].Value;
+MiniSQLParser.cs (184) : string whereColumn = null;
+MiniSQLParser.cs (185) : string whereOp = null;
+MiniSQLParser.cs (186) : string whereValue = null;
+MiniSQLParser.cs (188) : if (matchUpdate.Groups[3].Success)
+MiniSQLParser.cs (189) : {
+MiniSQLParser.cs (190) : whereColumn = matchUpdate.Groups[3].Value;
+MiniSQLParser.cs (191) : whereOp = matchUpdate.Groups[4].Value;
+MiniSQLParser.cs (192) : whereValue = matchUpdate.Groups[5].Value;
+MiniSQLParser.cs (193) : }
+MiniSQLParser.cs (195) : if (miniSQLQuery.ToUpper().Contains("WHERE") && (whereOp == null || whereValue == null))
+MiniSQLParser.cs (196) : {
+MiniSQLParser.cs (197) : return null;
+MiniSQLParser.cs (198) : }
+MiniSQLParser.cs (200) : string setPartSinComillas = Regex.Replace(valores, @"'[^']*'", "#");
+MiniSQLParser.cs (201) : if (setPartSinComillas.Contains(" ,") || setPartSinComillas.Contains(", "))
+MiniSQLParser.cs (202) : {
+MiniSQLParser.cs (203) : return null;
+MiniSQLParser.cs (204) : }
+MiniSQLParser.cs (206) : List<SetValue> setValues = new List<SetValue>();
+MiniSQLParser.cs (207) : string[] assignments = Regex.Split(valores, @",(?=(?:[^']*'[^']*')*[^']*$)");
+MiniSQLParser.cs (209) : foreach (string assignment in assignments)
+MiniSQLParser.cs (210) : {
+MiniSQLParser.cs (211) : if (!assignment.Contains("="))
+MiniSQLParser.cs (212) : {
+MiniSQLParser.cs (213) : return null;
+MiniSQLParser.cs (214) : }
+MiniSQLParser.cs (216) : string[] parts = assignment.Split('=');
+MiniSQLParser.cs (217) : if (parts.Length != 2)
+MiniSQLParser.cs (218) : {
+MiniSQLParser.cs (219) : return null;
+MiniSQLParser.cs (220) : }
+MiniSQLParser.cs (222) : string column = parts[0].Trim();
+MiniSQLParser.cs (223) : string value = parts[1].Trim();
+MiniSQLParser.cs (225) : if (!value.StartsWith("'") || !value.EndsWith("'"))
+MiniSQLParser.cs (226) : {
+MiniSQLParser.cs (227) : return null;
+MiniSQLParser.cs (228) : }
+MiniSQLParser.cs (230) : value = value.Substring(1, value.Length - 2);
+MiniSQLParser.cs (231) : setValues.Add(new SetValue(column, value));
+MiniSQLParser.cs (232) : }
+MiniSQLParser.cs (234) : if (setValues.Count == 0)
+MiniSQLParser.cs (235) : {
+MiniSQLParser.cs (236) : return null;
+MiniSQLParser.cs (237) : }
+MiniSQLParser.cs (239) : // Parsear WHERE
+MiniSQLParser.cs (240) : Condition condition = null;
+MiniSQLParser.cs (241) : if (whereColumn != null)
 MiniSQLParser.cs (242) : {
-MiniSQLParser.cs (243) : return null;
-MiniSQLParser.cs (244) : }
-MiniSQLParser.cs (246) : whereValue = whereValue.Substring(1, whereValue.Length - 2);
-MiniSQLParser.cs (247) : condition = new Condition(whereColumn, whereOp, whereValue);
-MiniSQLParser.cs (248) : }
-MiniSQLParser.cs (250) : return new Update(table, setValues, condition);
+MiniSQLParser.cs (243) : // Solo aceptar valores entre comillas simples
+MiniSQLParser.cs (244) : if (!whereValue.StartsWith("'") || !whereValue.EndsWith("'"))
+MiniSQLParser.cs (245) : {
+MiniSQLParser.cs (246) : return null;
+MiniSQLParser.cs (247) : }
+MiniSQLParser.cs (249) : whereValue = whereValue.Substring(1, whereValue.Length - 2);
+MiniSQLParser.cs (250) : condition = new Condition(whereColumn, whereOp, whereValue);
 MiniSQLParser.cs (251) : }
+MiniSQLParser.cs (253) : return new Update(table, setValues, condition);
+MiniSQLParser.cs (254) : }
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;
@@ -291,37 +294,37 @@ Manager.cs (125) : return profile.IsGrantedPrivilege(table, privilege);
 Manager.cs (136) : if (profile != null && ProfileByName(profile.Name) == null)
 Manager.cs (141) : if (!IsUserAdmin()) return;
 Manager.cs (143) : //si no es administrados no hace nada
-Manager.cs (255) : string managerDir = Path.Combine(databaseName, "managerData");
-Manager.cs (257) : if (Directory.Exists(managerDir))
-Manager.cs (258) : {
-Manager.cs (259) : Directory.Delete(managerDir, true);
-Manager.cs (260) : }
-Manager.cs (262) : Directory.CreateDirectory(managerDir);
-Manager.cs (264) : int index = 1;
-Manager.cs (265) : foreach (Profile profile in Profiles)
-Manager.cs (266) : {
-Manager.cs (267) : string profileFolder = Path.Combine(managerDir, index.ToString());
-Manager.cs (268) : Directory.CreateDirectory(profileFolder);
-Manager.cs (270) : string profileFile = Path.Combine(profileFolder, profile.Name + ".txt");
-Manager.cs (272) : using (StreamWriter writer = new StreamWriter(profileFile))
-Manager.cs (273) : {
-Manager.cs (274) : writer.WriteLine(profile.Name);
-Manager.cs (276) : foreach (User user in profile.Users)
-Manager.cs (277) : {
-Manager.cs (278) : writer.WriteLine($"USER:{user.Username},{user.EncryptedPassword}");
-Manager.cs (279) : }
-Manager.cs (281) : foreach (var tablePrivileges in profile.PrivilegesOn)
-Manager.cs (282) : {
-Manager.cs (283) : string table = tablePrivileges.Key;
-Manager.cs (284) : foreach (Privilege privilege in tablePrivileges.Value)
-Manager.cs (285) : {
-Manager.cs (286) : writer.WriteLine($"PRIV:{table},{privilege}");
-Manager.cs (287) : }
-Manager.cs (288) : }
-Manager.cs (289) : }
-Manager.cs (290) : index++;
-Manager.cs (291) : }
-Manager.cs (292) : }
+Manager.cs (342) : string managerDir = Path.Combine(databaseName, "managerData");
+Manager.cs (344) : if (Directory.Exists(managerDir))
+Manager.cs (345) : {
+Manager.cs (346) : Directory.Delete(managerDir, true);
+Manager.cs (347) : }
+Manager.cs (349) : Directory.CreateDirectory(managerDir);
+Manager.cs (351) : int index = 1;
+Manager.cs (352) : foreach (Profile profile in Profiles)
+Manager.cs (353) : {
+Manager.cs (354) : string profileFolder = Path.Combine(managerDir, index.ToString());
+Manager.cs (355) : Directory.CreateDirectory(profileFolder);
+Manager.cs (357) : string profileFile = Path.Combine(profileFolder, profile.Name + ".txt");
+Manager.cs (359) : using (StreamWriter writer = new StreamWriter(profileFile))
+Manager.cs (360) : {
+Manager.cs (361) : writer.WriteLine(profile.Name);
+Manager.cs (363) : foreach (User user in profile.Users)
+Manager.cs (364) : {
+Manager.cs (365) : writer.WriteLine($"USER:{user.Username},{user.EncryptedPassword}");
+Manager.cs (366) : }
+Manager.cs (368) : foreach (var tablePrivileges in profile.PrivilegesOn)
+Manager.cs (369) : {
+Manager.cs (370) : string table = tablePrivileges.Key;
+Manager.cs (371) : foreach (Privilege privilege in tablePrivileges.Value)
+Manager.cs (372) : {
+Manager.cs (373) : writer.WriteLine($"PRIV:{table},{privilege}");
+Manager.cs (374) : }
+Manager.cs (375) : }
+Manager.cs (376) : }
+Manager.cs (377) : index++;
+Manager.cs (378) : }
+Manager.cs (379) : }
 Profile.cs (72) : if (table == null || privilege == null)
 Profile.cs (73) : {
 Profile.cs (74) : return false;
