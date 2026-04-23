@@ -120,25 +120,26 @@ Table.cs (75) : public int ColumnIndexByName(string name)
 Table.cs (78) : if (string.IsNullOrEmpty(name)) return -1;
 Table.cs (81) : var colName = ColumnDefinitions[i].Name;
 Table.cs (82) : if (!string.IsNullOrEmpty(colName) && colName.Equals(name, StringComparison.OrdinalIgnoreCase))
-Table.cs (115) : public void DeleteIthRow(int index)
-Table.cs (117) : if (index >= 0 && index < Rows.Count)
-Table.cs (119) : Rows.RemoveAt(index);
-Table.cs (126) : var listaIndices = new List<int>();
-Table.cs (128) : for (int i = 0; i < Rows.Count; i++)
-Table.cs (129) : {
-Table.cs (130) : if (Rows[i] == null) continue;
-Table.cs (131) : if (condition == null || Rows[i].IsTrue(condition))
-Table.cs (132) : {
-Table.cs (133) : listaIndices.Add(i);
-Table.cs (134) : }
-Table.cs (135) : }
-Table.cs (136) : return listaIndices;
-Table.cs (212) : return true;
+Table.cs (88) : public void DeleteIthRow(int index)
+Table.cs (90) : if (index >= 0 && index < Rows.Count)
+Table.cs (92) : Rows.RemoveAt(index);
+Table.cs (99) : var listaIndices = new List<int>();
+Table.cs (101) : for (int i = 0; i < Rows.Count; i++)
+Table.cs (102) : {
+Table.cs (103) : if (Rows[i] == null) continue;
+Table.cs (104) : if (condition == null || Rows[i].IsTrue(condition))
+Table.cs (105) : {
+Table.cs (106) : listaIndices.Add(i);
+Table.cs (107) : }
+Table.cs (108) : }
+Table.cs (109) : return listaIndices;
+Table.cs (185) : return true;
 CreateSecurityProfile.cs (16) : ProfileName = profileName;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
 Delete.cs (23) : bool success = database.DeleteWhere(Table, Where);
 Delete.cs (24) : return success ? Constants.DeleteSuccess : database.LastErrorMessage;
+MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)\s*(=|<>|<=|>=|<|>)\s*('[^']*'|\d+(?:\.\d+)?))?\s*$";
 MiniSQLParser.cs (28) : const string createSecurityProfilePattern = @"^CREATE SECURITY PROFILE (\w+)$";
 MiniSQLParser.cs (202) : //DELETE
 MiniSQLParser.cs (203) : match = Regex.Match(miniSQLQuery, deletePattern, RegexOptions.IgnoreCase);
@@ -147,23 +148,22 @@ MiniSQLParser.cs (205) : {
 MiniSQLParser.cs (206) : string table = match.Groups[1].Value;
 MiniSQLParser.cs (207) : Condition where = null;
 MiniSQLParser.cs (209) : {
-MiniSQLParser.cs (210) : where = new Condition(
-MiniSQLParser.cs (211) : match.Groups[2].Value,
-MiniSQLParser.cs (212) : match.Groups[3].Value,
-MiniSQLParser.cs (213) : match.Groups[4].Value.Trim('\'')
-MiniSQLParser.cs (214) : );
-MiniSQLParser.cs (215) : }
-MiniSQLParser.cs (216) : return new Delete(table, where);
-MiniSQLParser.cs (217) : }
-MiniSQLParser.cs (234) : if (match.Success)
-MiniSQLParser.cs (235) : {
-MiniSQLParser.cs (236) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (237) : return new CreateSecurityProfile(profileName);
-MiniSQLParser.cs (238) : }
-MiniSQLParser.cs (251) : if (match.Success)
-MiniSQLParser.cs (252) : {
-MiniSQLParser.cs (253) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (255) : }
+MiniSQLParser.cs (210) : string column = match.Groups[2].Value;
+MiniSQLParser.cs (211) : string op = match.Groups[3].Value;
+MiniSQLParser.cs (212) : string val = match.Groups[4].Value.Trim('\'');
+MiniSQLParser.cs (213) : where = new Condition(column, op, val);
+MiniSQLParser.cs (214) : }
+MiniSQLParser.cs (215) : return new Delete(table, where);
+MiniSQLParser.cs (216) : }
+MiniSQLParser.cs (233) : if (match.Success)
+MiniSQLParser.cs (234) : {
+MiniSQLParser.cs (235) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (236) : return new CreateSecurityProfile(profileName);
+MiniSQLParser.cs (237) : }
+MiniSQLParser.cs (250) : if (match.Success)
+MiniSQLParser.cs (251) : {
+MiniSQLParser.cs (252) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (254) : }
 Profile.cs (20) : if (!PrivilegesOn.ContainsKey(table))
 Profile.cs (21) : {
 Profile.cs (22) : PrivilegesOn[table] = new List<Privilege>();
