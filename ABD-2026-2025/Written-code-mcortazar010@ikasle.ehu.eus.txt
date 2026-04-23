@@ -74,8 +74,10 @@ Database.cs (182) : }
 Database.cs (185) : return TablaRes;
 CreateSecurityProfile.cs (16) : ProfileName = profileName;
 DropSecurityProfile.cs (16) : ProfileName = profileName;
-MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"CREATE\s+SECURITY\s+PROFILE\s+(\w+)\s*"; //mikel
-MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"DROP\s+SECURITY\s+PROFILE\s+(\w+)\s*"; //mikel
+DropSecurityProfile.cs (24) : //      bool resultadoDrop = database.(ProfileName);
+DropSecurityProfile.cs (26) : //    return resultadoDrop.ToString();
+MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*"; //mikel
+MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*"; //mikel
 MiniSQLParser.cs (103) : {
 MiniSQLParser.cs (107) : List<string> columnList = CommaSeparatedNames(columns);
 MiniSQLParser.cs (108) : Condition condition = null;
@@ -94,9 +96,10 @@ MiniSQLParser.cs (295) : }
 MiniSQLParser.cs (297) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
 MiniSQLParser.cs (299) : if (match.Success)
 MiniSQLParser.cs (300) : {
-MiniSQLParser.cs (302) : string nombrePerfil = match.Groups[1].Value;
-MiniSQLParser.cs (304) : return new DropSecurityProfile(nombrePerfil);
-MiniSQLParser.cs (305) : }
+MiniSQLParser.cs (302) : if (match.Length != miniSQLQuery.Length) { return null; }
+MiniSQLParser.cs (304) : string nombrePerfil = match.Groups[1].Value;
+MiniSQLParser.cs (306) : return new DropSecurityProfile(nombrePerfil);
+MiniSQLParser.cs (307) : }
 Select.cs (19) : this.Table = table;
 Select.cs (20) : this.Columns = columns;
 Select.cs (21) : this.Where = condition;

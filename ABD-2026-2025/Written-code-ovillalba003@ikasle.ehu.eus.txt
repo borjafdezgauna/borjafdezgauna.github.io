@@ -255,6 +255,64 @@ Manager.cs (120) : {
 Manager.cs (121) : Profiles.Add(profile);
 Manager.cs (122) : }
 Manager.cs (123) : }
+Manager.cs (192) : try
+Manager.cs (193) : {
+Manager.cs (194) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (195) : string filePath = Path.Combine(path, "Manager.txt");
+Manager.cs (197) : Manager manager = new Manager(username);
+Manager.cs (199) : if(!File.Exists(filePath))
+Manager.cs (200) : return manager;
+Manager.cs (203) : using (TextReader reader = File.OpenText(filePath))
+Manager.cs (204) : {
+Manager.cs (205) : string line;
+Manager.cs (207) : while ((line = reader.ReadLine()) != null)
+Manager.cs (208) : {
+Manager.cs (209) : if(string.IsNullOrWhiteSpace(line))
+Manager.cs (210) : continue;
+Manager.cs (212) : Profile profile = new Profile();
+Manager.cs (213) : profile.Name = line;
+Manager.cs (215) : while ((line = reader.ReadLine()) != null && line != "Users:")
+Manager.cs (216) : {
+Manager.cs (217) : if (string.IsNullOrWhiteSpace(line))
+Manager.cs (218) : continue;
+Manager.cs (220) : string[] parts = line.Split('=');
+Manager.cs (222) : if (parts.Length == 2)
+Manager.cs (223) : {
+Manager.cs (224) : string table = parts[0].Trim();
+Manager.cs (225) : string[] privileges = parts[1].Split('|');
+Manager.cs (227) : foreach (string privilege in privileges)
+Manager.cs (228) : {
+Manager.cs (229) : if (Enum.TryParse(privilege.Trim(), out Privilege parsedPrivilege))
+Manager.cs (230) : {
+Manager.cs (231) : profile.GrantPrivilege(table, parsedPrivilege);
+Manager.cs (232) : }
+Manager.cs (233) : }
+Manager.cs (234) : }
+Manager.cs (235) : }
+Manager.cs (237) : while ((line = reader.ReadLine()) != null && line != "-------")
+Manager.cs (238) : {
+Manager.cs (239) : if (string.IsNullOrWhiteSpace(line))
+Manager.cs (240) : continue;
+Manager.cs (242) : string[] parts = line.Split(':');
+Manager.cs (244) : if (parts.Length == 2)
+Manager.cs (245) : {
+Manager.cs (246) : User user = new User
+Manager.cs (247) : {
+Manager.cs (248) : Username = parts[0],
+Manager.cs (249) : EncryptedPassword = parts[1]
+Manager.cs (250) : };
+Manager.cs (252) : profile.Users.Add(user);
+Manager.cs (253) : }
+Manager.cs (254) : }
+Manager.cs (255) : manager.Profiles.Add(profile);
+Manager.cs (256) : }
+Manager.cs (257) : }
+Manager.cs (259) : return manager;
+Manager.cs (261) : }
+Manager.cs (262) : catch
+Manager.cs (263) : {
+Manager.cs (264) : return null;
+Manager.cs (265) : }
 Profile.cs (20) : if(table == null)
 Profile.cs (21) : return false;
 Profile.cs (23) : if (!PrivilegesOn.ContainsKey(table))
