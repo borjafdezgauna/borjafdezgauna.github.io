@@ -282,14 +282,41 @@ Client.cs (33) : return true;
 Client.cs (35) : }catch
 Client.cs (36) : {
 Client.cs (41) : }
-Client.cs (59) : string request= $"<Open Database=\"{database}\" User=\"{username}\" Password=\"{password}\"/>";
-Client.cs (60) : string response = SendString(request);
-Client.cs (62) : if (response==null)
-Client.cs (63) : {
-Client.cs (64) : error="An error message from Constants.cs";
-Client.cs (66) : }
-Client.cs (68) : bool success= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
-Client.cs (70) : return success;
+Client.cs (50) : string messageToSend= message;
+Client.cs (51) : try
+Client.cs (52) : {
+Client.cs (53) : NetworkStream stream = m_tcpClient.GetStream();
+Client.cs (54) : //Pasamos el mensaje string a bytes para mandar (con UTF8 se transforma)
+Client.cs (55) : byte[] dataToSend = Encoding.UTF8.GetBytes(messageToSend);
+Client.cs (56) : //Mandamos al servidor el mensaje en bytes donde 0 es offset
+Client.cs (57) : stream.Write(dataToSend, 0, dataToSend.Length);
+Client.cs (59) : //EL buffer lee la respuesta del servido. EL tamaño es 4096 pero se pyede cambiar dependiendo de la respuesta esperada
+Client.cs (60) : byte[] buffer = new byte[4096];
+Client.cs (61) : int bytesRead = stream.Read(buffer, 0, buffer.Length);
+Client.cs (62) : //De vuelta a string la respuesta dle servidor
+Client.cs (63) : string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+Client.cs (64) : return response;
+Client.cs (65) : }
+Client.cs (66) : catch
+Client.cs (67) : {
+Client.cs (68) : return null;
+Client.cs (69) : }
+Client.cs (77) : string request= $"<Open Database=\"{database}\" User=\"{username}\" Password=\"{password}\"/>";
+Client.cs (78) : string response = SendString(request);
+Client.cs (80) : if (response==null)
+Client.cs (81) : {
+Client.cs (82) : error="An error message from Constants.cs";
+Client.cs (84) : }
+Client.cs (86) : bool success= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (88) : return success;
+Client.cs (97) : string request= $"<Create Database=\"{database}\" User=\"{username}\" Password=\"{password}\"/>";
+Client.cs (98) : string response = SendString(request);
+Client.cs (99) : if(response==null)
+Client.cs (100) : {
+Client.cs (101) : error="An error message from Constants.cs";
+Client.cs (103) : }
+Client.cs (104) : bool success= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (106) : return success;
 AddUser.cs (21) : Username = username;
 AddUser.cs (22) : Password = password;
 AddUser.cs (23) : ProfileName = profileName;

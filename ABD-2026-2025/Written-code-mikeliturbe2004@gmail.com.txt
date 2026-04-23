@@ -124,42 +124,50 @@ MiniSQLParser.cs (116) : string columnsText = match.Groups[2].Value;
 MiniSQLParser.cs (118) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
 MiniSQLParser.cs (120) : if (columnsText.Trim().Length != 0)
 MiniSQLParser.cs (121) : {
-MiniSQLParser.cs (122) : string[] parts = columnsText.Split(',');
-MiniSQLParser.cs (124) : foreach (string part in parts)
-MiniSQLParser.cs (125) : {
-MiniSQLParser.cs (126) : string[] columnParts = Regex.Split(part.Trim(), @"\s+");
-MiniSQLParser.cs (128) : if (columnParts.Length != 2)
-MiniSQLParser.cs (129) : return null;
-MiniSQLParser.cs (131) : string columnName = columnParts[0].Trim();
-MiniSQLParser.cs (132) : string columnType = columnParts[1].Trim();
-MiniSQLParser.cs (134) : ColumnDefinition.DataType type;
-MiniSQLParser.cs (136) : if (columnType == textType)
-MiniSQLParser.cs (137) : type = ColumnDefinition.DataType.String;
-MiniSQLParser.cs (138) : else if (columnType == intType)
-MiniSQLParser.cs (139) : type = ColumnDefinition.DataType.Int;
-MiniSQLParser.cs (140) : else if (columnType == doubleType)
-MiniSQLParser.cs (141) : type = ColumnDefinition.DataType.Double;
-MiniSQLParser.cs (142) : else
-MiniSQLParser.cs (143) : return null;
-MiniSQLParser.cs (145) : columns.Add(new ColumnDefinition(type, columnName));
-MiniSQLParser.cs (146) : }
-MiniSQLParser.cs (147) : }
-MiniSQLParser.cs (149) : return new CreateTable(table, columns);
-MiniSQLParser.cs (150) : }
-MiniSQLParser.cs (232) : match = Regex.Match(miniSQLQuery, deleteUserPattern);
-MiniSQLParser.cs (233) : if (match.Success)
-MiniSQLParser.cs (234) : {
-MiniSQLParser.cs (235) : string username = match.Groups[1].Value;
-MiniSQLParser.cs (236) : return new DeleteUser(username);
-MiniSQLParser.cs (237) : }
-MiniSQLParser.cs (259) : match = Regex.Match(miniSQLQuery, revokePattern);
-MiniSQLParser.cs (260) : if (match.Success)
-MiniSQLParser.cs (261) : {
-MiniSQLParser.cs (262) : string privilege = match.Groups[1].Value;
-MiniSQLParser.cs (263) : string table = match.Groups[2].Value;
-MiniSQLParser.cs (264) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (266) : return new Revoke(privilege, table, profile);
-MiniSQLParser.cs (267) : }
+MiniSQLParser.cs (122) : string trimmedColumnsText = columnsText.Trim();
+MiniSQLParser.cs (124) : if (trimmedColumnsText.StartsWith(",") ||
+MiniSQLParser.cs (125) : trimmedColumnsText.EndsWith(",") ||
+MiniSQLParser.cs (126) : trimmedColumnsText.Contains(",,"))
+MiniSQLParser.cs (127) : {
+MiniSQLParser.cs (128) : return null;
+MiniSQLParser.cs (129) : }
+MiniSQLParser.cs (131) : List<string> parts = CommaSeparatedNames(columnsText);
+MiniSQLParser.cs (133) : foreach (string part in parts)
+MiniSQLParser.cs (134) : {
+MiniSQLParser.cs (135) : string trimmedPart = part.Trim();
+MiniSQLParser.cs (136) : string[] columnParts = Regex.Split(trimmedPart, @"\s+");
+MiniSQLParser.cs (138) : if (columnParts.Length != 2)
+MiniSQLParser.cs (139) : return null;
+MiniSQLParser.cs (141) : string columnName = columnParts[0].Trim();
+MiniSQLParser.cs (142) : string columnType = columnParts[1].Trim();
+MiniSQLParser.cs (144) : ColumnDefinition.DataType type;
+MiniSQLParser.cs (146) : if (columnType == textType)
+MiniSQLParser.cs (147) : type = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (148) : else if (columnType == intType)
+MiniSQLParser.cs (149) : type = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (150) : else if (columnType == doubleType)
+MiniSQLParser.cs (151) : type = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (152) : else
+MiniSQLParser.cs (153) : return null;
+MiniSQLParser.cs (155) : columns.Add(new ColumnDefinition(type, columnName));
+MiniSQLParser.cs (156) : }
+MiniSQLParser.cs (157) : }
+MiniSQLParser.cs (159) : return new CreateTable(table, columns);
+MiniSQLParser.cs (161) : }
+MiniSQLParser.cs (242) : match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (243) : if (match.Success)
+MiniSQLParser.cs (244) : {
+MiniSQLParser.cs (245) : string username = match.Groups[1].Value;
+MiniSQLParser.cs (246) : return new DeleteUser(username);
+MiniSQLParser.cs (247) : }
+MiniSQLParser.cs (269) : match = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (270) : if (match.Success)
+MiniSQLParser.cs (271) : {
+MiniSQLParser.cs (272) : string privilege = match.Groups[1].Value;
+MiniSQLParser.cs (273) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (274) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (276) : return new Revoke(privilege, table, profile);
+MiniSQLParser.cs (277) : }
 Revoke.cs (18) : this.PrivilegeName = privilegeName;
 Revoke.cs (19) : this.TableName = tableName;
 Revoke.cs (20) : this.ProfileName = profileName;
