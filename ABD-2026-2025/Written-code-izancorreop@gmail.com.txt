@@ -22,13 +22,7 @@ Table.cs (185) : if (originalCol == null) continue;
 Insert.cs (24) : database.Insert(Table, Values);
 Insert.cs (25) : return database.LastErrorMessage;
 MiniSQLParser.cs (4) : using System.Linq;
-MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+([a-zA-Z]\w*(?:\s*,\s*[a-zA-Z]\w*)*)\s+FROM\s+([a-zA-Z]+)(?:\s+WHERE\s+([a-zA-Z]\w*)\s*([<=>])\s*(\w+(?:\.\w+)?|'[^']*'))?$";
-MiniSQLParser.cs (16) : const string insertPattern = @"^INSERT\s+INTO\s+(?<table>[a-zA-Z]+)\s+VALUES\s*\((?<values>.*)\)\s*$";
-MiniSQLParser.cs (18) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z]+)$";
-MiniSQLParser.cs (20) : //Note: The parsing of CREATE TABLE should accept empty columns "()" or no parens at all
-MiniSQLParser.cs (22) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z]+)(?:\s*\((.*)\))?$";
-MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z]+)\s+SET\s+(.+)\s+WHERE\s+(\w+)\s*([<=>])\s*(\w+|\d+(?:\.\d+)?|'[^']*')$";
-MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+([a-zA-Z]+)\s+WHERE\s+(\w+)\s*([<=>])\s*(\w+(?:\.\w+)?|'[^']*')$";
+MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+([a-zA-Z]\w*(?:\s*,\s*[a-zA-Z]\w*)*)\s+FROM\s+([a-zA-Z]\w*)(?:\s+WHERE\s+([a-zA-Z]\w*)\s*([<=>])\s*(\w+(?:\.\w+)?|'[^']*'))?$";
 MiniSQLParser.cs (49) : // select
 MiniSQLParser.cs (50) : var match = Regex.Match(miniSQLQuery, selectPattern);
 MiniSQLParser.cs (51) : if (match.Success)
@@ -43,25 +37,3 @@ MiniSQLParser.cs (59) : condition = new Condition(match.Groups[3].Value, match.G
 MiniSQLParser.cs (60) : return new Select(tableName, columns, condition);
 MiniSQLParser.cs (61) : }
 MiniSQLParser.cs (64) : match = Regex.Match(miniSQLQuery, dropTablePattern);
-MiniSQLParser.cs (84) : Match columnMatch = Regex.Match(columnPart, @"^\s*([a-zA-Z]\w*)\s+(String|Int|Double|TEXT|INT|DOUBLE)\s*$");
-MiniSQLParser.cs (94) : if (typeText == "String" || typeText == "TEXT")
-MiniSQLParser.cs (98) : else if (typeText == "Int" || typeText == "INT")
-MiniSQLParser.cs (102) : else if (typeText == "Double" || typeText == "DOUBLE")
-MiniSQLParser.cs (121) : var conditionValue = StripOptionalQuotes(match.Groups[4].Value);
-MiniSQLParser.cs (122) : var condition = new Condition(match.Groups[2].Value, match.Groups[3].Value, conditionValue);
-MiniSQLParser.cs (133) : if (valuesComma.Count == 0)
-MiniSQLParser.cs (134) : return null;
-MiniSQLParser.cs (135) : List<string> values = valuesComma.Select(v => StripOptionalQuotes(v)).ToList();
-MiniSQLParser.cs (157) : string value = StripOptionalQuotes(setMatch.Groups[2].Value);
-MiniSQLParser.cs (162) : string whereValue = StripOptionalQuotes(match.Groups[5].Value);
-MiniSQLParser.cs (185) : static string StripOptionalQuotes(string value)
-MiniSQLParser.cs (186) : {
-MiniSQLParser.cs (187) : string trimmed = value.Trim();
-MiniSQLParser.cs (188) : if (trimmed.Length >= 2 && trimmed.StartsWith("'") && trimmed.EndsWith("'"))
-MiniSQLParser.cs (189) : return trimmed.Substring(1, trimmed.Length - 2);
-MiniSQLParser.cs (190) : return trimmed;
-MiniSQLParser.cs (191) : }
-MiniSQLParser.cs (199) : string trimmed = value.Trim();
-MiniSQLParser.cs (200) : if (trimmed.Length < 2 || !trimmed.StartsWith("'") || !trimmed.EndsWith("'"))
-MiniSQLParser.cs (201) : return null;
-MiniSQLParser.cs (202) : string i = trimmed.Substring(1, trimmed.Length - 2);
