@@ -127,9 +127,26 @@ Database.cs (161) : }
 Database.cs (162) : }
 Database.cs (164) : //no hay ninguna tabla con ese nombre
 Database.cs (165) : LastErrorMessage = Constants.TableDoesNotExistError;
-AddUser.cs (19) : Username = username;
-AddUser.cs (20) : Password = password;
-AddUser.cs (21) : ProfileName = profileName;
+AddUser.cs (5) : using DbManager.Security;
+AddUser.cs (20) : Username = username;
+AddUser.cs (21) : Password = password;
+AddUser.cs (22) : ProfileName = profileName;
+AddUser.cs (29) : //comrpobar que el usuario es administrador, si no no puede a�adir
+AddUser.cs (30) : if (!database.SecurityManager.IsUserAdmin())
+AddUser.cs (31) : {
+AddUser.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (33) : }
+AddUser.cs (35) : //buscamos perfil de seguridad
+AddUser.cs (36) : Profile profile = database.SecurityManager.ProfileByUser(ProfileName);
+AddUser.cs (38) : //verificar que el perfil exista
+AddUser.cs (39) : if(profile == null)
+AddUser.cs (40) : {
+AddUser.cs (41) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (42) : }
+AddUser.cs (44) : //creamos el usuario y lo a�adimos a ese perfil
+AddUser.cs (45) : User user = new User(Username, Password);
+AddUser.cs (46) : profile.Users.Add(user);
+AddUser.cs (48) : return Constants.AddUserSuccess;
 Delete.cs (25) : //comrpobamos que se elimine correctamente
 Delete.cs (26) : if(database.DeleteWhere(Table, Where) == true)
 Delete.cs (27) : {
@@ -145,6 +162,7 @@ Insert.cs (36) : if (database.Insert(Table, Values))
 Insert.cs (37) : {
 Insert.cs (38) : return Constants.InsertSuccess;
 Insert.cs (39) : }
+MiniSQLParser.cs (45) : const string addUserPattern = @"ADD\s+USER\s+\(([a-zA-Z][a-zA-Z0-9]*),([^,]+),([a-zA-Z][a-zA-Z0-9]*)\)$";
 MiniSQLParser.cs (123) : //create table
 MiniSQLParser.cs (124) : Match createMatch = Regex.Match(miniSQLQuery, createTablePattern);
 MiniSQLParser.cs (126) : if (createMatch.Success)
@@ -180,6 +198,19 @@ MiniSQLParser.cs (173) : }
 MiniSQLParser.cs (174) : }
 MiniSQLParser.cs (175) : return new CreateTable(nombreTabla, crearColumnas);
 MiniSQLParser.cs (176) : }
+MiniSQLParser.cs (178) : //addUser
+MiniSQLParser.cs (179) : Match matchAddUser = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (180) : if (matchAddUser.Success)
+MiniSQLParser.cs (181) : {
+MiniSQLParser.cs (182) : string username = matchAddUser.Groups[1].Value;
+MiniSQLParser.cs (183) : string password = matchAddUser.Groups[2].Value;
+MiniSQLParser.cs (184) : string securityProfile = matchAddUser.Groups[3].Value;
+MiniSQLParser.cs (186) : if(string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(securityProfile))
+MiniSQLParser.cs (187) : {
+MiniSQLParser.cs (188) : return null;
+MiniSQLParser.cs (189) : }
+MiniSQLParser.cs (190) : return new AddUser(username, password, securityProfile);
+MiniSQLParser.cs (191) : }
 Manager.cs (25) : return profile != null && profile.Name == "Admin";
 Manager.cs (61) : //comprobamos que el usuario es admin ********
 Manager.cs (62) : if (!IsUserAdmin())
