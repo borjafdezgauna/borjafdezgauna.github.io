@@ -102,10 +102,10 @@ Table.cs (186) : public Table Select(List<string> columnNames, Condition conditi
 Table.cs (239) : public bool Insert(List<string> values) // Aitana
 Table.cs (256) : public bool Update(List<SetValue> setValues, Condition condition) // Aitana
 Client.cs (41) : // Maialen
-Client.cs (67) : // Aitana
-Client.cs (77) : // Endika
-Client.cs (87) : // Maialen
-Client.cs (96) : // Aitana
+Client.cs (69) : // Aitana
+Client.cs (79) : // Endika
+Client.cs (89) : // Maialen
+Client.cs (98) : // Aitana
 Server.cs (16) : // Maialen
 XmlDeserializer.cs (13) : // Aitana
 XmlDeserializer.cs (26) : // Aitana
@@ -425,67 +425,79 @@ Manager.cs (93) : if (profile != null)
 Manager.cs (94) : {
 Manager.cs (95) : profile.RevokePrivilege(table, privilege);
 Manager.cs (96) : }
-Manager.cs (126) : // Aitana
-Manager.cs (146) : // Maialen
-Manager.cs (164) : // Maialen
-Manager.cs (177) : // Unai
-Manager.cs (181) : if (username == null)
-Manager.cs (182) : {
-Manager.cs (183) : return null;
-Manager.cs (184) : }
-Manager.cs (186) : Profile profile = null;
-Manager.cs (188) : foreach (Profile p in Profiles)
-Manager.cs (189) : {
-Manager.cs (190) : foreach (User u in p.Users)
-Manager.cs (191) : {
-Manager.cs (192) : if (u.Username == username)
-Manager.cs (193) : {
-Manager.cs (194) : profile = p;
-Manager.cs (195) : }
-Manager.cs (196) : }
-Manager.cs (197) : }
-Manager.cs (199) : if (profile == null)
-Manager.cs (200) : {
-Manager.cs (202) : }
-Manager.cs (204) : return profile;
-Manager.cs (208) : // Aitana
-Manager.cs (231) : // Unai
-Manager.cs (235) : try
-Manager.cs (236) : {
-Manager.cs (237) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName, "security.dat");
-Manager.cs (239) : if (!File.Exists(path)) return new Manager(username);
-Manager.cs (241) : string jsonString = File.ReadAllText(path);
-Manager.cs (243) : List<Profile> perfilesCargados = JsonSerializer.Deserialize<List<Profile>>(jsonString);
-Manager.cs (245) : Manager manager = new Manager(username);
-Manager.cs (246) : if (perfilesCargados != null)
-Manager.cs (247) : {
-Manager.cs (248) : manager.Profiles = perfilesCargados;
-Manager.cs (250) : JsonArray jsonArray = JsonNode.Parse(jsonString).AsArray();
-Manager.cs (251) : for (int i = 0; i < perfilesCargados.Count; i++)
-Manager.cs (252) : {
-Manager.cs (253) : var privsNode = jsonArray[i]?["PrivilegesOn"]?.AsObject();
-Manager.cs (254) : if (privsNode != null)
-Manager.cs (255) : {
-Manager.cs (256) : foreach (var tableNode in privsNode)
-Manager.cs (257) : {
-Manager.cs (258) : string tableName = tableNode.Key;
-Manager.cs (259) : var privArray = tableNode.Value?.AsArray();
-Manager.cs (260) : if (privArray != null)
+Manager.cs (104) : if (!IsUserAdmin() && username != m_username)
+Manager.cs (105) : {
+Manager.cs (106) : return false;
+Manager.cs (107) : }
+Manager.cs (131) : // Aitana
+Manager.cs (151) : // Maialen
+Manager.cs (174) : // Maialen
+Manager.cs (191) : // Unai
+Manager.cs (195) : if (username == null)
+Manager.cs (196) : {
+Manager.cs (197) : return null;
+Manager.cs (198) : }
+Manager.cs (200) : Profile profile = null;
+Manager.cs (202) : foreach (Profile p in Profiles)
+Manager.cs (203) : {
+Manager.cs (204) : foreach (User u in p.Users)
+Manager.cs (205) : {
+Manager.cs (206) : if (u.Username == username)
+Manager.cs (207) : {
+Manager.cs (208) : profile = p;
+Manager.cs (209) : }
+Manager.cs (210) : }
+Manager.cs (211) : }
+Manager.cs (213) : if (profile == null)
+Manager.cs (214) : {
+Manager.cs (216) : }
+Manager.cs (218) : return profile;
+Manager.cs (222) : // Aitana
+Manager.cs (245) : // Unai
+Manager.cs (249) : try
+Manager.cs (250) : {
+Manager.cs (251) : string path = Path.Combine(Directory.GetCurrentDirectory(), databaseName, "security.dat");
+Manager.cs (253) : if (!File.Exists(path)) return new Manager(username);
+Manager.cs (255) : string jsonString = File.ReadAllText(path);
+Manager.cs (257) : List<Profile> loadedProfiles = JsonSerializer.Deserialize<List<Profile>>(jsonString);
+Manager.cs (259) : Manager manager = new Manager(username);
+Manager.cs (260) : if (loadedProfiles != null)
 Manager.cs (261) : {
-Manager.cs (262) : foreach (var privNode in privArray)
-Manager.cs (263) : {
-Manager.cs (264) : Privilege p = (Privilege)privNode.GetValue<int>();
-Manager.cs (265) : perfilesCargados[i].GrantPrivilege(tableName, p);
-Manager.cs (266) : }
-Manager.cs (267) : }
-Manager.cs (268) : }
-Manager.cs (269) : }
-Manager.cs (270) : }
-Manager.cs (271) : }
-Manager.cs (273) : return manager;
-Manager.cs (274) : }
-Manager.cs (275) : catch (Exception)
-Manager.cs (276) : {
-Manager.cs (278) : }
-Manager.cs (282) : // Endika
+Manager.cs (262) : manager.Profiles = loadedProfiles;
+Manager.cs (264) : JsonArray jsonArray = JsonNode.Parse(jsonString).AsArray();
+Manager.cs (265) : for (int i = 0; i < loadedProfiles.Count; i++)
+Manager.cs (266) : {
+Manager.cs (267) : var privsNode = jsonArray[i]?["PrivilegesOn"]?.AsObject();
+Manager.cs (268) : if (privsNode != null)
+Manager.cs (269) : {
+Manager.cs (270) : foreach (var tableNode in privsNode)
+Manager.cs (271) : {
+Manager.cs (272) : string tableName = tableNode.Key;
+Manager.cs (273) : var privArray = tableNode.Value?.AsArray();
+Manager.cs (274) : if (privArray != null)
+Manager.cs (275) : {
+Manager.cs (276) : foreach (var privNode in privArray)
+Manager.cs (277) : {
+Manager.cs (278) : Privilege p = (Privilege)privNode.GetValue<int>();
+Manager.cs (279) : loadedProfiles[i].GrantPrivilege(tableName, p);
+Manager.cs (280) : }
+Manager.cs (281) : }
+Manager.cs (282) : }
+Manager.cs (283) : }
+Manager.cs (284) : }
+Manager.cs (286) : if (manager.UserByName(username) == null)
+Manager.cs (287) : {
+Manager.cs (288) : return null;
+Manager.cs (289) : }
+Manager.cs (291) : }
+Manager.cs (293) : return manager;
+Manager.cs (294) : }
+Manager.cs (295) : catch (Exception)
+Manager.cs (296) : {
+Manager.cs (298) : }
+Manager.cs (302) : // Endika
+Manager.cs (307) : if (!IsUserAdmin())
+Manager.cs (308) : {
+Manager.cs (309) : return;
+Manager.cs (310) : }
 Profile.cs (17) : // Aitana

@@ -23,27 +23,39 @@ Database.cs (121) : return null;
 Database.cs (122) : }
 Database.cs (133) : }
 Row.cs (20) : if (columnDefinitions == null || values == null) { return; }
-Row.cs (23) : if (values.Count != columnDefinitions.Count) { return; }
-Row.cs (31) : if (Values == null) { return; }
-Row.cs (45) : if (Values == null) { return null; }
-Row.cs (60) : if (Values == null || condition == null) { return false; }
-Row.cs (80) : if (value == null) {return null; }
-Row.cs (81) : return value.Replace(Delimiter, DelimiterEncoded);
-Row.cs (100) : string result = "";
-Row.cs (101) : if (Values == null) { return null; }
-Row.cs (102) : for (int i = 0; i < Values.Count(); i++)
-Row.cs (103) : {
-Row.cs (104) : string encodedValue = Encode(Values[i]);
-Row.cs (105) : if (i == Values.Count - 1)
-Row.cs (106) : {
-Row.cs (107) : result = result + encodedValue;
-Row.cs (108) : }
-Row.cs (109) : else
-Row.cs (110) : {
-Row.cs (111) : result = result + encodedValue + Delimiter;
-Row.cs (112) : }
-Row.cs (113) : }
-Row.cs (114) : return result;
+Row.cs (23) : if (values.Count > columnDefinitions.Count) { return; }
+Row.cs (25) : Values = new List<string>();
+Row.cs (27) : for (int i = 0; i < columnDefinitions.Count; i++)
+Row.cs (28) : {
+Row.cs (29) : if (i < values.Count)
+Row.cs (30) : {
+Row.cs (31) : Values.Add(values[i]);
+Row.cs (32) : }
+Row.cs (33) : else
+Row.cs (34) : {
+Row.cs (35) : Values.Add(null);
+Row.cs (36) : }
+Row.cs (37) : }
+Row.cs (43) : if (Values == null) { return; }
+Row.cs (57) : if (Values == null) { return null; }
+Row.cs (72) : if (Values == null || condition == null) { return false; }
+Row.cs (92) : if (value == null) {return null; }
+Row.cs (93) : return value.Replace(Delimiter, DelimiterEncoded);
+Row.cs (112) : string result = "";
+Row.cs (113) : if (Values == null) { return null; }
+Row.cs (114) : for (int i = 0; i < Values.Count(); i++)
+Row.cs (115) : {
+Row.cs (116) : string encodedValue = Encode(Values[i]);
+Row.cs (117) : if (i == Values.Count - 1)
+Row.cs (118) : {
+Row.cs (119) : result = result + encodedValue;
+Row.cs (120) : }
+Row.cs (121) : else
+Row.cs (122) : {
+Row.cs (123) : result = result + encodedValue + Delimiter;
+Row.cs (124) : }
+Row.cs (125) : }
+Row.cs (126) : return result;
 Table.cs (4) : using System.Data.Common;
 Table.cs (29) : if (i < 0 || i >= NumRows()) { return null; }
 Table.cs (30) : return Rows[i];
@@ -74,40 +86,61 @@ CreateTable.cs (3) : using System.Data;
 CreateTable.cs (25) : var createTable = database.CreateTable(Table, ColumnsParameters);
 CreateTable.cs (26) : if (createTable == false) { return database.LastErrorMessage; }
 CreateTable.cs (27) : return Constants.CreateTableSuccess;
-DeleteUser.cs (16) : Username = username;
+DeleteUser.cs (1) : using DbManager.Parser;
+DeleteUser.cs (4) : using System.Linq;
+DeleteUser.cs (17) : Username = username;
+DeleteUser.cs (23) : /*var profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (25) : if (profile == null)
+DeleteUser.cs (26) : {
+DeleteUser.cs (27) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (30) : if (!database.SecurityManager.IsUserAdmin())
+DeleteUser.cs (31) : {
+DeleteUser.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (33) : }
+DeleteUser.cs (34) : for (int i = 0; i < profile.Users.Count; i++)
+DeleteUser.cs (35) : {
+DeleteUser.cs (36) : if (profile.Users[i].Username == Username)
+DeleteUser.cs (37) : {
+DeleteUser.cs (38) : profile.Users.RemoveAt(i);
+DeleteUser.cs (39) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (40) : }
+DeleteUser.cs (41) : }
+DeleteUser.cs (42) : return Constants.UserDoesNotExistError;*/
+DeleteUser.cs (43) : return null;
+DeleteUser.cs (44) : }
 DropSecurityProfile.cs (16) : ProfileName = profileName;
 DropTable.cs (15) : Table = table;
 DropTable.cs (23) : var dropTable=database.DropTable(Table);
 DropTable.cs (24) : if (dropTable == false) { return database.LastErrorMessage; }
 DropTable.cs (25) : return Constants.DropTableSuccess;
-MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+([a-zA-Z]\w*(?:,[a-zA-Z]\w*)*)\s+FROM\s+([a-zA-Z]\w*)(?:\s+WHERE\s+([a-zA-Z]\w*)\s*([<=>])\s*(\w+(?:\.\w+)?|'[^']*'))?$";
+MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+([a-zA-Z]\w*(?:,[a-zA-Z]\w*)*)\s+FROM\s+([a-zA-Z]\w*)(?:\s+WHERE\s+([a-zA-Z]\w*)([<=>])'([^']+)')?$";
 MiniSQLParser.cs (16) : const string insertPattern = @"^INSERT\s+INTO\s+([a-zA-Z]\w*)\s+VALUES\s*\(('[^']+'(?:,'[^']+')*)\)$";
-MiniSQLParser.cs (17) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z]\w*)$";
-MiniSQLParser.cs (23) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z]\w*)\s+SET\s+(.+)\s+WHERE\s+(\w+)([<=>])'([^']+)'$";
-MiniSQLParser.cs (25) : const string deletePattern = @"^DELETE\s+FROM\s+([a-zA-Z]\w*)\s+WHERE\s+(\w+)([<=>])'([^']+)'$";
-MiniSQLParser.cs (62) : //drop table
-MiniSQLParser.cs (64) : if (match.Success)
-MiniSQLParser.cs (65) : {
-MiniSQLParser.cs (66) : var table = match.Groups[1].Value;
-MiniSQLParser.cs (67) : return new DropTable(table);
-MiniSQLParser.cs (68) : }
-MiniSQLParser.cs (85) : if (!Regex.IsMatch(columnsText, @"^[a-zA-Z]\w*\s+(TEXT|INT|DOUBLE)(,[a-zA-Z]\w*\s+(TEXT|INT|DOUBLE))*$"))
-MiniSQLParser.cs (86) : {
-MiniSQLParser.cs (87) : return null;
-MiniSQLParser.cs (88) : }
-MiniSQLParser.cs (92) : Match columnMatch = Regex.Match(columnPart, @"^([a-zA-Z]\w*)\s+(TEXT|INT|DOUBLE)$");
-MiniSQLParser.cs (124) : //delete
-MiniSQLParser.cs (125) : match = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (126) : if (match.Success)
-MiniSQLParser.cs (127) : {
-MiniSQLParser.cs (128) : var table = match.Groups[1].Value;
-MiniSQLParser.cs (129) : var condition = new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value);
-MiniSQLParser.cs (130) : return new Delete(table, condition);
-MiniSQLParser.cs (131) : }
-MiniSQLParser.cs (157) : string valuesText = match.Groups[2].Value.TrimEnd();
-MiniSQLParser.cs (163) : Match setMatch = Regex.Match(setPart, @"^([a-zA-Z]\w*)='([^']+)'$");
-MiniSQLParser.cs (169) : string value = setMatch.Groups[2].Value;
-MiniSQLParser.cs (174) : string whereValue = match.Groups[5].Value;
+MiniSQLParser.cs (18) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z]\w*)$";
+MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z]\w*)\s+SET\s+(.+)\s+WHERE\s+(\w+)([<=>])'([^']+)'$";
+MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+([a-zA-Z]\w*)\s+WHERE\s+(\w+)([<=>])'([^']+)'$";
+MiniSQLParser.cs (63) : //drop table
+MiniSQLParser.cs (65) : if (match.Success)
+MiniSQLParser.cs (66) : {
+MiniSQLParser.cs (67) : var table = match.Groups[1].Value;
+MiniSQLParser.cs (68) : return new DropTable(table);
+MiniSQLParser.cs (69) : }
+MiniSQLParser.cs (86) : if (!Regex.IsMatch(columnsText, @"^[a-zA-Z]\w*\s+(TEXT|INT|DOUBLE)(,[a-zA-Z]\w*\s+(TEXT|INT|DOUBLE))*$"))
+MiniSQLParser.cs (87) : {
+MiniSQLParser.cs (88) : return null;
+MiniSQLParser.cs (89) : }
+MiniSQLParser.cs (93) : Match columnMatch = Regex.Match(columnPart, @"^([a-zA-Z]\w*)\s+(TEXT|INT|DOUBLE)$");
+MiniSQLParser.cs (125) : //delete
+MiniSQLParser.cs (126) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (127) : if (match.Success)
+MiniSQLParser.cs (128) : {
+MiniSQLParser.cs (129) : var table = match.Groups[1].Value;
+MiniSQLParser.cs (130) : var condition = new Condition(match.Groups[2].Value, match.Groups[3].Value, match.Groups[4].Value);
+MiniSQLParser.cs (131) : return new Delete(table, condition);
+MiniSQLParser.cs (132) : }
+MiniSQLParser.cs (158) : string valuesText = match.Groups[2].Value.TrimEnd();
+MiniSQLParser.cs (164) : Match setMatch = Regex.Match(setPart, @"^([a-zA-Z]\w*)='([^']+)'$");
+MiniSQLParser.cs (170) : string value = setMatch.Groups[2].Value;
+MiniSQLParser.cs (175) : string whereValue = match.Groups[5].Value;
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;

@@ -211,27 +211,73 @@ Update.cs (29) : database.Update(Table, Columns, Where);
 Update.cs (30) : return Constants.UpdateSuccess;
 Manager.cs (7) : using System.Text.Json;
 Manager.cs (8) : using System.Text.Json.Nodes;
-Manager.cs (68) : if (profileName==null || table==null)
+Manager.cs (68) : if (profileName == null || table == null)
 Manager.cs (69) : {
-Manager.cs (70) : return ;
+Manager.cs (70) : return;
 Manager.cs (71) : }
 Manager.cs (73) : if (profile != null)
 Manager.cs (74) : {
 Manager.cs (75) : profile.GrantPrivilege(table, privilege);
 Manager.cs (76) : }
-Manager.cs (285) : //commit para creacion de rama
-Manager.cs (287) : try
-Manager.cs (288) : {
-Manager.cs (289) : string folder = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Manager.cs (290) : Directory.CreateDirectory(folder);
-Manager.cs (291) : string path = Path.Combine(folder, "security.dat");
-Manager.cs (292) : JsonSerializerOptions options = new JsonSerializerOptions
-Manager.cs (293) : {
-Manager.cs (294) : WriteIndented = true
-Manager.cs (295) : };
-Manager.cs (296) : string json = JsonSerializer.Serialize(Profiles, options);
-Manager.cs (297) : File.WriteAllText(path, json);
-Manager.cs (298) : }catch (Exception ex)
-Manager.cs (299) : {
-Manager.cs (300) : return;
-Manager.cs (301) : }
+Manager.cs (305) : //commit para creacion de rama
+Manager.cs (312) : try
+Manager.cs (313) : {
+Manager.cs (314) : string folder = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (315) : Directory.CreateDirectory(folder);
+Manager.cs (316) : string path = Path.Combine(folder, "security.dat");
+Manager.cs (317) : using (StreamWriter sw = new StreamWriter(path, false))
+Manager.cs (318) : {
+Manager.cs (319) : foreach (Profile profile in Profiles)
+Manager.cs (320) : {
+Manager.cs (321) : if (profile == null)
+Manager.cs (322) : {
+Manager.cs (323) : continue;
+Manager.cs (324) : }
+Manager.cs (325) : foreach (User user in profile.Users)
+Manager.cs (326) : {
+Manager.cs (327) : if (user == null)
+Manager.cs (328) : {
+Manager.cs (329) : continue;
+Manager.cs (330) : string privileges = "";
+Manager.cs (331) : if (profile.IsGrantedPrivilege("Users", Privilege.Select))
+Manager.cs (332) : {
+Manager.cs (333) : if (privileges != "")
+Manager.cs (334) : {
+Manager.cs (335) : privileges += "/";
+Manager.cs (336) : }
+Manager.cs (337) : privileges += Privilege.Select.ToString();
+Manager.cs (338) : }
+Manager.cs (339) : if (profile.IsGrantedPrivilege("Users", Privilege.Insert))
+Manager.cs (340) : {
+Manager.cs (341) : if (privileges != "")
+Manager.cs (342) : {
+Manager.cs (343) : privileges += "/";
+Manager.cs (344) : }
+Manager.cs (345) : privileges += Privilege.Insert.ToString();
+Manager.cs (346) : }
+Manager.cs (347) : if (profile.IsGrantedPrivilege("Users", Privilege.Delete))
+Manager.cs (348) : {
+Manager.cs (349) : if (privileges != "")
+Manager.cs (350) : {
+Manager.cs (351) : privileges += "/";
+Manager.cs (352) : }
+Manager.cs (353) : privileges += Privilege.Delete.ToString();
+Manager.cs (354) : }
+Manager.cs (355) : if (profile.IsGrantedPrivilege("Users", Privilege.Update))
+Manager.cs (356) : {
+Manager.cs (357) : if (privileges != "")
+Manager.cs (358) : {
+Manager.cs (359) : privileges += "/";
+Manager.cs (360) : }
+Manager.cs (361) : privileges += Privilege.Update.ToString();
+Manager.cs (362) : }
+Manager.cs (363) : if (privileges != "")
+Manager.cs (364) : {
+Manager.cs (365) : sw.WriteLine(user.Username + "," + user.EncryptedPassword + "," + profile.Name + ",Users," + privileges);
+Manager.cs (366) : }
+Manager.cs (367) : }
+Manager.cs (368) : }
+Manager.cs (369) : }
+Manager.cs (374) : {
+Manager.cs (375) : return;
+Manager.cs (376) : }

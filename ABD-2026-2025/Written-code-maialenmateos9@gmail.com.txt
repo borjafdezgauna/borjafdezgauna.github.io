@@ -217,20 +217,31 @@ Table.cs (40) : {
 Table.cs (41) : Rows.Add(row);
 Table.cs (42) : }
 Table.cs (50) : return Rows.Count;
+Client.cs (9) : using System.IO;
+Client.cs (20) : // Aitana
+Client.cs (26) : try
+Client.cs (27) : {
+Client.cs (28) : m_tcpClient.Connect(ipAddress, port);
+Client.cs (29) : return true;
+Client.cs (30) : }
+Client.cs (31) : catch (Exception e)
+Client.cs (32) : {
+Client.cs (35) : }
 Client.cs (48) : try
 Client.cs (49) : {
 Client.cs (50) : NetworkStream strm = m_tcpClient.GetStream();
-Client.cs (51) : ASCIIEncoding encoding = new ASCIIEncoding();
-Client.cs (52) : byte[] bToSend = encoding.GetBytes(message);
-Client.cs (53) : strm.Write(bToSend, 0, bToSend.Length);
-Client.cs (55) : byte[] buff = new byte[1024];
-Client.cs (56) : int bToRead = strm.Read(buff, 0, buff.Length);
-Client.cs (57) : return encoding.GetString(buff, 0, bToRead);
-Client.cs (58) : }
-Client.cs (59) : catch (Exception e)
-Client.cs (60) : {
-Client.cs (61) : Console.WriteLine("Error sending message: " + e.Message);
-Client.cs (63) : }
+Client.cs (51) : ASCIIEncoding enco = new ASCIIEncoding();
+Client.cs (53) : byte[] bToSend = enco.GetBytes(message);
+Client.cs (54) : strm.Write(bToSend, 0, bToSend.Length);
+Client.cs (55) : strm.Flush();
+Client.cs (57) : byte[] buff = new byte[1024];
+Client.cs (58) : int bToRead = strm.Read(buff, 0, buff.Length);
+Client.cs (60) : return enco.GetString(buff, 0, bToRead);
+Client.cs (61) : }
+Client.cs (62) : catch (Exception ex)
+Client.cs (63) : {
+Client.cs (64) : throw new IOException("Server error.", ex);
+Client.cs (65) : }
 CreateTable.cs (18) : this.Table= table;
 CreateTable.cs (20) : if (columns == null)
 CreateTable.cs (21) : {
@@ -316,18 +327,30 @@ Manager.cs (50) : if (obj == null)
 Manager.cs (51) : {
 Manager.cs (53) : }
 Manager.cs (54) : return obj.EncryptedPassword == Encryption.Encrypt(password);
-Manager.cs (150) : foreach(Profile p in Profiles)
-Manager.cs (151) : {
-Manager.cs (152) : foreach(User u in p.Users)
-Manager.cs (153) : {
-Manager.cs (154) : if (username.Equals(u.Username))
-Manager.cs (155) : {
-Manager.cs (156) : return u;
-Manager.cs (157) : }
-Manager.cs (158) : }
+Manager.cs (156) : if (username == null)
+Manager.cs (157) : {
+Manager.cs (158) : return null;
 Manager.cs (159) : }
-Manager.cs (168) : foreach(var p in Profiles)
-Manager.cs (169) : {
-Manager.cs (170) : if(p.Name==profileName)
-Manager.cs (171) : return p;
-Manager.cs (172) : }
+Manager.cs (160) : foreach (Profile p in Profiles)
+Manager.cs (161) : {
+Manager.cs (162) : foreach (User u in p.Users)
+Manager.cs (163) : {
+Manager.cs (164) : if (u.Username.Equals(username))
+Manager.cs (165) : {
+Manager.cs (166) : return u;
+Manager.cs (167) : }
+Manager.cs (168) : }
+Manager.cs (169) : }
+Manager.cs (178) : if (string.IsNullOrEmpty(profileName))
+Manager.cs (179) : {
+Manager.cs (180) : return null;
+Manager.cs (181) : }
+Manager.cs (182) : foreach (Profile p in Profiles)
+Manager.cs (183) : {
+Manager.cs (184) : if (p.Name.Equals(profileName))
+Manager.cs (185) : return p;
+Manager.cs (186) : }
+Manager.cs (370) : }
+Manager.cs (371) : ;
+Manager.cs (372) : }
+Manager.cs (373) : catch (Exception ex)

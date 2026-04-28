@@ -134,42 +134,51 @@ Table.cs (134) : }
 Table.cs (135) : }
 Table.cs (136) : return listaIndices;
 Table.cs (212) : return true;
-CreateSecurityProfile.cs (16) : ProfileName = profileName;
+CreateSecurityProfile.cs (5) : using DbManager.Security;
+CreateSecurityProfile.cs (17) : ProfileName = profileName;
+CreateSecurityProfile.cs (23) : bool esAdmin = database.SecurityManager.IsUserAdmin();
+CreateSecurityProfile.cs (24) : if (esAdmin == false)
+CreateSecurityProfile.cs (25) : {
+CreateSecurityProfile.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateSecurityProfile.cs (28) : Profile profile = new Profile
+CreateSecurityProfile.cs (29) : {
+CreateSecurityProfile.cs (30) : Name = ProfileName
+CreateSecurityProfile.cs (31) : };
+CreateSecurityProfile.cs (32) : database.SecurityManager.AddProfile(profile);
+CreateSecurityProfile.cs (33) : return Constants.CreateSecurityProfileSuccess;
+CreateSecurityProfile.cs (37) : }
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
 Delete.cs (23) : bool success = database.DeleteWhere(Table, Where);
 Delete.cs (24) : return success ? Constants.DeleteSuccess : database.LastErrorMessage;
+MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)\s+(=|<>|<=|>=|<|>)\s+('[^']*'|\d+(?:\.\d+)?))?\s*;?$";
 MiniSQLParser.cs (28) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*$";
-MiniSQLParser.cs (202) : //DELETE
-MiniSQLParser.cs (203) : match = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (204) : if (match.Success)
-MiniSQLParser.cs (205) : {
-MiniSQLParser.cs (206) : string table = match.Groups[1].Value;
-MiniSQLParser.cs (207) : Condition where = null;
-MiniSQLParser.cs (209) : {
-MiniSQLParser.cs (210) : where = new Condition(
-MiniSQLParser.cs (211) : match.Groups[2].Value,
-MiniSQLParser.cs (212) : match.Groups[3].Value,
-MiniSQLParser.cs (213) : match.Groups[4].Value.Trim('\'')
-MiniSQLParser.cs (214) : );
-MiniSQLParser.cs (215) : }
-MiniSQLParser.cs (216) : return new Delete(table, where);
-MiniSQLParser.cs (217) : }
-MiniSQLParser.cs (234) : if (match.Success)
-MiniSQLParser.cs (235) : {
-MiniSQLParser.cs (236) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (237) : return new CreateSecurityProfile(profileName);
-MiniSQLParser.cs (238) : }
-MiniSQLParser.cs (251) : if (match.Success)
-MiniSQLParser.cs (252) : {
-MiniSQLParser.cs (253) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (255) : }
-Profile.cs (20) : if (!PrivilegesOn.ContainsKey(table))
-Profile.cs (21) : {
-Profile.cs (22) : PrivilegesOn[table] = new List<Privilege>();
-Profile.cs (23) : }
-Profile.cs (24) : if (!PrivilegesOn[table].Contains(privilege))
-Profile.cs (25) : {
-Profile.cs (26) : PrivilegesOn[table].Add(privilege);
-Profile.cs (27) : return true;
-Profile.cs (28) : }
+MiniSQLParser.cs (208) : //DELETE
+MiniSQLParser.cs (209) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (210) : if (match.Success)
+MiniSQLParser.cs (211) : {
+MiniSQLParser.cs (212) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (213) : Condition where = null;
+MiniSQLParser.cs (215) : {
+MiniSQLParser.cs (216) : where = new Condition(
+MiniSQLParser.cs (217) : match.Groups[2].Value,
+MiniSQLParser.cs (218) : match.Groups[3].Value,
+MiniSQLParser.cs (219) : match.Groups[4].Value.Trim('\'')
+MiniSQLParser.cs (220) : );
+MiniSQLParser.cs (221) : }
+MiniSQLParser.cs (222) : return new Delete(table, where);
+MiniSQLParser.cs (223) : }
+MiniSQLParser.cs (240) : if (match.Success)
+MiniSQLParser.cs (241) : {
+MiniSQLParser.cs (242) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (243) : return new CreateSecurityProfile(profileName);
+MiniSQLParser.cs (244) : }
+MiniSQLParser.cs (257) : if (match.Success)
+MiniSQLParser.cs (258) : {
+MiniSQLParser.cs (259) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (261) : }
+Profile.cs (23) : {
+Profile.cs (25) : }
+Profile.cs (28) : {
+Profile.cs (30) : return true;
+Profile.cs (31) : }
