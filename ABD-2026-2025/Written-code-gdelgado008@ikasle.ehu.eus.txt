@@ -120,8 +120,15 @@ Table.cs (143) : }
 Table.cs (144) : Rows = newRows;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
+Delete.cs (24) : var delete = database.DeleteWhere(Table, Where);
+Delete.cs (25) : if (delete == false)
+Delete.cs (26) : {
+Delete.cs (27) : return database.LastErrorMessage;
+Delete.cs (28) : }
+Delete.cs (29) : return Constants.DeleteSuccess;
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (22) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z]\w*)\s*\((.*)\)$";
+MiniSQLParser.cs (30) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z]+)$";
 MiniSQLParser.cs (71) : // create table
 MiniSQLParser.cs (72) : match = Regex.Match(miniSQLQuery, createTablePattern);
 MiniSQLParser.cs (73) : if (match.Success)
@@ -158,7 +165,64 @@ MiniSQLParser.cs (167) : return null;
 MiniSQLParser.cs (168) : }
 MiniSQLParser.cs (173) : }
 MiniSQLParser.cs (178) : }
+MiniSQLParser.cs (183) : // create security profile
+MiniSQLParser.cs (184) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (185) : if (match.Success)
+MiniSQLParser.cs (186) : {
+MiniSQLParser.cs (187) : return new CreateSecurityProfile(match.Groups[1].Value);
+MiniSQLParser.cs (188) : }
+MiniSQLParser.cs (190) : return null;
 SetValue.cs (17) : if (string.IsNullOrWhiteSpace(column)) { return; }
 SetValue.cs (18) : ColumnName = column;
 SetValue.cs (19) : Value = value;
 Update.cs (15) : Table = table;
+Update.cs (24) : var update = database.Update(Table, Columns, Where);
+Update.cs (25) : if (update == false)
+Update.cs (26) : {
+Update.cs (27) : return database.LastErrorMessage;
+Update.cs (28) : }
+Update.cs (29) : return Constants.UpdateSuccess;
+Manager.cs (108) : if (profile == null)
+Manager.cs (109) : {
+Manager.cs (110) : return;
+Manager.cs (111) : }
+Manager.cs (112) : if (ProfileByName(profile.Name) != null)
+Manager.cs (113) : {
+Manager.cs (114) : return;
+Manager.cs (115) : }
+Manager.cs (116) : Profiles.Add(profile);
+Manager.cs (122) : foreach (var profile in Profiles)
+Manager.cs (123) : {
+Manager.cs (124) : foreach (var user in profile.Users)
+Manager.cs (125) : {
+Manager.cs (126) : if (user.Username == username)
+Manager.cs (127) : {
+Manager.cs (128) : return user;
+Manager.cs (129) : }
+Manager.cs (130) : }
+Manager.cs (131) : }
+Manager.cs (138) : foreach (var profile in Profiles)
+Manager.cs (139) : {
+Manager.cs (140) : if (profile.Name == profileName)
+Manager.cs (141) : {
+Manager.cs (142) : return profile;
+Manager.cs (143) : }
+Manager.cs (144) : }
+Manager.cs (151) : foreach (var profile in Profiles)
+Manager.cs (152) : {
+Manager.cs (153) : foreach (var user in profile.Users)
+Manager.cs (154) : {
+Manager.cs (155) : if (user.Username == username)
+Manager.cs (156) : {
+Manager.cs (157) : return profile;
+Manager.cs (158) : }
+Manager.cs (159) : }
+Manager.cs (160) : }
+Manager.cs (167) : var profile = ProfileByName(profileName);
+Manager.cs (168) : if (profile == null)
+Manager.cs (169) : {
+Manager.cs (172) : Profiles.Remove(profile);
+Manager.cs (173) : return true;
+Manager.cs (174) : }
+User.cs (16) : Username = username;
+User.cs (17) : EncryptedPassword = password;
