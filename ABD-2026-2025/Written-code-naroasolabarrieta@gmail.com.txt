@@ -67,61 +67,59 @@ Table.cs (145) : foreach (var index in indices)
 Table.cs (146) : {
 Table.cs (147) : DeleteIthRow(index);
 Table.cs (148) : }
-Table.cs (214) : /*
-Table.cs (221) : */
-Table.cs (277) : public bool Update(List<SetValue> setValues, Condition condition)
-Table.cs (278) : {
-Table.cs (279) : if (condition == null)
-Table.cs (280) : return false;
-Table.cs (281) : var indices = RowIndicesWhereConditionIsTrue(condition);
-Table.cs (282) : if (indices.Count == 0)
-Table.cs (283) : return false;
-Table.cs (284) : foreach (var idx in indices)
+Table.cs (271) : public bool Update(List<SetValue> setValues, Condition condition)
+Table.cs (272) : {
+Table.cs (273) : if (condition == null)
+Table.cs (274) : return false;
+Table.cs (275) : var indices = RowIndicesWhereConditionIsTrue(condition);
+Table.cs (276) : if (indices.Count == 0)
+Table.cs (277) : return false;
+Table.cs (278) : foreach (var idx in indices)
+Table.cs (279) : {
+Table.cs (280) : Row row = GetRow(idx);
+Table.cs (282) : if (row == null) continue;
+Table.cs (284) : foreach (var sv in setValues)
 Table.cs (285) : {
-Table.cs (286) : Row row = GetRow(idx);
-Table.cs (288) : if (row == null) continue;
-Table.cs (290) : foreach (var sv in setValues)
-Table.cs (291) : {
-Table.cs (292) : row.SetValue(sv.ColumnName, sv.Value);
-Table.cs (293) : }
-Table.cs (294) : }
-Table.cs (296) : return true;
-Table.cs (297) : }
-Table.cs (299) : public override string ToString()
-Table.cs (300) : {
-Table.cs (301) : /*TODO DEADLINE 1.A: Return the table as a string. The format
-Table.cs (302) : //TODO DEADLINE 1.A: Delete the i-th row. If there is no i-th row, do nothing
-Table.cs (303) : is specified in the documentation
-Table.cs (304) : Valid examples:
-Table.cs (305) : "['Name']{'Adolfo'}{'Jacinto'}" <- one column, two rows
-Table.cs (306) : "['Name','Age']{'Adolfo','23'}{'Jacinto','24'}" <- two
-Table.cs (307) : columns, two rows
-Table.cs (308) : "" <- no columns, no rows
-Table.cs (309) : "['Name']" <- one column, no rows
-Table.cs (310) : */
-Table.cs (311) : if (ColumnDefinitions.Count == 0)
-Table.cs (312) : return "";
-Table.cs (314) : string result = "[";
-Table.cs (315) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Table.cs (286) : row.SetValue(sv.ColumnName, sv.Value);
+Table.cs (287) : }
+Table.cs (288) : }
+Table.cs (289) : return true;
+Table.cs (290) : }
+Table.cs (292) : public override string ToString()
+Table.cs (293) : {
+Table.cs (294) : /*TODO DEADLINE 1.A: Return the table as a string. The format
+Table.cs (295) : //TODO DEADLINE 1.A: Delete the i-th row. If there is no i-th row, do nothing
+Table.cs (296) : is specified in the documentation
+Table.cs (297) : Valid examples:
+Table.cs (298) : "['Name']{'Adolfo'}{'Jacinto'}" <- one column, two rows
+Table.cs (299) : "['Name','Age']{'Adolfo','23'}{'Jacinto','24'}" <- two
+Table.cs (300) : columns, two rows
+Table.cs (301) : "" <- no columns, no rows
+Table.cs (302) : "['Name']" <- one column, no rows
+Table.cs (303) : */
+Table.cs (304) : if (ColumnDefinitions.Count == 0)
+Table.cs (305) : return "";
+Table.cs (307) : string result = "[";
+Table.cs (308) : for (int i = 0; i < ColumnDefinitions.Count; i++)
+Table.cs (309) : {
+Table.cs (310) : result += $"'{ColumnDefinitions[i].Name}'";
+Table.cs (311) : if (i < ColumnDefinitions.Count - 1)
+Table.cs (312) : result += ",";
+Table.cs (313) : }
+Table.cs (314) : result += "]";
+Table.cs (315) : foreach (var row in Rows)
 Table.cs (316) : {
-Table.cs (317) : result += $"'{ColumnDefinitions[i].Name}'";
-Table.cs (318) : if (i < ColumnDefinitions.Count - 1)
-Table.cs (319) : result += ",";
-Table.cs (320) : }
-Table.cs (321) : result += "]";
-Table.cs (322) : foreach (var row in Rows)
-Table.cs (323) : {
-Table.cs (324) : result += "{";
-Table.cs (325) : for (int i = 0; i < row.Values.Count; i++)
-Table.cs (326) : {
-Table.cs (327) : result += $"'{row.Values[i]}'";
-Table.cs (328) : if (i < row.Values.Count - 1)
-Table.cs (329) : result += ",";
-Table.cs (330) : }
-Table.cs (331) : result += "}";
-Table.cs (332) : }
-Table.cs (334) : return result;
-Table.cs (335) : }
+Table.cs (317) : result += "{";
+Table.cs (318) : for (int i = 0; i < row.Values.Count; i++)
+Table.cs (319) : {
+Table.cs (320) : result += $"'{row.Values[i]}'";
+Table.cs (321) : if (i < row.Values.Count - 1)
+Table.cs (322) : result += ",";
+Table.cs (323) : }
+Table.cs (324) : result += "}";
+Table.cs (325) : }
+Table.cs (326) : return result;
+Table.cs (327) : }
 AddUser.cs (1) : using DbManager.Parser;
 AddUser.cs (2) : using DbManager.Security;
 AddUser.cs (20) : this.Username = username;
@@ -163,61 +161,61 @@ Grant.cs (43) : return Constants.GrantPrivilegeSuccess;
 MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*(=|<>|<|>|<=|>=)\s*('[^']*'|\d+(?:\.\d+)?))?\s*;?$";
 MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+([a-zA-Z]+)\s*$";
 MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(([a-zA-Z]+),([^,]+),([a-zA-Z]+)\)\s*$";
-MiniSQLParser.cs (163) : //UPDATE
-MiniSQLParser.cs (164) : match = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (165) : if (match.Success)
-MiniSQLParser.cs (166) : {
-MiniSQLParser.cs (167) : string table = match.Groups[1].Value;
-MiniSQLParser.cs (168) : string setText = match.Groups[2].Value;
-MiniSQLParser.cs (170) : List<SetValue> values = new List<SetValue>();
-MiniSQLParser.cs (171) : string[] assignments = setText.Split(',');
-MiniSQLParser.cs (173) : foreach (string assignment in assignments)
-MiniSQLParser.cs (174) : {
-MiniSQLParser.cs (175) : var setMatch = Regex.Match(
-MiniSQLParser.cs (176) : assignment.Trim(),
-MiniSQLParser.cs (177) : @"^(\w+)\s*=\s*('[^']*'|\d+(?:\.\d+)?)$"
-MiniSQLParser.cs (178) : );
-MiniSQLParser.cs (180) : if (!setMatch.Success)
-MiniSQLParser.cs (181) : return null;
-MiniSQLParser.cs (183) : string column = setMatch.Groups[1].Value;
-MiniSQLParser.cs (184) : string rawValue = setMatch.Groups[2].Value;
-MiniSQLParser.cs (186) : if (!rawValue.StartsWith("'") && !Regex.IsMatch(rawValue, @"^\d+(\.\d+)?$"))
-MiniSQLParser.cs (187) : return null;
-MiniSQLParser.cs (189) : string value = rawValue.Trim('\'');
-MiniSQLParser.cs (191) : values.Add(new SetValue(column, value));
-MiniSQLParser.cs (192) : }
-MiniSQLParser.cs (194) : Condition condition = null;
-MiniSQLParser.cs (196) : if (match.Groups[3].Success)
-MiniSQLParser.cs (197) : {
-MiniSQLParser.cs (198) : string col = match.Groups[3].Value;
-MiniSQLParser.cs (199) : string op = match.Groups[4].Value;
-MiniSQLParser.cs (200) : string val = match.Groups[5].Value.Trim('\'');
-MiniSQLParser.cs (202) : condition = new Condition(col, op, val);
-MiniSQLParser.cs (203) : }
-MiniSQLParser.cs (205) : return new Update(table, values, condition);
-MiniSQLParser.cs (206) : }
-MiniSQLParser.cs (214) : if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
-MiniSQLParser.cs (228) : //ADDUSER
-MiniSQLParser.cs (230) : if (match.Success)
-MiniSQLParser.cs (231) : {
-MiniSQLParser.cs (232) : string user = match.Groups[1].Value;
-MiniSQLParser.cs (233) : string pass = match.Groups[2].Value;
-MiniSQLParser.cs (234) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (235) : return new AddUser(user, pass, profile);
-MiniSQLParser.cs (236) : }
-MiniSQLParser.cs (238) : //CREATESECURITYPROFILE
-MiniSQLParser.cs (246) : //DELETEUSER
-MiniSQLParser.cs (255) : //DROPSECURITYPROFILE
-MiniSQLParser.cs (263) : //GRANT
-MiniSQLParser.cs (265) : if (match.Success)
-MiniSQLParser.cs (266) : {
-MiniSQLParser.cs (267) : string privilege = match.Groups[1].Value;
-MiniSQLParser.cs (268) : string table = match.Groups[2].Value;
-MiniSQLParser.cs (269) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (271) : return new Grant(privilege, table, profile);
-MiniSQLParser.cs (272) : }
-MiniSQLParser.cs (274) : //REVOKE
-MiniSQLParser.cs (285) : return null;
+MiniSQLParser.cs (164) : //UPDATE
+MiniSQLParser.cs (165) : match = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (166) : if (match.Success)
+MiniSQLParser.cs (167) : {
+MiniSQLParser.cs (168) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (169) : string setText = match.Groups[2].Value;
+MiniSQLParser.cs (171) : List<SetValue> values = new List<SetValue>();
+MiniSQLParser.cs (172) : string[] assignments = setText.Split(',');
+MiniSQLParser.cs (174) : foreach (string assignment in assignments)
+MiniSQLParser.cs (175) : {
+MiniSQLParser.cs (176) : var setMatch = Regex.Match(
+MiniSQLParser.cs (177) : assignment.Trim(),
+MiniSQLParser.cs (178) : @"^(\w+)\s*=\s*('[^']*'|\d+(?:\.\d+)?)$"
+MiniSQLParser.cs (179) : );
+MiniSQLParser.cs (181) : if (!setMatch.Success)
+MiniSQLParser.cs (182) : return null;
+MiniSQLParser.cs (184) : string column = setMatch.Groups[1].Value;
+MiniSQLParser.cs (185) : string rawValue = setMatch.Groups[2].Value;
+MiniSQLParser.cs (187) : if (!rawValue.StartsWith("'") && !Regex.IsMatch(rawValue, @"^\d+(\.\d+)?$"))
+MiniSQLParser.cs (188) : return null;
+MiniSQLParser.cs (190) : string value = rawValue.Trim('\'');
+MiniSQLParser.cs (192) : values.Add(new SetValue(column, value));
+MiniSQLParser.cs (193) : }
+MiniSQLParser.cs (195) : Condition condition = null;
+MiniSQLParser.cs (197) : if (match.Groups[3].Success)
+MiniSQLParser.cs (198) : {
+MiniSQLParser.cs (199) : string col = match.Groups[3].Value;
+MiniSQLParser.cs (200) : string op = match.Groups[4].Value;
+MiniSQLParser.cs (201) : string val = match.Groups[5].Value.Trim('\'');
+MiniSQLParser.cs (203) : condition = new Condition(col, op, val);
+MiniSQLParser.cs (204) : }
+MiniSQLParser.cs (206) : return new Update(table, values, condition);
+MiniSQLParser.cs (207) : }
+MiniSQLParser.cs (215) : if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
+MiniSQLParser.cs (229) : //ADDUSER
+MiniSQLParser.cs (231) : if (match.Success)
+MiniSQLParser.cs (232) : {
+MiniSQLParser.cs (233) : string user = match.Groups[1].Value;
+MiniSQLParser.cs (234) : string pass = match.Groups[2].Value;
+MiniSQLParser.cs (235) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (236) : return new AddUser(user, pass, profile);
+MiniSQLParser.cs (237) : }
+MiniSQLParser.cs (239) : //CREATESECURITYPROFILE
+MiniSQLParser.cs (247) : //DELETEUSER
+MiniSQLParser.cs (256) : //DROPSECURITYPROFILE
+MiniSQLParser.cs (264) : //GRANT
+MiniSQLParser.cs (266) : if (match.Success)
+MiniSQLParser.cs (267) : {
+MiniSQLParser.cs (268) : string privilege = match.Groups[1].Value;
+MiniSQLParser.cs (269) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (270) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (272) : return new Grant(privilege, table, profile);
+MiniSQLParser.cs (273) : }
+MiniSQLParser.cs (275) : //REVOKE
+MiniSQLParser.cs (286) : return null;
 SetValue.cs (18) : this.Value = value;
 Update.cs (15) : this.Table = table;
 Update.cs (16) : this.Columns = columnNames;

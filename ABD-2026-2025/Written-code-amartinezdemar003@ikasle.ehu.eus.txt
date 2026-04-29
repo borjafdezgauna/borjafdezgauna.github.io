@@ -1,5 +1,14 @@
 ColumnDefinition.cs (18) : Type = type;
 ColumnDefinition.cs (19) : Name = name;
+Database.cs (25) : Tables = new List<Table>();
+Database.cs (242) : if(!SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Update))
+Database.cs (243) : {
+Database.cs (244) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (245) : return false;
+Database.cs (246) : }
+Database.cs (265) : LastErrorMessage = Constants.UpdateSuccess;
+Database.cs (299) : SecurityManager.Save(databaseName);
+Database.cs (353) : string secFile = Path.Combine(path, "security.json");
 Row.cs (4) : using System.Data.Common;
 Row.cs (73) : ColumnDefinition c = null;
 Row.cs (77) : {
@@ -77,77 +86,86 @@ Revoke.cs (59) : return Constants.RevokePrivilegeSuccess;
 Manager.cs (29) : Profile profile = ProfileByUser(m_username);
 Manager.cs (31) : if (profile != null)
 Manager.cs (32) : {
-Manager.cs (33) : if(profile.Name == Profile.AdminProfileName)
+Manager.cs (33) : if (profile.Name == Profile.AdminProfileName)
 Manager.cs (34) : return true;
 Manager.cs (35) : }
-Manager.cs (79) : // Unai
-Manager.cs (99) : // Aitana
-Manager.cs (109) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table))
-Manager.cs (110) : {
-Manager.cs (112) : }
-Manager.cs (114) : Profile profile = ProfileByUser(username);
-Manager.cs (115) : if (profile == null)
-Manager.cs (116) : {
-Manager.cs (117) : return false;
-Manager.cs (118) : }
-Manager.cs (120) : if (profile.Name == Profile.AdminProfileName)
-Manager.cs (121) : {
-Manager.cs (122) : return true;
-Manager.cs (123) : }
-Manager.cs (125) : return profile.IsGrantedPrivilege(table, privilege);
-Manager.cs (137) : if (IsUserAdmin())
-Manager.cs (138) : {
-Manager.cs (139) : if (profile != null)
-Manager.cs (140) : {
-Manager.cs (141) : if (ProfileByName(profile.Name) == null)
-Manager.cs (142) : {
-Manager.cs (143) : Profiles.Add(profile);
-Manager.cs (144) : }
-Manager.cs (145) : }
-Manager.cs (146) : }
-Manager.cs (228) : if (IsUserAdmin())
-Manager.cs (229) : {
-Manager.cs (230) : Profile profile = ProfileByName(profileName);
-Manager.cs (232) : if (profile != null)
-Manager.cs (233) : {
-Manager.cs (235) : Profiles.Remove(profile);
-Manager.cs (236) : return true;
-Manager.cs (238) : }
-Manager.cs (239) : }
-Profile.cs (23) : if (table == null)
-Profile.cs (24) : {
-Profile.cs (26) : return false;
+Manager.cs (67) : if (IsUserAdmin())
+Manager.cs (68) : {
+Manager.cs (69) : Profile profile = ProfileByName(profileName);
+Manager.cs (81) : }
+Manager.cs (83) : // Unai
+Manager.cs (89) : if (IsUserAdmin())
+Manager.cs (90) : {
+Manager.cs (91) : Profile profile = ProfileByName(profileName);
+Manager.cs (104) : }
+Manager.cs (106) : // Aitana
+Manager.cs (114) : if (username == null) {
+Manager.cs (116) : }
+Manager.cs (118) : if (ProfileByUser(username) != null)
+Manager.cs (119) : {
+Manager.cs (121) : Profile profile = ProfileByUser(username);
+Manager.cs (125) : if (profile.Name == Profile.AdminProfileName)
+Manager.cs (126) : {
+Manager.cs (127) : return true;
+Manager.cs (128) : }
+Manager.cs (130) : return profile.IsGrantedPrivilege(table, privilege);
+Manager.cs (131) : }
+Manager.cs (132) : return false;
+Manager.cs (133) : }
+Manager.cs (145) : if (IsUserAdmin())
+Manager.cs (146) : {
+Manager.cs (147) : if (profile != null)
+Manager.cs (148) : {
+Manager.cs (149) : if (ProfileByName(profile.Name) == null)
+Manager.cs (150) : {
+Manager.cs (151) : Profiles.Add(profile);
+Manager.cs (152) : }
+Manager.cs (153) : }
+Manager.cs (154) : }
+Manager.cs (231) : if (IsUserAdmin())
+Manager.cs (232) : {
+Manager.cs (233) : Profile profile = ProfileByName(profileName);
+Manager.cs (235) : if (profile != null)
+Manager.cs (236) : {
+Manager.cs (238) : Profiles.Remove(profile);
+Manager.cs (239) : return true;
+Manager.cs (241) : }
+Manager.cs (242) : }
+Profile.cs (24) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (25) : {
+Profile.cs (26) : PrivilegesOn[table] = new List<Privilege>();
 Profile.cs (27) : }
-Profile.cs (29) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (29) : if (!PrivilegesOn[table].Contains(privilege))
 Profile.cs (30) : {
-Profile.cs (31) : PrivilegesOn[table] = new List<Privilege>();
-Profile.cs (32) : }
-Profile.cs (34) : if (PrivilegesOn[table].Contains(privilege))
-Profile.cs (35) : {
-Profile.cs (37) : }
-Profile.cs (39) : PrivilegesOn[table].Add(privilege);
-Profile.cs (40) : return true;
-Profile.cs (49) : if (table == null)
-Profile.cs (50) : {
-Profile.cs (52) : }
-Profile.cs (54) : if (!PrivilegesOn.ContainsKey(table))
-Profile.cs (55) : {
-Profile.cs (57) : return false;
-Profile.cs (58) : }
-Profile.cs (60) : if (!PrivilegesOn[table].Contains(privilege))
-Profile.cs (61) : {
-Profile.cs (62) : return false;
-Profile.cs (63) : }
-Profile.cs (65) : PrivilegesOn[table].Remove(privilege);
-Profile.cs (66) : return true;
-Profile.cs (75) : if (table == null)
-Profile.cs (76) : {
-Profile.cs (80) : if (!PrivilegesOn.ContainsKey(table))
-Profile.cs (81) : {
-Profile.cs (82) : return false;
-Profile.cs (83) : }
-Profile.cs (85) : return PrivilegesOn[table].Contains(privilege);
+Profile.cs (31) : PrivilegesOn[table].Add(privilege);
+Profile.cs (32) : return true;
+Profile.cs (33) : }
+Profile.cs (35) : return false;
+Profile.cs (46) : if (table == null)
+Profile.cs (47) : {
+Profile.cs (49) : }
+Profile.cs (51) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (52) : {
+Profile.cs (54) : return false;
+Profile.cs (55) : }
+Profile.cs (57) : if (!PrivilegesOn[table].Contains(privilege))
+Profile.cs (58) : {
+Profile.cs (59) : return false;
+Profile.cs (60) : }
+Profile.cs (62) : PrivilegesOn[table].Remove(privilege);
+Profile.cs (63) : return true;
+Profile.cs (73) : if (table == null)
+Profile.cs (74) : {
+Profile.cs (78) : if (!PrivilegesOn.ContainsKey(table))
+Profile.cs (79) : {
+Profile.cs (80) : return false;
+Profile.cs (81) : }
+Profile.cs (83) : if (!PrivilegesOn[table].Contains(privilege))
+Profile.cs (84) : {
+Profile.cs (85) : return false;
 Profile.cs (86) : }
+Profile.cs (87) : return true;
+Profile.cs (92) : }
 User.cs (1) : using DbManager.Security;
 User.cs (14) : //Aitana
 User.cs (18) : this.Username = username;

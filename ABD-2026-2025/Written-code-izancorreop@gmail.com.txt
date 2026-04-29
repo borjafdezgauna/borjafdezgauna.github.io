@@ -19,20 +19,47 @@ Table.cs (5) : using System.Linq;
 Table.cs (37) : if (row.Values == null || row.Values.Count != ColumnDefinitions.Count) { return; }
 Table.cs (175) : if (columnNames == null) columnNames = ColumnDefinitions.Select(c => c.Name).ToList();
 Table.cs (185) : if (originalCol == null) continue;
+AddUser.cs (19) : Username = username;
+AddUser.cs (20) : Password = password;
+AddUser.cs (21) : ProfileName = profileName;
 Insert.cs (24) : database.Insert(Table, Values);
 Insert.cs (25) : return database.LastErrorMessage;
 MiniSQLParser.cs (4) : using System.Linq;
-MiniSQLParser.cs (49) : // select
-MiniSQLParser.cs (50) : var match = Regex.Match(miniSQLQuery, selectPattern);
-MiniSQLParser.cs (51) : if (match.Success)
-MiniSQLParser.cs (52) : {
-MiniSQLParser.cs (53) : List<string> columns = CommaSeparatedNames(match.Groups[1].Value)
-MiniSQLParser.cs (54) : .Select(c => c.Trim())
-MiniSQLParser.cs (55) : .ToList();
-MiniSQLParser.cs (56) : string tableName = match.Groups[2].Value;
-MiniSQLParser.cs (57) : Condition condition = null;
-MiniSQLParser.cs (58) : if (match.Groups[3].Value != "")
-MiniSQLParser.cs (59) : condition = new Condition(match.Groups[3].Value, match.Groups[4].Value, match.Groups[5].Value);
-MiniSQLParser.cs (60) : return new Select(tableName, columns, condition);
-MiniSQLParser.cs (61) : }
-MiniSQLParser.cs (64) : match = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (38) : const string addUserPattern = @"^ADD\s+USER\s+\((?<user>[a-zA-Z]+)[,](?<password>[a-zA-Z]+)[,](?<profile>[a-zA-Z]+)\)$";
+MiniSQLParser.cs (39) : var addUser = new Regex(addUserPattern, RegexOptions.None);
+MiniSQLParser.cs (41) : const string deleteUserPattern = @"^DELETE\s+USER\s+(?<user>[a-zA-Z]+)$";
+MiniSQLParser.cs (42) : var deleteUser = new Regex(deleteUserPattern, RegexOptions.None);
+MiniSQLParser.cs (51) : // select
+MiniSQLParser.cs (52) : var match = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (53) : if (match.Success)
+MiniSQLParser.cs (54) : {
+MiniSQLParser.cs (55) : List<string> columns = CommaSeparatedNames(match.Groups[1].Value)
+MiniSQLParser.cs (56) : .Select(c => c.Trim())
+MiniSQLParser.cs (57) : .ToList();
+MiniSQLParser.cs (58) : string tableName = match.Groups[2].Value;
+MiniSQLParser.cs (59) : Condition condition = null;
+MiniSQLParser.cs (60) : if (match.Groups[3].Value != "")
+MiniSQLParser.cs (61) : condition = new Condition(match.Groups[3].Value, match.Groups[4].Value, match.Groups[5].Value);
+MiniSQLParser.cs (62) : return new Select(tableName, columns, condition);
+MiniSQLParser.cs (63) : }
+MiniSQLParser.cs (66) : match = Regex.Match(miniSQLQuery, dropTablePattern);
+MiniSQLParser.cs (192) : //add user
+MiniSQLParser.cs (193) : var trimmedQuery = miniSQLQuery.Trim();
+MiniSQLParser.cs (194) : var addUserMatch = addUser.Match(trimmedQuery);
+MiniSQLParser.cs (195) : if (addUserMatch.Success)
+MiniSQLParser.cs (196) : {
+MiniSQLParser.cs (197) : var user = addUserMatch.Groups["user"].Value;
+MiniSQLParser.cs (198) : var password = addUserMatch.Groups["password"].Value;
+MiniSQLParser.cs (199) : var profile = addUserMatch.Groups["profile"].Value;
+MiniSQLParser.cs (201) : return new AddUser(user, password, profile);
+MiniSQLParser.cs (202) : }
+MiniSQLParser.cs (204) : //delete user
+MiniSQLParser.cs (205) : var deleteUserMatch = deleteUser.Match(trimmedQuery);
+MiniSQLParser.cs (206) : if (deleteUserMatch.Success)
+MiniSQLParser.cs (207) : {
+MiniSQLParser.cs (208) : var user = deleteUserMatch.Groups["user"].Value;
+MiniSQLParser.cs (210) : return new DeleteUser(user);
+MiniSQLParser.cs (223) : }
+Revoke.cs (18) : PrivilegeName = privilegeName;
+Revoke.cs (19) : TableName = tableName;
+Revoke.cs (20) : ProfileName = profileName;
