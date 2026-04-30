@@ -158,9 +158,31 @@ Grant.cs (38) : return Constants.ProfileAlreadyHasPrivilege;
 Grant.cs (39) : }
 Grant.cs (41) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
 Grant.cs (43) : return Constants.GrantPrivilegeSuccess;
-MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*(=|<>|<|>|<=|>=)\s*('[^']*'|\d+(?:\.\d+)?))?\s*;?$";
+MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+(.+?)\s+FROM\s+(\w+)(?:\s+WHERE\s+(.*)\s*)?$";
+MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)(=|<>|<|>|<=|>=)('[^']*'|\d+))?$";
+MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)(=|<>|<=|>=|<|>)('[^']*'|\d+(?:\.\d+)?))?\s*;?$";
 MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+([a-zA-Z]+)\s*$";
 MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(([a-zA-Z]+),([^,]+),([a-zA-Z]+)\)\s*$";
+MiniSQLParser.cs (51) : var newSelect = new Select();
+MiniSQLParser.cs (54) : string columnNames = match.Groups[1].Value;
+MiniSQLParser.cs (55) : string[] columnsSelect = columnNames.Split(',').Select(c => c.Trim()).ToArray();
+MiniSQLParser.cs (57) : string tableSelect = match.Groups[2].Value;
+MiniSQLParser.cs (59) : Condition conditionsParse = null;
+MiniSQLParser.cs (61) : if (match.Groups[3].Success && !string.IsNullOrWhiteSpace(match.Groups[3].Value))
+MiniSQLParser.cs (62) : {
+MiniSQLParser.cs (63) : string conditions = match.Groups[3].Value;
+MiniSQLParser.cs (64) : string[] eachCondition = conditions.Split(",");
+MiniSQLParser.cs (66) : foreach (var condition in eachCondition)
+MiniSQLParser.cs (68) : var conditionMatch = Regex.Match(condition.Trim(), @"(\w+)\s*(<=|>=|=|<|>)\s*['""]?([^'""]+)['""]?$");
+MiniSQLParser.cs (69) : if (conditionMatch.Success)
+MiniSQLParser.cs (70) : {
+MiniSQLParser.cs (71) : string col = conditionMatch.Groups[1].Value;
+MiniSQLParser.cs (72) : string op = conditionMatch.Groups[2].Value;
+MiniSQLParser.cs (73) : string val = conditionMatch.Groups[3].Value;
+MiniSQLParser.cs (75) : conditionsParse = new Condition(col, op, val);
+MiniSQLParser.cs (76) : }
+MiniSQLParser.cs (77) : }
+MiniSQLParser.cs (80) : return new Select(tableSelect, columnsSelect.ToList(), conditionsParse);
 MiniSQLParser.cs (164) : //UPDATE
 MiniSQLParser.cs (165) : match = Regex.Match(miniSQLQuery, updateTablePattern);
 MiniSQLParser.cs (166) : if (match.Success)
@@ -173,49 +195,68 @@ MiniSQLParser.cs (174) : foreach (string assignment in assignments)
 MiniSQLParser.cs (175) : {
 MiniSQLParser.cs (176) : var setMatch = Regex.Match(
 MiniSQLParser.cs (177) : assignment.Trim(),
-MiniSQLParser.cs (178) : @"^(\w+)\s*=\s*('[^']*'|\d+(?:\.\d+)?)$"
+MiniSQLParser.cs (178) : @"^(\w+)=('[^']*'|\d+)$"
 MiniSQLParser.cs (179) : );
 MiniSQLParser.cs (181) : if (!setMatch.Success)
 MiniSQLParser.cs (182) : return null;
 MiniSQLParser.cs (184) : string column = setMatch.Groups[1].Value;
 MiniSQLParser.cs (185) : string rawValue = setMatch.Groups[2].Value;
-MiniSQLParser.cs (187) : if (!rawValue.StartsWith("'") && !Regex.IsMatch(rawValue, @"^\d+(\.\d+)?$"))
-MiniSQLParser.cs (188) : return null;
-MiniSQLParser.cs (190) : string value = rawValue.Trim('\'');
-MiniSQLParser.cs (192) : values.Add(new SetValue(column, value));
-MiniSQLParser.cs (193) : }
-MiniSQLParser.cs (195) : Condition condition = null;
-MiniSQLParser.cs (197) : if (match.Groups[3].Success)
-MiniSQLParser.cs (198) : {
-MiniSQLParser.cs (199) : string col = match.Groups[3].Value;
-MiniSQLParser.cs (200) : string op = match.Groups[4].Value;
-MiniSQLParser.cs (201) : string val = match.Groups[5].Value.Trim('\'');
-MiniSQLParser.cs (203) : condition = new Condition(col, op, val);
-MiniSQLParser.cs (204) : }
-MiniSQLParser.cs (206) : return new Update(table, values, condition);
-MiniSQLParser.cs (207) : }
-MiniSQLParser.cs (215) : if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
-MiniSQLParser.cs (229) : //ADDUSER
-MiniSQLParser.cs (231) : if (match.Success)
-MiniSQLParser.cs (232) : {
-MiniSQLParser.cs (233) : string user = match.Groups[1].Value;
-MiniSQLParser.cs (234) : string pass = match.Groups[2].Value;
-MiniSQLParser.cs (235) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (236) : return new AddUser(user, pass, profile);
-MiniSQLParser.cs (237) : }
-MiniSQLParser.cs (239) : //CREATESECURITYPROFILE
-MiniSQLParser.cs (247) : //DELETEUSER
-MiniSQLParser.cs (256) : //DROPSECURITYPROFILE
-MiniSQLParser.cs (264) : //GRANT
-MiniSQLParser.cs (266) : if (match.Success)
-MiniSQLParser.cs (267) : {
-MiniSQLParser.cs (268) : string privilege = match.Groups[1].Value;
-MiniSQLParser.cs (269) : string table = match.Groups[2].Value;
-MiniSQLParser.cs (270) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (272) : return new Grant(privilege, table, profile);
-MiniSQLParser.cs (273) : }
-MiniSQLParser.cs (275) : //REVOKE
-MiniSQLParser.cs (286) : return null;
+MiniSQLParser.cs (186) : if (rawValue.StartsWith("'"))
+MiniSQLParser.cs (187) : {
+MiniSQLParser.cs (188) : if (!rawValue.EndsWith("'"))
+MiniSQLParser.cs (189) : return null;
+MiniSQLParser.cs (190) : }
+MiniSQLParser.cs (191) : else
+MiniSQLParser.cs (192) : {
+MiniSQLParser.cs (193) : if (!Regex.IsMatch(rawValue, @"^\d+$"))
+MiniSQLParser.cs (194) : return null;
+MiniSQLParser.cs (195) : }
+MiniSQLParser.cs (197) : string value = rawValue.Trim('\'');
+MiniSQLParser.cs (199) : values.Add(new SetValue(column, value));
+MiniSQLParser.cs (200) : }
+MiniSQLParser.cs (202) : Condition condition = null;
+MiniSQLParser.cs (203) : if (match.Groups[3].Success)
+MiniSQLParser.cs (204) : {
+MiniSQLParser.cs (205) : string col = match.Groups[3].Value;
+MiniSQLParser.cs (206) : string op = match.Groups[4].Value;
+MiniSQLParser.cs (207) : string rawVal = match.Groups[5].Value;
+MiniSQLParser.cs (208) : if (rawVal.StartsWith("'"))
+MiniSQLParser.cs (209) : {
+MiniSQLParser.cs (210) : if (!rawVal.EndsWith("'"))
+MiniSQLParser.cs (211) : return null;
+MiniSQLParser.cs (212) : }
+MiniSQLParser.cs (213) : else
+MiniSQLParser.cs (214) : {
+MiniSQLParser.cs (215) : if (!Regex.IsMatch(rawVal, @"^\d+$"))
+MiniSQLParser.cs (216) : return null;
+MiniSQLParser.cs (217) : }
+MiniSQLParser.cs (219) : string val = rawVal.Trim('\'');
+MiniSQLParser.cs (221) : condition = new Condition(col, op, val);
+MiniSQLParser.cs (222) : }
+MiniSQLParser.cs (224) : return new Update(table, values, condition);
+MiniSQLParser.cs (225) : }
+MiniSQLParser.cs (233) : if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
+MiniSQLParser.cs (247) : //ADDUSER
+MiniSQLParser.cs (249) : if (match.Success)
+MiniSQLParser.cs (250) : {
+MiniSQLParser.cs (251) : string user = match.Groups[1].Value;
+MiniSQLParser.cs (252) : string pass = match.Groups[2].Value;
+MiniSQLParser.cs (253) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (254) : return new AddUser(user, pass, profile);
+MiniSQLParser.cs (255) : }
+MiniSQLParser.cs (257) : //CREATESECURITYPROFILE
+MiniSQLParser.cs (265) : //DELETEUSER
+MiniSQLParser.cs (274) : //DROPSECURITYPROFILE
+MiniSQLParser.cs (282) : //GRANT
+MiniSQLParser.cs (284) : if (match.Success)
+MiniSQLParser.cs (285) : {
+MiniSQLParser.cs (286) : string privilege = match.Groups[1].Value;
+MiniSQLParser.cs (287) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (288) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (290) : return new Grant(privilege, table, profile);
+MiniSQLParser.cs (291) : }
+MiniSQLParser.cs (293) : //REVOKE
+MiniSQLParser.cs (304) : return null;
 SetValue.cs (18) : this.Value = value;
 Update.cs (15) : this.Table = table;
 Update.cs (16) : this.Columns = columnNames;

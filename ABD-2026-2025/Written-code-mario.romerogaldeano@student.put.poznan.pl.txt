@@ -1,27 +1,27 @@
-Database.cs (56) : if (TableByName(tableName) != null)
-Database.cs (57) : {
-Database.cs (58) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (60) : }
-Database.cs (61) : else if (ColumnDefinition == null||ColumnDefinition.Count()==0)
-Database.cs (62) : {
-Database.cs (63) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
-Database.cs (64) : return false;
-Database.cs (65) : }
-Database.cs (66) : AddTable(new Table(tableName, ColumnDefinition));
-Database.cs (67) : LastErrorMessage = Constants.CreateTableSuccess;
-Database.cs (68) : return true;
-Database.cs (75) : if (TableByName(tableName) == null)
-Database.cs (76) : {
-Database.cs (77) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (80) : Tables.Remove(TableByName(tableName));
-Database.cs (81) : LastErrorMessage = Constants.DropTableSuccess;
-Database.cs (82) : return true;
-Database.cs (83) : }
-Database.cs (118) : if (columns == null || columns.Count == 0)
-Database.cs (120) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (121) : return null;
-Database.cs (122) : }
-Database.cs (133) : }
+Database.cs (60) : if (TableByName(tableName) != null)
+Database.cs (61) : {
+Database.cs (62) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (64) : }
+Database.cs (65) : else if (ColumnDefinition == null||ColumnDefinition.Count()==0)
+Database.cs (66) : {
+Database.cs (67) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (68) : return false;
+Database.cs (69) : }
+Database.cs (70) : AddTable(new Table(tableName, ColumnDefinition));
+Database.cs (71) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (72) : return true;
+Database.cs (79) : if (TableByName(tableName) == null)
+Database.cs (80) : {
+Database.cs (81) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (84) : Tables.Remove(TableByName(tableName));
+Database.cs (85) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (86) : return true;
+Database.cs (87) : }
+Database.cs (122) : if (columns == null || columns.Count == 0)
+Database.cs (124) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (125) : return null;
+Database.cs (126) : }
+Database.cs (137) : }
 Row.cs (20) : if (columnDefinitions == null || values == null) { return; }
 Row.cs (23) : if (values.Count > columnDefinitions.Count) { return; }
 Row.cs (25) : Values = new List<string>();
@@ -89,7 +89,7 @@ CreateTable.cs (27) : return Constants.CreateTableSuccess;
 DeleteUser.cs (1) : using DbManager.Parser;
 DeleteUser.cs (4) : using System.Linq;
 DeleteUser.cs (17) : Username = username;
-DeleteUser.cs (23) : /*var profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (23) : var profile = database.SecurityManager.ProfileByUser(Username);
 DeleteUser.cs (24) : if (!database.SecurityManager.IsUserAdmin())
 DeleteUser.cs (25) : {
 DeleteUser.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
@@ -98,34 +98,24 @@ DeleteUser.cs (28) : if (profile == null)
 DeleteUser.cs (29) : {
 DeleteUser.cs (30) : return Constants.UserDoesNotExistError;
 DeleteUser.cs (31) : }
-DeleteUser.cs (32) : for (int i = 0; i < profile.Users.Count; i++)
-DeleteUser.cs (33) : {
-DeleteUser.cs (34) : if (profile.Users[i].Username == Username)
-DeleteUser.cs (35) : {
-DeleteUser.cs (36) : profile.Users.RemoveAt(i);
-DeleteUser.cs (37) : return Constants.DeleteUserSuccess;
-DeleteUser.cs (38) : }
-DeleteUser.cs (39) : }
-DeleteUser.cs (40) : return Constants.UserDoesNotExistError;*/
-DeleteUser.cs (41) : return null;
-DeleteUser.cs (42) : }
+DeleteUser.cs (32) : var user = database.SecurityManager.UserByName(Username);
+DeleteUser.cs (33) : profile.Users.Remove(user);
+DeleteUser.cs (34) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (35) : //return null;
+DeleteUser.cs (36) : }
 DropSecurityProfile.cs (5) : using DbManager.Security;
 DropSecurityProfile.cs (17) : ProfileName = profileName;
-DropSecurityProfile.cs (23) : /*var profile = database.SecurityManager.ProfileByUser(ProfileName);
-DropSecurityProfile.cs (24) : if (profile == null)
+DropSecurityProfile.cs (23) : /*var profile = database.SecurityManager.ProfileByName(ProfileName);
+DropSecurityProfile.cs (24) : if (!database.SecurityManager.IsUserAdmin())
 DropSecurityProfile.cs (25) : {
-DropSecurityProfile.cs (26) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 DropSecurityProfile.cs (27) : }
-DropSecurityProfile.cs (28) : if (!database.SecurityManager.IsUserAdmin())
+DropSecurityProfile.cs (28) : if (profile == null)
 DropSecurityProfile.cs (29) : {
-DropSecurityProfile.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (30) : return Constants.SecurityProfileDoesNotExistError;
 DropSecurityProfile.cs (31) : }
-DropSecurityProfile.cs (32) : for (int i = 0; i < database.SecurityManager.Profiles.Count; i++)
-DropSecurityProfile.cs (33) : {
-DropSecurityProfile.cs (34) : database.SecurityManager.Profiles.RemoveAt(i);
-DropSecurityProfile.cs (35) : return Constants.DropSecurityProfileSuccess;
-DropSecurityProfile.cs (36) : }
-DropSecurityProfile.cs (37) : return Constants.SecurityProfileDoesNotExistError;*/
+DropSecurityProfile.cs (32) : database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (33) : return Constants.DropSecurityProfileSuccess;*/
 DropTable.cs (15) : Table = table;
 DropTable.cs (23) : var dropTable=database.DropTable(Table);
 DropTable.cs (24) : if (dropTable == false) { return database.LastErrorMessage; }
@@ -135,6 +125,7 @@ MiniSQLParser.cs (16) : const string insertPattern = @"^INSERT\s+INTO\s+([a-zA-Z
 MiniSQLParser.cs (18) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z]\w*)$";
 MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+([a-zA-Z]\w*)\s+SET\s+(.+)\s+WHERE\s+(\w+)([<=>])'([^']+)'$";
 MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+([a-zA-Z]\w*)\s+WHERE\s+(\w+)([<=>])'([^']+)'$";
+MiniSQLParser.cs (32) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z]+)$";
 MiniSQLParser.cs (65) : //drop table
 MiniSQLParser.cs (67) : if (match.Success)
 MiniSQLParser.cs (68) : {
@@ -158,6 +149,12 @@ MiniSQLParser.cs (160) : string valuesText = match.Groups[2].Value.TrimEnd();
 MiniSQLParser.cs (166) : Match setMatch = Regex.Match(setPart, @"^([a-zA-Z]\w*)='([^']+)'$");
 MiniSQLParser.cs (172) : string value = setMatch.Groups[2].Value;
 MiniSQLParser.cs (177) : string whereValue = match.Groups[5].Value;
+MiniSQLParser.cs (241) : // drop security profile
+MiniSQLParser.cs (242) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (243) : if (match.Success)
+MiniSQLParser.cs (244) : {
+MiniSQLParser.cs (245) : return new DropSecurityProfile(match.Groups[1].Value);
+MiniSQLParser.cs (246) : }
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;
