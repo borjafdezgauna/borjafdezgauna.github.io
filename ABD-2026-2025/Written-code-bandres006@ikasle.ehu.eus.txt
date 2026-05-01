@@ -138,7 +138,7 @@ AddUser.cs (31) : {
 AddUser.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 AddUser.cs (33) : }
 AddUser.cs (35) : //buscamos perfil de seguridad
-AddUser.cs (36) : Profile profile = database.SecurityManager.ProfileByUser(ProfileName);
+AddUser.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
 AddUser.cs (38) : //verificar que el perfil exista
 AddUser.cs (39) : if(profile == null)
 AddUser.cs (40) : {
@@ -163,6 +163,7 @@ Insert.cs (36) : if (database.Insert(Table, Values))
 Insert.cs (37) : {
 Insert.cs (38) : return Constants.InsertSuccess;
 Insert.cs (39) : }
+MiniSQLParser.cs (39) : const string dropSecurityProfilePattern = @"DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z]+)$";
 MiniSQLParser.cs (45) : const string addUserPattern = @"ADD\s+USER\s+\(([a-zA-Z][a-zA-Z0-9]*),([^,]+),([a-zA-Z][a-zA-Z0-9]*)\)$";
 MiniSQLParser.cs (123) : //create table
 MiniSQLParser.cs (124) : Match createMatch = Regex.Match(miniSQLQuery, createTablePattern);
@@ -212,6 +213,17 @@ MiniSQLParser.cs (188) : return null;
 MiniSQLParser.cs (189) : }
 MiniSQLParser.cs (190) : return new AddUser(username, password, securityProfile);
 MiniSQLParser.cs (191) : }
+MiniSQLParser.cs (193) : //dropSecurityProfile
+MiniSQLParser.cs (194) : Match matchDropSecurityProfile = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (195) : if (matchDropSecurityProfile.Success)
+MiniSQLParser.cs (196) : {
+MiniSQLParser.cs (197) : string profileName = matchDropSecurityProfile.Groups[1].Value.Trim();
+MiniSQLParser.cs (198) : if (string.IsNullOrEmpty(profileName))
+MiniSQLParser.cs (199) : {
+MiniSQLParser.cs (200) : return null;
+MiniSQLParser.cs (201) : }
+MiniSQLParser.cs (203) : return new DropSecurityProfile(profileName);
+MiniSQLParser.cs (205) : }
 Manager.cs (25) : return profile != null && profile.Name == "Admin";
 Manager.cs (61) : //comprobamos que el usuario es admin ********
 Manager.cs (62) : if (!IsUserAdmin())

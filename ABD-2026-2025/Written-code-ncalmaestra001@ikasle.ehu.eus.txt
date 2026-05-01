@@ -87,10 +87,10 @@ Row.cs (151) : return new Row(columns, decodedValues);
 Table.cs (20) : Name = name;
 Table.cs (21) : ColumnDefinitions = columns;
 Table.cs (22) : Rows = new List<Row>();
-CreateSecurityProfile.cs (16) : ProfileName = profileName;
-Grant.cs (18) : PrivilegeName = privilegeName;
-Grant.cs (19) : TableName = tableName;
-Grant.cs (20) : ProfileName = profileName;
+CreateSecurityProfile.cs (18) : ProfileName = profileName;
+Grant.cs (20) : PrivilegeName = privilegeName;
+Grant.cs (21) : TableName = tableName;
+Grant.cs (22) : ProfileName = profileName;
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
 MiniSQLParser.cs (34) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+(\w+)\s*$";
@@ -188,35 +188,43 @@ Manager.cs (44) : return true;
 Manager.cs (45) : }
 Manager.cs (46) : }
 Manager.cs (47) : }
-Manager.cs (56) : foreach (var profile in Profiles)
+Manager.cs (56) : if (!IsUserAdmin())
 Manager.cs (57) : {
-Manager.cs (58) : if (profile.Name == profileName && table!=null)
-Manager.cs (59) : {
-Manager.cs (60) : profile.GrantPrivilege(table, privilege);
-Manager.cs (61) : }
-Manager.cs (62) : }
-Manager.cs (70) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
-Manager.cs (71) : {
-Manager.cs (72) : return;
-Manager.cs (73) : }
-Manager.cs (74) : foreach (var profile in Profiles)
-Manager.cs (75) : {
-Manager.cs (76) : if (profile.Name == profileName)
-Manager.cs (77) : {
-Manager.cs (78) : profile.RevokePrivilege(table, privilege);
+Manager.cs (58) : return;
+Manager.cs (59) : }
+Manager.cs (60) : foreach (var profile in Profiles)
+Manager.cs (61) : {
+Manager.cs (62) : if (profile.Name == profileName && table!=null)
+Manager.cs (63) : {
+Manager.cs (64) : profile.GrantPrivilege(table, privilege);
+Manager.cs (65) : }
+Manager.cs (66) : }
+Manager.cs (73) : if (!IsUserAdmin())
+Manager.cs (74) : {
+Manager.cs (75) : return;
+Manager.cs (76) : }
+Manager.cs (77) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
+Manager.cs (78) : {
 Manager.cs (79) : return;
 Manager.cs (80) : }
-Manager.cs (81) : }
-Manager.cs (89) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table))
-Manager.cs (90) : {
-Manager.cs (91) : return false;
-Manager.cs (92) : }
-Manager.cs (93) : Profile profile = ProfileByUser(username);
-Manager.cs (94) : if (profile == null)
-Manager.cs (95) : {
-Manager.cs (96) : return false;
-Manager.cs (97) : }
-Manager.cs (98) : return profile.IsGrantedPrivilege(table, privilege);
+Manager.cs (81) : foreach (var profile in Profiles)
+Manager.cs (82) : {
+Manager.cs (83) : if (profile.Name == profileName)
+Manager.cs (84) : {
+Manager.cs (85) : profile.RevokePrivilege(table, privilege);
+Manager.cs (86) : return;
+Manager.cs (87) : }
+Manager.cs (88) : }
+Manager.cs (96) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table))
+Manager.cs (97) : {
+Manager.cs (98) : return false;
+Manager.cs (99) : }
+Manager.cs (100) : Profile profile = ProfileByUser(username);
+Manager.cs (101) : if (profile == null)
+Manager.cs (102) : {
+Manager.cs (103) : return false;
+Manager.cs (104) : }
+Manager.cs (105) : return profile.IsGrantedPrivilege(table, privilege);
 Profile.cs (20) : if (string.IsNullOrEmpty(table))
 Profile.cs (21) : {
 Profile.cs (22) : return false;

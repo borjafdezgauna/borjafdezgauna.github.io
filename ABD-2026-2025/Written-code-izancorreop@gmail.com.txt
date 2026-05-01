@@ -8,31 +8,30 @@ Database.cs (229) : SecurityManager.Save(databaseName);
 Database.cs (237) : private const string String = "String";
 Database.cs (238) : private const string Double = "Double";
 Database.cs (239) : private const string Int = "Int";
-Database.cs (246) : if (!System.IO.File.Exists(databaseName)) return null;
-Database.cs (248) : using (var reader = System.IO.File.OpenText(databaseName))
-Database.cs (249) : {
-Database.cs (250) : string line = reader.ReadLine();
-Database.cs (251) : while (line != null && line != "USER")
-Database.cs (252) : {
-Database.cs (259) : if (column == String) columnTypes.Add(DbManager.ColumnDefinition.DataType.String);
-Database.cs (260) : else if (column == Double) columnTypes.Add(DbManager.ColumnDefinition.DataType.Double);
-Database.cs (261) : else if (column == Int) columnTypes.Add(DbManager.ColumnDefinition.DataType.Int);
-Database.cs (303) : }
-Database.cs (304) : // Read the saved username (line after "USER")
-Database.cs (305) : if (line == "USER") reader.ReadLine();
-Database.cs (306) : }
-Database.cs (308) : var manager = Manager.Load(databaseName, username);
-Database.cs (309) : if (manager == null || !manager.IsPasswordCorrect(username, password))
-Database.cs (310) : return null;
-Database.cs (312) : database.m_username = username;
-Database.cs (313) : database.SecurityManager = manager;
+Database.cs (247) : if (!System.IO.File.Exists(databaseName)) return null;
+Database.cs (249) : using (var reader = System.IO.File.OpenText(databaseName))
+Database.cs (250) : {
+Database.cs (251) : string line = reader.ReadLine();
+Database.cs (252) : while (line != null && line != "USER")
+Database.cs (253) : {
+Database.cs (260) : if (column == String) columnTypes.Add(DbManager.ColumnDefinition.DataType.String);
+Database.cs (261) : else if (column == Double) columnTypes.Add(DbManager.ColumnDefinition.DataType.Double);
+Database.cs (262) : else if (column == Int) columnTypes.Add(DbManager.ColumnDefinition.DataType.Int);
+Database.cs (304) : }
+Database.cs (305) : // Read the saved username (line after "USER")
+Database.cs (307) : }
+Database.cs (309) : var manager = Manager.Load(databaseName, username);
+Database.cs (310) : if (manager == null || !manager.IsPasswordCorrect(username, password))
+Database.cs (311) : return null;
+Database.cs (313) : database.m_username = username;
+Database.cs (314) : database.SecurityManager = manager;
 Table.cs (5) : using System.Linq;
 Table.cs (37) : if (row.Values == null || row.Values.Count != ColumnDefinitions.Count) { return; }
 Table.cs (175) : if (columnNames == null) columnNames = ColumnDefinitions.Select(c => c.Name).ToList();
 Table.cs (185) : if (originalCol == null) continue;
-AddUser.cs (19) : Username = username;
-AddUser.cs (20) : Password = password;
-AddUser.cs (21) : ProfileName = profileName;
+AddUser.cs (20) : Username = username;
+AddUser.cs (21) : Password = password;
+AddUser.cs (22) : ProfileName = profileName;
 Insert.cs (24) : database.Insert(Table, Values);
 Insert.cs (25) : return database.LastErrorMessage;
 MiniSQLParser.cs (4) : using System.Linq;
@@ -74,53 +73,52 @@ MiniSQLParser.cs (223) : }
 Revoke.cs (18) : PrivilegeName = privilegeName;
 Revoke.cs (19) : TableName = tableName;
 Revoke.cs (20) : ProfileName = profileName;
-Manager.cs (175) : var securityFile = databaseName + ".security";
-Manager.cs (176) : if (!File.Exists(securityFile)) return null;
-Manager.cs (178) : var manager = new Manager(username);
-Manager.cs (179) : Profile currentProfile = null;
-Manager.cs (181) : using (var reader = File.OpenText(securityFile))
-Manager.cs (182) : {
-Manager.cs (183) : string line;
-Manager.cs (184) : while ((line = reader.ReadLine()) != null)
-Manager.cs (185) : {
-Manager.cs (186) : if (line.StartsWith("PROFILE:"))
-Manager.cs (187) : {
-Manager.cs (188) : currentProfile = new Profile { Name = line.Substring("PROFILE:".Length) };
-Manager.cs (189) : manager.Profiles.Add(currentProfile);
-Manager.cs (190) : }
-Manager.cs (191) : else if (line.StartsWith("USER:") && currentProfile != null)
+Manager.cs (182) : var securityFile = databaseName + ".security";
+Manager.cs (183) : if (!File.Exists(securityFile)) return null;
+Manager.cs (185) : var manager = new Manager(username);
+Manager.cs (186) : Profile currentProfile = null;
+Manager.cs (188) : using (var reader = File.OpenText(securityFile))
+Manager.cs (189) : {
+Manager.cs (190) : string line;
+Manager.cs (191) : while ((line = reader.ReadLine()) != null)
 Manager.cs (192) : {
-Manager.cs (193) : var parts = line.Substring("USER:".Length).Split(':', 2);
-Manager.cs (194) : currentProfile.Users.Add(new User { Username = parts[0], EncryptedPassword = parts[1] });
-Manager.cs (195) : }
-Manager.cs (196) : else if (line.StartsWith("PRIVILEGE:") && currentProfile != null)
-Manager.cs (197) : {
-Manager.cs (198) : var rest = line.Substring("PRIVILEGE:".Length);
-Manager.cs (199) : var colonIdx = rest.IndexOf(':');
-Manager.cs (200) : var tableName = rest.Substring(0, colonIdx);
-Manager.cs (201) : var privilegeNames = rest.Substring(colonIdx + 1).Split(',', StringSplitOptions.RemoveEmptyEntries);
-Manager.cs (202) : foreach (var privName in privilegeNames)
-Manager.cs (203) : {
-Manager.cs (204) : if (Enum.TryParse<Privilege>(privName, out var priv))
-Manager.cs (205) : currentProfile.GrantPrivilege(tableName, priv);
-Manager.cs (206) : }
-Manager.cs (207) : }
-Manager.cs (208) : }
-Manager.cs (209) : }
-Manager.cs (210) : return manager;
-Manager.cs (215) : using (var writer = File.CreateText(databaseName + ".security"))
-Manager.cs (216) : {
-Manager.cs (217) : foreach (var profile in Profiles)
-Manager.cs (218) : {
-Manager.cs (219) : writer.WriteLine("PROFILE:" + profile.Name);
-Manager.cs (220) : foreach (var user in profile.Users)
-Manager.cs (221) : {
-Manager.cs (222) : writer.WriteLine("USER:" + user.Username + ":" + user.EncryptedPassword);
-Manager.cs (223) : }
-Manager.cs (224) : foreach (var entry in profile.PrivilegesOn)
+Manager.cs (193) : if (line.StartsWith("PROFILE:"))
+Manager.cs (194) : {
+Manager.cs (195) : currentProfile = new Profile { Name = line.Substring("PROFILE:".Length) };
+Manager.cs (196) : manager.Profiles.Add(currentProfile);
+Manager.cs (197) : }
+Manager.cs (198) : else if (line.StartsWith("USER:") && currentProfile != null)
+Manager.cs (199) : {
+Manager.cs (200) : var parts = line.Substring("USER:".Length).Split(':', 2);
+Manager.cs (201) : currentProfile.Users.Add(new User { Username = parts[0], EncryptedPassword = parts[1] });
+Manager.cs (202) : }
+Manager.cs (203) : else if (line.StartsWith("PRIVILEGE:") && currentProfile != null)
+Manager.cs (204) : {
+Manager.cs (205) : var rest = line.Substring("PRIVILEGE:".Length);
+Manager.cs (206) : var colonIdx = rest.IndexOf(':');
+Manager.cs (207) : var tableName = rest.Substring(0, colonIdx);
+Manager.cs (208) : var privilegeNames = rest.Substring(colonIdx + 1).Split(',', StringSplitOptions.RemoveEmptyEntries);
+Manager.cs (209) : foreach (var privName in privilegeNames)
+Manager.cs (210) : {
+Manager.cs (211) : if (Enum.TryParse<Privilege>(privName, out var priv))
+Manager.cs (212) : currentProfile.GrantPrivilege(tableName, priv);
+Manager.cs (213) : }
+Manager.cs (214) : }
+Manager.cs (215) : }
+Manager.cs (216) : }
+Manager.cs (217) : return manager;
+Manager.cs (222) : using (var writer = File.CreateText(databaseName + ".security"))
+Manager.cs (223) : {
+Manager.cs (224) : foreach (var profile in Profiles)
 Manager.cs (225) : {
-Manager.cs (226) : var privileges = string.Join(",", entry.Value.Select(p => p.ToString()));
-Manager.cs (227) : writer.WriteLine("PRIVILEGE:" + entry.Key + ":" + privileges);
-Manager.cs (228) : }
-Manager.cs (229) : }
+Manager.cs (226) : writer.WriteLine("PROFILE:" + profile.Name);
+Manager.cs (227) : foreach (var user in profile.Users)
+Manager.cs (228) : {
+Manager.cs (229) : writer.WriteLine("USER:" + user.Username + ":" + user.EncryptedPassword);
 Manager.cs (230) : }
+Manager.cs (231) : foreach (var entry in profile.PrivilegesOn)
+Manager.cs (232) : {
+Manager.cs (244) : writer.WriteLine("PRIVILEGE:" + entry.Key + ":" + privileges);
+Manager.cs (245) : }
+Manager.cs (246) : }
+Manager.cs (247) : }

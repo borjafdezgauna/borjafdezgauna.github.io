@@ -22,6 +22,8 @@ Database.cs (124) : LastErrorMessage = Constants.ColumnDoesNotExistError;
 Database.cs (125) : return null;
 Database.cs (126) : }
 Database.cs (137) : }
+Database.cs (240) : private const string UserLine = "USER";
+Database.cs (306) : if (line == UserLine) reader.ReadLine();
 Row.cs (20) : if (columnDefinitions == null || values == null) { return; }
 Row.cs (23) : if (values.Count > columnDefinitions.Count) { return; }
 Row.cs (25) : Values = new List<string>();
@@ -82,6 +84,27 @@ Table.cs (83) : return i;
 Table.cs (84) : }
 Table.cs (85) : }
 Table.cs (86) : return -1;
+AddUser.cs (1) : using DbManager.Parser;
+AddUser.cs (2) : using DbManager.Security;
+AddUser.cs (28) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (29) : if (!database.SecurityManager.IsUserAdmin())
+AddUser.cs (30) : {
+AddUser.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (32) : }
+AddUser.cs (33) : if (profile == null)
+AddUser.cs (34) : {
+AddUser.cs (35) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (36) : }
+AddUser.cs (37) : profile.Users.Add(new User(Username, Encryption.Encrypt(Password)));
+AddUser.cs (38) : return Constants.AddUserSuccess;
+CreateSecurityProfile.cs (3) : using System.Data;
+CreateSecurityProfile.cs (6) : using DbManager.Security;
+CreateSecurityProfile.cs (24) : if (!database.SecurityManager.IsUserAdmin())
+CreateSecurityProfile.cs (25) : {
+CreateSecurityProfile.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateSecurityProfile.cs (27) : }
+CreateSecurityProfile.cs (28) : database.SecurityManager.AddProfile(new Profile { Name=ProfileName});
+CreateSecurityProfile.cs (29) : return Constants.CreateSecurityProfileSuccess;
 CreateTable.cs (3) : using System.Data;
 CreateTable.cs (25) : var createTable = database.CreateTable(Table, ColumnsParameters);
 CreateTable.cs (26) : if (createTable == false) { return database.LastErrorMessage; }
@@ -89,7 +112,7 @@ CreateTable.cs (27) : return Constants.CreateTableSuccess;
 DeleteUser.cs (1) : using DbManager.Parser;
 DeleteUser.cs (4) : using System.Linq;
 DeleteUser.cs (17) : Username = username;
-DeleteUser.cs (23) : var profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (23) : var profile = database.SecurityManager.ProfileByUser(Username);//si profile by user devuelve null sabemos que no existe el usuario
 DeleteUser.cs (24) : if (!database.SecurityManager.IsUserAdmin())
 DeleteUser.cs (25) : {
 DeleteUser.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
@@ -105,7 +128,7 @@ DeleteUser.cs (35) : //return null;
 DeleteUser.cs (36) : }
 DropSecurityProfile.cs (5) : using DbManager.Security;
 DropSecurityProfile.cs (17) : ProfileName = profileName;
-DropSecurityProfile.cs (23) : /*var profile = database.SecurityManager.ProfileByName(ProfileName);
+DropSecurityProfile.cs (23) : var profile = database.SecurityManager.ProfileByName(ProfileName);
 DropSecurityProfile.cs (24) : if (!database.SecurityManager.IsUserAdmin())
 DropSecurityProfile.cs (25) : {
 DropSecurityProfile.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
@@ -115,11 +138,37 @@ DropSecurityProfile.cs (29) : {
 DropSecurityProfile.cs (30) : return Constants.SecurityProfileDoesNotExistError;
 DropSecurityProfile.cs (31) : }
 DropSecurityProfile.cs (32) : database.SecurityManager.RemoveProfile(ProfileName);
-DropSecurityProfile.cs (33) : return Constants.DropSecurityProfileSuccess;*/
+DropSecurityProfile.cs (33) : return Constants.DropSecurityProfileSuccess;
 DropTable.cs (15) : Table = table;
 DropTable.cs (23) : var dropTable=database.DropTable(Table);
 DropTable.cs (24) : if (dropTable == false) { return database.LastErrorMessage; }
 DropTable.cs (25) : return Constants.DropTableSuccess;
+Grant.cs (3) : using System.Data;
+Grant.cs (6) : using DbManager.Security;
+Grant.cs (28) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (29) : Privilege privilege;
+Grant.cs (30) : if (!database.SecurityManager.IsUserAdmin())
+Grant.cs (31) : {
+Grant.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (33) : }
+Grant.cs (34) : if (profile == null)
+Grant.cs (35) : {
+Grant.cs (36) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (37) : }
+Grant.cs (38) : try
+Grant.cs (39) : {
+Grant.cs (40) : privilege = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Grant.cs (41) : }
+Grant.cs (42) : catch
+Grant.cs (43) : {
+Grant.cs (44) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (45) : }
+Grant.cs (46) : bool granted = profile.GrantPrivilege(TableName, privilege);
+Grant.cs (47) : if (!granted)
+Grant.cs (48) : {
+Grant.cs (49) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (50) : }
+Grant.cs (51) : return Constants.GrantPrivilegeSuccess;
 MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+([a-zA-Z]\w*(?:,[a-zA-Z]\w*)*)\s+FROM\s+([a-zA-Z]\w*)(?:\s+WHERE\s+([a-zA-Z]\w*)([<=>])'([^']+)')?$";
 MiniSQLParser.cs (16) : const string insertPattern = @"^INSERT\s+INTO\s+([a-zA-Z]\w*)\s+VALUES\s*\(('[^']+'(?:,'[^']+')*)\)$";
 MiniSQLParser.cs (18) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z]\w*)$";
@@ -158,3 +207,12 @@ MiniSQLParser.cs (246) : }
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;
+Manager.cs (233) : string privileges = "";
+Manager.cs (235) : foreach (var privilege in entry.Value)
+Manager.cs (236) : {
+Manager.cs (237) : if (privileges != "")
+Manager.cs (238) : {
+Manager.cs (239) : privileges += ",";
+Manager.cs (240) : }
+Manager.cs (242) : privileges += privilege.ToString();
+Manager.cs (243) : }
