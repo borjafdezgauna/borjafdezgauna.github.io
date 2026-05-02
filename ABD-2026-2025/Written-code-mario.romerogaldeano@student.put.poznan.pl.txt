@@ -145,12 +145,12 @@ DropTable.cs (24) : if (dropTable == false) { return database.LastErrorMessage; 
 DropTable.cs (25) : return Constants.DropTableSuccess;
 Grant.cs (3) : using System.Data;
 Grant.cs (6) : using DbManager.Security;
-Grant.cs (28) : var profile = database.SecurityManager.ProfileByName(ProfileName);
-Grant.cs (29) : Privilege privilege;
-Grant.cs (30) : if (!database.SecurityManager.IsUserAdmin())
-Grant.cs (31) : {
-Grant.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Grant.cs (33) : }
+Grant.cs (28) : Privilege privilege;
+Grant.cs (29) : if (!database.SecurityManager.IsUserAdmin())
+Grant.cs (30) : {
+Grant.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (32) : }
+Grant.cs (33) : var profile = database.SecurityManager.ProfileByName(ProfileName);
 Grant.cs (34) : if (profile == null)
 Grant.cs (35) : {
 Grant.cs (36) : return Constants.SecurityProfileDoesNotExistError;
@@ -204,15 +204,44 @@ MiniSQLParser.cs (243) : if (match.Success)
 MiniSQLParser.cs (244) : {
 MiniSQLParser.cs (245) : return new DropSecurityProfile(match.Groups[1].Value);
 MiniSQLParser.cs (246) : }
-Select.cs (18) : Table = table;
-Select.cs (19) : Columns = columns;
-Select.cs (20) : Where = condition;
-Manager.cs (233) : string privileges = "";
-Manager.cs (235) : foreach (var privilege in entry.Value)
-Manager.cs (236) : {
-Manager.cs (237) : if (privileges != "")
-Manager.cs (238) : {
-Manager.cs (239) : privileges += ",";
-Manager.cs (240) : }
-Manager.cs (242) : privileges += privilege.ToString();
-Manager.cs (243) : }
+Revoke.cs (1) : using DbManager.Parser;
+Revoke.cs (2) : using DbManager.Security;
+Revoke.cs (27) : if (!database.SecurityManager.IsUserAdmin())
+Revoke.cs (28) : {
+Revoke.cs (29) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (30) : }
+Revoke.cs (31) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+Revoke.cs (32) : if (profile == null)
+Revoke.cs (33) : {
+Revoke.cs (34) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (35) : }
+Revoke.cs (36) : Privilege privilege;
+Revoke.cs (37) : try
+Revoke.cs (38) : {
+Revoke.cs (39) : privilege = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Revoke.cs (40) : }
+Revoke.cs (41) : catch
+Revoke.cs (42) : {
+Revoke.cs (43) : return Constants.PrivilegeDoesNotExistError;
+Revoke.cs (44) : }
+Revoke.cs (45) : profile.RevokePrivilege(TableName, privilege);
+Revoke.cs (46) : return Constants.RevokePrivilegeSuccess;
+Select.cs (1) : using DbManager.Security;
+Select.cs (19) : Table = table;
+Select.cs (20) : Columns = columns;
+Select.cs (21) : Where = condition;
+Select.cs (28) : var result=database.Select(Table, Columns, Where);
+Select.cs (29) : if (result == null)
+Select.cs (30) : {
+Select.cs (31) : return database.LastErrorMessage;
+Select.cs (32) : }
+Select.cs (33) : return result.ToString();
+Manager.cs (229) : string privileges = "";
+Manager.cs (231) : foreach (var privilege in entry.Value)
+Manager.cs (232) : {
+Manager.cs (233) : if (privileges != "")
+Manager.cs (234) : {
+Manager.cs (235) : privileges += ",";
+Manager.cs (236) : }
+Manager.cs (238) : privileges += privilege.ToString();
+Manager.cs (239) : }
