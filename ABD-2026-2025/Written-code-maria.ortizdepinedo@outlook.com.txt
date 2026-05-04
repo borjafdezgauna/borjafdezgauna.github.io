@@ -211,6 +211,18 @@ Table.cs (250) : Row r = new Row(ColumnDefinitions, values);
 Table.cs (251) : Rows.Add(r);
 Table.cs (252) : return true;
 Table.cs (253) : }
+CreateSecurityProfile.cs (5) : using DbManager.Security;
+CreateSecurityProfile.cs (17) : ProfileName = profileName;
+CreateSecurityProfile.cs (24) : //1.tenemos q mirar si es admin
+CreateSecurityProfile.cs (25) : if (!database.IsUserAdmin())
+CreateSecurityProfile.cs (26) : {
+CreateSecurityProfile.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateSecurityProfile.cs (28) : }
+CreateSecurityProfile.cs (29) : //2.creamos y añadimos el perfil
+CreateSecurityProfile.cs (30) : var profile = new Profile();
+CreateSecurityProfile.cs (31) : profile.Name = ProfileName;
+CreateSecurityProfile.cs (32) : database.SecurityManager.AddProfile(profile);
+CreateSecurityProfile.cs (33) : return Constants.CreateSecurityProfileSuccess;
 DropTable.cs (22) : if (database.DropTable(Table))
 DropTable.cs (23) : {
 DropTable.cs (24) : return Constants.DropTableSuccess;
@@ -222,6 +234,7 @@ DropTable.cs (29) : }
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (17) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z0-9]+)$";
 MiniSQLParser.cs (34) : const string deletePattern = @"^DELETE\s+FROM\s+([a-zA-Z0-9]+)\s+WHERE\s+([a-zA-Z0-9]+)(>|<|=)'([^']*)'$";
+MiniSQLParser.cs (37) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z]+)$";
 MiniSQLParser.cs (129) : string columnasText = createMatch.Groups[2].Value;
 MiniSQLParser.cs (138) : if (!string.IsNullOrWhiteSpace(columnasText))
 MiniSQLParser.cs (140) : // Dividir por comas
@@ -242,6 +255,13 @@ MiniSQLParser.cs (297) : string whereValue = matchDelete.Groups[4].Value;
 MiniSQLParser.cs (299) : Condition condition = new Condition(whereColumn, whereOperator, whereValue);
 MiniSQLParser.cs (300) : return new Delete(table, condition);
 MiniSQLParser.cs (301) : }
+MiniSQLParser.cs (307) : // Create Security Profile
+MiniSQLParser.cs (308) : Match matchCreateSecurity = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (309) : if (matchCreateSecurity.Success)
+MiniSQLParser.cs (310) : {
+MiniSQLParser.cs (311) : string profileName = matchCreateSecurity.Groups[1].Value;
+MiniSQLParser.cs (312) : return new CreateSecurityProfile(profileName);
+MiniSQLParser.cs (313) : }
 Revoke.cs (18) : PrivilegeName = privilegeName;
 Revoke.cs (19) : TableName = tableName;
 Revoke.cs (20) : ProfileName = profileName;

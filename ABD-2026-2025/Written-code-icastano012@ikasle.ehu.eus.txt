@@ -164,9 +164,9 @@ Insert.cs (28) : return Constants.TableDoesNotExistError;
 Insert.cs (29) : else if(database.Insert(Table, Values))
 Insert.cs (30) : return Constants.InsertSuccess;
 Insert.cs (31) : return Constants.Error;
-MiniSQLParser.cs (32) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
-MiniSQLParser.cs (34) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
-MiniSQLParser.cs (40) : const string addUserPattern = @"^ADD\s+USER\s+\(\s*([A-Za-z][A-Za-z0-9]*)\s*,\s*([a-zA-Z0-9]+)\s*,\s*([A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$";
+MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (39) : const string addUserPattern = @"^ADD\s+USER\s+\(\s*([A-Za-z][A-Za-z0-9]*)\s*,\s*([a-zA-Z0-9]+)\s*,\s*([A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$";
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
 Manager.cs (36) : User user = UserByName(username);
@@ -175,68 +175,64 @@ Manager.cs (38) : return false;
 Manager.cs (39) : password = Encryption.Encrypt(password);
 Manager.cs (40) : if (user.EncryptedPassword == password)
 Manager.cs (41) : return true;
-Manager.cs (73) : if(!IsUserAdmin())
+Manager.cs (73) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
 Manager.cs (74) : {
 Manager.cs (75) : return;
 Manager.cs (76) : }
-Manager.cs (78) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
+Manager.cs (78) : if(IsUserAdmin())
 Manager.cs (79) : {
-Manager.cs (80) : return;
-Manager.cs (81) : }
-Manager.cs (83) : if(IsUserAdmin() && IsGrantedPrivilege(profileName, table, privilege))
-Manager.cs (84) : {
-Manager.cs (85) : Profile profile = ProfileByName(profileName);
-Manager.cs (86) : if((profile != null) || (table != null))
-Manager.cs (87) : {
-Manager.cs (88) : profile.RevokePrivilege(table, privilege);
-Manager.cs (89) : }
-Manager.cs (91) : }
-Manager.cs (159) : foreach (Profile profile in Profiles)
-Manager.cs (160) : {
-Manager.cs (161) : foreach (User user in profile.Users)
-Manager.cs (162) : {
-Manager.cs (163) : if (user.Username.Equals(username))
-Manager.cs (164) : {
-Manager.cs (165) : return profile;
-Manager.cs (166) : }
-Manager.cs (167) : }
-Manager.cs (168) : }
-Manager.cs (271) : try
-Manager.cs (272) : {
-Manager.cs (273) : string folder = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Manager.cs (274) : Directory.CreateDirectory(folder);
-Manager.cs (276) : string securityFile = Path.Combine(folder, "manager.txt");
-Manager.cs (278) : using (TextWriter tw = File.CreateText(securityFile))
-Manager.cs (279) : {
-Manager.cs (280) : foreach (Profile p in Profiles)
-Manager.cs (281) : {
-Manager.cs (282) : tw.WriteLine(p.Name);
-Manager.cs (284) : foreach (string table in p.PrivilegesOn.Keys)
-Manager.cs (285) : {
-Manager.cs (286) : string privLine = table + "=";
-Manager.cs (287) : bool first = true;
-Manager.cs (288) : foreach (Privilege priv in p.PrivilegesOn[table])
-Manager.cs (289) : {
-Manager.cs (290) : if (!first)
-Manager.cs (291) : privLine += "|";
-Manager.cs (292) : privLine += priv.ToString();
-Manager.cs (293) : first = false;
-Manager.cs (294) : }
-Manager.cs (295) : tw.WriteLine(privLine);
-Manager.cs (296) : }
-Manager.cs (298) : tw.WriteLine("Users:");
-Manager.cs (300) : foreach (User u in p.Users)
-Manager.cs (301) : {
-Manager.cs (302) : tw.WriteLine(u.Username + ":" + u.EncryptedPassword);
+Manager.cs (80) : Profile profile = ProfileByName(profileName);
+Manager.cs (81) : if((profile != null) && (table != null))
+Manager.cs (82) : {
+Manager.cs (83) : profile.RevokePrivilege(table, privilege);
+Manager.cs (84) : }
+Manager.cs (86) : }
+Manager.cs (154) : foreach (Profile profile in Profiles)
+Manager.cs (155) : {
+Manager.cs (156) : foreach (User user in profile.Users)
+Manager.cs (157) : {
+Manager.cs (158) : if (user.Username.Equals(username))
+Manager.cs (159) : {
+Manager.cs (160) : return profile;
+Manager.cs (161) : }
+Manager.cs (162) : }
+Manager.cs (163) : }
+Manager.cs (266) : try
+Manager.cs (267) : {
+Manager.cs (268) : string folder = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (269) : Directory.CreateDirectory(folder);
+Manager.cs (271) : string securityFile = Path.Combine(folder, "manager.txt");
+Manager.cs (273) : using (TextWriter tw = File.CreateText(securityFile))
+Manager.cs (274) : {
+Manager.cs (275) : foreach (Profile p in Profiles)
+Manager.cs (276) : {
+Manager.cs (277) : tw.WriteLine(p.Name);
+Manager.cs (279) : foreach (string table in p.PrivilegesOn.Keys)
+Manager.cs (280) : {
+Manager.cs (281) : string privLine = table + "=";
+Manager.cs (282) : bool first = true;
+Manager.cs (283) : foreach (Privilege priv in p.PrivilegesOn[table])
+Manager.cs (284) : {
+Manager.cs (285) : if (!first)
+Manager.cs (286) : privLine += "|";
+Manager.cs (287) : privLine += priv.ToString();
+Manager.cs (288) : first = false;
+Manager.cs (289) : }
+Manager.cs (290) : tw.WriteLine(privLine);
+Manager.cs (291) : }
+Manager.cs (293) : tw.WriteLine("Users:");
+Manager.cs (295) : foreach (User u in p.Users)
+Manager.cs (296) : {
+Manager.cs (297) : tw.WriteLine(u.Username + ":" + u.EncryptedPassword);
+Manager.cs (298) : }
+Manager.cs (300) : tw.WriteLine("-------");
+Manager.cs (301) : }
+Manager.cs (302) : }
 Manager.cs (303) : }
-Manager.cs (305) : tw.WriteLine("-------");
-Manager.cs (306) : }
+Manager.cs (304) : catch
+Manager.cs (305) : {
+Manager.cs (306) : return;
 Manager.cs (307) : }
-Manager.cs (308) : }
-Manager.cs (309) : catch
-Manager.cs (310) : {
-Manager.cs (311) : return;
-Manager.cs (312) : }
 Profile.cs (38) : if (table == null || privilege == null)
 Profile.cs (39) : {
 Profile.cs (41) : }

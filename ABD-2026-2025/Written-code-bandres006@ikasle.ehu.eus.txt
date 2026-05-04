@@ -158,20 +158,22 @@ Delete.cs (31) : {
 Delete.cs (32) : //como no se ha eliminado correctamente devolvemos el error
 Delete.cs (33) : return database.LastErrorMessage;
 Delete.cs (34) : }
-DropSecurityProfile.cs (16) : ProfileName = profileName;
-DropSecurityProfile.cs (24) : //comprobamos que sea administrador si no no puede eliminar a nadie
-DropSecurityProfile.cs (25) : if (!database.SecurityManager.IsUserAdmin())
-DropSecurityProfile.cs (26) : {
-DropSecurityProfile.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-DropSecurityProfile.cs (28) : }
-DropSecurityProfile.cs (30) : //si es adminitrados
-DropSecurityProfile.cs (32) : bool seHaEliminado = database.SecurityManager.RemoveProfile(ProfileName);
-DropSecurityProfile.cs (34) : //si se ha podido eliminar
-DropSecurityProfile.cs (35) : if (seHaEliminado)
+DropSecurityProfile.cs (5) : using DbManager.Security;
+DropSecurityProfile.cs (17) : ProfileName = profileName;
+DropSecurityProfile.cs (25) : //comprobamos que sea administrador si no no puede eliminar a nadie
+DropSecurityProfile.cs (26) : if (!database.IsUserAdmin())
+DropSecurityProfile.cs (27) : {
+DropSecurityProfile.cs (28) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (29) : }
+DropSecurityProfile.cs (31) : //si es adminitrador
+DropSecurityProfile.cs (32) : //creamos el perfil
+DropSecurityProfile.cs (33) : Profile prof = database.SecurityManager.ProfileByName(ProfileName);
+DropSecurityProfile.cs (35) : if(prof == null)
 DropSecurityProfile.cs (36) : {
-DropSecurityProfile.cs (37) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (37) : return Constants.SecurityProfileDoesNotExistError;
 DropSecurityProfile.cs (38) : }
-DropSecurityProfile.cs (40) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (40) : database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (42) : return Constants.DropSecurityProfileSuccess;
 Insert.cs (36) : if (database.Insert(Table, Values))
 Insert.cs (37) : {
 Insert.cs (38) : return Constants.InsertSuccess;

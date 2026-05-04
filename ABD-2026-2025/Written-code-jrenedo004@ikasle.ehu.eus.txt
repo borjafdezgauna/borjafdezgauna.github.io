@@ -211,20 +211,46 @@ Table.cs (384) : table.Insert(new List<string>() {TestColumn2Row2, TestColumn1Ro
 Table.cs (385) : table.Insert(new List<string>() {TestColumn2Row3, TestColumn1Row3 });
 Table.cs (386) : return table;
 Table.cs (387) : }
-AddUser.cs (19) : Username = username;
-AddUser.cs (20) : Password = password;
-AddUser.cs (21) : ProfileName = profileName;
-AddUser.cs (33) : public override bool Equals(object obj)
-AddUser.cs (34) : {
-AddUser.cs (35) : AddUser other = (AddUser)obj;
-AddUser.cs (36) : return (Username == other.Username && Password == other.Password && ProfileName == other.ProfileName);
+AddUser.cs (5) : using DbManager.Security;
+AddUser.cs (20) : Username = username;
+AddUser.cs (21) : Password = password;
+AddUser.cs (22) : ProfileName = profileName;
+AddUser.cs (30) : if (!(database.SecurityManager.IsUserAdmin()))
+AddUser.cs (31) : {
+AddUser.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (33) : }
+AddUser.cs (34) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
+AddUser.cs (35) : {
+AddUser.cs (36) : return Constants.SecurityProfileDoesNotExistError;
 AddUser.cs (37) : }
-CreateSecurityProfile.cs (16) : ProfileName = profileName;
-CreateSecurityProfile.cs (28) : public override bool Equals(object obj)
-CreateSecurityProfile.cs (29) : {
-CreateSecurityProfile.cs (30) : CreateSecurityProfile other = (CreateSecurityProfile)obj;
-CreateSecurityProfile.cs (31) : return (ProfileName == other.ProfileName);
+AddUser.cs (38) : User user = new User(Username, Password);
+AddUser.cs (39) : database.SecurityManager.ProfileByName(ProfileName).Users.Add(user);
+AddUser.cs (40) : return Constants.AddUserSuccess;
+AddUser.cs (44) : public override bool Equals(object obj)
+AddUser.cs (45) : {
+AddUser.cs (46) : AddUser other = (AddUser)obj;
+AddUser.cs (47) : return (Username == other.Username && Password == other.Password && ProfileName == other.ProfileName);
+AddUser.cs (48) : }
+CreateSecurityProfile.cs (1) : using DbManager.Parser;
+CreateSecurityProfile.cs (2) : using DbManager.Security;
+CreateSecurityProfile.cs (17) : ProfileName = profileName;
+CreateSecurityProfile.cs (24) : Profile profileObj = database.SecurityManager.ProfileByName(ProfileName);
+CreateSecurityProfile.cs (25) : if (profileObj == null)
+CreateSecurityProfile.cs (26) : {
+CreateSecurityProfile.cs (27) : return Constants.SecurityProfileDoesNotExistError;
+CreateSecurityProfile.cs (28) : }
+CreateSecurityProfile.cs (29) : if (!(database.SecurityManager.IsUserAdmin()))
+CreateSecurityProfile.cs (30) : {
+CreateSecurityProfile.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 CreateSecurityProfile.cs (32) : }
+CreateSecurityProfile.cs (34) : Profile profile = new Profile() { Name = ProfileName };
+CreateSecurityProfile.cs (35) : database.SecurityManager.AddProfile(profile);
+CreateSecurityProfile.cs (36) : return Constants.CreateSecurityProfileSuccess;
+CreateSecurityProfile.cs (40) : public override bool Equals(object obj)
+CreateSecurityProfile.cs (41) : {
+CreateSecurityProfile.cs (42) : CreateSecurityProfile other = (CreateSecurityProfile)obj;
+CreateSecurityProfile.cs (43) : return (ProfileName == other.ProfileName);
+CreateSecurityProfile.cs (44) : }
 CreateTable.cs (3) : using System.Linq;
 CreateTable.cs (25) : if (database.CreateTable(Table, ColumnsParameters))
 CreateTable.cs (26) : {
@@ -236,18 +262,42 @@ CreateTable.cs (34) : {
 CreateTable.cs (35) : CreateTable other = (CreateTable)obj;
 CreateTable.cs (36) : return (Table == other.Table && ColumnsParameters.SequenceEqual(other.ColumnsParameters));
 CreateTable.cs (37) : }
-DeleteUser.cs (16) : Username = username;
-DeleteUser.cs (27) : public override bool Equals(object obj)
+DeleteUser.cs (1) : using DbManager.Parser;
+DeleteUser.cs (2) : using DbManager.Security;
+DeleteUser.cs (17) : Username = username;
+DeleteUser.cs (23) : if (!(database.SecurityManager.IsUserAdmin()))
+DeleteUser.cs (24) : {
+DeleteUser.cs (25) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (26) : }
+DeleteUser.cs (27) : if (database.SecurityManager.UserByName(Username) == null)
 DeleteUser.cs (28) : {
-DeleteUser.cs (29) : DeleteUser other = (DeleteUser)obj;
-DeleteUser.cs (30) : return (Username == other.Username);
-DeleteUser.cs (31) : }
-DropSecurityProfile.cs (16) : ProfileName = profileName;
-DropSecurityProfile.cs (27) : public override bool Equals(object obj)
-DropSecurityProfile.cs (28) : {
-DropSecurityProfile.cs (29) : DropSecurityProfile other = (DropSecurityProfile)obj;
-DropSecurityProfile.cs (30) : return (ProfileName == other.ProfileName);
+DeleteUser.cs (29) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (30) : }
+DeleteUser.cs (31) : database.SecurityManager.ProfileByUser(Username).Users.Remove(database.SecurityManager.UserByName(Username));
+DeleteUser.cs (32) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (38) : public override bool Equals(object obj)
+DeleteUser.cs (39) : {
+DeleteUser.cs (40) : DeleteUser other = (DeleteUser)obj;
+DeleteUser.cs (41) : return (Username == other.Username);
+DeleteUser.cs (42) : }
+DropSecurityProfile.cs (5) : using DbManager.Security;
+DropSecurityProfile.cs (17) : ProfileName = profileName;
+DropSecurityProfile.cs (23) : Profile profileObj = database.SecurityManager.ProfileByName(ProfileName);
+DropSecurityProfile.cs (24) : if (profileObj == null)
+DropSecurityProfile.cs (25) : {
+DropSecurityProfile.cs (26) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (27) : }
+DropSecurityProfile.cs (28) : if (!(database.SecurityManager.IsUserAdmin()))
+DropSecurityProfile.cs (29) : {
+DropSecurityProfile.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 DropSecurityProfile.cs (31) : }
+DropSecurityProfile.cs (33) : database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (34) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (38) : public override bool Equals(object obj)
+DropSecurityProfile.cs (39) : {
+DropSecurityProfile.cs (40) : DropSecurityProfile other = (DropSecurityProfile)obj;
+DropSecurityProfile.cs (41) : return (ProfileName == other.ProfileName);
+DropSecurityProfile.cs (42) : }
 DropTable.cs (22) : if (database.DropTable(Table))
 DropTable.cs (23) : {
 DropTable.cs (24) : return Constants.DropTableSuccess;
@@ -265,11 +315,12 @@ DropTable.cs (39) : }
 Grant.cs (19) : PrivilegeName = privilegeName;
 Grant.cs (20) : TableName = tableName;
 Grant.cs (21) : ProfileName = profileName;
-Grant.cs (65) : public override bool Equals(object obj)
-Grant.cs (66) : {
-Grant.cs (67) : Grant other = (Grant)obj;
-Grant.cs (68) : return (PrivilegeName == other.PrivilegeName && TableName == other.TableName && ProfileName == other.ProfileName);
-Grant.cs (69) : }
+Grant.cs (33) : Privilege privilegeObj = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Grant.cs (49) : public override bool Equals(object obj)
+Grant.cs (50) : {
+Grant.cs (51) : Grant other = (Grant)obj;
+Grant.cs (52) : return (PrivilegeName == other.PrivilegeName && TableName == other.TableName && ProfileName == other.ProfileName);
+Grant.cs (53) : }
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (15) : const string selectPattern = @"SELECT\s+([\w]+(?:,[\w]+)*)\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)\s*(<|>|=)\s*'(-?\d+(?:\.\d+)?|[a-zA-Z]+)')?";
 MiniSQLParser.cs (19) : const string dropTablePattern = @"DROP\s+TABLE\s+([\w+]+)";
@@ -518,3 +569,42 @@ Manager.cs (306) : }
 Manager.cs (307) : writer.Close();
 Manager.cs (308) : }
 Manager.cs (309) : }
+Manager.cs (311) : public override bool Equals(object obj)
+Manager.cs (312) : {
+Manager.cs (313) : Manager other = (Manager)obj;
+Manager.cs (314) : if(Profiles.SequenceEqual(other.Profiles) && m_username.Equals(other.m_username))
+Manager.cs (315) : {
+Manager.cs (316) : return true;
+Manager.cs (317) : }
+Manager.cs (318) : return false;
+Manager.cs (319) : }
+Profile.cs (40) : public override bool Equals(object obj)
+Profile.cs (41) : {
+Profile.cs (42) : Profile other = (Profile)obj;
+Profile.cs (43) : if (Name.Equals(other.Name) && (Users.SequenceEqual(other.Users))){
+Profile.cs (44) : foreach(string tabla in PrivilegesOn.Keys)
+Profile.cs (45) : {
+Profile.cs (46) : if (!other.PrivilegesOn.ContainsKey(tabla))
+Profile.cs (47) : {
+Profile.cs (48) : return false;
+Profile.cs (49) : }
+Profile.cs (50) : List<Privilege> listaMia = PrivilegesOn[tabla];
+Profile.cs (51) : List<Privilege> listaOtra = other.PrivilegesOn[tabla];
+Profile.cs (52) : if (!listaMia.SequenceEqual(listaOtra))
+Profile.cs (53) : {
+Profile.cs (54) : return false;
+Profile.cs (55) : }
+Profile.cs (56) : }
+Profile.cs (57) : return true;
+Profile.cs (58) : }
+Profile.cs (59) : return false;
+Profile.cs (60) : }
+User.cs (22) : public override bool Equals(object obj)
+User.cs (23) : {
+User.cs (24) : User other = (User)obj;
+User.cs (25) : if(Username.Equals(other.Username) && (EncryptedPassword.Equals(other.EncryptedPassword)))
+User.cs (26) : {
+User.cs (27) : return true;
+User.cs (28) : }
+User.cs (29) : return false;
+User.cs (30) : }

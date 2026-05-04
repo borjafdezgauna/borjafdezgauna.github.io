@@ -42,111 +42,121 @@ Database.cs (111) : Tables.Remove(tablaEliminada);
 Database.cs (112) : return true;
 Database.cs (113) : }
 Database.cs (114) : }
-Database.cs (121) : Table tablaEncontrada = null;
-Database.cs (123) : foreach (Table tabla in Tables)
-Database.cs (124) : {
-Database.cs (125) : if (tabla.Name == tableName)
-Database.cs (126) : if (tabla.Name == tableName)
-Database.cs (127) : {
-Database.cs (128) : tablaEncontrada = tabla;
-Database.cs (129) : tablaEncontrada = tabla;
-Database.cs (130) : }
-Database.cs (131) : }
-Database.cs (133) : if (tablaEncontrada == null)
-Database.cs (134) : {
-Database.cs (135) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (136) : return false;
-Database.cs (137) : }
-Database.cs (138) : else
+Database.cs (126) : Table tablaEncontrada = null;
+Database.cs (128) : foreach (Table tabla in Tables)
+Database.cs (129) : {
+Database.cs (130) : if (tabla.Name == tableName)
+Database.cs (131) : if (tabla.Name == tableName)
+Database.cs (132) : {
+Database.cs (133) : tablaEncontrada = tabla;
+Database.cs (134) : tablaEncontrada = tabla;
+Database.cs (135) : }
+Database.cs (136) : }
+Database.cs (138) : if (tablaEncontrada == null)
 Database.cs (139) : {
-Database.cs (140) : bool insercionCorrecta = tablaEncontrada.Insert(values);
-Database.cs (142) : if (insercionCorrecta == true)
-Database.cs (143) : {
-Database.cs (144) : LastErrorMessage = Constants.InsertSuccess;
-Database.cs (145) : return true;
-Database.cs (146) : }
-Database.cs (148) : else
-Database.cs (149) : {
-Database.cs (150) : LastErrorMessage = Constants.ColumnCountsDontMatch;
-Database.cs (151) : return false;
-Database.cs (152) : }
-Database.cs (153) : }
-Database.cs (257) : try
-Database.cs (258) : {
-Database.cs (259) : string filePath = databaseName + ".txt";
-Database.cs (261) : using (StreamWriter writer = new StreamWriter(filePath))
-Database.cs (262) : {
-Database.cs (263) : writer.WriteLine(Tables.Count);
-Database.cs (265) : foreach (Table table in Tables)
-Database.cs (266) : {
-Database.cs (267) : writer.WriteLine(table.Name);
-Database.cs (269) : writer.WriteLine(table.NumColumns());
-Database.cs (270) : for (int i = 0; i < table.NumColumns(); i++)
-Database.cs (271) : {
-Database.cs (272) : writer.WriteLine(table.GetColumn(i).AsText());
-Database.cs (273) : }
-Database.cs (275) : writer.WriteLine(table.NumRows());
-Database.cs (276) : for (int i = 0; i < table.NumRows(); i++)
-Database.cs (277) : {
-Database.cs (278) : writer.WriteLine(table.GetRow(i).AsText());
-Database.cs (279) : }
-Database.cs (280) : }
-Database.cs (281) : }
-Database.cs (283) : if (SecurityManager != null)
+Database.cs (140) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (141) : return false;
+Database.cs (142) : }
+Database.cs (143) : else
+Database.cs (144) : {
+Database.cs (145) : bool insercionCorrecta = tablaEncontrada.Insert(values);
+Database.cs (147) : if (insercionCorrecta == true)
+Database.cs (148) : {
+Database.cs (149) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (150) : return true;
+Database.cs (151) : }
+Database.cs (153) : else
+Database.cs (154) : {
+Database.cs (155) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (156) : return false;
+Database.cs (157) : }
+Database.cs (158) : }
+Database.cs (199) : if (!SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Delete))
+Database.cs (200) : {
+Database.cs (201) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (202) : return false;
+Database.cs (203) : }
+Database.cs (236) : if (!SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Update))
+Database.cs (237) : {
+Database.cs (238) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (239) : return false;
+Database.cs (240) : }
+Database.cs (283) : try
 Database.cs (284) : {
-Database.cs (285) : SecurityManager.Save(databaseName);
-Database.cs (286) : }
-Database.cs (288) : return true;
-Database.cs (289) : }
-Database.cs (290) : catch (Exception)
-Database.cs (291) : {
-Database.cs (292) : return false;
-Database.cs (293) : }
-Database.cs (302) : try
+Database.cs (285) : string filePath = databaseName + ".txt";
+Database.cs (287) : using (StreamWriter writer = new StreamWriter(filePath))
+Database.cs (288) : {
+Database.cs (289) : writer.WriteLine(Tables.Count);
+Database.cs (291) : foreach (Table table in Tables)
+Database.cs (292) : {
+Database.cs (293) : writer.WriteLine(table.Name);
+Database.cs (295) : writer.WriteLine(table.NumColumns());
+Database.cs (296) : for (int i = 0; i < table.NumColumns(); i++)
+Database.cs (297) : {
+Database.cs (298) : writer.WriteLine(table.GetColumn(i).AsText());
+Database.cs (299) : }
+Database.cs (301) : writer.WriteLine(table.NumRows());
+Database.cs (302) : for (int i = 0; i < table.NumRows(); i++)
 Database.cs (303) : {
-Database.cs (304) : string filePath = databaseName + ".txt";
-Database.cs (306) : if (!File.Exists(filePath))
-Database.cs (307) : {
-Database.cs (311) : Database db = new Database();
-Database.cs (313) : using (StreamReader reader = new StreamReader(filePath))
-Database.cs (314) : {
-Database.cs (315) : int numberOfTables = int.Parse(reader.ReadLine());
-Database.cs (317) : for (int t = 0; t < numberOfTables; t++)
-Database.cs (318) : {
-Database.cs (319) : string tableName = reader.ReadLine();
-Database.cs (321) : int numColumns = int.Parse(reader.ReadLine());
-Database.cs (322) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (323) : for (int c = 0; c < numColumns; c++)
-Database.cs (324) : {
-Database.cs (325) : string columnText = reader.ReadLine();
-Database.cs (326) : columns.Add(ColumnDefinition.Parse(columnText));
-Database.cs (327) : }
-Database.cs (329) : Table newTable = new Table(tableName, columns);
-Database.cs (331) : int numRows = int.Parse(reader.ReadLine());
-Database.cs (332) : for (int r = 0; r < numRows; r++)
+Database.cs (304) : writer.WriteLine(table.GetRow(i).AsText());
+Database.cs (305) : }
+Database.cs (306) : }
+Database.cs (307) : }
+Database.cs (309) : if (SecurityManager != null)
+Database.cs (310) : {
+Database.cs (311) : SecurityManager.Save(databaseName);
+Database.cs (312) : }
+Database.cs (314) : return true;
+Database.cs (315) : }
+Database.cs (316) : catch (Exception)
+Database.cs (317) : {
+Database.cs (318) : return false;
+Database.cs (319) : }
+Database.cs (328) : try
+Database.cs (329) : {
+Database.cs (330) : string filePath = databaseName + ".txt";
+Database.cs (332) : if (!File.Exists(filePath))
 Database.cs (333) : {
-Database.cs (334) : string rowText = reader.ReadLine();
-Database.cs (335) : newTable.AddRow(Row.Parse(columns, rowText));
-Database.cs (336) : }
-Database.cs (338) : db.Tables.Add(newTable);
-Database.cs (339) : }
-Database.cs (340) : }
-Database.cs (342) : db.m_username = username;
-Database.cs (343) : db.SecurityManager = DbManager.Security.Manager.Load(databaseName, username);
-Database.cs (345) : if (db.SecurityManager != null && db.SecurityManager.IsPasswordCorrect(username, password))
-Database.cs (346) : {
-Database.cs (347) : return db;
-Database.cs (348) : }
-Database.cs (349) : else
+Database.cs (337) : Database db = new Database();
+Database.cs (339) : using (StreamReader reader = new StreamReader(filePath))
+Database.cs (340) : {
+Database.cs (341) : int numberOfTables = int.Parse(reader.ReadLine());
+Database.cs (343) : for (int t = 0; t < numberOfTables; t++)
+Database.cs (344) : {
+Database.cs (345) : string tableName = reader.ReadLine();
+Database.cs (347) : int numColumns = int.Parse(reader.ReadLine());
+Database.cs (348) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (349) : for (int c = 0; c < numColumns; c++)
 Database.cs (350) : {
-Database.cs (351) : return null;
-Database.cs (352) : }
+Database.cs (351) : string columnText = reader.ReadLine();
+Database.cs (352) : columns.Add(ColumnDefinition.Parse(columnText));
 Database.cs (353) : }
-Database.cs (354) : catch (Exception)
-Database.cs (355) : {
-Database.cs (356) : return null;
-Database.cs (357) : }
-Database.cs (358) : }
+Database.cs (355) : Table newTable = new Table(tableName, columns);
+Database.cs (357) : int numRows = int.Parse(reader.ReadLine());
+Database.cs (358) : for (int r = 0; r < numRows; r++)
+Database.cs (359) : {
+Database.cs (360) : string rowText = reader.ReadLine();
+Database.cs (361) : newTable.AddRow(Row.Parse(columns, rowText));
+Database.cs (362) : }
+Database.cs (364) : db.Tables.Add(newTable);
+Database.cs (365) : }
+Database.cs (366) : }
+Database.cs (368) : db.m_username = username;
+Database.cs (369) : db.SecurityManager = DbManager.Security.Manager.Load(databaseName, username);
+Database.cs (371) : if (db.SecurityManager != null && db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (372) : {
+Database.cs (373) : return db;
+Database.cs (374) : }
+Database.cs (375) : else
+Database.cs (376) : {
+Database.cs (377) : return null;
+Database.cs (378) : }
+Database.cs (379) : }
+Database.cs (380) : catch (Exception)
+Database.cs (381) : {
+Database.cs (382) : return null;
+Database.cs (383) : }
+Database.cs (384) : }
 Table.cs (17) : Name = name;
 Table.cs (18) : ColumnDefinitions = columns;
 Table.cs (25) : if (i >= 0 && i < Rows.Count)

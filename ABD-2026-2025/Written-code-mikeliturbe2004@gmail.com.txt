@@ -91,14 +91,20 @@ CreateTable.cs (17) : Table = table;
 CreateTable.cs (18) : ColumnsParameters = columns;
 CreateTable.cs (26) : database.CreateTable(Table, ColumnsParameters);
 CreateTable.cs (27) : return database.LastErrorMessage;
-DeleteUser.cs (25) : if (database == null || database.SecurityManager == null)
-DeleteUser.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-DeleteUser.cs (28) : if (!database.SecurityManager.IsUserAdmin())
-DeleteUser.cs (29) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-DeleteUser.cs (31) : var user = database.SecurityManager.UserByName(Username);
-DeleteUser.cs (32) : if (user == null)
-DeleteUser.cs (33) : return Constants.UserDoesNotExistError;
-DeleteUser.cs (35) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (1) : using DbManager.Parser;
+DeleteUser.cs (2) : using DbManager.Security;
+DeleteUser.cs (26) : if (database == null || database.SecurityManager == null)
+DeleteUser.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (29) : if (!database.SecurityManager.IsUserAdmin())
+DeleteUser.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (32) : var user = database.SecurityManager.UserByName(Username);
+DeleteUser.cs (33) : if (user == null)
+DeleteUser.cs (34) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (36) : var profile = database.SecurityManager.ProfileByUser(Username);
+DeleteUser.cs (37) : if (profile == null)
+DeleteUser.cs (38) : return Constants.UserDoesNotExistError;
+DeleteUser.cs (40) : profile.Users.Remove(user);
+DeleteUser.cs (43) : return Constants.DeleteUserSuccess;
 DropTable.cs (15) : Table = table;
 DropTable.cs (23) : database.DropTable(Table);
 DropTable.cs (24) : return database.LastErrorMessage;
@@ -187,17 +193,19 @@ Revoke.cs (2) : using DbManager.Security;
 Revoke.cs (19) : this.PrivilegeName = privilegeName;
 Revoke.cs (20) : this.TableName = tableName;
 Revoke.cs (21) : this.ProfileName = profileName;
-Revoke.cs (29) : var profile = database.SecurityManager.ProfileByName(ProfileName);
-Revoke.cs (30) : if (profile == null)
-Revoke.cs (31) : return Constants.SecurityProfileDoesNotExistError;
-Revoke.cs (33) : var table = database.TableByName(TableName);
-Revoke.cs (34) : if (table == null)
-Revoke.cs (35) : return Constants.TableDoesNotExistError;
-Revoke.cs (37) : if (!Enum.TryParse<Privilege>(PrivilegeName, true, out var privilege))
-Revoke.cs (38) : return Constants.PrivilegeDoesNotExistError;
-Revoke.cs (40) : if (!database.SecurityManager.IsGrantedPrivilege(ProfileName, TableName, privilege))
-Revoke.cs (41) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Revoke.cs (43) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, privilege);
-Revoke.cs (45) : return Constants.RevokePrivilegeSuccess;
+Revoke.cs (29) : if (database == null || database.SecurityManager == null)
+Revoke.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (32) : if (!database.SecurityManager.IsUserAdmin())
+Revoke.cs (33) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (35) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+Revoke.cs (36) : if (profile == null)
+Revoke.cs (37) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (39) : var table = database.TableByName(TableName);
+Revoke.cs (40) : if (table == null)
+Revoke.cs (41) : return Constants.TableDoesNotExistError;
+Revoke.cs (43) : if (!Enum.TryParse(PrivilegeName, true, out Privilege privilege))
+Revoke.cs (44) : return Constants.PrivilegeDoesNotExistError;
+Revoke.cs (46) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, privilege);
+Revoke.cs (48) : return Constants.RevokePrivilegeSuccess;
 SetValue.cs (17) : this.ColumnName = column;
 User.cs (21) : public User() {}

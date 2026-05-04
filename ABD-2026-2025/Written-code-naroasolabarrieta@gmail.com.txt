@@ -122,23 +122,23 @@ Table.cs (326) : return result;
 Table.cs (327) : }
 AddUser.cs (1) : using DbManager.Parser;
 AddUser.cs (2) : using DbManager.Security;
-AddUser.cs (20) : this.Username = username;
-AddUser.cs (21) : this.Password = password;
-AddUser.cs (22) : this.ProfileName = profileName;
-AddUser.cs (29) : var profile = database.SecurityManager.ProfileByName(ProfileName);
-AddUser.cs (31) : if (profile == null)
-AddUser.cs (32) : {
+AddUser.cs (5) : using System.Linq;
+AddUser.cs (21) : this.Username = username;
+AddUser.cs (22) : this.Password = password;
+AddUser.cs (23) : this.ProfileName = profileName;
+AddUser.cs (30) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (32) : if (profile == null)
 AddUser.cs (33) : return Constants.SecurityProfileDoesNotExistError;
-AddUser.cs (34) : }
-AddUser.cs (35) : var existingUser = database.SecurityManager.UserByName(Username);
-AddUser.cs (36) : if (existingUser != null)
-AddUser.cs (37) : {
-AddUser.cs (38) : return Constants.Error + "User already exists";
-AddUser.cs (39) : }
+AddUser.cs (34) : foreach (var p in database.SecurityManager.Profiles)
+AddUser.cs (35) : {
+AddUser.cs (36) : if (p.Users.Any(u => u.Username == Username))
+AddUser.cs (37) : return Constants.Error + "User already exists";
+AddUser.cs (38) : }
 AddUser.cs (40) : User user = new User(Username, Password);
 AddUser.cs (41) : profile.Users.Add(user);
 AddUser.cs (43) : return Constants.AddUserSuccess;
-DeleteUser.cs (16) : this.Username = username;
+AddUser.cs (47) : }
+DeleteUser.cs (17) : this.Username = username;
 Grant.cs (1) : using DbManager.Parser;
 Grant.cs (2) : using DbManager.Security;
 Grant.cs (19) : this.PrivilegeName = privilegeName;
@@ -157,9 +157,9 @@ Grant.cs (37) : {
 Grant.cs (38) : return Constants.ProfileAlreadyHasPrivilege;
 Grant.cs (39) : }
 Grant.cs (41) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
-Grant.cs (43) : return Constants.GrantPrivilegeSuccess;
+Grant.cs (42) : return Constants.GrantPrivilegeSuccess;
 MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+(.+?)\s+FROM\s+(\w+)(?:\s+WHERE\s+(.*)\s*)?$";
-MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)(=|<>|<|>|<=|>=)('[^']*'|\d+))?$";
+MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*(<=|>=|<>|=|<|>)\s*('[^']*'|\d+))?\s*$";
 MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)(=|<>|<=|>=|<|>)('[^']*'|\d+(?:\.\d+)?))?\s*;?$";
 MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+([a-zA-Z]+)\s*$";
 MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(([a-zA-Z]+),([^,]+),([a-zA-Z]+)\)\s*$";
@@ -195,7 +195,7 @@ MiniSQLParser.cs (174) : foreach (string assignment in assignments)
 MiniSQLParser.cs (175) : {
 MiniSQLParser.cs (176) : var setMatch = Regex.Match(
 MiniSQLParser.cs (177) : assignment.Trim(),
-MiniSQLParser.cs (178) : @"^(\w+)=('[^']*'|\d+)$"
+MiniSQLParser.cs (178) : @"^(\w+)\s*=\s*('[^']*'|\d+)$"
 MiniSQLParser.cs (179) : );
 MiniSQLParser.cs (181) : if (!setMatch.Success)
 MiniSQLParser.cs (182) : return null;
@@ -266,39 +266,34 @@ Update.cs (27) : if (result)
 Update.cs (28) : return Constants.UpdateSuccess;
 Update.cs (29) : else
 Update.cs (30) : return database.LastErrorMessage;
-Manager.cs (19) : if (ProfileByName("admin") == null)
-Manager.cs (20) : {
-Manager.cs (21) : var adminProfile = new Profile()
-Manager.cs (22) : {
-Manager.cs (23) : Name = "admin"
-Manager.cs (24) : };
-Manager.cs (25) : adminProfile.Users.Add(new User("admin", Encryption.Encrypt("admin")));
-Manager.cs (26) : Profiles.Add(adminProfile);
-Manager.cs (27) : }
-Manager.cs (34) : return m_username.Equals("admin", StringComparison.OrdinalIgnoreCase);
-Manager.cs (42) : User user = UserByName(username);
-Manager.cs (44) : if (user == null)
-Manager.cs (47) : string encryptedPassword = Encryption.Encrypt(password);
-Manager.cs (48) : return user.EncryptedPassword.Equals(encryptedPassword);
-Manager.cs (55) : var profile = ProfileByName(profileName);
-Manager.cs (56) : if (profile == null) return;
-Manager.cs (57) : if (profile.IsGrantedPrivilege(table, privilege))
-Manager.cs (58) : return;
-Manager.cs (60) : profile.GrantPrivilege(table, privilege);
-Manager.cs (61) : }
-Manager.cs (75) : if (IsUserAdmin()) return true;
-Manager.cs (76) : var profile = ProfileByUser(username);
-Manager.cs (77) : if (profile == null) return false;
-Manager.cs (78) : return profile.IsGrantedPrivilege(table, privilege);
-Manager.cs (85) : Profiles.Add(profile);
-Manager.cs (93) : foreach (var profile in Profiles)
-Manager.cs (94) : {
-Manager.cs (95) : var user = profile.Users.FirstOrDefault(u => u.Username == username);
-Manager.cs (96) : if (user != null)
-Manager.cs (97) : return user;
-Manager.cs (98) : }
-Manager.cs (109) : return Profiles.FirstOrDefault(p => p.Name == profileName);
-Manager.cs (117) : return Profiles.FirstOrDefault(p => p.Users.Any(u => u.Username == username));
+Manager.cs (14) : if (ProfileByName("admin") == null)
+Manager.cs (15) : {
+Manager.cs (16) : var adminProfile = new Profile()
+Manager.cs (17) : {
+Manager.cs (18) : Name = "admin"
+Manager.cs (19) : };
+Manager.cs (20) : adminProfile.Users.Add(new User("admin", Encryption.Encrypt("admin")));
+Manager.cs (21) : Profiles.Add(adminProfile);
+Manager.cs (22) : }
+Manager.cs (29) : return m_username.Equals("admin", StringComparison.OrdinalIgnoreCase);
+Manager.cs (37) : User user = UserByName(username);
+Manager.cs (39) : if (user == null)
+Manager.cs (42) : string encryptedPassword = Encryption.Encrypt(password);
+Manager.cs (43) : return user.EncryptedPassword.Equals(encryptedPassword);
+Manager.cs (50) : var profile = ProfileByName(profileName);
+Manager.cs (51) : if (profile == null) return;
+Manager.cs (52) : if (profile.IsGrantedPrivilege(table, privilege))
+Manager.cs (53) : return;
+Manager.cs (55) : profile.GrantPrivilege(table, privilege);
+Manager.cs (56) : }
+Manager.cs (70) : if (IsUserAdmin()) return true;
+Manager.cs (71) : var profile = ProfileByUser(username);
+Manager.cs (72) : if (profile == null) return false;
+Manager.cs (73) : return profile.IsGrantedPrivilege(table, privilege);
+Manager.cs (80) : Profiles.Add(profile);
+Manager.cs (97) : return null;
+Manager.cs (103) : return null;
+Manager.cs (122) : return null;
 Profile.cs (20) : string tableName = table.ToUpper();
 Profile.cs (22) : if (!PrivilegesOn.ContainsKey(tableName))
 Profile.cs (24) : PrivilegesOn[tableName] = new List<Privilege>();
