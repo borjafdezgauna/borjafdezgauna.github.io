@@ -72,10 +72,34 @@ Database.cs (180) : LastErrorMessage = Constants.ColumnDoesNotExistError;
 Database.cs (181) : return null;
 Database.cs (182) : }
 Database.cs (185) : return TablaRes;
-CreateSecurityProfile.cs (16) : ProfileName = profileName;
-DropSecurityProfile.cs (16) : ProfileName = profileName;
-DropSecurityProfile.cs (24) : //      bool resultadoDrop = database.(ProfileName);
-DropSecurityProfile.cs (26) : //    return resultadoDrop.ToString();
+CreateSecurityProfile.cs (5) : using DbManager.Security;
+CreateSecurityProfile.cs (17) : ProfileName = profileName;
+CreateSecurityProfile.cs (25) : if (!database.SecurityManager.IsUserAdmin())
+CreateSecurityProfile.cs (26) : {
+CreateSecurityProfile.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+CreateSecurityProfile.cs (28) : }
+CreateSecurityProfile.cs (30) : if (database.SecurityManager.ProfileByName(ProfileName) != null)
+CreateSecurityProfile.cs (31) : {
+CreateSecurityProfile.cs (33) : return Constants.ProfileAlreadyHasPrivilege;
+CreateSecurityProfile.cs (34) : }
+CreateSecurityProfile.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+CreateSecurityProfile.cs (38) : database.SecurityManager.AddProfile(profile);
+CreateSecurityProfile.cs (40) : return Constants.CreateSecurityProfileSuccess;
+DropSecurityProfile.cs (3) : using System.Reflection.Metadata.Ecma335;
+DropSecurityProfile.cs (17) : ProfileName = profileName;
+DropSecurityProfile.cs (25) : if (database.SecurityManager.IsUserAdmin() == false)
+DropSecurityProfile.cs (26) : {
+DropSecurityProfile.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (30) : }
+DropSecurityProfile.cs (32) : bool exito = database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (34) : if (exito)
+DropSecurityProfile.cs (35) : {
+DropSecurityProfile.cs (37) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (40) : else
+DropSecurityProfile.cs (41) : {
+DropSecurityProfile.cs (42) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (43) : }
+DropSecurityProfile.cs (48) : }
 MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*"; //mikel
 MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"DROP\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*"; //mikel
 MiniSQLParser.cs (103) : {

@@ -158,9 +158,7 @@ Grant.cs (38) : return Constants.ProfileAlreadyHasPrivilege;
 Grant.cs (39) : }
 Grant.cs (41) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
 Grant.cs (42) : return Constants.GrantPrivilegeSuccess;
-MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+(.+?)\s+FROM\s+(\w+)(?:\s+WHERE\s+(.*)\s*)?$";
 MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*(<=|>=|<>|=|<|>)\s*('[^']*'|\d+))?\s*$";
-MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)(=|<>|<=|>=|<|>)('[^']*'|\d+(?:\.\d+)?))?\s*;?$";
 MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+([a-zA-Z]+)\s*$";
 MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(([a-zA-Z]+),([^,]+),([a-zA-Z]+)\)\s*$";
 MiniSQLParser.cs (51) : var newSelect = new Select();
@@ -235,28 +233,27 @@ MiniSQLParser.cs (221) : condition = new Condition(col, op, val);
 MiniSQLParser.cs (222) : }
 MiniSQLParser.cs (224) : return new Update(table, values, condition);
 MiniSQLParser.cs (225) : }
-MiniSQLParser.cs (233) : if (match.Groups[2].Success && !string.IsNullOrWhiteSpace(match.Groups[2].Value))
-MiniSQLParser.cs (247) : //ADDUSER
-MiniSQLParser.cs (249) : if (match.Success)
-MiniSQLParser.cs (250) : {
-MiniSQLParser.cs (251) : string user = match.Groups[1].Value;
-MiniSQLParser.cs (252) : string pass = match.Groups[2].Value;
-MiniSQLParser.cs (253) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (254) : return new AddUser(user, pass, profile);
-MiniSQLParser.cs (255) : }
-MiniSQLParser.cs (257) : //CREATESECURITYPROFILE
-MiniSQLParser.cs (265) : //DELETEUSER
-MiniSQLParser.cs (274) : //DROPSECURITYPROFILE
-MiniSQLParser.cs (282) : //GRANT
-MiniSQLParser.cs (284) : if (match.Success)
-MiniSQLParser.cs (285) : {
-MiniSQLParser.cs (286) : string privilege = match.Groups[1].Value;
-MiniSQLParser.cs (287) : string table = match.Groups[2].Value;
-MiniSQLParser.cs (288) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (290) : return new Grant(privilege, table, profile);
-MiniSQLParser.cs (291) : }
-MiniSQLParser.cs (293) : //REVOKE
-MiniSQLParser.cs (304) : return null;
+MiniSQLParser.cs (245) : //ADDUSER
+MiniSQLParser.cs (247) : if (match.Success)
+MiniSQLParser.cs (248) : {
+MiniSQLParser.cs (249) : string user = match.Groups[1].Value;
+MiniSQLParser.cs (250) : string pass = match.Groups[2].Value;
+MiniSQLParser.cs (251) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (252) : return new AddUser(user, pass, profile);
+MiniSQLParser.cs (253) : }
+MiniSQLParser.cs (255) : //CREATESECURITYPROFILE
+MiniSQLParser.cs (263) : //DELETEUSER
+MiniSQLParser.cs (272) : //DROPSECURITYPROFILE
+MiniSQLParser.cs (280) : //GRANT
+MiniSQLParser.cs (282) : if (match.Success)
+MiniSQLParser.cs (283) : {
+MiniSQLParser.cs (284) : string privilege = match.Groups[1].Value;
+MiniSQLParser.cs (285) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (286) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (288) : return new Grant(privilege, table, profile);
+MiniSQLParser.cs (289) : }
+MiniSQLParser.cs (291) : //REVOKE
+MiniSQLParser.cs (302) : return null;
 SetValue.cs (18) : this.Value = value;
 Update.cs (15) : this.Table = table;
 Update.cs (16) : this.Columns = columnNames;
@@ -266,16 +263,16 @@ Update.cs (27) : if (result)
 Update.cs (28) : return Constants.UpdateSuccess;
 Update.cs (29) : else
 Update.cs (30) : return database.LastErrorMessage;
-Manager.cs (14) : if (ProfileByName("admin") == null)
-Manager.cs (15) : {
-Manager.cs (16) : var adminProfile = new Profile()
-Manager.cs (17) : {
-Manager.cs (18) : Name = "admin"
-Manager.cs (19) : };
-Manager.cs (20) : adminProfile.Users.Add(new User("admin", Encryption.Encrypt("admin")));
-Manager.cs (21) : Profiles.Add(adminProfile);
-Manager.cs (22) : }
-Manager.cs (29) : return m_username.Equals("admin", StringComparison.OrdinalIgnoreCase);
+Manager.cs (15) : if (ProfileByName("admin") == null)
+Manager.cs (16) : {
+Manager.cs (17) : var adminProfile = new Profile()
+Manager.cs (18) : {
+Manager.cs (19) : Name = "admin"
+Manager.cs (20) : };
+Manager.cs (21) : adminProfile.Users.Add(new User("admin", Encryption.Encrypt("admin")));
+Manager.cs (22) : Profiles.Add(adminProfile);
+Manager.cs (23) : }
+Manager.cs (30) : return m_username.Equals("admin", StringComparison.OrdinalIgnoreCase);
 Manager.cs (37) : User user = UserByName(username);
 Manager.cs (39) : if (user == null)
 Manager.cs (42) : string encryptedPassword = Encryption.Encrypt(password);

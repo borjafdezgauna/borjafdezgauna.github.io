@@ -28,44 +28,42 @@ Table.cs (5) : using System.Linq;
 Table.cs (37) : if (row.Values == null || row.Values.Count != ColumnDefinitions.Count) { return; }
 Table.cs (175) : if (columnNames == null) columnNames = ColumnDefinitions.Select(c => c.Name).ToList();
 Table.cs (185) : if (originalCol == null) continue;
-Server.cs (22) : try
-Server.cs (23) : {
-Server.cs (24) : DbManager.Database serverDatabase = new Database("admin", "adminPassword");
-Server.cs (25) : //Listen on port 1200. Accept connections from any IP address
-Server.cs (26) : TcpListener server = new TcpListener(IPAddress.Parse("0.0.0.0"), 1200);
-Server.cs (28) : server.Start();
-Server.cs (30) : //("Server running and listening on port 1200");
-Server.cs (32) : Socket socket = server.AcceptSocket();
-Server.cs (34) : //("Connection accepted from " + socket.RemoteEndPoint);
-Server.cs (36) : bool trueFalse = true;
-Server.cs (37) : while (trueFalse == true)
-Server.cs (38) : {
-Server.cs (39) : byte[] buffer = new byte[100];
-Server.cs (40) : int bytesRead = socket.Receive(buffer);
-Server.cs (41) : buffer[bytesRead] = 0;
-Server.cs (42) : ASCIIEncoding encoding = new ASCIIEncoding();
-Server.cs (43) : string clientMessage = encoding.GetString(buffer).Substring(0, bytesRead);
-Server.cs (45) : //("Message received from client: " + clientMessage);
-Server.cs (46) : if (clientMessage == "Exit")
-Server.cs (47) : {
-Server.cs (48) : trueFalse = false;
-Server.cs (49) : }
-Server.cs (50) : else
-Server.cs (51) : {
-Server.cs (52) : string clientResult = serverDatabase.ExecuteMiniSQLQuery(clientMessage);
-Server.cs (53) : socket.Send(encoding.GetBytes(clientResult));
-Server.cs (54) : }
-Server.cs (55) : }
-Server.cs (57) : Task.Delay(2000).Wait();
-Server.cs (59) : socket.Close();
-Server.cs (60) : server.Stop();
-Server.cs (62) : //("Server closed. Press any key to finish...");
-Server.cs (63) : Console.ReadKey();
-Server.cs (64) : }
-Server.cs (65) : catch (Exception e)
-Server.cs (66) : {
-Server.cs (67) : //("Unhandled error: " + e);
-Server.cs (68) : }
+Server.cs (24) : try
+Server.cs (25) : {
+Server.cs (26) : DbManager.Database serverDatabase = new Database("admin", "adminPassword");
+Server.cs (27) : //Listen on port 1200. Accept connections from any IP address
+Server.cs (30) : server.Start();
+Server.cs (32) : //("Server running and listening on port 1200");
+Server.cs (34) : Socket socket = server.AcceptSocket();
+Server.cs (36) : //("Connection accepted from " + socket.RemoteEndPoint);
+Server.cs (38) : bool trueFalse = true;
+Server.cs (39) : while (trueFalse == true)
+Server.cs (40) : {
+Server.cs (41) : byte[] buffer = new byte[100];
+Server.cs (42) : int bytesRead = socket.Receive(buffer);
+Server.cs (43) : buffer[bytesRead] = 0;
+Server.cs (44) : ASCIIEncoding encoding = new ASCIIEncoding();
+Server.cs (45) : string clientMessage = encoding.GetString(buffer).Substring(0, bytesRead);
+Server.cs (47) : //("Message received from client: " + clientMessage);
+Server.cs (49) : {
+Server.cs (50) : trueFalse = false;
+Server.cs (51) : }
+Server.cs (52) : else
+Server.cs (53) : {
+Server.cs (54) : string clientResult = serverDatabase.ExecuteMiniSQLQuery(clientMessage);
+Server.cs (55) : socket.Send(encoding.GetBytes(clientResult));
+Server.cs (56) : }
+Server.cs (57) : }
+Server.cs (59) : Task.Delay(2000).Wait();
+Server.cs (61) : socket.Close();
+Server.cs (62) : server.Stop();
+Server.cs (64) : //("Server closed. Press any key to finish...");
+Server.cs (65) : Console.ReadKey();
+Server.cs (66) : }
+Server.cs (67) : catch (Exception e)
+Server.cs (68) : {
+Server.cs (69) : //("Unhandled error: " + e);
+Server.cs (70) : }
 AddUser.cs (20) : Username = username;
 AddUser.cs (21) : Password = password;
 AddUser.cs (22) : ProfileName = profileName;
@@ -110,52 +108,52 @@ MiniSQLParser.cs (223) : }
 Revoke.cs (19) : PrivilegeName = privilegeName;
 Revoke.cs (20) : TableName = tableName;
 Revoke.cs (21) : ProfileName = profileName;
-Manager.cs (190) : var securityFile = databaseName + ".security";
-Manager.cs (191) : if (!File.Exists(securityFile)) return null;
-Manager.cs (193) : var manager = new Manager(username);
-Manager.cs (194) : Profile currentProfile = null;
-Manager.cs (196) : using (var reader = File.OpenText(securityFile))
-Manager.cs (197) : {
-Manager.cs (198) : string line;
-Manager.cs (199) : while ((line = reader.ReadLine()) != null)
-Manager.cs (200) : {
-Manager.cs (201) : if (line.StartsWith("PROFILE:"))
-Manager.cs (202) : {
-Manager.cs (203) : currentProfile = new Profile { Name = line.Substring("PROFILE:".Length) };
-Manager.cs (204) : manager.Profiles.Add(currentProfile);
-Manager.cs (205) : }
-Manager.cs (206) : else if (line.StartsWith("USER:") && currentProfile != null)
-Manager.cs (207) : {
-Manager.cs (208) : var parts = line.Substring("USER:".Length).Split(':', 2);
-Manager.cs (209) : currentProfile.Users.Add(new User { Username = parts[0], EncryptedPassword = parts[1] });
-Manager.cs (210) : }
-Manager.cs (211) : else if (line.StartsWith("PRIVILEGE:") && currentProfile != null)
-Manager.cs (212) : {
-Manager.cs (213) : var rest = line.Substring("PRIVILEGE:".Length);
-Manager.cs (214) : var colonIdx = rest.IndexOf(':');
-Manager.cs (215) : var tableName = rest.Substring(0, colonIdx);
-Manager.cs (216) : var privilegeNames = rest.Substring(colonIdx + 1).Split(',', StringSplitOptions.RemoveEmptyEntries);
-Manager.cs (217) : foreach (var privName in privilegeNames)
-Manager.cs (218) : {
-Manager.cs (219) : if (Enum.TryParse<Privilege>(privName, out var priv))
-Manager.cs (220) : currentProfile.GrantPrivilege(tableName, priv);
-Manager.cs (221) : }
+Manager.cs (191) : var securityFile = databaseName + ".security";
+Manager.cs (192) : if (!File.Exists(securityFile)) return null;
+Manager.cs (194) : var manager = new Manager(username);
+Manager.cs (195) : Profile currentProfile = null;
+Manager.cs (197) : using (var reader = File.OpenText(securityFile))
+Manager.cs (198) : {
+Manager.cs (199) : string line;
+Manager.cs (200) : while ((line = reader.ReadLine()) != null)
+Manager.cs (201) : {
+Manager.cs (202) : if (line.StartsWith("PROFILE:"))
+Manager.cs (203) : {
+Manager.cs (204) : currentProfile = new Profile { Name = line.Substring("PROFILE:".Length) };
+Manager.cs (205) : manager.Profiles.Add(currentProfile);
+Manager.cs (206) : }
+Manager.cs (207) : else if (line.StartsWith("USER:") && currentProfile != null)
+Manager.cs (208) : {
+Manager.cs (209) : var parts = line.Substring("USER:".Length).Split(':', 2);
+Manager.cs (210) : currentProfile.Users.Add(new User { Username = parts[0], EncryptedPassword = parts[1] });
+Manager.cs (211) : }
+Manager.cs (212) : else if (line.StartsWith("PRIVILEGE:") && currentProfile != null)
+Manager.cs (213) : {
+Manager.cs (214) : var rest = line.Substring("PRIVILEGE:".Length);
+Manager.cs (215) : var colonIdx = rest.IndexOf(':');
+Manager.cs (216) : var tableName = rest.Substring(0, colonIdx);
+Manager.cs (217) : var privilegeNames = rest.Substring(colonIdx + 1).Split(',', StringSplitOptions.RemoveEmptyEntries);
+Manager.cs (218) : foreach (var privName in privilegeNames)
+Manager.cs (219) : {
+Manager.cs (220) : if (Enum.TryParse<Privilege>(privName, out var priv))
+Manager.cs (221) : currentProfile.GrantPrivilege(tableName, priv);
 Manager.cs (222) : }
 Manager.cs (223) : }
 Manager.cs (224) : }
-Manager.cs (225) : return manager;
-Manager.cs (230) : using (var writer = File.CreateText(databaseName + ".security"))
-Manager.cs (231) : {
-Manager.cs (232) : foreach (var profile in Profiles)
-Manager.cs (233) : {
-Manager.cs (234) : writer.WriteLine("PROFILE:" + profile.Name);
-Manager.cs (235) : foreach (var user in profile.Users)
-Manager.cs (236) : {
-Manager.cs (237) : writer.WriteLine("USER:" + user.Username + ":" + user.EncryptedPassword);
-Manager.cs (238) : }
-Manager.cs (239) : foreach (var entry in profile.PrivilegesOn)
-Manager.cs (240) : {
-Manager.cs (252) : writer.WriteLine("PRIVILEGE:" + entry.Key + ":" + privileges);
-Manager.cs (253) : }
+Manager.cs (225) : }
+Manager.cs (226) : return manager;
+Manager.cs (231) : using (var writer = File.CreateText(databaseName + ".security"))
+Manager.cs (232) : {
+Manager.cs (233) : foreach (var profile in Profiles)
+Manager.cs (234) : {
+Manager.cs (235) : writer.WriteLine("PROFILE:" + profile.Name);
+Manager.cs (236) : foreach (var user in profile.Users)
+Manager.cs (237) : {
+Manager.cs (238) : writer.WriteLine("USER:" + user.Username + ":" + user.EncryptedPassword);
+Manager.cs (239) : }
+Manager.cs (240) : foreach (var entry in profile.PrivilegesOn)
+Manager.cs (241) : {
+Manager.cs (253) : writer.WriteLine("PRIVILEGE:" + entry.Key + ":" + privileges);
 Manager.cs (254) : }
 Manager.cs (255) : }
+Manager.cs (256) : }
