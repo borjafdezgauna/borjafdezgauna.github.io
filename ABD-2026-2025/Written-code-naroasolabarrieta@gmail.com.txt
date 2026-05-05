@@ -158,7 +158,7 @@ Grant.cs (38) : return Constants.ProfileAlreadyHasPrivilege;
 Grant.cs (39) : }
 Grant.cs (41) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
 Grant.cs (42) : return Constants.GrantPrivilegeSuccess;
-MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*(<=|>=|<>|=|<|>)\s*('[^']*'|\d+))?\s*$";
+MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)(<=|>=|<>|=|<|>)('[^']+'|\d+))?\s*$";
 MiniSQLParser.cs (32) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(\w+)\s+TO\s+([a-zA-Z]+)\s*$";
 MiniSQLParser.cs (36) : const string addUserPattern = @"^ADD\s+USER\s*\(([a-zA-Z]+),([^,]+),([a-zA-Z]+)\)\s*$";
 MiniSQLParser.cs (51) : var newSelect = new Select();
@@ -181,7 +181,7 @@ MiniSQLParser.cs (75) : conditionsParse = new Condition(col, op, val);
 MiniSQLParser.cs (76) : }
 MiniSQLParser.cs (77) : }
 MiniSQLParser.cs (80) : return new Select(tableSelect, columnsSelect.ToList(), conditionsParse);
-MiniSQLParser.cs (164) : //UPDATE
+MiniSQLParser.cs (164) : // UPDATE
 MiniSQLParser.cs (165) : match = Regex.Match(miniSQLQuery, updateTablePattern);
 MiniSQLParser.cs (166) : if (match.Success)
 MiniSQLParser.cs (167) : {
@@ -191,69 +191,71 @@ MiniSQLParser.cs (171) : List<SetValue> values = new List<SetValue>();
 MiniSQLParser.cs (172) : string[] assignments = setText.Split(',');
 MiniSQLParser.cs (174) : foreach (string assignment in assignments)
 MiniSQLParser.cs (175) : {
-MiniSQLParser.cs (176) : var setMatch = Regex.Match(
-MiniSQLParser.cs (177) : assignment.Trim(),
-MiniSQLParser.cs (178) : @"^(\w+)\s*=\s*('[^']*'|\d+)$"
-MiniSQLParser.cs (179) : );
-MiniSQLParser.cs (181) : if (!setMatch.Success)
-MiniSQLParser.cs (182) : return null;
-MiniSQLParser.cs (184) : string column = setMatch.Groups[1].Value;
-MiniSQLParser.cs (185) : string rawValue = setMatch.Groups[2].Value;
-MiniSQLParser.cs (186) : if (rawValue.StartsWith("'"))
-MiniSQLParser.cs (187) : {
-MiniSQLParser.cs (188) : if (!rawValue.EndsWith("'"))
-MiniSQLParser.cs (189) : return null;
-MiniSQLParser.cs (190) : }
-MiniSQLParser.cs (191) : else
-MiniSQLParser.cs (192) : {
-MiniSQLParser.cs (193) : if (!Regex.IsMatch(rawValue, @"^\d+$"))
-MiniSQLParser.cs (194) : return null;
-MiniSQLParser.cs (195) : }
-MiniSQLParser.cs (197) : string value = rawValue.Trim('\'');
-MiniSQLParser.cs (199) : values.Add(new SetValue(column, value));
-MiniSQLParser.cs (200) : }
-MiniSQLParser.cs (202) : Condition condition = null;
-MiniSQLParser.cs (203) : if (match.Groups[3].Success)
-MiniSQLParser.cs (204) : {
-MiniSQLParser.cs (205) : string col = match.Groups[3].Value;
-MiniSQLParser.cs (206) : string op = match.Groups[4].Value;
-MiniSQLParser.cs (207) : string rawVal = match.Groups[5].Value;
-MiniSQLParser.cs (208) : if (rawVal.StartsWith("'"))
-MiniSQLParser.cs (209) : {
-MiniSQLParser.cs (210) : if (!rawVal.EndsWith("'"))
-MiniSQLParser.cs (211) : return null;
-MiniSQLParser.cs (212) : }
-MiniSQLParser.cs (213) : else
-MiniSQLParser.cs (214) : {
-MiniSQLParser.cs (215) : if (!Regex.IsMatch(rawVal, @"^\d+$"))
-MiniSQLParser.cs (216) : return null;
-MiniSQLParser.cs (217) : }
-MiniSQLParser.cs (219) : string val = rawVal.Trim('\'');
-MiniSQLParser.cs (221) : condition = new Condition(col, op, val);
-MiniSQLParser.cs (222) : }
-MiniSQLParser.cs (224) : return new Update(table, values, condition);
-MiniSQLParser.cs (225) : }
-MiniSQLParser.cs (245) : //ADDUSER
-MiniSQLParser.cs (247) : if (match.Success)
-MiniSQLParser.cs (248) : {
-MiniSQLParser.cs (249) : string user = match.Groups[1].Value;
-MiniSQLParser.cs (250) : string pass = match.Groups[2].Value;
-MiniSQLParser.cs (251) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (252) : return new AddUser(user, pass, profile);
-MiniSQLParser.cs (253) : }
-MiniSQLParser.cs (255) : //CREATESECURITYPROFILE
-MiniSQLParser.cs (263) : //DELETEUSER
-MiniSQLParser.cs (272) : //DROPSECURITYPROFILE
-MiniSQLParser.cs (280) : //GRANT
-MiniSQLParser.cs (282) : if (match.Success)
-MiniSQLParser.cs (283) : {
-MiniSQLParser.cs (284) : string privilege = match.Groups[1].Value;
-MiniSQLParser.cs (285) : string table = match.Groups[2].Value;
-MiniSQLParser.cs (286) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (288) : return new Grant(privilege, table, profile);
-MiniSQLParser.cs (289) : }
-MiniSQLParser.cs (291) : //REVOKE
-MiniSQLParser.cs (302) : return null;
+MiniSQLParser.cs (176) : if (assignment.StartsWith(" ") || assignment.EndsWith(" "))
+MiniSQLParser.cs (177) : return null;
+MiniSQLParser.cs (179) : var setMatch = Regex.Match(
+MiniSQLParser.cs (180) : assignment,
+MiniSQLParser.cs (181) : @"^(\w+)=('[^']*'|\d+)$"
+MiniSQLParser.cs (182) : );
+MiniSQLParser.cs (184) : if (!setMatch.Success)
+MiniSQLParser.cs (185) : return null;
+MiniSQLParser.cs (187) : string column = setMatch.Groups[1].Value;
+MiniSQLParser.cs (188) : string rawValue = setMatch.Groups[2].Value;
+MiniSQLParser.cs (189) : if (rawValue.StartsWith("'"))
+MiniSQLParser.cs (190) : {
+MiniSQLParser.cs (191) : if (!rawValue.EndsWith("'"))
+MiniSQLParser.cs (192) : return null;
+MiniSQLParser.cs (193) : }
+MiniSQLParser.cs (194) : else
+MiniSQLParser.cs (195) : {
+MiniSQLParser.cs (196) : if (!Regex.IsMatch(rawValue, @"^\d+$"))
+MiniSQLParser.cs (197) : return null;
+MiniSQLParser.cs (198) : }
+MiniSQLParser.cs (200) : string value = rawValue.Trim('\'');
+MiniSQLParser.cs (202) : values.Add(new SetValue(column, value));
+MiniSQLParser.cs (203) : }
+MiniSQLParser.cs (205) : Condition condition = null;
+MiniSQLParser.cs (207) : if (match.Groups[3].Success)
+MiniSQLParser.cs (208) : {
+MiniSQLParser.cs (209) : string col = match.Groups[3].Value;
+MiniSQLParser.cs (210) : string op = match.Groups[4].Value;
+MiniSQLParser.cs (211) : string rawVal = match.Groups[5].Value;
+MiniSQLParser.cs (212) : if (rawVal.StartsWith("'"))
+MiniSQLParser.cs (213) : {
+MiniSQLParser.cs (214) : if (!rawVal.EndsWith("'"))
+MiniSQLParser.cs (215) : return null;
+MiniSQLParser.cs (216) : }
+MiniSQLParser.cs (217) : else
+MiniSQLParser.cs (218) : {
+MiniSQLParser.cs (219) : if (!Regex.IsMatch(rawVal, @"^\d+$"))
+MiniSQLParser.cs (220) : return null;
+MiniSQLParser.cs (221) : }
+MiniSQLParser.cs (223) : string val = rawVal.Trim('\'');
+MiniSQLParser.cs (225) : condition = new Condition(col, op, val);
+MiniSQLParser.cs (226) : }
+MiniSQLParser.cs (228) : return new Update(table, values, condition);
+MiniSQLParser.cs (229) : }
+MiniSQLParser.cs (249) : //ADDUSER
+MiniSQLParser.cs (251) : if (match.Success)
+MiniSQLParser.cs (252) : {
+MiniSQLParser.cs (253) : string user = match.Groups[1].Value;
+MiniSQLParser.cs (254) : string pass = match.Groups[2].Value;
+MiniSQLParser.cs (255) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (256) : return new AddUser(user, pass, profile);
+MiniSQLParser.cs (257) : }
+MiniSQLParser.cs (259) : //CREATESECURITYPROFILE
+MiniSQLParser.cs (267) : //DELETEUSER
+MiniSQLParser.cs (276) : //DROPSECURITYPROFILE
+MiniSQLParser.cs (284) : //GRANT
+MiniSQLParser.cs (286) : if (match.Success)
+MiniSQLParser.cs (287) : {
+MiniSQLParser.cs (288) : string privilege = match.Groups[1].Value;
+MiniSQLParser.cs (289) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (290) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (292) : return new Grant(privilege, table, profile);
+MiniSQLParser.cs (293) : }
+MiniSQLParser.cs (295) : //REVOKE
+MiniSQLParser.cs (306) : return null;
 SetValue.cs (18) : this.Value = value;
 Update.cs (15) : this.Table = table;
 Update.cs (16) : this.Columns = columnNames;
@@ -263,34 +265,85 @@ Update.cs (27) : if (result)
 Update.cs (28) : return Constants.UpdateSuccess;
 Update.cs (29) : else
 Update.cs (30) : return database.LastErrorMessage;
-Manager.cs (15) : if (ProfileByName("admin") == null)
-Manager.cs (16) : {
-Manager.cs (17) : var adminProfile = new Profile()
-Manager.cs (18) : {
-Manager.cs (19) : Name = "admin"
-Manager.cs (20) : };
-Manager.cs (21) : adminProfile.Users.Add(new User("admin", Encryption.Encrypt("admin")));
-Manager.cs (22) : Profiles.Add(adminProfile);
-Manager.cs (23) : }
-Manager.cs (30) : return m_username.Equals("admin", StringComparison.OrdinalIgnoreCase);
-Manager.cs (37) : User user = UserByName(username);
-Manager.cs (39) : if (user == null)
-Manager.cs (42) : string encryptedPassword = Encryption.Encrypt(password);
-Manager.cs (43) : return user.EncryptedPassword.Equals(encryptedPassword);
-Manager.cs (50) : var profile = ProfileByName(profileName);
-Manager.cs (51) : if (profile == null) return;
-Manager.cs (52) : if (profile.IsGrantedPrivilege(table, privilege))
-Manager.cs (53) : return;
-Manager.cs (55) : profile.GrantPrivilege(table, privilege);
-Manager.cs (56) : }
-Manager.cs (70) : if (IsUserAdmin()) return true;
-Manager.cs (71) : var profile = ProfileByUser(username);
-Manager.cs (72) : if (profile == null) return false;
-Manager.cs (73) : return profile.IsGrantedPrivilege(table, privilege);
-Manager.cs (80) : Profiles.Add(profile);
-Manager.cs (97) : return null;
-Manager.cs (103) : return null;
-Manager.cs (122) : return null;
+Manager.cs (20) : if (ProfileByName("admin") == null)
+Manager.cs (21) : {
+Manager.cs (22) : var adminProfile = new Profile()
+Manager.cs (23) : {
+Manager.cs (24) : Name = "admin"
+Manager.cs (25) : };
+Manager.cs (26) : adminProfile.Users.Add(new User("admin", Encryption.Encrypt("admin")));
+Manager.cs (27) : Profiles.Add(adminProfile);
+Manager.cs (28) : }
+Manager.cs (34) : return m_username.Equals("admin", StringComparison.OrdinalIgnoreCase);
+Manager.cs (40) : User user = UserByName(username);
+Manager.cs (42) : if (user == null)
+Manager.cs (45) : string encryptedPassword = Encryption.Encrypt(password);
+Manager.cs (46) : return user.EncryptedPassword.Equals(encryptedPassword);
+Manager.cs (52) : var profile = ProfileByName(profileName);
+Manager.cs (53) : if (profile == null) return;
+Manager.cs (54) : if (profile.IsGrantedPrivilege(table, privilege))
+Manager.cs (55) : return;
+Manager.cs (57) : profile.GrantPrivilege(table, privilege);
+Manager.cs (58) : }
+Manager.cs (84) : if (IsUserAdmin()) return true;
+Manager.cs (85) : var profile = ProfileByUser(username);
+Manager.cs (86) : if (profile == null) return false;
+Manager.cs (87) : return profile.IsGrantedPrivilege(table, privilege);
+Manager.cs (99) : Profiles.Add(profile);
+Manager.cs (129) : return null;
+Manager.cs (160) : string fileName = databaseName + ".path";
+Manager.cs (161) : Manager manager = new Manager(username);
+Manager.cs (162) : if (!File.Exists(fileName))
+Manager.cs (163) : return manager;
+Manager.cs (164) : string[] lines = File.ReadAllLines(fileName);
+Manager.cs (165) : Profile currentProfile = null;
+Manager.cs (166) : string currentTable = null;
+Manager.cs (168) : foreach (string line in lines)
+Manager.cs (169) : {
+Manager.cs (170) : if (string.IsNullOrWhiteSpace(line))
+Manager.cs (171) : continue;
+Manager.cs (173) : if (line.StartsWith("Profile: "))
+Manager.cs (174) : {
+Manager.cs (175) : currentTable = null;
+Manager.cs (177) : string profileName = line.Substring("Profile: ".Length).Trim();
+Manager.cs (179) : currentProfile = new Profile()
+Manager.cs (180) : {
+Manager.cs (181) : Name = profileName
+Manager.cs (182) : };
+Manager.cs (184) : manager.Profiles.Add(currentProfile);
+Manager.cs (185) : }
+Manager.cs (186) : else if (line.StartsWith("User: "))
+Manager.cs (187) : {
+Manager.cs (188) : if (currentProfile == null)
+Manager.cs (189) : continue;
+Manager.cs (191) : string content = line.Substring("User: ".Length);
+Manager.cs (192) : string[] parts = content.Split(',');
+Manager.cs (194) : if (parts.Length < 2)
+Manager.cs (195) : continue;
+Manager.cs (197) : string usernamePart = parts[0].Trim();
+Manager.cs (198) : string passwordPart = parts[1].Trim();
+Manager.cs (200) : string userName = usernamePart;
+Manager.cs (201) : string password = passwordPart.Replace("Password: ", "").Trim();
+Manager.cs (203) : currentProfile.Users.Add(new User(userName, password));
+Manager.cs (204) : }
+Manager.cs (205) : else if (line.StartsWith("Table: "))
+Manager.cs (206) : {
+Manager.cs (207) : currentTable = line.Substring("Table: ".Length).Trim();
+Manager.cs (208) : }
+Manager.cs (209) : else if (line.StartsWith("Privilege: "))
+Manager.cs (210) : {
+Manager.cs (211) : if (currentProfile == null)
+Manager.cs (212) : continue;
+Manager.cs (213) : if (string.IsNullOrWhiteSpace(currentTable)) //HAU KENDU LEIKE goiku ---> WIYHOUT table null testa kendute ra
+Manager.cs (214) : continue;
+Manager.cs (215) : string privilegeStr = line.Substring("Privilege: ".Length).Trim();
+Manager.cs (217) : if (Enum.TryParse(privilegeStr, out Privilege privilege))
+Manager.cs (218) : {
+Manager.cs (219) : currentProfile.GrantPrivilege(currentTable, privilege);
+Manager.cs (220) : }
+Manager.cs (221) : }
+Manager.cs (222) : }
+Manager.cs (224) : return manager;
 Profile.cs (20) : string tableName = table.ToUpper();
 Profile.cs (22) : if (!PrivilegesOn.ContainsKey(tableName))
 Profile.cs (24) : PrivilegesOn[tableName] = new List<Privilege>();

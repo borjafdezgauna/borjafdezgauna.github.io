@@ -196,8 +196,39 @@ MiniSQLParser.cs (279) : {
 MiniSQLParser.cs (280) : if (match.Length != miniSQLQuery.Length) { return null; }
 MiniSQLParser.cs (282) : return (new Revoke(match.Groups[1].Value, match.Groups[2].Value, match.Groups[3].Value));
 MiniSQLParser.cs (283) : }
-Revoke.cs (18) : PrivilegeName = privilegeName;
-Revoke.cs (19) : TableName = tableName;
-Revoke.cs (20) : ProfileName = profileName;
+Revoke.cs (5) : using DbManager.Security;
+Revoke.cs (19) : PrivilegeName = privilegeName;
+Revoke.cs (20) : TableName = tableName;
+Revoke.cs (21) : ProfileName = profileName;
+Revoke.cs (29) : Privilege privilegio;
+Revoke.cs (30) : if (PrivilegeName == "DELETE")
+Revoke.cs (31) : {
+Revoke.cs (32) : privilegio = Privilege.Delete;
+Revoke.cs (33) : } else if (PrivilegeName == "INSERT")
+Revoke.cs (34) : {
+Revoke.cs (35) : privilegio = Privilege.Insert;
+Revoke.cs (36) : }
+Revoke.cs (37) : else if (PrivilegeName == "SELECT")
+Revoke.cs (38) : {
+Revoke.cs (39) : privilegio = Privilege.Select;
+Revoke.cs (40) : }
+Revoke.cs (41) : else
+Revoke.cs (42) : {
+Revoke.cs (43) : privilegio = Privilege.Update;
+Revoke.cs (44) : }
+Revoke.cs (46) : if(database.SecurityManager.ProfileByName(ProfileName)== null)
+Revoke.cs (47) : {
+Revoke.cs (48) : return Constants.SecurityProfileDoesNotExistError;
+Revoke.cs (49) : }
+Revoke.cs (50) : else if(!database.SecurityManager.ProfileByName(ProfileName).PrivilegesOn[TableName].Contains(privilegio))
+Revoke.cs (51) : {
+Revoke.cs (52) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Revoke.cs (53) : }
+Revoke.cs (54) : else
+Revoke.cs (55) : {
+Revoke.cs (56) : return Constants.RevokePrivilegeSuccess;
+Revoke.cs (57) : }
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
+User.cs (16) : Username = username;
+User.cs (17) : EncryptedPassword = Encryption.Encrypt(password);

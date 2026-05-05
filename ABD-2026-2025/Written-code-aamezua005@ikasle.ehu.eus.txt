@@ -153,27 +153,51 @@ Delete.cs (23) : bool success = database.DeleteWhere(Table, Where);
 Delete.cs (24) : return success ? Constants.DeleteSuccess : database.LastErrorMessage;
 MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<>|<=|>=|<|>)('[^']+'|\d+)\s*$";
 MiniSQLParser.cs (28) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*$";
-MiniSQLParser.cs (227) : //DELETE
-MiniSQLParser.cs (228) : match = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (229) : if (match.Success)
-MiniSQLParser.cs (230) : {
-MiniSQLParser.cs (231) : string table = match.Groups[1].Value;
-MiniSQLParser.cs (233) : Condition where = new Condition(
-MiniSQLParser.cs (234) : match.Groups[2].Value,
-MiniSQLParser.cs (235) : match.Groups[3].Value,
-MiniSQLParser.cs (236) : match.Groups[4].Value.Trim('\'')
-MiniSQLParser.cs (237) : );
-MiniSQLParser.cs (239) : return new Delete(table, where);
-MiniSQLParser.cs (240) : }
-MiniSQLParser.cs (257) : if (match.Success)
-MiniSQLParser.cs (258) : {
-MiniSQLParser.cs (259) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (260) : return new CreateSecurityProfile(profileName);
-MiniSQLParser.cs (261) : }
-MiniSQLParser.cs (274) : if (match.Success)
-MiniSQLParser.cs (275) : {
-MiniSQLParser.cs (276) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (278) : }
+MiniSQLParser.cs (231) : //DELETE
+MiniSQLParser.cs (232) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (233) : if (match.Success)
+MiniSQLParser.cs (234) : {
+MiniSQLParser.cs (235) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (237) : Condition where = new Condition(
+MiniSQLParser.cs (238) : match.Groups[2].Value,
+MiniSQLParser.cs (239) : match.Groups[3].Value,
+MiniSQLParser.cs (240) : match.Groups[4].Value.Trim('\'')
+MiniSQLParser.cs (241) : );
+MiniSQLParser.cs (243) : return new Delete(table, where);
+MiniSQLParser.cs (244) : }
+MiniSQLParser.cs (261) : if (match.Success)
+MiniSQLParser.cs (262) : {
+MiniSQLParser.cs (263) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (264) : return new CreateSecurityProfile(profileName);
+MiniSQLParser.cs (265) : }
+MiniSQLParser.cs (278) : if (match.Success)
+MiniSQLParser.cs (279) : {
+MiniSQLParser.cs (280) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (282) : }
+Manager.cs (231) : string nombreArchivo = databaseName + ".path";
+Manager.cs (232) : string contenidoTotal = "";
+Manager.cs (233) : foreach (var profile in Profiles)
+Manager.cs (234) : {
+Manager.cs (235) : string perfil = $"Profile: {profile.Name}\n";
+Manager.cs (236) : contenidoTotal += perfil;
+Manager.cs (237) : foreach (var user in profile.Users)
+Manager.cs (238) : {
+Manager.cs (239) : string usuario = $"User: {user.Username}, Password: {user.EncryptedPassword}\n";
+Manager.cs (240) : contenidoTotal += usuario;
+Manager.cs (241) : }
+Manager.cs (242) : foreach (var entrada in profile.PrivilegesOn)
+Manager.cs (243) : {
+Manager.cs (244) : string tabla = $"Table: {entrada.Key}\n";
+Manager.cs (245) : contenidoTotal += tabla;
+Manager.cs (246) : foreach (var privilege in entrada.Value)
+Manager.cs (247) : {
+Manager.cs (248) : string privilegio = $"Privilege: {privilege}\n";
+Manager.cs (249) : contenidoTotal += privilegio;
+Manager.cs (250) : }
+Manager.cs (251) : }
+Manager.cs (252) : contenidoTotal += "\n";
+Manager.cs (253) : }
+Manager.cs (254) : File.WriteAllText(nombreArchivo, contenidoTotal);
 Profile.cs (23) : {
 Profile.cs (25) : }
 Profile.cs (28) : {

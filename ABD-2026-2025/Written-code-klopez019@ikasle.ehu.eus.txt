@@ -284,52 +284,144 @@ Manager.cs (44) : }
 Manager.cs (45) : else
 Manager.cs (46) : {
 Manager.cs (48) : }
-Manager.cs (69) : Profile perfilBuscado = ProfileByName(profileName);
-Manager.cs (71) : if (perfilBuscado != null)
-Manager.cs (72) : {
-Manager.cs (73) : perfilBuscado.RevokePrivilege(table, privilege);
-Manager.cs (74) : }
-Manager.cs (81) : Profile perfilBuscado = ProfileByUser(username);
-Manager.cs (83) : if (perfilBuscado != null)
-Manager.cs (84) : {
-Manager.cs (85) : return perfilBuscado.IsGrantedPrivilege(table, privilege);
-Manager.cs (86) : }
-Manager.cs (87) : else
-Manager.cs (88) : {
-Manager.cs (90) : }
-Manager.cs (98) : Profiles.Add(profile);
-Manager.cs (106) : foreach (Profile p in Profiles)
-Manager.cs (107) : {
-Manager.cs (108) : foreach (User u in p.Users)
-Manager.cs (109) : {
-Manager.cs (110) : if (u.Username.Equals(username))
-Manager.cs (111) : {
-Manager.cs (112) : return u;
-Manager.cs (113) : }
+Manager.cs (55) : if(!IsUserAdmin()) { return; }
+Manager.cs (69) : if (!IsUserAdmin()) { return; }
+Manager.cs (70) : Profile perfilBuscado = ProfileByName(profileName);
+Manager.cs (72) : if (perfilBuscado != null)
+Manager.cs (73) : {
+Manager.cs (74) : perfilBuscado.RevokePrivilege(table, privilege);
+Manager.cs (75) : }
+Manager.cs (82) : Profile perfilBuscado = ProfileByUser(username);
+Manager.cs (84) : if (perfilBuscado != null)
+Manager.cs (85) : {
+Manager.cs (86) : return perfilBuscado.IsGrantedPrivilege(table, privilege);
+Manager.cs (87) : }
+Manager.cs (88) : else
+Manager.cs (89) : {
+Manager.cs (91) : }
+Manager.cs (98) : if (!IsUserAdmin()) { return; }
+Manager.cs (99) : Profiles.Add(profile);
+Manager.cs (107) : foreach (Profile p in Profiles)
+Manager.cs (108) : {
+Manager.cs (109) : foreach (User u in p.Users)
+Manager.cs (110) : {
+Manager.cs (111) : if (u.Username.Equals(username))
+Manager.cs (112) : {
+Manager.cs (113) : return u;
 Manager.cs (114) : }
 Manager.cs (115) : }
-Manager.cs (123) : foreach(Profile p in Profiles)
-Manager.cs (124) : {
-Manager.cs (125) : if (p.Name.Equals(profileName))
-Manager.cs (126) : {
-Manager.cs (127) : return p;
-Manager.cs (128) : }
+Manager.cs (116) : }
+Manager.cs (124) : foreach(Profile p in Profiles)
+Manager.cs (125) : {
+Manager.cs (126) : if (p.Name.Equals(profileName))
+Manager.cs (127) : {
+Manager.cs (128) : return p;
 Manager.cs (129) : }
-Manager.cs (138) : foreach (Profile p in Profiles)
-Manager.cs (139) : {
-Manager.cs (140) : foreach(User u in p.Users)
-Manager.cs (141) : {
-Manager.cs (142) : if (u.Username.Equals(username))
-Manager.cs (143) : {
-Manager.cs (144) : return p;
-Manager.cs (145) : }
+Manager.cs (130) : }
+Manager.cs (139) : foreach (Profile p in Profiles)
+Manager.cs (140) : {
+Manager.cs (141) : foreach(User u in p.Users)
+Manager.cs (142) : {
+Manager.cs (143) : if (u.Username.Equals(username))
+Manager.cs (144) : {
+Manager.cs (145) : return p;
 Manager.cs (146) : }
 Manager.cs (147) : }
-Manager.cs (155) : foreach( Profile p in Profiles)
-Manager.cs (156) : {
-Manager.cs (157) : if (p.Name.Equals(profileName))
+Manager.cs (148) : }
+Manager.cs (156) : if (!IsUserAdmin()) { return false; }
+Manager.cs (157) : foreach ( Profile p in Profiles)
 Manager.cs (158) : {
-Manager.cs (159) : Profiles.Remove(p);
-Manager.cs (160) : return true;
-Manager.cs (161) : }
-Manager.cs (162) : }
+Manager.cs (159) : if (p.Name.Equals(profileName))
+Manager.cs (160) : {
+Manager.cs (161) : Profiles.Remove(p);
+Manager.cs (162) : return true;
+Manager.cs (163) : }
+Manager.cs (164) : }
+Manager.cs (171) : try
+Manager.cs (172) : {
+Manager.cs (173) : if (databaseName != null && !databaseName.Equals(""))
+Manager.cs (174) : {
+Manager.cs (175) : string[] files = Directory.GetFiles(databaseName, "*.txt");
+Manager.cs (176) : Manager mg = new Manager(username);
+Manager.cs (177) : String fileNoExtension;
+Manager.cs (178) : foreach (string file in files)
+Manager.cs (179) : {
+Manager.cs (180) : fileNoExtension = System.IO.Path.GetFileNameWithoutExtension(file);
+Manager.cs (181) : bool exists = System.IO.File.Exists(file); //checks that the file exists
+Manager.cs (182) : if (!exists) { return null; }
+Manager.cs (184) : TextReader reader = System.IO.File.OpenText(file); //opens an existing file
+Manager.cs (186) : Profile p = new Profile();
+Manager.cs (187) : String line = reader.ReadLine();
+Manager.cs (188) : p.Name = line;
+Manager.cs (190) : String tName;
+Manager.cs (192) : line=reader.ReadLine();
+Manager.cs (193) : while (line != null && !line.Equals(""))
+Manager.cs (194) : {
+Manager.cs (195) : string[] splited = line.Split("%");
+Manager.cs (196) : tName = splited[0];
+Manager.cs (197) : string[] privs = splited[1].Split(",");
+Manager.cs (198) : for(int i=0; i < privs.Length - 1; i++)
+Manager.cs (199) : {
+Manager.cs (200) : p.GrantPrivilege(tName, Enum.Parse<Privilege>(privs[i]));
+Manager.cs (201) : }
+Manager.cs (202) : line = reader.ReadLine();
+Manager.cs (203) : }
+Manager.cs (205) : line = reader.ReadLine();
+Manager.cs (207) : List<User> usrs = new List<User>();
+Manager.cs (208) : User u;
+Manager.cs (209) : while (line != null && !line.Equals(""))
+Manager.cs (210) : {
+Manager.cs (211) : u = new User();
+Manager.cs (212) : string[] a = line.Split(",");
+Manager.cs (213) : u.Username = a[0];
+Manager.cs (214) : u.EncryptedPassword = a[1];
+Manager.cs (215) : usrs.Add(u);
+Manager.cs (216) : line = reader.ReadLine();
+Manager.cs (217) : }
+Manager.cs (218) : p.Users = usrs;
+Manager.cs (219) : mg.AddProfile(p);
+Manager.cs (220) : reader.Close();
+Manager.cs (222) : }
+Manager.cs (223) : return mg;
+Manager.cs (224) : }
+Manager.cs (225) : else { return null; }
+Manager.cs (226) : }
+Manager.cs (227) : catch (Exception e)
+Manager.cs (228) : {
+Manager.cs (230) : }
+Manager.cs (238) : try
+Manager.cs (239) : {
+Manager.cs (240) : if (databaseName == null || databaseName.Equals("")) { return; }
+Manager.cs (242) : if (!Directory.Exists(databaseName))
+Manager.cs (243) : {
+Manager.cs (244) : Directory.CreateDirectory(databaseName);
+Manager.cs (245) : }
+Manager.cs (247) : if (Profiles != null && Profiles.Count != 0)
+Manager.cs (248) : {
+Manager.cs (249) : foreach (Profile p in Profiles)
+Manager.cs (250) : {
+Manager.cs (251) : TextWriter writer = System.IO.File.CreateText(databaseName + "\\" + p.Name + ".txt"); //creates a new text file
+Manager.cs (252) : writer.WriteLine(p.Name);
+Manager.cs (253) : var keys = p.PrivilegesOn.Keys;
+Manager.cs (254) : foreach(String x in keys)
+Manager.cs (255) : {
+Manager.cs (256) : writer.Write(x + "%");
+Manager.cs (257) : foreach(Privilege pr in p.PrivilegesOn[x])
+Manager.cs (258) : {
+Manager.cs (259) : writer.Write(pr+",");
+Manager.cs (260) : }
+Manager.cs (261) : writer.WriteLine();
+Manager.cs (262) : }
+Manager.cs (263) : writer.WriteLine();
+Manager.cs (264) : foreach(User u in p.Users)
+Manager.cs (265) : {
+Manager.cs (266) : writer.WriteLine(u.Username + "," + u.EncryptedPassword);
+Manager.cs (267) : }
+Manager.cs (268) : writer.Close();
+Manager.cs (269) : }
+Manager.cs (270) : }
+Manager.cs (271) : }
+Manager.cs (272) : catch (Exception e)
+Manager.cs (273) : {
+Manager.cs (274) : return;
+Manager.cs (275) : }

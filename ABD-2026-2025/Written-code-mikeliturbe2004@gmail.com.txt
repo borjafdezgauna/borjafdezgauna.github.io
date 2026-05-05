@@ -174,20 +174,20 @@ MiniSQLParser.cs (157) : }
 MiniSQLParser.cs (158) : }
 MiniSQLParser.cs (160) : return new CreateTable(table, columns);
 MiniSQLParser.cs (162) : }
-MiniSQLParser.cs (265) : match = Regex.Match(miniSQLQuery, deleteUserPattern);
-MiniSQLParser.cs (266) : if (match.Success)
-MiniSQLParser.cs (267) : {
-MiniSQLParser.cs (268) : string username = match.Groups[1].Value;
-MiniSQLParser.cs (269) : return new DeleteUser(username);
-MiniSQLParser.cs (270) : }
-MiniSQLParser.cs (292) : match = Regex.Match(miniSQLQuery, revokePattern);
-MiniSQLParser.cs (293) : if (match.Success)
-MiniSQLParser.cs (294) : {
-MiniSQLParser.cs (295) : string privilege = match.Groups[1].Value;
-MiniSQLParser.cs (296) : string table = match.Groups[2].Value;
-MiniSQLParser.cs (297) : string profile = match.Groups[3].Value;
-MiniSQLParser.cs (299) : return new Revoke(privilege, table, profile);
-MiniSQLParser.cs (300) : }
+MiniSQLParser.cs (269) : match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (270) : if (match.Success)
+MiniSQLParser.cs (271) : {
+MiniSQLParser.cs (272) : string username = match.Groups[1].Value;
+MiniSQLParser.cs (273) : return new DeleteUser(username);
+MiniSQLParser.cs (274) : }
+MiniSQLParser.cs (296) : match = Regex.Match(miniSQLQuery, revokePattern);
+MiniSQLParser.cs (297) : if (match.Success)
+MiniSQLParser.cs (298) : {
+MiniSQLParser.cs (299) : string privilege = match.Groups[1].Value;
+MiniSQLParser.cs (300) : string table = match.Groups[2].Value;
+MiniSQLParser.cs (301) : string profile = match.Groups[3].Value;
+MiniSQLParser.cs (303) : return new Revoke(privilege, table, profile);
+MiniSQLParser.cs (304) : }
 Revoke.cs (1) : using DbManager.Parser;
 Revoke.cs (2) : using DbManager.Security;
 Revoke.cs (19) : this.PrivilegeName = privilegeName;
@@ -208,4 +208,28 @@ Revoke.cs (44) : return Constants.PrivilegeDoesNotExistError;
 Revoke.cs (46) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, privilege);
 Revoke.cs (48) : return Constants.RevokePrivilegeSuccess;
 SetValue.cs (17) : this.ColumnName = column;
+Manager.cs (3) : using System.IO;
+Manager.cs (4) : using System.Linq;
+Manager.cs (5) : using System.Runtime.CompilerServices;
+Manager.cs (6) : using System.Text;
+Manager.cs (7) : using System.Threading.Tasks;
+Manager.cs (65) : if (!IsUserAdmin())
+Manager.cs (66) : return;
+Manager.cs (68) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
+Manager.cs (69) : return;
+Manager.cs (71) : foreach (var profile in Profiles)
+Manager.cs (72) : {
+Manager.cs (73) : if (profile.Name == profileName)
+Manager.cs (74) : {
+Manager.cs (75) : profile.RevokePrivilege(table, privilege);
+Manager.cs (76) : return;
+Manager.cs (77) : }
+Manager.cs (78) : }
+Manager.cs (93) : if (profile == null)
+Manager.cs (94) : return;
+Manager.cs (96) : if (ProfileByName(profile.Name) != null)
+Manager.cs (97) : return;
+Profile.cs (51) : string tableName = table.ToUpper();
+Profile.cs (53) : if (!PrivilegesOn.ContainsKey(tableName))
+Profile.cs (56) : return PrivilegesOn[tableName].Remove(privilege);
 User.cs (21) : public User() {}
