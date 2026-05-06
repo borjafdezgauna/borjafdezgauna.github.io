@@ -1,49 +1,71 @@
 ColumnDefinition.cs (29) : if (value == null)
 ColumnDefinition.cs (32) : return value.Replace(Delimiter, DelimiterEncoded);
-Database.cs (112) : //DEADLINE 1.B: Insert a new row to the table. If it doesn't exist return
-Database.cs (113) : //false and set LastErrorMessage appropriately
-Database.cs (114) : //If everything goes ok, set LastErrorMessage with the appropriate
-Database.cs (115) : //success message (Check Constants.cs)
-Database.cs (116) : Table table = TableByName(tableName);
-Database.cs (117) : if (table == null)
-Database.cs (118) : {
-Database.cs (119) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (121) : }
-Database.cs (123) : bool insertGoneGood = table.Insert(values);
-Database.cs (124) : if (insertGoneGood)
-Database.cs (125) : {
-Database.cs (126) : LastErrorMessage = Constants.InsertSuccess;
-Database.cs (127) : return true;
-Database.cs (128) : }
-Database.cs (129) : else
-Database.cs (130) : {
-Database.cs (131) : LastErrorMessage = Constants.ColumnCountsDontMatch;
-Database.cs (132) : return false;
-Database.cs (133) : }
-Database.cs (138) : //DEADLINE 1.B: Return the result of the select. If the table doesn't exist
-Database.cs (139) : //return null and set LastErrorMessage appropriately (Check Constants.cs)
-Database.cs (140) : //If any of the requested columns doesn't exist, return null and set
-Database.cs (141) : //LastErrorMessage (Check Constants.cs)
-Database.cs (143) : Table table = TableByName(tableName);
-Database.cs (144) : if (table == null)
-Database.cs (145) : {
-Database.cs (146) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (148) : }
-Database.cs (149) : if (columns != null && columns.Count>0)
-Database.cs (150) : {
-Database.cs (151) : for (int i=0; i<columns.Count; i++)
-Database.cs (152) : {
-Database.cs (153) : string columnName = columns[i];
-Database.cs (154) : if (table.ColumnIndexByName(columnName) == -1)
-Database.cs (155) : {
-Database.cs (156) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (157) : return null;
-Database.cs (158) : }
+Database.cs (8) : using System.Xml.Linq;
+Database.cs (9) : using DbManager.Parser;
+Database.cs (10) : using DbManager.Security;
+Database.cs (113) : //DEADLINE 1.B: Insert a new row to the table. If it doesn't exist return
+Database.cs (114) : //false and set LastErrorMessage appropriately
+Database.cs (115) : //If everything goes ok, set LastErrorMessage with the appropriate
+Database.cs (116) : //success message (Check Constants.cs)
+Database.cs (117) : Table table = TableByName(tableName);
+Database.cs (118) : if (table == null)
+Database.cs (119) : {
+Database.cs (120) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (122) : }
+Database.cs (124) : bool insertGoneGood = table.Insert(values);
+Database.cs (125) : if (insertGoneGood)
+Database.cs (126) : {
+Database.cs (127) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (128) : return true;
+Database.cs (129) : }
+Database.cs (130) : else
+Database.cs (131) : {
+Database.cs (132) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (133) : return false;
+Database.cs (134) : }
+Database.cs (139) : //DEADLINE 1.B: Return the result of the select. If the table doesn't exist
+Database.cs (140) : //return null and set LastErrorMessage appropriately (Check Constants.cs)
+Database.cs (141) : //If any of the requested columns doesn't exist, return null and set
+Database.cs (142) : //LastErrorMessage (Check Constants.cs)
+Database.cs (144) : Table table = TableByName(tableName);
+Database.cs (145) : if (table == null)
+Database.cs (146) : {
+Database.cs (147) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (149) : }
+Database.cs (150) : if (columns != null && columns.Count>0)
+Database.cs (151) : {
+Database.cs (152) : for (int i=0; i<columns.Count; i++)
+Database.cs (153) : {
+Database.cs (154) : string columnName = columns[i];
+Database.cs (155) : if (table.ColumnIndexByName(columnName) == -1)
+Database.cs (156) : {
+Database.cs (157) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (158) : return null;
 Database.cs (159) : }
 Database.cs (160) : }
-Database.cs (161) : Table result = table.Select(columns, condition);
-Database.cs (162) : //LastErrorMessage = Constants.success;
-Database.cs (163) : return result;
+Database.cs (161) : }
+Database.cs (162) : Table result = table.Select(columns, condition);
+Database.cs (163) : //LastErrorMessage = Constants.success;
+Database.cs (164) : return result;
+Database.cs (235) : //DEADLINE 1.C: Save this database to disk with the given name
+Database.cs (236) : //If everything goes ok, return true, false otherwise.
+Database.cs (237) : //DEADLINE 5: Save the SecurityManager so that it can be loaded with the database in Load()
+Database.cs (243) : var options = new JsonSerializerOptions { IncludeFields = true };
+Database.cs (245) : string json = JsonSerializer.Serialize(this.Tables, options);
+Database.cs (248) : if(this.SecurityManager != null)
+Database.cs (249) : {
+Database.cs (250) : this.SecurityManager.Save(databaseName);
+Database.cs (251) : }
+Database.cs (253) : return true;
+Database.cs (261) : //After loading the database, load the SecurityManager and check the password is correct. If it's not,
+Database.cs (262) : //return null. If it is return the database
+Database.cs (275) : Manager verifManager = Manager.Load(databaseName, username);
+Database.cs (276) : if (!verifManager.IsPasswordCorrect(username, password))
+Database.cs (278) : return null;
+Database.cs (279) : }
+Database.cs (282) : var options = new JsonSerializerOptions { IncludeFields = true };
+Database.cs (285) : if (tables == null) return null;
+Database.cs (290) : db.SecurityManager = verifManager;
 Row.cs (91) : if (value == null)
 Row.cs (94) : return value.Replace(Delimiter, DelimiterEncoded);
 Table.cs (3) : using System.Data.Common;
@@ -164,28 +186,33 @@ MiniSQLParser.cs (49) : //SELECT
 MiniSQLParser.cs (50) : match = Regex.Match(miniSQLQuery, selectPattern);
 MiniSQLParser.cs (52) : if (match.Success)
 MiniSQLParser.cs (53) : {
-MiniSQLParser.cs (67) : {
-MiniSQLParser.cs (68) : var conditionMatch = Regex.Match(condition.Trim(), @"^(\w+)(<=|>=|=|<|>)'([^'\s]+)'$");
-MiniSQLParser.cs (78) : }
-MiniSQLParser.cs (81) : }
-MiniSQLParser.cs (83) : //INSERT
-MiniSQLParser.cs (84) : match = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (85) : if (match.Success)
-MiniSQLParser.cs (86) : {
-MiniSQLParser.cs (87) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (89) : string literalValues = match.Groups[2].Value;
-MiniSQLParser.cs (90) : List<string> values = literalValues.Split(',').Select(v => v.Trim().Trim('\'')).ToList();
-MiniSQLParser.cs (91) : if (!literalValues.Contains("'"))
-MiniSQLParser.cs (92) : {
-MiniSQLParser.cs (93) : return null;
-MiniSQLParser.cs (94) : }
-MiniSQLParser.cs (96) : return new Insert(tableName, values);
-MiniSQLParser.cs (97) : }
-MiniSQLParser.cs (233) : match = Regex.Match(miniSQLQuery, addUserPattern);
-MiniSQLParser.cs (243) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
-MiniSQLParser.cs (260) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
-MiniSQLParser.cs (264) : return new DropSecurityProfile(profileName);
-MiniSQLParser.cs (268) : match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (65) : bool validCondition = true;
+MiniSQLParser.cs (68) : {
+MiniSQLParser.cs (69) : var conditionMatch = Regex.Match(condition.Trim(), @"^(\w+)(<=|>=|=|<|>)'([^'\s]+)'$");
+MiniSQLParser.cs (70) : if (!conditionMatch.Success)
+MiniSQLParser.cs (72) : validCondition = false;
+MiniSQLParser.cs (73) : break;
+MiniSQLParser.cs (74) : }
+MiniSQLParser.cs (82) : if (!validCondition) return null;
+MiniSQLParser.cs (85) : }
+MiniSQLParser.cs (87) : //INSERT
+MiniSQLParser.cs (88) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (89) : if (match.Success)
+MiniSQLParser.cs (90) : {
+MiniSQLParser.cs (91) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (93) : string literalValues = match.Groups[2].Value;
+MiniSQLParser.cs (94) : List<string> values = literalValues.Split(',').Select(v => v.Trim().Trim('\'')).ToList();
+MiniSQLParser.cs (95) : if (!literalValues.Contains("'"))
+MiniSQLParser.cs (96) : {
+MiniSQLParser.cs (97) : return null;
+MiniSQLParser.cs (98) : }
+MiniSQLParser.cs (100) : return new Insert(tableName, values);
+MiniSQLParser.cs (101) : }
+MiniSQLParser.cs (237) : match = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (247) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (264) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (268) : return new DropSecurityProfile(profileName);
+MiniSQLParser.cs (272) : match = Regex.Match(miniSQLQuery, grantPattern);
 Select.cs (18) : this.Table = table;
 Select.cs (19) : this.Columns = columns ?? new List<string>();
 Select.cs (20) : this.Where = condition;

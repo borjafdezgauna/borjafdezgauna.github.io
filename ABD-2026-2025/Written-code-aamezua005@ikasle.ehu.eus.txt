@@ -49,53 +49,42 @@ Condition.cs (80) : }
 Condition.cs (81) : }
 Condition.cs (82) : return false;
 Condition.cs (84) : }
-Database.cs (8) : using System.Text.Json;
-Database.cs (31) : Tables = new List<Table>();
-Database.cs (32) : m_username = adminUsername;
-Database.cs (33) : SecurityManager = new Manager(adminUsername);
-Database.cs (39) : if (table == null)
-Database.cs (41) : if (TableByName(table.Name) != null)
-Database.cs (42) : return false;
-Database.cs (44) : Tables.Add(table);
-Database.cs (45) : return true;
-Database.cs (52) : if (tableName == null)
-Database.cs (55) : foreach (var table in Tables)
-Database.cs (56) : {
-Database.cs (57) : if (table.Name != null &&
-Database.cs (58) : table.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase))
-Database.cs (59) : return table;
-Database.cs (60) : }
-Database.cs (61) : return null;
-Database.cs (235) : if (string.IsNullOrEmpty(databaseName))
-Database.cs (238) : string filePath = databaseName + ".db";
-Database.cs (239) : var options = new JsonSerializerOptions
-Database.cs (240) : {
-Database.cs (241) : IncludeFields = true
-Database.cs (242) : };
-Database.cs (243) : string json = JsonSerializer.Serialize(Tables, options);
-Database.cs (244) : File.WriteAllText(filePath, json);
-Database.cs (245) : return true;
-Database.cs (256) : if (string.IsNullOrEmpty(databaseName))
-Database.cs (257) : {
-Database.cs (258) : return null;
-Database.cs (259) : }
-Database.cs (260) : string filePath = databaseName + ".db";
-Database.cs (262) : if (!File.Exists(filePath))
-Database.cs (263) : {
-Database.cs (264) : return null;
-Database.cs (265) : }
-Database.cs (266) : var options = new JsonSerializerOptions
-Database.cs (267) : {
-Database.cs (268) : IncludeFields = true
-Database.cs (269) : };
-Database.cs (270) : string json = File.ReadAllText(filePath);
-Database.cs (271) : List<Table> tables = JsonSerializer.Deserialize<List<Table>>(json, options);
-Database.cs (273) : if (tables == null)
-Database.cs (276) : Database db = new Database();
-Database.cs (277) : db.Tables = tables;
-Database.cs (278) : db.m_username = username;
-Database.cs (279) : db.SecurityManager = new Manager(username);
-Database.cs (280) : return db;
+Database.cs (6) : using System.Text.Json;
+Database.cs (32) : Tables = new List<Table>();
+Database.cs (33) : m_username = adminUsername;
+Database.cs (34) : SecurityManager = new Manager(adminUsername);
+Database.cs (40) : if (table == null)
+Database.cs (42) : if (TableByName(table.Name) != null)
+Database.cs (43) : return false;
+Database.cs (45) : Tables.Add(table);
+Database.cs (46) : return true;
+Database.cs (53) : if (tableName == null)
+Database.cs (56) : foreach (var table in Tables)
+Database.cs (57) : {
+Database.cs (58) : if (table.Name != null &&
+Database.cs (59) : table.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase))
+Database.cs (60) : return table;
+Database.cs (61) : }
+Database.cs (62) : return null;
+Database.cs (239) : if (string.IsNullOrEmpty(databaseName))
+Database.cs (242) : string filePath = databaseName + ".db";
+Database.cs (246) : File.WriteAllText(filePath, json);
+Database.cs (264) : if (string.IsNullOrEmpty(databaseName))
+Database.cs (265) : {
+Database.cs (266) : return null;
+Database.cs (267) : }
+Database.cs (268) : string filePath = databaseName + ".db";
+Database.cs (270) : if (!File.Exists(filePath))
+Database.cs (271) : {
+Database.cs (272) : return null;
+Database.cs (273) : }
+Database.cs (277) : {
+Database.cs (281) : string json = File.ReadAllText(filePath);
+Database.cs (283) : List<Table> tables = JsonSerializer.Deserialize<List<Table>>(json, options);
+Database.cs (287) : Database db = new Database();
+Database.cs (288) : db.Tables = tables;
+Database.cs (289) : db.m_username = username;
+Database.cs (291) : return db;
 Row.cs (13) : [System.Text.Json.Serialization.JsonInclude]
 Table.cs (11) : [System.Text.Json.Serialization.JsonInclude]
 Table.cs (12) : private List<ColumnDefinition> ColumnDefinitions = new List<ColumnDefinition>();
@@ -145,27 +134,27 @@ Delete.cs (23) : bool success = database.DeleteWhere(Table, Where);
 Delete.cs (24) : return success ? Constants.DeleteSuccess : database.LastErrorMessage;
 MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<>|<=|>=|<|>)('[^']+'|\d+)\s*$";
 MiniSQLParser.cs (28) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*$";
-MiniSQLParser.cs (214) : //DELETE
-MiniSQLParser.cs (215) : match = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (216) : if (match.Success)
-MiniSQLParser.cs (217) : {
-MiniSQLParser.cs (218) : string table = match.Groups[1].Value;
-MiniSQLParser.cs (220) : Condition where = new Condition(
-MiniSQLParser.cs (221) : match.Groups[2].Value,
-MiniSQLParser.cs (222) : match.Groups[3].Value,
-MiniSQLParser.cs (223) : match.Groups[4].Value.Trim('\'')
-MiniSQLParser.cs (224) : );
-MiniSQLParser.cs (226) : return new Delete(table, where);
-MiniSQLParser.cs (227) : }
-MiniSQLParser.cs (244) : if (match.Success)
-MiniSQLParser.cs (245) : {
-MiniSQLParser.cs (246) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (247) : return new CreateSecurityProfile(profileName);
-MiniSQLParser.cs (248) : }
-MiniSQLParser.cs (261) : if (match.Success)
-MiniSQLParser.cs (262) : {
-MiniSQLParser.cs (263) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (265) : }
+MiniSQLParser.cs (218) : //DELETE
+MiniSQLParser.cs (219) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (220) : if (match.Success)
+MiniSQLParser.cs (221) : {
+MiniSQLParser.cs (222) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (224) : Condition where = new Condition(
+MiniSQLParser.cs (225) : match.Groups[2].Value,
+MiniSQLParser.cs (226) : match.Groups[3].Value,
+MiniSQLParser.cs (227) : match.Groups[4].Value.Trim('\'')
+MiniSQLParser.cs (228) : );
+MiniSQLParser.cs (230) : return new Delete(table, where);
+MiniSQLParser.cs (231) : }
+MiniSQLParser.cs (248) : if (match.Success)
+MiniSQLParser.cs (249) : {
+MiniSQLParser.cs (250) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (251) : return new CreateSecurityProfile(profileName);
+MiniSQLParser.cs (252) : }
+MiniSQLParser.cs (265) : if (match.Success)
+MiniSQLParser.cs (266) : {
+MiniSQLParser.cs (267) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (269) : }
 Manager.cs (230) : string nombreArchivo = databaseName + ".path";
 Manager.cs (231) : string contenidoTotal = "";
 Manager.cs (232) : foreach (var profile in Profiles)
