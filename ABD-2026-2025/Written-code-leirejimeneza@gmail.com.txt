@@ -115,6 +115,36 @@ Table.cs (279) : }
 Table.cs (280) : }
 Table.cs (281) : return true;
 DropTable.cs (15) : Table = table;
+Grant.cs (1) : using DbManager.Parser;
+Grant.cs (2) : using DbManager.Security;
+Grant.cs (19) : PrivilegeName = privilegeName;
+Grant.cs (20) : TableName = tableName;
+Grant.cs (21) : ProfileName = profileName;
+Grant.cs (29) : /*if (!database.SecurityManager.IsUserAdmin())
+Grant.cs (30) : {
+Grant.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (32) : }
+Grant.cs (34) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (35) : if (profile == null || string.IsNullOrEmpty(TableName))
+Grant.cs (36) : {
+Grant.cs (37) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (38) : }
+Grant.cs (40) : Privilege privilege;
+Grant.cs (41) : try
+Grant.cs (42) : {
+Grant.cs (43) : privilege = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Grant.cs (44) : }
+Grant.cs (45) : catch (Exception)
+Grant.cs (46) : {
+Grant.cs (47) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (48) : }
+Grant.cs (50) : if (profile.IsGrantedPrivilege(TableName, privilege))
+Grant.cs (51) : {
+Grant.cs (52) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (55) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
+Grant.cs (56) : return Constants.GrantPrivilegeSuccess;*/
+Grant.cs (57) : return null;
+Grant.cs (58) : }
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
 Insert.cs (22) : // Verificar que database no es null
@@ -139,6 +169,7 @@ MiniSQLParser.cs (28) : //const string createTablePattern = @"CREATE\s+TABLE\s+(
 MiniSQLParser.cs (29) : //const string createTablePattern = @"CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s*\((.*)\)";
 MiniSQLParser.cs (31) : //LEIRE --> #26
 MiniSQLParser.cs (32) : const string updateTablePattern = @"UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*([=<>])\s*('[^']*'))?$";
+MiniSQLParser.cs (41) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+([A-Za-z][A-Za-z0-9]*)\s+TO\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (65) : //select
 MiniSQLParser.cs (70) : string column = matchSelect.Groups[1].Value;
 MiniSQLParser.cs (71) : //Separar las columas
@@ -247,6 +278,19 @@ MiniSQLParser.cs (284) : condition = new Condition(whereColumn, whereOp, whereVa
 MiniSQLParser.cs (285) : }
 MiniSQLParser.cs (287) : return new Update(table, setValues, condition);
 MiniSQLParser.cs (288) : }
+MiniSQLParser.cs (346) : //GRANT
+MiniSQLParser.cs (347) : Match matchGrant = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (348) : if (matchGrant.Success)
+MiniSQLParser.cs (349) : {
+MiniSQLParser.cs (350) : string permission = matchGrant.Groups[1].Value;
+MiniSQLParser.cs (351) : string resource = matchGrant.Groups[2].Value;
+MiniSQLParser.cs (352) : string user = matchGrant.Groups[3].Value;
+MiniSQLParser.cs (354) : if (string.IsNullOrEmpty(permission) || string.IsNullOrEmpty(resource) || string.IsNullOrEmpty(user))
+MiniSQLParser.cs (355) : {
+MiniSQLParser.cs (357) : }
+MiniSQLParser.cs (359) : return new Grant(permission, resource, user);
+MiniSQLParser.cs (360) : }
+MiniSQLParser.cs (362) : return null;
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;

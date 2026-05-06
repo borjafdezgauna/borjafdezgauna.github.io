@@ -66,27 +66,24 @@ Database.cs (58) : table.Name.Equals(tableName, StringComparison.OrdinalIgnoreCa
 Database.cs (59) : return table;
 Database.cs (60) : }
 Database.cs (61) : return null;
-Database.cs (234) : try
-Database.cs (235) : {
-Database.cs (236) : if (string.IsNullOrEmpty(databaseName))
-Database.cs (239) : string filePath = databaseName + ".db";
-Database.cs (240) : var options = new JsonSerializerOptions
-Database.cs (241) : {
-Database.cs (242) : IncludeFields = true
-Database.cs (243) : };
-Database.cs (244) : string json = JsonSerializer.Serialize(Tables, options);
-Database.cs (245) : File.WriteAllText(filePath, json);
-Database.cs (246) : return true;
-Database.cs (247) : }
-Database.cs (248) : catch
-Database.cs (249) : {
-Database.cs (250) : return false;
-Database.cs (251) : }
-Database.cs (260) : try
-Database.cs (261) : {
-Database.cs (262) : string filePath = databaseName + ".db";
-Database.cs (264) : if (!File.Exists(filePath))
-Database.cs (265) : return null;
+Database.cs (235) : if (string.IsNullOrEmpty(databaseName))
+Database.cs (238) : string filePath = databaseName + ".db";
+Database.cs (239) : var options = new JsonSerializerOptions
+Database.cs (240) : {
+Database.cs (241) : IncludeFields = true
+Database.cs (242) : };
+Database.cs (243) : string json = JsonSerializer.Serialize(Tables, options);
+Database.cs (244) : File.WriteAllText(filePath, json);
+Database.cs (245) : return true;
+Database.cs (256) : if (string.IsNullOrEmpty(databaseName))
+Database.cs (257) : {
+Database.cs (258) : return null;
+Database.cs (259) : }
+Database.cs (260) : string filePath = databaseName + ".db";
+Database.cs (262) : if (!File.Exists(filePath))
+Database.cs (263) : {
+Database.cs (264) : return null;
+Database.cs (265) : }
 Database.cs (266) : var options = new JsonSerializerOptions
 Database.cs (267) : {
 Database.cs (268) : IncludeFields = true
@@ -99,11 +96,6 @@ Database.cs (277) : db.Tables = tables;
 Database.cs (278) : db.m_username = username;
 Database.cs (279) : db.SecurityManager = new Manager(username);
 Database.cs (280) : return db;
-Database.cs (281) : }
-Database.cs (282) : catch
-Database.cs (283) : {
-Database.cs (284) : return null;
-Database.cs (285) : }
 Row.cs (13) : [System.Text.Json.Serialization.JsonInclude]
 Table.cs (11) : [System.Text.Json.Serialization.JsonInclude]
 Table.cs (12) : private List<ColumnDefinition> ColumnDefinitions = new List<ColumnDefinition>();
@@ -153,51 +145,51 @@ Delete.cs (23) : bool success = database.DeleteWhere(Table, Where);
 Delete.cs (24) : return success ? Constants.DeleteSuccess : database.LastErrorMessage;
 MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<>|<=|>=|<|>)('[^']+'|\d+)\s*$";
 MiniSQLParser.cs (28) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*$";
-MiniSQLParser.cs (231) : //DELETE
-MiniSQLParser.cs (232) : match = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (233) : if (match.Success)
-MiniSQLParser.cs (234) : {
-MiniSQLParser.cs (235) : string table = match.Groups[1].Value;
-MiniSQLParser.cs (237) : Condition where = new Condition(
-MiniSQLParser.cs (238) : match.Groups[2].Value,
-MiniSQLParser.cs (239) : match.Groups[3].Value,
-MiniSQLParser.cs (240) : match.Groups[4].Value.Trim('\'')
-MiniSQLParser.cs (241) : );
-MiniSQLParser.cs (243) : return new Delete(table, where);
-MiniSQLParser.cs (244) : }
+MiniSQLParser.cs (214) : //DELETE
+MiniSQLParser.cs (215) : match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (216) : if (match.Success)
+MiniSQLParser.cs (217) : {
+MiniSQLParser.cs (218) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (220) : Condition where = new Condition(
+MiniSQLParser.cs (221) : match.Groups[2].Value,
+MiniSQLParser.cs (222) : match.Groups[3].Value,
+MiniSQLParser.cs (223) : match.Groups[4].Value.Trim('\'')
+MiniSQLParser.cs (224) : );
+MiniSQLParser.cs (226) : return new Delete(table, where);
+MiniSQLParser.cs (227) : }
+MiniSQLParser.cs (244) : if (match.Success)
+MiniSQLParser.cs (245) : {
+MiniSQLParser.cs (246) : string profileName = match.Groups[1].Value;
+MiniSQLParser.cs (247) : return new CreateSecurityProfile(profileName);
+MiniSQLParser.cs (248) : }
 MiniSQLParser.cs (261) : if (match.Success)
 MiniSQLParser.cs (262) : {
 MiniSQLParser.cs (263) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (264) : return new CreateSecurityProfile(profileName);
 MiniSQLParser.cs (265) : }
-MiniSQLParser.cs (278) : if (match.Success)
-MiniSQLParser.cs (279) : {
-MiniSQLParser.cs (280) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (282) : }
-Manager.cs (231) : string nombreArchivo = databaseName + ".path";
-Manager.cs (232) : string contenidoTotal = "";
-Manager.cs (233) : foreach (var profile in Profiles)
-Manager.cs (234) : {
-Manager.cs (235) : string perfil = $"Profile: {profile.Name}\n";
-Manager.cs (236) : contenidoTotal += perfil;
-Manager.cs (237) : foreach (var user in profile.Users)
-Manager.cs (238) : {
-Manager.cs (239) : string usuario = $"User: {user.Username}, Password: {user.EncryptedPassword}\n";
-Manager.cs (240) : contenidoTotal += usuario;
-Manager.cs (241) : }
-Manager.cs (242) : foreach (var entrada in profile.PrivilegesOn)
-Manager.cs (243) : {
-Manager.cs (244) : string tabla = $"Table: {entrada.Key}\n";
-Manager.cs (245) : contenidoTotal += tabla;
-Manager.cs (246) : foreach (var privilege in entrada.Value)
-Manager.cs (247) : {
-Manager.cs (248) : string privilegio = $"Privilege: {privilege}\n";
-Manager.cs (249) : contenidoTotal += privilegio;
+Manager.cs (230) : string nombreArchivo = databaseName + ".path";
+Manager.cs (231) : string contenidoTotal = "";
+Manager.cs (232) : foreach (var profile in Profiles)
+Manager.cs (233) : {
+Manager.cs (234) : string perfil = $"Profile: {profile.Name}\n";
+Manager.cs (235) : contenidoTotal += perfil;
+Manager.cs (236) : foreach (var user in profile.Users)
+Manager.cs (237) : {
+Manager.cs (238) : string usuario = $"User: {user.Username}, Password: {user.EncryptedPassword}\n";
+Manager.cs (239) : contenidoTotal += usuario;
+Manager.cs (240) : }
+Manager.cs (241) : foreach (var entrada in profile.PrivilegesOn)
+Manager.cs (242) : {
+Manager.cs (243) : string tabla = $"Table: {entrada.Key}\n";
+Manager.cs (244) : contenidoTotal += tabla;
+Manager.cs (245) : foreach (var privilege in entrada.Value)
+Manager.cs (246) : {
+Manager.cs (247) : string privilegio = $"Privilege: {privilege}\n";
+Manager.cs (248) : contenidoTotal += privilegio;
+Manager.cs (249) : }
 Manager.cs (250) : }
-Manager.cs (251) : }
-Manager.cs (252) : contenidoTotal += "\n";
-Manager.cs (253) : }
-Manager.cs (254) : File.WriteAllText(nombreArchivo, contenidoTotal);
+Manager.cs (251) : contenidoTotal += "\n";
+Manager.cs (252) : }
+Manager.cs (253) : File.WriteAllText(nombreArchivo, contenidoTotal);
 Profile.cs (23) : {
 Profile.cs (25) : }
 Profile.cs (28) : {
