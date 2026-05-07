@@ -114,29 +114,30 @@ MiniSQLParser.cs (14) : private const string DoubleType = "DOUBLE";
 MiniSQLParser.cs (29) : @"^\s*INSERT\s+INTO\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+" +
 MiniSQLParser.cs (30) : @"VALUES\s*\(\s*(?<vals>('[^']*'|-?[0-9.]+)(?:\s*,\s*('[^']*'|-?[0-9.]+))*)\s*\)\s*;?\s*\z";
 MiniSQLParser.cs (34) : @"^\s*DROP\s+TABLE\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*\z";
-MiniSQLParser.cs (41) : @"^\s*UPDATE\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+" +
-MiniSQLParser.cs (42) : @"SET\s+(?<set>[a-zA-Z][a-zA-Z0-9_]*\s*=\s*(?:'[^']*'|-?[0-9.]+)(?:\s*,\s*[a-zA-Z][a-zA-Z0-9_]*\s*=\s*(?:'[^']*'|-?[0-9.]+))*)\s+" +
-MiniSQLParser.cs (43) : @"WHERE\s+(?<wcol>[a-zA-Z][a-zA-Z0-9_]*)\s*(?<wop>=|!=|<=|>=|<|>)\s*(?<wval>'[^']*'|-?[0-9.]+)\s*;?\s*\z";
-MiniSQLParser.cs (47) : @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)('-?\d+(\.\d+)?'|'[^']+')$";
-MiniSQLParser.cs (50) : @"^\s*CREATE\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
-MiniSQLParser.cs (53) : @"^\s*DROP\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
-MiniSQLParser.cs (56) : @"^\s*GRANT\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
-MiniSQLParser.cs (59) : @"^\s*REVOKE\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
-MiniSQLParser.cs (144) : {
-MiniSQLParser.cs (145) : string valor = mDelete.Groups[4].Value.Trim();
-MiniSQLParser.cs (146) : if (valor.Contains(" ") && !valor.StartsWith("'")) return null;
-MiniSQLParser.cs (147) : return new Delete(mDelete.Groups[1].Value.Trim(), new Condition(mDelete.Groups[2].Value.Trim(), mDelete.Groups[3].Value.Trim(), valor.Trim('\'')));
-MiniSQLParser.cs (148) : }
-MiniSQLParser.cs (172) : values.Add(Unquote(current.Trim()));
-MiniSQLParser.cs (173) : current = "";
-MiniSQLParser.cs (235) : if (tokens.Length != 2)
-MiniSQLParser.cs (238) : string nameText = tokens[0].Trim();
-MiniSQLParser.cs (239) : string typeText = tokens[1].Trim().ToUpper();
-MiniSQLParser.cs (242) : if (typeText == StringType) dt = ColumnDefinition.DataType.String;
-MiniSQLParser.cs (243) : else if (typeText == IntType) dt = ColumnDefinition.DataType.Int;
-MiniSQLParser.cs (244) : else if (typeText == DoubleType) dt = ColumnDefinition.DataType.Double;
-MiniSQLParser.cs (249) : if (cols.Count == 0)
-MiniSQLParser.cs (250) : return null;
+MiniSQLParser.cs (41) : @"^UPDATE\s+(\w+)\s+SET\s+(\w+=('[-]?\d+(\.\d+)?'|'[^']+')(?:,(\w+=('[-]?\d+(\.\d+)?'|'[^']+'))*)?)\s+WHERE\s+(\w+)(=|<|>)('[-]?\d+(\.\d+)?'|'[^']+')$";
+MiniSQLParser.cs (45) : @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)('-?\d+(\.\d+)?'|'[^']+')$";
+MiniSQLParser.cs (48) : @"^\s*CREATE\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
+MiniSQLParser.cs (51) : @"^\s*DROP\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
+MiniSQLParser.cs (54) : @"^\s*GRANT\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (57) : @"^\s*REVOKE\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (134) : var setValues = ParseSetValues(mUpdate.Groups[2].Value);
+MiniSQLParser.cs (135) : if (setValues == null) return null;
+MiniSQLParser.cs (136) : return new Update(mUpdate.Groups[1].Value, setValues, new Condition(mUpdate.Groups[8].Value, mUpdate.Groups[9].Value, mUpdate.Groups[10].Value.Trim('\'')));
+MiniSQLParser.cs (141) : {
+MiniSQLParser.cs (142) : string valor = mDelete.Groups[4].Value.Trim();
+MiniSQLParser.cs (143) : if (valor.Contains(" ") && !valor.StartsWith("'")) return null;
+MiniSQLParser.cs (144) : return new Delete(mDelete.Groups[1].Value.Trim(), new Condition(mDelete.Groups[2].Value.Trim(), mDelete.Groups[3].Value.Trim(), valor.Trim('\'')));
+MiniSQLParser.cs (145) : }
+MiniSQLParser.cs (169) : values.Add(Unquote(current.Trim()));
+MiniSQLParser.cs (170) : current = "";
+MiniSQLParser.cs (232) : if (tokens.Length != 2)
+MiniSQLParser.cs (235) : string nameText = tokens[0].Trim();
+MiniSQLParser.cs (236) : string typeText = tokens[1].Trim().ToUpper();
+MiniSQLParser.cs (239) : if (typeText == StringType) dt = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (240) : else if (typeText == IntType) dt = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (241) : else if (typeText == DoubleType) dt = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (246) : if (cols.Count == 0)
+MiniSQLParser.cs (247) : return null;
 Select.cs (28) : Table result = database.Select(this.Table, this.Columns, this.Where);
 Select.cs (32) : return result.ToString();
 Update.cs (3) : using System.Data.Common;

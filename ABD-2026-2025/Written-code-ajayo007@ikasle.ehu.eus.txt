@@ -65,8 +65,8 @@ Database.cs (273) : };
 Database.cs (277) : if (tables == null)
 Database.cs (278) : return null;
 Database.cs (283) : db.SecurityManager = new Manager(username);
-Row.cs (91) : if (value == null)
-Row.cs (94) : return value.Replace(Delimiter, DelimiterEncoded);
+Row.cs (88) : if (value == null)
+Row.cs (91) : return value.Replace(Delimiter, DelimiterEncoded);
 Table.cs (3) : using System.Data.Common;
 Table.cs (4) : using System.Xml.Linq;
 Table.cs (5) : using DbManager.Parser;
@@ -158,12 +158,15 @@ Table.cs (235) : public const ColumnDefinition.DataType TestColumn3Type =
 Table.cs (236) : ColumnDefinition.DataType.Int;
 Table.cs (254) : if (rows.Count != NumRows()) throw new Exception($"The table has {NumRows()} rows and {rows.Count} were expected");
 DropSecurityProfile.cs (16) : this.ProfileName = profileName;
-DropSecurityProfile.cs (22) : database.SecurityManager.RemoveProfile(this.ProfileName);
-DropSecurityProfile.cs (23) : if (string.IsNullOrEmpty(database.LastErrorMessage))
-DropSecurityProfile.cs (24) : {
-DropSecurityProfile.cs (25) : return Constants.DropSecurityProfileSuccess;
-DropSecurityProfile.cs (26) : }
-DropSecurityProfile.cs (27) : return database.LastErrorMessage;
+DropSecurityProfile.cs (22) : if (database == null || database.SecurityManager == null)
+DropSecurityProfile.cs (23) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (25) : if (!database.SecurityManager.IsUserAdmin())
+DropSecurityProfile.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (28) : var profile = database.SecurityManager.ProfileByName(ProfileName);
+DropSecurityProfile.cs (30) : if (profile == null)
+DropSecurityProfile.cs (31) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (33) : database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (35) : return Constants.DropSecurityProfileSuccess;
 Insert.cs (6) : using System.Xml.Linq;
 Insert.cs (17) : this.Table = table;
 Insert.cs (18) : this.Values = values ?? new List<string>();
@@ -187,7 +190,7 @@ MiniSQLParser.cs (52) : if (match.Success)
 MiniSQLParser.cs (53) : {
 MiniSQLParser.cs (65) : bool validCond = true;
 MiniSQLParser.cs (68) : {
-MiniSQLParser.cs (69) : var conditionMatch = Regex.Match(condition.Trim(), @"^(\w+)(<=|>=|=|<|>)'([^'\s]+)'$");
+MiniSQLParser.cs (69) : var conditionMatch = Regex.Match(condition.Trim(), @"^(\w+)(=|<|>)'([^']*)'$");
 MiniSQLParser.cs (70) : if (!conditionMatch.Success)
 MiniSQLParser.cs (72) : validCond = false;
 MiniSQLParser.cs (73) : break;

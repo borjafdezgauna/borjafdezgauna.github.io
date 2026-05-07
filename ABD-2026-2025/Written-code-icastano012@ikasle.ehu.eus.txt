@@ -46,40 +46,46 @@ Condition.cs (75) : default:
 Condition.cs (76) : return false;
 Condition.cs (77) : }
 Condition.cs (78) : }
-Database.cs (132) : Table table = TableByName(tableName);
-Database.cs (133) : if (table == null)
-Database.cs (134) : {
-Database.cs (135) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (136) : return false;
-Database.cs (137) : }
-Database.cs (138) : if (table.Insert(values))
-Database.cs (139) : {
-Database.cs (140) : LastErrorMessage = Constants.InsertSuccess;
-Database.cs (141) : return true;
-Database.cs (142) : }
-Database.cs (143) : LastErrorMessage = Constants.ColumnCountsDontMatch;
-Database.cs (152) : Table table = TableByName(tableName);
-Database.cs (153) : if (table == null)
-Database.cs (154) : {
-Database.cs (155) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (157) : }
-Database.cs (158) : if (columns.Count > 0)
-Database.cs (159) : {
-Database.cs (160) : foreach (string column in columns)
-Database.cs (161) : {
-Database.cs (162) : if (table.ColumnByName(column) == null)
-Database.cs (163) : {
-Database.cs (164) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (165) : return null;
-Database.cs (166) : }
-Database.cs (167) : }
-Database.cs (168) : }
-Database.cs (169) : else
-Database.cs (170) : {
-Database.cs (171) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (172) : return null;
-Database.cs (173) : }
-Database.cs (174) : return table.Select(columns, condition);
+Database.cs (33) : SecurityManager = new Manager(m_username);
+Database.cs (35) : Profile adminP = new Profile();
+Database.cs (36) : adminP.Name = Profile.AdminProfileName;
+Database.cs (38) : User adminU = new User(adminUsername, adminPassword);
+Database.cs (39) : adminP.Users.Add(adminU);
+Database.cs (41) : SecurityManager.Profiles.Add(adminP);
+Database.cs (140) : Table table = TableByName(tableName);
+Database.cs (141) : if (table == null)
+Database.cs (142) : {
+Database.cs (143) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (144) : return false;
+Database.cs (145) : }
+Database.cs (146) : if (table.Insert(values))
+Database.cs (147) : {
+Database.cs (148) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (149) : return true;
+Database.cs (150) : }
+Database.cs (151) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (160) : Table table = TableByName(tableName);
+Database.cs (161) : if (table == null)
+Database.cs (162) : {
+Database.cs (163) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (165) : }
+Database.cs (166) : if (columns.Count > 0)
+Database.cs (167) : {
+Database.cs (168) : foreach (string column in columns)
+Database.cs (169) : {
+Database.cs (170) : if (table.ColumnByName(column) == null)
+Database.cs (171) : {
+Database.cs (172) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (173) : return null;
+Database.cs (174) : }
+Database.cs (175) : }
+Database.cs (176) : }
+Database.cs (177) : else
+Database.cs (178) : {
+Database.cs (179) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (180) : return null;
+Database.cs (181) : }
+Database.cs (182) : return table.Select(columns, condition);
 Row.cs (99) : if (string.IsNullOrEmpty(value))
 Row.cs (100) : {
 Row.cs (101) : return value;
@@ -133,6 +139,16 @@ Table.cs (232) : Rows[rowIndex].Values[columnIndex] = setValue.Value;
 Table.cs (233) : }
 Table.cs (234) : }
 Table.cs (235) : return true;
+AddUser.cs (34) : if (!database.IsUserAdmin())
+AddUser.cs (45) : if (database.SecurityManager.UserByName(Username) != null)
+AddUser.cs (46) : {
+AddUser.cs (47) : return Constants.Error;
+AddUser.cs (48) : }
+AddUser.cs (50) : if (string.IsNullOrEmpty(Password))
+AddUser.cs (51) : {
+AddUser.cs (52) : return Constants.Error;
+AddUser.cs (53) : }
+AddUser.cs (58) : return Constants.AddUserSuccess;
 CreateTable.cs (17) : Table = table;
 CreateTable.cs (18) : ColumnsParameters = columns;
 CreateTable.cs (24) : if (database == null)

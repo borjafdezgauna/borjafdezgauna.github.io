@@ -70,7 +70,6 @@ AddUser.cs (22) : ProfileName = profileName;
 Insert.cs (24) : database.Insert(Table, Values);
 Insert.cs (25) : return database.LastErrorMessage;
 MiniSQLParser.cs (4) : using System.Linq;
-MiniSQLParser.cs (38) : const string addUserPattern = @"^ADD\s+USER\s+\((?<user>[a-zA-Z]+)[,](?<password>[a-zA-Z]+)[,](?<profile>[a-zA-Z]+)\)$";
 MiniSQLParser.cs (39) : var addUser = new Regex(addUserPattern, RegexOptions.None);
 MiniSQLParser.cs (41) : const string deleteUserPattern = @"^DELETE\s+USER\s+(?<user>[a-zA-Z]+)$";
 MiniSQLParser.cs (42) : var deleteUser = new Regex(deleteUserPattern, RegexOptions.None);
@@ -108,52 +107,52 @@ MiniSQLParser.cs (223) : }
 Revoke.cs (19) : PrivilegeName = privilegeName;
 Revoke.cs (20) : TableName = tableName;
 Revoke.cs (21) : ProfileName = profileName;
-Manager.cs (191) : var securityFile = databaseName + ".security";
-Manager.cs (192) : if (!File.Exists(securityFile)) return null;
-Manager.cs (194) : var manager = new Manager(username);
-Manager.cs (195) : Profile currentProfile = null;
-Manager.cs (197) : using (var reader = File.OpenText(securityFile))
-Manager.cs (198) : {
-Manager.cs (199) : string line;
-Manager.cs (200) : while ((line = reader.ReadLine()) != null)
+Manager.cs (194) : var securityFile = databaseName + ".security";
+Manager.cs (195) : if (!File.Exists(securityFile)) return null;
+Manager.cs (197) : var manager = new Manager(username);
+Manager.cs (198) : Profile currentProfile = null;
+Manager.cs (200) : using (var reader = File.OpenText(securityFile))
 Manager.cs (201) : {
-Manager.cs (202) : if (line.StartsWith("PROFILE:"))
-Manager.cs (203) : {
-Manager.cs (204) : currentProfile = new Profile { Name = line.Substring("PROFILE:".Length) };
-Manager.cs (205) : manager.Profiles.Add(currentProfile);
-Manager.cs (206) : }
-Manager.cs (207) : else if (line.StartsWith("USER:") && currentProfile != null)
-Manager.cs (208) : {
-Manager.cs (209) : var parts = line.Substring("USER:".Length).Split(':', 2);
-Manager.cs (210) : currentProfile.Users.Add(new User { Username = parts[0], EncryptedPassword = parts[1] });
-Manager.cs (211) : }
-Manager.cs (212) : else if (line.StartsWith("PRIVILEGE:") && currentProfile != null)
-Manager.cs (213) : {
-Manager.cs (214) : var rest = line.Substring("PRIVILEGE:".Length);
-Manager.cs (215) : var colonIdx = rest.IndexOf(':');
-Manager.cs (216) : var tableName = rest.Substring(0, colonIdx);
-Manager.cs (217) : var privilegeNames = rest.Substring(colonIdx + 1).Split(',', StringSplitOptions.RemoveEmptyEntries);
-Manager.cs (218) : foreach (var privName in privilegeNames)
-Manager.cs (219) : {
-Manager.cs (220) : if (Enum.TryParse<Privilege>(privName, out var priv))
-Manager.cs (221) : currentProfile.GrantPrivilege(tableName, priv);
-Manager.cs (222) : }
-Manager.cs (223) : }
-Manager.cs (224) : }
+Manager.cs (202) : string line;
+Manager.cs (203) : while ((line = reader.ReadLine()) != null)
+Manager.cs (204) : {
+Manager.cs (205) : if (line.StartsWith("PROFILE:"))
+Manager.cs (206) : {
+Manager.cs (207) : currentProfile = new Profile { Name = line.Substring("PROFILE:".Length) };
+Manager.cs (208) : manager.Profiles.Add(currentProfile);
+Manager.cs (209) : }
+Manager.cs (210) : else if (line.StartsWith("USER:") && currentProfile != null)
+Manager.cs (211) : {
+Manager.cs (212) : var parts = line.Substring("USER:".Length).Split(':', 2);
+Manager.cs (213) : currentProfile.Users.Add(new User { Username = parts[0], EncryptedPassword = parts[1] });
+Manager.cs (214) : }
+Manager.cs (215) : else if (line.StartsWith("PRIVILEGE:") && currentProfile != null)
+Manager.cs (216) : {
+Manager.cs (217) : var rest = line.Substring("PRIVILEGE:".Length);
+Manager.cs (218) : var colonIdx = rest.IndexOf(':');
+Manager.cs (219) : var tableName = rest.Substring(0, colonIdx);
+Manager.cs (220) : var privilegeNames = rest.Substring(colonIdx + 1).Split(',', StringSplitOptions.RemoveEmptyEntries);
+Manager.cs (221) : foreach (var privName in privilegeNames)
+Manager.cs (222) : {
+Manager.cs (223) : if (Enum.TryParse<Privilege>(privName, out var priv))
+Manager.cs (224) : currentProfile.GrantPrivilege(tableName, priv);
 Manager.cs (225) : }
-Manager.cs (226) : return manager;
-Manager.cs (231) : using (var writer = File.CreateText(databaseName + ".security"))
-Manager.cs (232) : {
-Manager.cs (233) : foreach (var profile in Profiles)
-Manager.cs (234) : {
-Manager.cs (235) : writer.WriteLine("PROFILE:" + profile.Name);
-Manager.cs (236) : foreach (var user in profile.Users)
+Manager.cs (226) : }
+Manager.cs (227) : }
+Manager.cs (228) : }
+Manager.cs (229) : return manager;
+Manager.cs (234) : using (var writer = File.CreateText(databaseName + ".security"))
+Manager.cs (235) : {
+Manager.cs (236) : foreach (var profile in Profiles)
 Manager.cs (237) : {
-Manager.cs (238) : writer.WriteLine("USER:" + user.Username + ":" + user.EncryptedPassword);
-Manager.cs (239) : }
-Manager.cs (240) : foreach (var entry in profile.PrivilegesOn)
-Manager.cs (241) : {
-Manager.cs (253) : writer.WriteLine("PRIVILEGE:" + entry.Key + ":" + privileges);
-Manager.cs (254) : }
-Manager.cs (255) : }
-Manager.cs (256) : }
+Manager.cs (238) : writer.WriteLine("PROFILE:" + profile.Name);
+Manager.cs (239) : foreach (var user in profile.Users)
+Manager.cs (240) : {
+Manager.cs (241) : writer.WriteLine("USER:" + user.Username + ":" + user.EncryptedPassword);
+Manager.cs (242) : }
+Manager.cs (243) : foreach (var entry in profile.PrivilegesOn)
+Manager.cs (244) : {
+Manager.cs (256) : writer.WriteLine("PRIVILEGE:" + entry.Key + ":" + privileges);
+Manager.cs (257) : }
+Manager.cs (258) : }
+Manager.cs (259) : }

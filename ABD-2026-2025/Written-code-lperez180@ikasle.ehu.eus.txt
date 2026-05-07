@@ -271,74 +271,65 @@ Table.cs (305) : }
 Table.cs (306) : return update;
 Client.cs (6) : using System.Linq.Expressions;
 Client.cs (7) : using System.Net;
-Client.cs (26) : try
-Client.cs (27) : {
-Client.cs (28) : if (m_tcpClient!=null)
-Client.cs (29) : {
-Client.cs (30) : m_tcpClient.Close();
-Client.cs (31) : }
-Client.cs (32) : TcpClient newClient = new TcpClient();
-Client.cs (33) : m_tcpClient.Connect(ipAddress, port);
-Client.cs (34) : return true;
-Client.cs (36) : }catch
-Client.cs (37) : {
-Client.cs (42) : }
-Client.cs (51) : string messageToSend= message;
-Client.cs (52) : try
-Client.cs (53) : {
-Client.cs (54) : NetworkStream stream = m_tcpClient.GetStream();
-Client.cs (55) : //Pasamos el mensaje string a bytes para mandar (con UTF8 se transforma)
-Client.cs (56) : byte[] dataToSend = Encoding.UTF8.GetBytes(messageToSend);
-Client.cs (57) : //Mandamos al servidor el mensaje en bytes donde 0 es offset
-Client.cs (58) : stream.Write(dataToSend, 0, dataToSend.Length);
-Client.cs (60) : //EL buffer lee la respuesta del servido. EL tamaño es 4096 pero se pyede cambiar dependiendo de la respuesta esperada
-Client.cs (61) : byte[] buffer = new byte[4096];
-Client.cs (62) : int bytesRead = stream.Read(buffer, 0, buffer.Length);
-Client.cs (64) : if(bytesRead==0)
-Client.cs (65) : {
-Client.cs (66) : return null;
-Client.cs (67) : }
-Client.cs (68) : //De vuelta a string la respuesta dle servidor
-Client.cs (69) : string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-Client.cs (70) : return response;
-Client.cs (71) : }
-Client.cs (72) : catch
-Client.cs (73) : {
-Client.cs (74) : return null;
-Client.cs (75) : }
-Client.cs (83) : string request= XmlSerializer.OpenDatabase(database, username, password);
-Client.cs (84) : string response = SendString(request);
-Client.cs (86) : if (response==null)
-Client.cs (87) : {
-Client.cs (88) : error="An error message from Constants.cs";
+Client.cs (9) : using System.Runtime.Serialization.Formatters;
+Client.cs (27) : try
+Client.cs (28) : {
+Client.cs (29) : if (m_tcpClient!=null)
+Client.cs (30) : {
+Client.cs (31) : m_tcpClient.Close();
+Client.cs (32) : }
+Client.cs (33) : TcpClient newClient = new TcpClient();
+Client.cs (34) : m_tcpClient.Connect(ipAddress, port);
+Client.cs (35) : return true;
+Client.cs (37) : }catch
+Client.cs (38) : {
+Client.cs (43) : }
+Client.cs (52) : string messageToSend= message;
+Client.cs (53) : try
+Client.cs (54) : {
+Client.cs (55) : NetworkStream stream = m_tcpClient.GetStream();
+Client.cs (56) : //Pasamos el mensaje string a bytes para mandar (con UTF8 se transforma)
+Client.cs (57) : byte[] dataToSend = Encoding.UTF8.GetBytes(messageToSend);
+Client.cs (58) : //Mandamos al servidor el mensaje en bytes donde 0 es offset
+Client.cs (59) : stream.Write(dataToSend, 0, dataToSend.Length);
+Client.cs (61) : //EL buffer lee la respuesta del servido. EL tamaño es 4096 pero se pyede cambiar dependiendo de la respuesta esperada
+Client.cs (62) : byte[] buffer = new byte[4096];
+Client.cs (63) : int bytesRead = stream.Read(buffer, 0, buffer.Length);
+Client.cs (65) : if(bytesRead==0)
+Client.cs (66) : {
+Client.cs (67) : return null;
+Client.cs (68) : }
+Client.cs (69) : //De vuelta a string la respuesta dle servidor
+Client.cs (70) : string response = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+Client.cs (71) : return response;
+Client.cs (72) : }
+Client.cs (73) : catch
+Client.cs (74) : {
+Client.cs (75) : return null;
+Client.cs (76) : }
+Client.cs (84) : string request= XmlSerializer.OpenDatabase(database, username, password);
+Client.cs (85) : string response = SendString(request);
+Client.cs (87) : if (database==null || username==null || password==null)
+Client.cs (88) : {
 Client.cs (90) : }
-Client.cs (92) : bool success= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
-Client.cs (94) : return success;
+Client.cs (92) : bool Error= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (94) : return Error;
 Client.cs (103) : string request= XmlSerializer.CreateDatabase(database, username, password);
 Client.cs (104) : string response = SendString(request);
-Client.cs (105) : if(response==null)
-Client.cs (106) : {
-Client.cs (107) : error="An error message from Constants.cs";
-Client.cs (109) : }
-Client.cs (110) : bool success= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
-Client.cs (112) : return success;
-Client.cs (120) : string queryRequest=XmlSerializer.Query(query);
-Client.cs (121) : string response = SendString(queryRequest);
-Client.cs (122) : if (response==null)
-Client.cs (123) : {
-Client.cs (124) : return "An error message from Constants.cs";
-Client.cs (125) : }
-Client.cs (127) : if(XmlDeserializer.ParseQueryAnswer(response, out string answerContent))
-Client.cs (128) : {
-Client.cs (129) : return answerContent;
-Client.cs (130) : }
-Client.cs (131) : else
-Client.cs (132) : {
-Client.cs (133) : return answerContent;
-Client.cs (134) : }
-Client.cs (141) : SendString(XmlSerializer.CloseConnection);
-Client.cs (142) : m_tcpClient.Close();
-Server.cs (72) : ;
+Client.cs (106) : bool Error= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (108) : return Error;
+Client.cs (116) : string queryRequest=XmlSerializer.Query(query);
+Client.cs (117) : string response = SendString(queryRequest);
+Client.cs (120) : if(XmlDeserializer.ParseQueryAnswer(response, out string answerContent))
+Client.cs (121) : {
+Client.cs (122) : return answerContent;
+Client.cs (123) : }
+Client.cs (124) : else
+Client.cs (125) : {
+Client.cs (126) : return null;
+Client.cs (127) : }
+Client.cs (134) : SendString(XmlSerializer.CloseConnection);
+Client.cs (135) : m_tcpClient.Close();
 AddUser.cs (21) : Username = username;
 AddUser.cs (22) : Password = password;
 AddUser.cs (23) : ProfileName = profileName;
