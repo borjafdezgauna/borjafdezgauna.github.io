@@ -1,151 +1,163 @@
 Database.cs (26) : m_username = adminUsername;
 Database.cs (27) : //instanciar manager!!! (SECURITY)
-Database.cs (34) : if (table != null)
-Database.cs (35) : {
-Database.cs (36) : Tables.Add(table);
-Database.cs (37) : return true;
-Database.cs (38) : }
-Database.cs (39) : else { return false; }
-Database.cs (47) : foreach (Table t in Tables)
-Database.cs (48) : {
-Database.cs (49) : if (t.Name.Equals(tableName))
-Database.cs (50) : {
-Database.cs (51) : return t;
-Database.cs (52) : }
-Database.cs (53) : }
-Database.cs (64) : if (tableName != null && !(tableName.Equals("")))
-Database.cs (65) : {
-Database.cs (66) : foreach (Table t in Tables)
-Database.cs (67) : {
-Database.cs (68) : if (t.Name.Equals(tableName))
-Database.cs (69) : {
-Database.cs (70) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (71) : return false;
-Database.cs (72) : }
-Database.cs (73) : }
-Database.cs (75) : if (ColumnDefinition == null || ColumnDefinition.Count <= 0)
-Database.cs (76) : {
-Database.cs (77) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
-Database.cs (79) : }
-Database.cs (81) : Table newT = new Table(tableName, ColumnDefinition);
-Database.cs (82) : Tables.Add(newT);
-Database.cs (83) : LastErrorMessage = Constants.CreateTableSuccess;
-Database.cs (84) : return true;
-Database.cs (85) : }
-Database.cs (86) : else { return false; }
-Database.cs (94) : if (tableName != null)
-Database.cs (95) : {
-Database.cs (96) : foreach (Table t in Tables)
-Database.cs (97) : {
-Database.cs (98) : if (t.Name.Equals(tableName))
-Database.cs (99) : {
-Database.cs (100) : Tables.Remove(t);
-Database.cs (101) : LastErrorMessage = Constants.DropTableSuccess;
-Database.cs (102) : return true;
-Database.cs (103) : }
-Database.cs (104) : }
-Database.cs (105) : }
-Database.cs (106) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (275) : try
-Database.cs (276) : {
-Database.cs (277) : if (databaseName == null || databaseName.Equals("")) { return false; }
-Database.cs (279) : if (!Directory.Exists(databaseName))
-Database.cs (280) : {
-Database.cs (281) : Directory.CreateDirectory(databaseName);
-Database.cs (282) : }
-Database.cs (284) : if (Tables != null && Tables.Count != 0)
+Database.cs (28) : SecurityManager = new Manager(adminUsername);
+Database.cs (30) : Profile adminProfile = new Profile();
+Database.cs (31) : adminProfile.Name = Profile.AdminProfileName;
+Database.cs (32) : adminProfile.Users.Add(new User(adminUsername, adminPassword));
+Database.cs (33) : SecurityManager.Profiles.Add(adminProfile);
+Database.cs (39) : if (table != null)
+Database.cs (40) : {
+Database.cs (41) : Tables.Add(table);
+Database.cs (42) : return true;
+Database.cs (43) : }
+Database.cs (44) : else { return false; }
+Database.cs (52) : foreach (Table t in Tables)
+Database.cs (53) : {
+Database.cs (54) : if (t.Name.Equals(tableName))
+Database.cs (55) : {
+Database.cs (56) : return t;
+Database.cs (57) : }
+Database.cs (58) : }
+Database.cs (69) : if (tableName != null && !(tableName.Equals("")))
+Database.cs (70) : {
+Database.cs (71) : foreach (Table t in Tables)
+Database.cs (72) : {
+Database.cs (73) : if (t.Name.Equals(tableName))
+Database.cs (74) : {
+Database.cs (75) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (76) : return false;
+Database.cs (77) : }
+Database.cs (78) : }
+Database.cs (80) : if (ColumnDefinition == null || ColumnDefinition.Count <= 0)
+Database.cs (81) : {
+Database.cs (82) : LastErrorMessage = Constants.DatabaseCreatedWithoutColumnsError;
+Database.cs (84) : }
+Database.cs (86) : Table newT = new Table(tableName, ColumnDefinition);
+Database.cs (87) : Tables.Add(newT);
+Database.cs (88) : LastErrorMessage = Constants.CreateTableSuccess;
+Database.cs (89) : return true;
+Database.cs (90) : }
+Database.cs (91) : else { return false; }
+Database.cs (99) : if (tableName != null)
+Database.cs (100) : {
+Database.cs (101) : foreach (Table t in Tables)
+Database.cs (102) : {
+Database.cs (103) : if (t.Name.Equals(tableName))
+Database.cs (104) : {
+Database.cs (105) : Tables.Remove(t);
+Database.cs (106) : LastErrorMessage = Constants.DropTableSuccess;
+Database.cs (107) : return true;
+Database.cs (108) : }
+Database.cs (109) : }
+Database.cs (110) : }
+Database.cs (111) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (280) : try
+Database.cs (281) : {
+Database.cs (282) : if (databaseName == null || databaseName.Equals("")) { return false; }
+Database.cs (284) : if (!Directory.Exists(databaseName))
 Database.cs (285) : {
-Database.cs (286) : String toSave;
-Database.cs (287) : List<ColumnDefinition> cds;
-Database.cs (288) : ColumnDefinition c;
-Database.cs (289) : Row r;
-Database.cs (291) : foreach (Table t in Tables)
-Database.cs (292) : {
-Database.cs (293) : TextWriter writer = System.IO.File.CreateText(databaseName + "\\" + t.Name + ".txt"); //creates a new text file
-Database.cs (294) : cds = new List<ColumnDefinition>();
-Database.cs (295) : for (int i = 0; i < t.NumColumns(); i++)
-Database.cs (296) : {
-Database.cs (297) : c = t.GetColumn(i);
-Database.cs (298) : writer.WriteLine(c.AsText());
-Database.cs (299) : }
-Database.cs (300) : writer.WriteLine();
-Database.cs (301) : for (int i = 0; i < t.NumRows(); i++)
-Database.cs (302) : {
-Database.cs (303) : r = t.GetRow(i);
-Database.cs (304) : writer.WriteLine(r.AsText());
-Database.cs (305) : }
-Database.cs (306) : writer.Close();
-Database.cs (307) : }
-Database.cs (308) : }
-Database.cs (309) : return true;
+Database.cs (286) : Directory.CreateDirectory(databaseName);
+Database.cs (287) : }
+Database.cs (289) : if (Tables != null && Tables.Count != 0)
+Database.cs (290) : {
+Database.cs (291) : String toSave;
+Database.cs (292) : List<ColumnDefinition> cds;
+Database.cs (293) : ColumnDefinition c;
+Database.cs (294) : Row r;
+Database.cs (296) : foreach (Table t in Tables)
+Database.cs (297) : {
+Database.cs (298) : TextWriter writer = System.IO.File.CreateText(databaseName + "\\" + t.Name + ".txt"); //creates a new text file
+Database.cs (299) : cds = new List<ColumnDefinition>();
+Database.cs (300) : for (int i = 0; i < t.NumColumns(); i++)
+Database.cs (301) : {
+Database.cs (302) : c = t.GetColumn(i);
+Database.cs (303) : writer.WriteLine(c.AsText());
+Database.cs (304) : }
+Database.cs (305) : writer.WriteLine();
+Database.cs (306) : for (int i = 0; i < t.NumRows(); i++)
+Database.cs (307) : {
+Database.cs (308) : r = t.GetRow(i);
+Database.cs (309) : writer.WriteLine(r.AsText());
 Database.cs (310) : }
-Database.cs (311) : catch (Exception e)
-Database.cs (312) : {
-Database.cs (313) : return false;
-Database.cs (314) : }
-Database.cs (325) : try
-Database.cs (326) : {
-Database.cs (327) : if (databaseName != null && !databaseName.Equals(""))
-Database.cs (328) : {
-Database.cs (329) : string[] files = Directory.GetFiles(databaseName, "*.txt");
-Database.cs (330) : Database db = new Database();
-Database.cs (331) : String fileNoExtension;
-Database.cs (332) : foreach (string file in files)
+Database.cs (311) : writer.Close();
+Database.cs (312) : }
+Database.cs (313) : }
+Database.cs (314) : return true;
+Database.cs (315) : }
+Database.cs (316) : catch (Exception e)
+Database.cs (317) : {
+Database.cs (318) : return false;
+Database.cs (319) : }
+Database.cs (330) : try
+Database.cs (331) : {
+Database.cs (332) : if (databaseName != null && !databaseName.Equals(""))
 Database.cs (333) : {
-Database.cs (334) : fileNoExtension = System.IO.Path.GetFileNameWithoutExtension(file);
-Database.cs (335) : bool exists = System.IO.File.Exists(file); //checks that the file exists
-Database.cs (336) : if (!exists) { return null; }
-Database.cs (337) : List<ColumnDefinition> cd = new List<ColumnDefinition>();
-Database.cs (339) : TextReader reader = System.IO.File.OpenText(file); //opens an existing file
-Database.cs (340) : String line = reader.ReadLine();
-Database.cs (341) : while (line != null && !line.Equals(""))
-Database.cs (342) : {
-Database.cs (343) : cd.Add(ColumnDefinition.Parse(line));
-Database.cs (344) : line = reader.ReadLine();
-Database.cs (345) : }
-Database.cs (346) : Table t = new Table(fileNoExtension, cd);
-Database.cs (347) : line = reader.ReadLine();
-Database.cs (349) : while (line != null && !line.Equals(""))
-Database.cs (350) : {
-Database.cs (351) : t.AddRow(Row.Parse(cd, line));
+Database.cs (334) : string[] files = Directory.GetFiles(databaseName, "*.txt");
+Database.cs (335) : Database db = new Database();
+Database.cs (336) : String fileNoExtension;
+Database.cs (337) : foreach (string file in files)
+Database.cs (338) : {
+Database.cs (339) : fileNoExtension = System.IO.Path.GetFileNameWithoutExtension(file);
+Database.cs (340) : bool exists = System.IO.File.Exists(file); //checks that the file exists
+Database.cs (341) : if (!exists) { return null; }
+Database.cs (342) : List<ColumnDefinition> cd = new List<ColumnDefinition>();
+Database.cs (344) : TextReader reader = System.IO.File.OpenText(file); //opens an existing file
+Database.cs (345) : String line = reader.ReadLine();
+Database.cs (346) : while (line != null && !line.Equals(""))
+Database.cs (347) : {
+Database.cs (348) : cd.Add(ColumnDefinition.Parse(line));
+Database.cs (349) : line = reader.ReadLine();
+Database.cs (350) : }
+Database.cs (351) : Table t = new Table(fileNoExtension, cd);
 Database.cs (352) : line = reader.ReadLine();
-Database.cs (353) : }
-Database.cs (355) : db.AddTable(t);
-Database.cs (356) : reader.Close();
-Database.cs (357) : }
-Database.cs (358) : return db;
-Database.cs (359) : }
-Database.cs (360) : }
-Database.cs (361) : catch (Exception e)
-Database.cs (362) : {
-Database.cs (363) : return null;
-Database.cs (364) : }
-Database.cs (422) : public static bool AreEqual(Database db1, Database db2)
-Database.cs (423) : {
-Database.cs (424) : if (db1 == null || db2 == null) { return false; }
-Database.cs (425) : if (db1.Tables.Count != db2.Tables.Count) { return false; }
-Database.cs (426) : for (int i = 0; i < db1.Tables.Count; i++) //IMPORTA EL ORDEN (para el save and load da igual, si se hace uso de este metodo comprobar ese matiz)
-Database.cs (427) : {
-Database.cs (428) : Table t1 = db1.Tables[i];
-Database.cs (429) : Table t2 = db2.Tables[i];
-Database.cs (431) : if (t1 == null || t2 == null) { return false; }
-Database.cs (432) : if (t1.NumColumns() != t2.NumColumns()) { return false; }
-Database.cs (433) : for (int j = 0; j < t1.NumColumns(); j++)
-Database.cs (434) : {
-Database.cs (435) : if (t1.GetColumn(j).AsText() != t2.GetColumn(j).AsText())
+Database.cs (354) : while (line != null && !line.Equals(""))
+Database.cs (355) : {
+Database.cs (356) : t.AddRow(Row.Parse(cd, line));
+Database.cs (357) : line = reader.ReadLine();
+Database.cs (358) : }
+Database.cs (360) : db.AddTable(t);
+Database.cs (361) : reader.Close();
+Database.cs (362) : }
+Database.cs (363) : if(!db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (364) : {
+Database.cs (365) : return null;
+Database.cs (366) : }
+Database.cs (367) : else
+Database.cs (368) : {
+Database.cs (369) : return db;
+Database.cs (370) : }
+Database.cs (372) : }
+Database.cs (373) : }
+Database.cs (374) : catch (Exception e)
+Database.cs (375) : {
+Database.cs (376) : return null;
+Database.cs (377) : }
+Database.cs (435) : public static bool AreEqual(Database db1, Database db2)
 Database.cs (436) : {
-Database.cs (437) : return false;
-Database.cs (438) : }
-Database.cs (439) : }
-Database.cs (441) : if (t1.NumRows() != t2.NumRows()) { return false; }
-Database.cs (442) : for (int z = 0; z < t1.NumRows(); z++)
-Database.cs (443) : {
-Database.cs (444) : if (t1.GetRow(z).AsText() != t2.GetRow(z).AsText())
-Database.cs (445) : { return false; }
-Database.cs (446) : }
-Database.cs (447) : }
-Database.cs (448) : return true;
-Database.cs (449) : }
+Database.cs (437) : if (db1 == null || db2 == null) { return false; }
+Database.cs (438) : if (db1.Tables.Count != db2.Tables.Count) { return false; }
+Database.cs (439) : for (int i = 0; i < db1.Tables.Count; i++) //IMPORTA EL ORDEN (para el save and load da igual, si se hace uso de este metodo comprobar ese matiz)
+Database.cs (440) : {
+Database.cs (441) : Table t1 = db1.Tables[i];
+Database.cs (442) : Table t2 = db2.Tables[i];
+Database.cs (444) : if (t1 == null || t2 == null) { return false; }
+Database.cs (445) : if (t1.NumColumns() != t2.NumColumns()) { return false; }
+Database.cs (446) : for (int j = 0; j < t1.NumColumns(); j++)
+Database.cs (447) : {
+Database.cs (448) : if (t1.GetColumn(j).AsText() != t2.GetColumn(j).AsText())
+Database.cs (449) : {
+Database.cs (450) : return false;
+Database.cs (451) : }
+Database.cs (452) : }
+Database.cs (454) : if (t1.NumRows() != t2.NumRows()) { return false; }
+Database.cs (455) : for (int z = 0; z < t1.NumRows(); z++)
+Database.cs (456) : {
+Database.cs (457) : if (t1.GetRow(z).AsText() != t2.GetRow(z).AsText())
+Database.cs (458) : { return false; }
+Database.cs (459) : }
+Database.cs (460) : }
+Database.cs (461) : return true;
+Database.cs (462) : }
 Table.cs (113) : if (ColumnDefinitions != null && ColumnDefinitions.Count > 0)
 Table.cs (114) : {
 Table.cs (116) : ColumnDefinition last = ColumnDefinitions[ColumnDefinitions.Count - 1];
@@ -406,22 +418,61 @@ Manager.cs (253) : var keys = p.PrivilegesOn.Keys;
 Manager.cs (254) : foreach(String x in keys)
 Manager.cs (255) : {
 Manager.cs (256) : writer.Write(x + "%");
-Manager.cs (257) : foreach(Privilege pr in p.PrivilegesOn[x])
+Manager.cs (257) : if(p.PrivilegesOn != null && p.PrivilegesOn.Count != 0)
 Manager.cs (258) : {
-Manager.cs (259) : writer.Write(pr+",");
-Manager.cs (260) : }
-Manager.cs (261) : writer.WriteLine();
+Manager.cs (259) : foreach(Privilege pr in p.PrivilegesOn[x])
+Manager.cs (260) : {
+Manager.cs (261) : writer.Write(pr+",");
 Manager.cs (262) : }
 Manager.cs (263) : writer.WriteLine();
-Manager.cs (264) : foreach(User u in p.Users)
-Manager.cs (265) : {
-Manager.cs (266) : writer.WriteLine(u.Username + "," + u.EncryptedPassword);
-Manager.cs (267) : }
-Manager.cs (268) : writer.Close();
-Manager.cs (269) : }
+Manager.cs (264) : }
+Manager.cs (265) : }
+Manager.cs (266) : writer.WriteLine();
+Manager.cs (267) : foreach(User u in p.Users)
+Manager.cs (268) : {
+Manager.cs (269) : writer.WriteLine(u.Username + "," + u.EncryptedPassword);
 Manager.cs (270) : }
-Manager.cs (271) : }
-Manager.cs (272) : catch (Exception e)
-Manager.cs (273) : {
-Manager.cs (274) : return;
-Manager.cs (275) : }
+Manager.cs (271) : writer.Close();
+Manager.cs (272) : }
+Manager.cs (273) : }
+Manager.cs (274) : }
+Manager.cs (275) : catch (Exception e)
+Manager.cs (276) : {
+Manager.cs (277) : return;
+Manager.cs (278) : }
+Manager.cs (281) : public static bool AreEqual(Manager m1, Manager m2)
+Manager.cs (282) : {
+Manager.cs (283) : if(m1 == null || m2 == null || !m1.m_username.Equals(m2.m_username)) {  return false; }
+Manager.cs (285) : List<Profile> p1 = m1.Profiles, p2 = m2.Profiles;
+Manager.cs (286) : if (p1 == null || p2 == null) { return false; }
+Manager.cs (287) : if (p1.Count == p2.Count)
+Manager.cs (288) : {
+Manager.cs (289) : String toCompare1 = toStringProfiles(p1), toCompare2 = toStringProfiles(p2);
+Manager.cs (290) : return (toCompare1.Equals(toCompare2));
+Manager.cs (291) : }
+Manager.cs (292) : return false;
+Manager.cs (293) : }
+Manager.cs (295) : public static string toStringProfiles (List<Profile> Profiles)
+Manager.cs (296) : {
+Manager.cs (297) : string result = "";
+Manager.cs (298) : foreach (Profile p in Profiles)
+Manager.cs (299) : {
+Manager.cs (300) : result += p.Name;
+Manager.cs (301) : var keys = p.PrivilegesOn.Keys;
+Manager.cs (302) : foreach (String x in keys)
+Manager.cs (303) : {
+Manager.cs (304) : result += x + "%";
+Manager.cs (305) : foreach (Privilege pr in p.PrivilegesOn[x])
+Manager.cs (306) : {
+Manager.cs (307) : result += pr + ",";
+Manager.cs (308) : }
+Manager.cs (309) : result += "\n";
+Manager.cs (310) : }
+Manager.cs (311) : result += "\n";
+Manager.cs (312) : foreach (User u in p.Users)
+Manager.cs (313) : {
+Manager.cs (314) : result += u.Username + "," + u.EncryptedPassword;
+Manager.cs (315) : }
+Manager.cs (316) : }
+Manager.cs (317) : return result;
+Manager.cs (318) : }

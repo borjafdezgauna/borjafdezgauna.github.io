@@ -50,22 +50,21 @@ Database.cs (164) : return result;
 Database.cs (235) : //DEADLINE 1.C: Save this database to disk with the given name
 Database.cs (236) : //If everything goes ok, return true, false otherwise.
 Database.cs (237) : //DEADLINE 5: Save the SecurityManager so that it can be loaded with the database in Load()
-Database.cs (243) : var options = new JsonSerializerOptions { IncludeFields = true };
-Database.cs (245) : string json = JsonSerializer.Serialize(this.Tables, options);
-Database.cs (248) : if(this.SecurityManager != null)
-Database.cs (249) : {
-Database.cs (250) : this.SecurityManager.Save(databaseName);
-Database.cs (251) : }
-Database.cs (253) : return true;
-Database.cs (261) : //After loading the database, load the SecurityManager and check the password is correct. If it's not,
-Database.cs (262) : //return null. If it is return the database
-Database.cs (275) : Manager verifManager = Manager.Load(databaseName, username);
-Database.cs (276) : if (!verifManager.IsPasswordCorrect(username, password))
+Database.cs (243) : var options = new JsonSerializerOptions
+Database.cs (244) : {
+Database.cs (245) : IncludeFields = true
+Database.cs (246) : };
+Database.cs (247) : string json = JsonSerializer.Serialize(Tables, options);
+Database.cs (248) : File.WriteAllText(filePath, json);
+Database.cs (249) : return true;
+Database.cs (257) : //After loading the database, load the SecurityManager and check the password is correct. If it's not,
+Database.cs (258) : //return null. If it is return the database
+Database.cs (270) : var options = new JsonSerializerOptions
+Database.cs (272) : IncludeFields = true
+Database.cs (273) : };
+Database.cs (277) : if (tables == null)
 Database.cs (278) : return null;
-Database.cs (279) : }
-Database.cs (282) : var options = new JsonSerializerOptions { IncludeFields = true };
-Database.cs (285) : if (tables == null) return null;
-Database.cs (290) : db.SecurityManager = verifManager;
+Database.cs (283) : db.SecurityManager = new Manager(username);
 Row.cs (91) : if (value == null)
 Row.cs (94) : return value.Replace(Delimiter, DelimiterEncoded);
 Table.cs (3) : using System.Data.Common;
@@ -172,8 +171,8 @@ Insert.cs (19) : }
 Insert.cs (21) : public Insert()
 Insert.cs (22) : {
 Insert.cs (23) : Values = new List<string>();
-Insert.cs (31) : database.Insert(this.Table, this.Values);
-Insert.cs (32) : if (string.IsNullOrEmpty(database.LastErrorMessage))
+Insert.cs (31) : bool success = database.Insert(this.Table, this.Values);
+Insert.cs (32) : if (success)
 Insert.cs (33) : {
 Insert.cs (34) : return Constants.InsertSuccess;
 Insert.cs (35) : }
@@ -186,33 +185,33 @@ MiniSQLParser.cs (49) : //SELECT
 MiniSQLParser.cs (50) : match = Regex.Match(miniSQLQuery, selectPattern);
 MiniSQLParser.cs (52) : if (match.Success)
 MiniSQLParser.cs (53) : {
-MiniSQLParser.cs (65) : bool validCondition = true;
+MiniSQLParser.cs (65) : bool validCond = true;
 MiniSQLParser.cs (68) : {
 MiniSQLParser.cs (69) : var conditionMatch = Regex.Match(condition.Trim(), @"^(\w+)(<=|>=|=|<|>)'([^'\s]+)'$");
 MiniSQLParser.cs (70) : if (!conditionMatch.Success)
-MiniSQLParser.cs (72) : validCondition = false;
+MiniSQLParser.cs (72) : validCond = false;
 MiniSQLParser.cs (73) : break;
 MiniSQLParser.cs (74) : }
-MiniSQLParser.cs (82) : if (!validCondition) return null;
-MiniSQLParser.cs (85) : }
-MiniSQLParser.cs (87) : //INSERT
-MiniSQLParser.cs (88) : match = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (89) : if (match.Success)
-MiniSQLParser.cs (90) : {
-MiniSQLParser.cs (91) : string tableName = match.Groups[1].Value;
-MiniSQLParser.cs (93) : string literalValues = match.Groups[2].Value;
-MiniSQLParser.cs (94) : List<string> values = literalValues.Split(',').Select(v => v.Trim().Trim('\'')).ToList();
-MiniSQLParser.cs (95) : if (!literalValues.Contains("'"))
-MiniSQLParser.cs (96) : {
-MiniSQLParser.cs (97) : return null;
-MiniSQLParser.cs (98) : }
-MiniSQLParser.cs (100) : return new Insert(tableName, values);
-MiniSQLParser.cs (101) : }
-MiniSQLParser.cs (237) : match = Regex.Match(miniSQLQuery, addUserPattern);
-MiniSQLParser.cs (247) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
-MiniSQLParser.cs (264) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
-MiniSQLParser.cs (268) : return new DropSecurityProfile(profileName);
-MiniSQLParser.cs (272) : match = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (83) : if (!validCond) return null;
+MiniSQLParser.cs (86) : }
+MiniSQLParser.cs (88) : //INSERT
+MiniSQLParser.cs (89) : match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (90) : if (match.Success)
+MiniSQLParser.cs (91) : {
+MiniSQLParser.cs (92) : string tableName = match.Groups[1].Value;
+MiniSQLParser.cs (94) : string literalValues = match.Groups[2].Value;
+MiniSQLParser.cs (95) : List<string> values = literalValues.Split(',').Select(v => v.Trim().Trim('\'')).ToList();
+MiniSQLParser.cs (96) : if (!literalValues.Contains("'"))
+MiniSQLParser.cs (97) : {
+MiniSQLParser.cs (98) : return null;
+MiniSQLParser.cs (99) : }
+MiniSQLParser.cs (101) : return new Insert(tableName, values);
+MiniSQLParser.cs (102) : }
+MiniSQLParser.cs (238) : match = Regex.Match(miniSQLQuery, addUserPattern);
+MiniSQLParser.cs (248) : match = Regex.Match(miniSQLQuery, createSecurityProfilePattern);
+MiniSQLParser.cs (265) : match = Regex.Match(miniSQLQuery, dropSecurityProfilePattern);
+MiniSQLParser.cs (269) : return new DropSecurityProfile(profileName);
+MiniSQLParser.cs (273) : match = Regex.Match(miniSQLQuery, grantPattern);
 Select.cs (18) : this.Table = table;
 Select.cs (19) : this.Columns = columns ?? new List<string>();
 Select.cs (20) : this.Where = condition;
@@ -220,33 +219,38 @@ Select.cs (21) : }
 Select.cs (23) : public Select()
 Select.cs (24) : {
 Select.cs (25) : Columns = new List<string>();
-Select.cs (31) : database.Select(this.Table, this.Columns, this.Where);
-Select.cs (32) : return database.LastErrorMessage;
+Select.cs (31) : Table table = database.Select(this.Table, this.Columns, this.Where);
+Select.cs (32) : if(table == null)
+Select.cs (33) : {
+Select.cs (34) : return database.LastErrorMessage;
+Select.cs (35) : }
+Select.cs (36) : return table.ToString();
 Manager.cs (8) : using System.Xml.Linq;
-Manager.cs (105) : if (string.IsNullOrEmpty(username)) return null;
-Manager.cs (107) : for (int i=0; i<Profiles.Count; i++)
-Manager.cs (108) : {
-Manager.cs (109) : var profile = Profiles[i];
-Manager.cs (110) : for (int j=0; j<profile.Users.Count; j++)
-Manager.cs (111) : {
-Manager.cs (112) : var user = profile.Users[j];
-Manager.cs (113) : if(user.Username.Equals(username)) return user;
-Manager.cs (114) : }
-Manager.cs (115) : }
-Manager.cs (122) : if(string.IsNullOrEmpty(profileName)) return null;
-Manager.cs (124) : for(int i=0; i<Profiles.Count; i++)
-Manager.cs (125) : {
-Manager.cs (126) : var profile = Profiles[i];
-Manager.cs (127) : if(profile.Name.Equals(profileName)) return profile;
-Manager.cs (128) : }
-Manager.cs (135) : if(string.IsNullOrEmpty (username)) return null;
-Manager.cs (137) : for(int i=0; i < Profiles.Count; i++)
-Manager.cs (138) : {
-Manager.cs (139) : var profile= Profiles[i];
-Manager.cs (140) : for(int j=0; j<profile.Users.Count; j++)
-Manager.cs (141) : {
-Manager.cs (142) : var user = profile.Users[j];
-Manager.cs (143) : if (user.Username.Equals(username)) return profile;
-Manager.cs (144) : }
-Manager.cs (145) : }
-Manager.cs (146) : return null;
+Manager.cs (107) : if (string.IsNullOrEmpty(username)) return null;
+Manager.cs (109) : for (int i=0; i<Profiles.Count; i++)
+Manager.cs (110) : {
+Manager.cs (111) : var profile = Profiles[i];
+Manager.cs (112) : for (int j=0; j<profile.Users.Count; j++)
+Manager.cs (113) : {
+Manager.cs (114) : var user = profile.Users[j];
+Manager.cs (115) : if(user.Username.Equals(username)) return user;
+Manager.cs (116) : }
+Manager.cs (117) : }
+Manager.cs (124) : if(string.IsNullOrEmpty(profileName)) return null;
+Manager.cs (126) : if (profileName.Equals("admin", StringComparison.OrdinalIgnoreCase)) return new Profile { Name = "admin" };
+Manager.cs (128) : for (int i=0; i<Profiles.Count; i++)
+Manager.cs (129) : {
+Manager.cs (130) : var profile = Profiles[i];
+Manager.cs (131) : if(profile.Name.Equals(profileName)) return profile;
+Manager.cs (132) : }
+Manager.cs (139) : if(string.IsNullOrEmpty (username)) return null;
+Manager.cs (141) : for(int i=0; i < Profiles.Count; i++)
+Manager.cs (142) : {
+Manager.cs (143) : var profile= Profiles[i];
+Manager.cs (144) : for(int j=0; j<profile.Users.Count; j++)
+Manager.cs (145) : {
+Manager.cs (146) : var user = profile.Users[j];
+Manager.cs (147) : if (user.Username.Equals(username)) return profile;
+Manager.cs (148) : }
+Manager.cs (149) : }
+Manager.cs (150) : return null;
