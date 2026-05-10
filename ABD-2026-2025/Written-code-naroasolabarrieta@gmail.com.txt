@@ -314,32 +314,36 @@ Manager.cs (222) : string usernamePart = parts[0].Trim();
 Manager.cs (223) : string passwordPart = parts[1].Trim();
 Manager.cs (225) : string userName = usernamePart;
 Manager.cs (226) : string password = passwordPart.Replace("Password: ", "").Trim();
-Manager.cs (228) : currentProfile.Users.Add(new User(userName, Encryption.Encrypt(password)));
-Manager.cs (229) : }
-Manager.cs (230) : else if (line.StartsWith("Table: "))
-Manager.cs (231) : {
-Manager.cs (232) : currentTable = line.Substring("Table: ".Length).Trim();
+Manager.cs (228) : currentProfile.Users.Add(new User()
+Manager.cs (229) : {
+Manager.cs (230) : Username = userName,
+Manager.cs (231) : EncryptedPassword = password
+Manager.cs (232) : });
 Manager.cs (233) : }
-Manager.cs (234) : else if (line.StartsWith("Privilege: "))
+Manager.cs (234) : else if (line.StartsWith("Table: "))
 Manager.cs (235) : {
-Manager.cs (236) : if (currentProfile == null)
-Manager.cs (237) : continue;
-Manager.cs (238) : if (string.IsNullOrWhiteSpace(currentTable)) //HAU KENDU LEIKE goiku ---> WIYHOUT table null testa kendute ra
-Manager.cs (239) : continue;
-Manager.cs (240) : string privilegeStr = line.Substring("Privilege: ".Length).Trim();
-Manager.cs (242) : if (Enum.TryParse(privilegeStr, out Privilege privilege))
-Manager.cs (243) : {
-Manager.cs (244) : currentProfile.GrantPrivilege(currentTable, privilege);
-Manager.cs (245) : }
-Manager.cs (246) : }
-Manager.cs (247) : }
-Manager.cs (248) : if (manager.ProfileByName("admin") == null)
-Manager.cs (249) : {
-Manager.cs (250) : Profile adminProfile = new Profile() { Name = "admin" };
-Manager.cs (251) : adminProfile.Users.Add(new User("admin", "admin"));
-Manager.cs (252) : manager.Profiles.Add(adminProfile);
-Manager.cs (253) : }
-Manager.cs (255) : return manager;
+Manager.cs (236) : currentTable = line.Substring("Table: ".Length).Trim();
+Manager.cs (237) : }
+Manager.cs (238) : else if (line.StartsWith("Privilege: "))
+Manager.cs (239) : {
+Manager.cs (240) : if (currentProfile == null)
+Manager.cs (241) : continue;
+Manager.cs (242) : if (string.IsNullOrWhiteSpace(currentTable)) //HAU KENDU LEIKE goiku ---> WIYHOUT table null testa kendute ra
+Manager.cs (243) : continue;
+Manager.cs (244) : string privilegeStr = line.Substring("Privilege: ".Length).Trim();
+Manager.cs (246) : if (Enum.TryParse(privilegeStr, out Privilege privilege))
+Manager.cs (247) : {
+Manager.cs (248) : currentProfile.GrantPrivilege(currentTable, privilege);
+Manager.cs (249) : }
+Manager.cs (250) : }
+Manager.cs (251) : }
+Manager.cs (252) : if (manager.ProfileByName("admin") == null)
+Manager.cs (253) : {
+Manager.cs (254) : Profile adminProfile = new Profile() { Name = "admin" };
+Manager.cs (255) : adminProfile.Users.Add(new User("admin", "admin"));
+Manager.cs (256) : manager.Profiles.Add(adminProfile);
+Manager.cs (257) : }
+Manager.cs (259) : return manager;
 Profile.cs (20) : string tableName = table.ToUpper();
 Profile.cs (26) : if (!PrivilegesOn.ContainsKey(tableName))
 Profile.cs (28) : PrivilegesOn[tableName] = new List<Privilege>();
@@ -355,13 +359,6 @@ Profile.cs (50) : }
 Profile.cs (56) : public bool RevokePrivilege(string table, Privilege privilege)
 Profile.cs (58) : //TODO DEADLINE 5: Revoke this privilege on this table. Return false if there is an error, true otherwise
 User.cs (15) : this.Username = username;
-User.cs (17) : if (string.IsNullOrEmpty(password))
-User.cs (18) : {
-User.cs (19) : this.EncryptedPassword = "";
-User.cs (20) : return;
-User.cs (21) : }
-User.cs (22) : string encrypted = Encryption.Encrypt(password);
-User.cs (23) : if (password == encrypted)
-User.cs (24) : this.EncryptedPassword = password;
-User.cs (25) : else
-User.cs (26) : this.EncryptedPassword = encrypted;
+User.cs (16) : Username = username;
+User.cs (17) : EncryptedPassword = Encryption.Encrypt(password);
+User.cs (18) : }
