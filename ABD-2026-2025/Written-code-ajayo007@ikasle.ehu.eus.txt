@@ -59,12 +59,15 @@ Database.cs (248) : File.WriteAllText(filePath, json);
 Database.cs (251) : return true;
 Database.cs (259) : //After loading the database, load the SecurityManager and check the password is correct. If it's not,
 Database.cs (260) : //return null. If it is return the database
+Database.cs (262) : if (string.IsNullOrEmpty(databaseName) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+Database.cs (270) : string json = File.ReadAllText(filePath);
 Database.cs (272) : var options = new JsonSerializerOptions
 Database.cs (274) : IncludeFields = true
 Database.cs (275) : };
-Database.cs (279) : if (tables == null)
-Database.cs (280) : return null;
-Database.cs (285) : db.SecurityManager = new Manager(username);
+Database.cs (279) : Manager manager = Manager.Load(databaseName, username);
+Database.cs (281) : if (manager == null || !manager.IsPasswordCorrect(username, password))
+Database.cs (282) : return null;
+Database.cs (287) : db.SecurityManager = manager;
 Row.cs (88) : if (value == null)
 Row.cs (91) : return value.Replace(Delimiter, DelimiterEncoded);
 Table.cs (3) : using System.Data.Common;
@@ -240,7 +243,7 @@ Manager.cs (124) : if(user.Username.Equals(username)) return user;
 Manager.cs (125) : }
 Manager.cs (126) : }
 Manager.cs (133) : if(string.IsNullOrEmpty(profileName)) return null;
-Manager.cs (135) : if (profileName.Equals("admin", StringComparison.OrdinalIgnoreCase)) return new Profile { Name = "admin" };
+Manager.cs (135) : //if (profileName.Equals("admin", StringComparison.OrdinalIgnoreCase)) return new Profile { Name = "admin" };
 Manager.cs (137) : for (int i=0; i<Profiles.Count; i++)
 Manager.cs (138) : {
 Manager.cs (139) : var profile = Profiles[i];

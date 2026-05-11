@@ -312,17 +312,16 @@ DropTable.cs (36) : return true;
 DropTable.cs (37) : }
 DropTable.cs (38) : return false;
 DropTable.cs (39) : }
-Grant.cs (19) : PrivilegeName = privilegeName;
-Grant.cs (20) : TableName = tableName;
-Grant.cs (21) : ProfileName = profileName;
-Grant.cs (33) : Privilege privilegeObj = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
-Grant.cs (49) : public override bool Equals(object obj)
-Grant.cs (50) : {
-Grant.cs (51) : Grant other = (Grant)obj;
-Grant.cs (52) : return (PrivilegeName == other.PrivilegeName && TableName == other.TableName && ProfileName == other.ProfileName);
-Grant.cs (53) : }
+Grant.cs (20) : PrivilegeName = privilegeName;
+Grant.cs (21) : TableName = tableName;
+Grant.cs (22) : ProfileName = profileName;
+Grant.cs (63) : public override bool Equals(object obj)
+Grant.cs (64) : {
+Grant.cs (65) : Grant other = (Grant)obj;
+Grant.cs (66) : return (PrivilegeName == other.PrivilegeName && TableName == other.TableName && ProfileName == other.ProfileName);
+Grant.cs (67) : }
 MiniSQLParser.cs (2) : using System;
-MiniSQLParser.cs (15) : const string selectPattern = @"SELECT\s+([\w]+(?:,[\w]+)*)\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)\s*(<|>|=)\s*'(-?\d+(?:\.\d+)?|[a-zA-Z]+)')?";
+MiniSQLParser.cs (15) : const string selectPattern = @"SELECT\s+([\w]+(?:,[\w]+)*)\s+FROM\s+(\w+)(?:\s+WHERE\s+(\w+)(<|>|=)'(-?\d+(?:\.\d+)?|[a-zA-Z\s]+)')?";
 MiniSQLParser.cs (19) : const string dropTablePattern = @"DROP\s+TABLE\s+([\w+]+)";
 MiniSQLParser.cs (23) : const string createTablePattern = @"CREATE\s+TABLE\s+([\w+]+)\s+\(([\w]+\s+(?:INT|DOUBLE|TEXT)(?:,[\w+]+\s+(?:INT|DOUBLE|TEXT))*)?\)";
 MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z]+)";
@@ -419,14 +418,14 @@ MiniSQLParser.cs (198) : if (match.Success && match.Length == miniSQLQuery.Lengt
 MiniSQLParser.cs (199) : {
 MiniSQLParser.cs (200) : return new DropSecurityProfile(match.Groups[1].Value);
 MiniSQLParser.cs (201) : }
-Revoke.cs (19) : PrivilegeName = privilegeName;
-Revoke.cs (20) : TableName = tableName;
-Revoke.cs (21) : ProfileName = profileName;
-Revoke.cs (64) : public override bool Equals(object obj)
-Revoke.cs (65) : {
-Revoke.cs (66) : Revoke other = (Revoke)obj;
-Revoke.cs (67) : return (PrivilegeName == other.PrivilegeName && TableName == other.TableName && ProfileName == other.ProfileName);
-Revoke.cs (68) : }
+Revoke.cs (20) : PrivilegeName = privilegeName;
+Revoke.cs (21) : TableName = tableName;
+Revoke.cs (22) : ProfileName = profileName;
+Revoke.cs (67) : public override bool Equals(object obj)
+Revoke.cs (68) : {
+Revoke.cs (69) : Revoke other = (Revoke)obj;
+Revoke.cs (70) : return (PrivilegeName == other.PrivilegeName && TableName == other.TableName && ProfileName == other.ProfileName);
+Revoke.cs (71) : }
 Select.cs (26) : Table result = database.Select(Table,Columns,Where);
 Select.cs (27) : if (result == null || result.ToString() == null)
 Select.cs (28) : {
@@ -462,153 +461,126 @@ Update.cs (37) : return true;
 Update.cs (38) : }
 Update.cs (39) : return false;
 Update.cs (40) : }
-Manager.cs (25) : if(ProfileByUser(m_username) != null && ProfileByUser(m_username).Name == Profile.AdminProfileName)
-Manager.cs (135) : if (IsUserAdmin())
-Manager.cs (136) : {
-Manager.cs (137) : Profiles.Add(profile);
-Manager.cs (138) : }
-Manager.cs (175) : foreach (Profile p in Profiles)
-Manager.cs (176) : {
-Manager.cs (177) : foreach (User u in p.Users)
-Manager.cs (178) : {
-Manager.cs (179) : if (u.Username.Equals(username))
-Manager.cs (180) : {
-Manager.cs (181) : return p;
+Manager.cs (24) : if(ProfileByUser(m_username) != null && ProfileByUser(m_username).Name == Profile.AdminProfileName)
+Manager.cs (134) : if (IsUserAdmin())
+Manager.cs (135) : {
+Manager.cs (136) : Profiles.Add(profile);
+Manager.cs (137) : }
+Manager.cs (174) : foreach (Profile p in Profiles)
+Manager.cs (175) : {
+Manager.cs (176) : foreach (User u in p.Users)
+Manager.cs (177) : {
+Manager.cs (178) : if (u.Username.Equals(username))
+Manager.cs (179) : {
+Manager.cs (180) : return p;
+Manager.cs (181) : }
 Manager.cs (182) : }
 Manager.cs (183) : }
-Manager.cs (184) : }
-Manager.cs (192) : if (IsUserAdmin())
-Manager.cs (193) : {
-Manager.cs (194) : foreach (Profile p in Profiles)
+Manager.cs (191) : if (IsUserAdmin())
+Manager.cs (192) : {
+Manager.cs (193) : Profile p = ProfileByName(profileName);
+Manager.cs (194) : if (p != null)
 Manager.cs (195) : {
-Manager.cs (197) : if (p.Name.Equals(profileName))
-Manager.cs (198) : {
-Manager.cs (199) : Profiles.Remove(p);
-Manager.cs (200) : }
-Manager.cs (201) : }
-Manager.cs (204) : return false;
-Manager.cs (205) : }
-Manager.cs (211) : Manager manager = new Manager(username);
-Manager.cs (212) : if (!Directory.Exists(databaseName))
-Manager.cs (213) : {
-Manager.cs (214) : return manager;
-Manager.cs (215) : }
-Manager.cs (216) : string[] files = Directory.GetFiles(databaseName, "*-profile.txt");
-Manager.cs (217) : foreach (string file in files)
-Manager.cs (218) : {
-Manager.cs (219) : StreamReader reader = new StreamReader(file);
-Manager.cs (221) : string profileName = Path.GetFileNameWithoutExtension(file).Replace("-profile", "");
-Manager.cs (222) : Profile p = new Profile();
-Manager.cs (223) : p.Name = profileName;
-Manager.cs (225) : string line = reader.ReadLine();
-Manager.cs (227) : // Primera parte: Leer tablas y privilegios
-Manager.cs (228) : while ((line = reader.ReadLine()) != null)
-Manager.cs (229) : {
-Manager.cs (230) : string separator = "{USERNAME} || {PASSWORD}";
-Manager.cs (231) : if (line == separator)
-Manager.cs (232) : {
-Manager.cs (233) : break;
-Manager.cs (234) : }
-Manager.cs (236) : string[] parts = line.Split(':');
-Manager.cs (237) : if (parts.Length >= 2)
-Manager.cs (238) : {
-Manager.cs (239) : List<Privilege> privilegesList = new List<Privilege>();
-Manager.cs (240) : string[] privileges = parts[1].Trim().Split(' ');
-Manager.cs (242) : foreach (string s in privileges)
-Manager.cs (243) : {
-Manager.cs (244) : Privilege privilegeparse;
-Manager.cs (245) : switch (s)
-Manager.cs (246) : {
-Manager.cs (247) : case "Delete": privilegeparse = Privilege.Delete;
+Manager.cs (196) : Profiles.Remove(p);
+Manager.cs (197) : return true;
+Manager.cs (198) : }
+Manager.cs (199) : }
+Manager.cs (207) : Manager manager = new Manager(username);
+Manager.cs (208) : if (!Directory.Exists(databaseName))
+Manager.cs (209) : {
+Manager.cs (210) : return manager;
+Manager.cs (211) : }
+Manager.cs (212) : string[] files = Directory.GetFiles(databaseName, "*-profile.txt");
+Manager.cs (213) : foreach (string file in files)
+Manager.cs (214) : {
+Manager.cs (215) : StreamReader reader = new StreamReader(file);
+Manager.cs (217) : string profileName = Path.GetFileNameWithoutExtension(file).Replace("-profile", "");
+Manager.cs (218) : Profile p = new Profile();
+Manager.cs (219) : p.Name = profileName;
+Manager.cs (221) : string line = reader.ReadLine();
+Manager.cs (223) : // Primera parte: Leer tablas y privilegios
+Manager.cs (224) : while ((line = reader.ReadLine()) != null)
+Manager.cs (225) : {
+Manager.cs (226) : string separator = "{USERNAME} || {PASSWORD}";
+Manager.cs (227) : if (line == separator)
+Manager.cs (228) : {
+Manager.cs (229) : break;
+Manager.cs (230) : }
+Manager.cs (232) : string[] parts = line.Split(':');
+Manager.cs (233) : if (parts.Length >= 2)
+Manager.cs (234) : {
+Manager.cs (235) : List<Privilege> privilegesList = new List<Privilege>();
+Manager.cs (236) : string[] privileges = parts[1].Trim().Split(' ');
+Manager.cs (238) : foreach (string s in privileges)
+Manager.cs (239) : {
+Manager.cs (240) : Privilege privilegeparse;
+Manager.cs (241) : switch (s)
+Manager.cs (242) : {
+Manager.cs (243) : case "Delete": privilegeparse = Privilege.Delete;
+Manager.cs (244) : break;
+Manager.cs (245) : case "Insert": privilegeparse = Privilege.Insert;
+Manager.cs (246) : break;
+Manager.cs (247) : case "Update": privilegeparse = Privilege.Update;
 Manager.cs (248) : break;
-Manager.cs (249) : case "Insert": privilegeparse = Privilege.Insert;
+Manager.cs (249) : case "Select": privilegeparse = Privilege.Select;
 Manager.cs (250) : break;
-Manager.cs (251) : case "Update": privilegeparse = Privilege.Update;
+Manager.cs (251) : default: privilegeparse = Privilege.Select;
 Manager.cs (252) : break;
-Manager.cs (253) : case "Select": privilegeparse = Privilege.Select;
-Manager.cs (254) : break;
-Manager.cs (255) : default: privilegeparse = Privilege.Select;
-Manager.cs (256) : break;
+Manager.cs (253) : }
+Manager.cs (254) : privilegesList.Add(privilegeparse);
+Manager.cs (255) : }
+Manager.cs (256) : p.PrivilegesOn.Add(parts[0], privilegesList);
 Manager.cs (257) : }
-Manager.cs (258) : privilegesList.Add(privilegeparse);
-Manager.cs (259) : }
-Manager.cs (260) : p.PrivilegesOn.Add(parts[0], privilegesList);
-Manager.cs (261) : }
-Manager.cs (262) : }
-Manager.cs (264) : // Segunda parte: Leer usuarios
-Manager.cs (265) : while ((line = reader.ReadLine()) != null)
-Manager.cs (266) : {
-Manager.cs (267) : string[] userinfo = line.Split(" || ");
-Manager.cs (268) : User u = new User();
-Manager.cs (269) : u.Username = userinfo[0];
-Manager.cs (270) : u.EncryptedPassword = userinfo[1];
-Manager.cs (271) : p.Users.Add(u);
-Manager.cs (272) : }
-Manager.cs (273) : manager.Profiles.Add(p);
-Manager.cs (274) : reader.Close();
-Manager.cs (275) : }
-Manager.cs (276) : return manager;
-Manager.cs (277) : }
-Manager.cs (285) : if (!Directory.Exists(databaseName))
-Manager.cs (286) : {
-Manager.cs (287) : Directory.CreateDirectory(databaseName);
-Manager.cs (288) : }
-Manager.cs (290) : foreach (Profile p in Profiles)
-Manager.cs (291) : {
-Manager.cs (292) : string filePath = databaseName + "\\" + p.Name + "-profile.txt";
-Manager.cs (293) : StreamWriter writer = new StreamWriter(filePath);
-Manager.cs (295) : writer.WriteLine("{TABLE} || {PRIVILEGES}");
-Manager.cs (296) : foreach (var entry in p.PrivilegesOn)
-Manager.cs (297) : {
-Manager.cs (298) : writer.Write(entry.Key + ":");
-Manager.cs (299) : for (int i = 0; i < entry.Value.Count; i++)
-Manager.cs (300) : {
-Manager.cs (301) : writer.Write(entry.Value[i]);
-Manager.cs (302) : if (i < entry.Value.Count - 1)
-Manager.cs (303) : {
-Manager.cs (304) : writer.Write(" ");
-Manager.cs (305) : }
-Manager.cs (306) : }
-Manager.cs (307) : writer.WriteLine();
-Manager.cs (309) : writer.WriteLine("{USERNAME} || {PASSWORD}");
-Manager.cs (310) : foreach (User u in p.Users)
-Manager.cs (311) : {
-Manager.cs (312) : writer.WriteLine(u.Username + " || " + u.EncryptedPassword);
-Manager.cs (313) : }
-Manager.cs (314) : writer.Close();
-Manager.cs (315) : }
-Manager.cs (316) : }
-Manager.cs (318) : public override bool Equals(object obj)
-Manager.cs (319) : {
-Manager.cs (320) : Manager other = (Manager)obj;
-Manager.cs (321) : if(Profiles.SequenceEqual(other.Profiles) && m_username.Equals(other.m_username))
-Manager.cs (322) : {
-Manager.cs (323) : return true;
-Manager.cs (324) : }
-Manager.cs (325) : return false;
-Manager.cs (326) : }
-Profile.cs (40) : public override bool Equals(object obj)
-Profile.cs (41) : {
-Profile.cs (42) : Profile other = (Profile)obj;
-Profile.cs (43) : if (Name.Equals(other.Name) && (Users.SequenceEqual(other.Users)))
-Profile.cs (44) : {
-Profile.cs (45) : foreach(string tabla in PrivilegesOn.Keys)
-Profile.cs (46) : {
-Profile.cs (47) : if (!other.PrivilegesOn.ContainsKey(tabla))
-Profile.cs (48) : {
-Profile.cs (49) : return false;
-Profile.cs (50) : }
-Profile.cs (51) : List<Privilege> listaMia = PrivilegesOn[tabla];
-Profile.cs (52) : List<Privilege> listaOtra = other.PrivilegesOn[tabla];
-Profile.cs (53) : if (!listaMia.SequenceEqual(listaOtra))
-Profile.cs (54) : {
-Profile.cs (55) : return false;
-Profile.cs (56) : }
-Profile.cs (57) : }
-Profile.cs (58) : return true;
-Profile.cs (59) : }
-Profile.cs (60) : return false;
-Profile.cs (61) : }
+Manager.cs (258) : }
+Manager.cs (260) : // Segunda parte: Leer usuarios
+Manager.cs (261) : while ((line = reader.ReadLine()) != null)
+Manager.cs (262) : {
+Manager.cs (263) : string[] userinfo = line.Split(" || ");
+Manager.cs (264) : User u = new User();
+Manager.cs (265) : u.Username = userinfo[0];
+Manager.cs (266) : u.EncryptedPassword = userinfo[1];
+Manager.cs (267) : p.Users.Add(u);
+Manager.cs (268) : }
+Manager.cs (269) : manager.Profiles.Add(p);
+Manager.cs (270) : reader.Close();
+Manager.cs (271) : }
+Manager.cs (272) : return manager;
+Manager.cs (273) : }
+Manager.cs (281) : if (!Directory.Exists(databaseName))
+Manager.cs (282) : {
+Manager.cs (283) : Directory.CreateDirectory(databaseName);
+Manager.cs (284) : }
+Manager.cs (286) : foreach (Profile p in Profiles)
+Manager.cs (287) : {
+Manager.cs (288) : string filePath = databaseName + "\\" + p.Name + "-profile.txt";
+Manager.cs (289) : StreamWriter writer = new StreamWriter(filePath);
+Manager.cs (291) : writer.WriteLine("{TABLE} || {PRIVILEGES}");
+Manager.cs (292) : foreach (var entry in p.PrivilegesOn)
+Manager.cs (293) : {
+Manager.cs (294) : writer.Write(entry.Key + ":");
+Manager.cs (295) : for (int i = 0; i < entry.Value.Count; i++)
+Manager.cs (296) : {
+Manager.cs (297) : writer.Write(entry.Value[i]);
+Manager.cs (298) : if (i < entry.Value.Count - 1)
+Manager.cs (299) : {
+Manager.cs (300) : writer.Write(" ");
+Manager.cs (301) : }
+Manager.cs (302) : }
+Manager.cs (303) : writer.WriteLine();
+Manager.cs (305) : writer.WriteLine("{USERNAME} || {PASSWORD}");
+Manager.cs (306) : foreach (User u in p.Users)
+Manager.cs (307) : {
+Manager.cs (308) : writer.WriteLine(u.Username + " || " + u.EncryptedPassword);
+Manager.cs (309) : }
+Manager.cs (310) : writer.Close();
+Manager.cs (311) : }
+Manager.cs (312) : }
+Manager.cs (313) : public override bool Equals(object obj)
+Manager.cs (314) : {
+Manager.cs (316) : {
+Manager.cs (323) : }
+Manager.cs (332) : return false;
+Manager.cs (333) : }
 User.cs (22) : public override bool Equals(object obj)
 User.cs (23) : {
 User.cs (24) : User other = (User)obj;

@@ -242,105 +242,87 @@ Client.cs (62) : catch (Exception ex)
 Client.cs (63) : {
 Client.cs (64) : throw new IOException("Server error.", ex);
 Client.cs (65) : }
-Client.cs (114) : string cmnd = XmlSerializer.Query(query);
-Client.cs (115) : string resp= SendString(cmnd);
-Client.cs (117) : if (resp==null)
-Client.cs (118) : {
-Client.cs (119) : return "No server response.";
-Client.cs (120) : }
-Client.cs (122) : string content;
-Client.cs (123) : bool sucs = XmlDeserializer.ParseQueryAnswer(resp,out content);
-Client.cs (124) : if(sucs)
-Client.cs (125) : {
-Client.cs (126) : return content;
-Client.cs (127) : }
-Client.cs (128) : else
-Client.cs (129) : {
-Client.cs (130) : return "error";
-Client.cs (131) : }
+Client.cs (129) : string cmnd = XmlSerializer.Query(query);
+Client.cs (130) : string resp= SendString(cmnd);
+Client.cs (132) : if (resp==null)
+Client.cs (133) : {
+Client.cs (134) : return "No server response.";
+Client.cs (135) : }
+Client.cs (137) : string content;
+Client.cs (138) : bool sucs = XmlDeserializer.ParseQueryAnswer(resp,out content);
+Client.cs (139) : if(sucs)
+Client.cs (140) : {
+Client.cs (141) : return content;
+Client.cs (142) : }
+Client.cs (143) : else
+Client.cs (144) : {
+Client.cs (145) : return "error";
+Client.cs (146) : }
 Server.cs (11) : using DbManager;
 Server.cs (12) : using System.IO;
 Server.cs (13) : using System.Xml.Serialization;
-Server.cs (19) : private Database database;
-Server.cs (27) : TcpListener listen = new TcpListener(IPAddress.Any, port);
-Server.cs (29) : while (true)
-Server.cs (30) : {
-Server.cs (31) : using (TcpClient client = listen.AcceptTcpClient())
-Server.cs (32) : using (NetworkStream stream = client.GetStream())
-Server.cs (33) : using (StreamReader reader = new StreamReader(stream))
-Server.cs (34) : using (StreamWriter writer = new StreamWriter(stream))
-Server.cs (35) : {
-Server.cs (36) : bool con = true;
-Server.cs (37) : while (con)
-Server.cs (38) : {
-Server.cs (39) : try
-Server.cs (40) : {
-Server.cs (41) : string xmlRequest = reader.ReadLine();
-Server.cs (42) : if (string.IsNullOrEmpty(xmlRequest))
-Server.cs (43) : {
-Server.cs (44) : con = false;
-Server.cs (45) : }
-Server.cs (46) : else
-Server.cs (47) : {
-Server.cs (48) : string response = ProcessRequest(xmlRequest);
-Server.cs (49) : writer.WriteLine(response);
-Server.cs (50) : writer.Flush();
-Server.cs (51) : if (xmlRequest.Contains("<Close/>"))
-Server.cs (52) : {
-Server.cs (53) : con = false;
-Server.cs (54) : }
+Server.cs (14) : using System.Linq.Expressions;
+Server.cs (20) : private Database database;
+Server.cs (28) : TcpListener listen = new TcpListener(IPAddress.Any, port);
+Server.cs (29) : listen.Start();
+Server.cs (30) : while (true)
+Server.cs (31) : {
+Server.cs (32) : using (TcpClient client = listen.AcceptTcpClient())
+Server.cs (33) : using (NetworkStream stream = client.GetStream())
+Server.cs (34) : {
+Server.cs (35) : bool con = true;
+Server.cs (36) : while (con)
+Server.cs (37) : {
+Server.cs (38) : try
+Server.cs (39) : {
+Server.cs (40) : StreamReader read = new StreamReader(stream);
+Server.cs (41) : string xmlReq = read.ReadLine();
+Server.cs (42) : string responseXml = "";
+Server.cs (44) : if (xmlReq.Contains("<Create"))
+Server.cs (45) : {
+Server.cs (46) : responseXml = XmlSerializer.CreateSuccess;
+Server.cs (47) : }
+Server.cs (48) : else if (xmlReq.Contains("<Open"))
+Server.cs (49) : {
+Server.cs (50) : responseXml = XmlSerializer.OpenCreateSuccess;
+Server.cs (51) : }
+Server.cs (52) : else if (xmlReq.Contains("<Query"))
+Server.cs (53) : {
+Server.cs (54) : responseXml = XmlSerializer.SucessfulAnswer("Execute query");
 Server.cs (55) : }
-Server.cs (57) : }
-Server.cs (58) : catch (Exception e)
-Server.cs (59) : {
-Server.cs (60) : writer.WriteLine($"<Error>{e.Message}</Error>");
-Server.cs (61) : writer.Flush();
-Server.cs (62) : con = false;
-Server.cs (63) : }
-Server.cs (64) : }
+Server.cs (56) : else if (xmlReq.Contains("<Close"))
+Server.cs (57) : {
+Server.cs (58) : con = false;
+Server.cs (59) : responseXml = XmlSerializer.OpenCreateSuccess;
+Server.cs (60) : }
+Server.cs (61) : }
+Server.cs (62) : catch (Exception e)
+Server.cs (63) : {
+Server.cs (64) : con = false;
 Server.cs (65) : }
 Server.cs (66) : }
 Server.cs (67) : }
-Server.cs (69) : private string ProcessRequest(string xml)
-Server.cs (70) : {
-Server.cs (71) : if (xml.Contains("<Open"))
-Server.cs (72) : {
-Server.cs (73) : try
-Server.cs (74) : {
-Server.cs (75) : return "<Success/>";
-Server.cs (76) : }
-Server.cs (77) : catch (Exception)
-Server.cs (78) : {
-Server.cs (79) : return "<Error>Error opening data base</Error>";
-Server.cs (81) : }
-Server.cs (82) : }
-Server.cs (83) : if (xml.Contains("<Create"))
-Server.cs (84) : {
-Server.cs (85) : try
-Server.cs (86) : {
-Server.cs (87) : return "<Success/>";
-Server.cs (88) : }
-Server.cs (89) : catch (Exception)
-Server.cs (90) : {
-Server.cs (91) : return "<Error>Error creating data base</Error>";
-Server.cs (92) : }
-Server.cs (93) : }
-Server.cs (94) : if (xml.Contains("<Query>"))
-Server.cs (95) : {
-Server.cs (96) : try
-Server.cs (97) : {
-Server.cs (98) : return "<Answer>[Name,Surname]{Unai,Lobete}{Maialen,Mateos}</Answer>";
-Server.cs (99) : }
-Server.cs (100) : catch (Exception)
-Server.cs (101) : {
-Server.cs (102) : return "<Answer><Error>Error at query </Error></Answer>";
-Server.cs (103) : }
-Server.cs (104) : }
-Server.cs (106) : if (xml.Contains("<Close/>"))
-Server.cs (107) : {
-Server.cs (108) : return "<Success/>";
-Server.cs (109) : }
-Server.cs (111) : return "<Error>Unknown Command</Error>";
+Server.cs (68) : }
+XmlDeserializer.cs (8) : using System.Xml.Linq;
+XmlDeserializer.cs (78) : try
+XmlDeserializer.cs (79) : {
+XmlDeserializer.cs (80) : if (string.IsNullOrEmpty(command) || !command.Trim().StartsWith("<Create"))
+XmlDeserializer.cs (81) : {
+XmlDeserializer.cs (82) : return false;
+XmlDeserializer.cs (83) : }
+XmlDeserializer.cs (84) : XElement xml = XElement.Parse(command);
+XmlDeserializer.cs (85) : if (xml.Name.LocalName == "Create")
+XmlDeserializer.cs (86) : {
+XmlDeserializer.cs (87) : database = (string)xml.Attribute("Database");
+XmlDeserializer.cs (88) : username = (string)xml.Attribute("User");
+XmlDeserializer.cs (89) : password = (string)xml.Attribute("Password");
+XmlDeserializer.cs (90) : return !string.IsNullOrEmpty(database);
+XmlDeserializer.cs (91) : }
+XmlDeserializer.cs (92) : }
+XmlDeserializer.cs (93) : catch
+XmlDeserializer.cs (94) : {
+XmlDeserializer.cs (95) : return false;
+XmlDeserializer.cs (96) : }
 CreateTable.cs (18) : this.Table= table;
 CreateTable.cs (20) : if (columns == null)
 CreateTable.cs (21) : {
@@ -394,23 +376,19 @@ DropTable.cs (39) : }
 DropTable.cs (41) : return Constants.Error + "Couldn't drop table";
 Grant.cs (5) : using DbManager.Security;
 Grant.cs (42) : string upperPrivilege = PrivilegeName.ToUpper();
-Grant.cs (43) : if (upperPrivilege == "SELECT")
-Grant.cs (44) : {
-Grant.cs (45) : privilege = DbManager.Security.Privilege.Select;
-Grant.cs (46) : }
-Grant.cs (47) : else if (upperPrivilege == "INSERT")
-Grant.cs (48) : {
-Grant.cs (49) : privilege = DbManager.Security.Privilege.Insert;
-Grant.cs (50) : }
-Grant.cs (51) : else if (upperPrivilege == "UPDATE")
-Grant.cs (52) : {
-Grant.cs (53) : privilege = DbManager.Security.Privilege.Update;
-Grant.cs (54) : }
-Grant.cs (55) : else if (upperPrivilege == "DELETE")
-Grant.cs (56) : {
-Grant.cs (57) : privilege = DbManager.Security.Privilege.Delete;
-Grant.cs (58) : }
-Grant.cs (59) : else
+Grant.cs (49) : {
+Grant.cs (50) : privilege = DbManager.Security.Privilege.Select;
+Grant.cs (51) : }
+Grant.cs (53) : {
+Grant.cs (54) : privilege = DbManager.Security.Privilege.Insert;
+Grant.cs (55) : }
+Grant.cs (57) : {
+Grant.cs (58) : privilege = DbManager.Security.Privilege.Update;
+Grant.cs (59) : }
+Grant.cs (61) : {
+Grant.cs (62) : privilege = DbManager.Security.Privilege.Delete;
+Grant.cs (63) : }
+Grant.cs (64) : else
 Select.cs (4) : using System.Runtime.CompilerServices;
 Select.cs (20) : this.Table = table;
 Select.cs (21) : this.Columns = columns ?? new List<string> ();

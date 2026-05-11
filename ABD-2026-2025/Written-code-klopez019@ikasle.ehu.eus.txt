@@ -208,14 +208,27 @@ Table.cs (192) : for (int i = num; i >= 0; i--)
 Table.cs (193) : {
 Table.cs (194) : Rows.RemoveAt(toDelete[i]);
 Table.cs (195) : }
-AddUser.cs (19) : Username = username;
-AddUser.cs (20) : Password = password;
-AddUser.cs (21) : ProfileName = profileName;
+AddUser.cs (5) : using DbManager.Security;
+AddUser.cs (20) : Username = username;
+AddUser.cs (21) : Password = password;
+AddUser.cs (22) : ProfileName = profileName;
+AddUser.cs (30) : if(!database.SecurityManager.IsUserAdmin()) { return Constants.UsersProfileIsNotGrantedRequiredPrivilege; }
+AddUser.cs (31) : Profile p = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (32) : if (p == null) { return Constants.SecurityProfileDoesNotExistError; }
+AddUser.cs (34) : User usuario = new User(Username, Password);
+AddUser.cs (35) : p.Users.Add(usuario);
+AddUser.cs (36) : return Constants.AddUserSuccess;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
 Delete.cs (24) : database.DeleteWhere(Table, Where);
 Delete.cs (25) : return database.LastErrorMessage;
-DeleteUser.cs (16) : Username = username;
+DeleteUser.cs (5) : using DbManager.Security;
+DeleteUser.cs (17) : Username = username;
+DeleteUser.cs (24) : if (!database.SecurityManager.IsUserAdmin()) { return Constants.UsersProfileIsNotGrantedRequiredPrivilege; }
+DeleteUser.cs (26) : User u = database.SecurityManager.UserByName(Username);
+DeleteUser.cs (27) : if(u == null) { return Constants.UserDoesNotExistError; }
+DeleteUser.cs (29) : database.SecurityManager.ProfileByUser(Username).Users.Remove(u);
+DeleteUser.cs (30) : return Constants.DeleteUserSuccess;
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
 Insert.cs (26) : database.Insert(Table, Values);
@@ -390,7 +403,7 @@ Manager.cs (215) : usrs.Add(u);
 Manager.cs (216) : line = reader.ReadLine();
 Manager.cs (217) : }
 Manager.cs (218) : p.Users = usrs;
-Manager.cs (219) : mg.AddProfile(p);
+Manager.cs (219) : mg.Profiles.Add(p);
 Manager.cs (220) : reader.Close();
 Manager.cs (222) : }
 Manager.cs (223) : return mg;

@@ -284,66 +284,75 @@ Manager.cs (178) : return Profiles.Remove(profile);
 Manager.cs (185) : string fileName = databaseName + ".path";
 Manager.cs (186) : Manager manager = new Manager(username);
 Manager.cs (187) : if (!File.Exists(fileName))
-Manager.cs (188) : return manager;
-Manager.cs (189) : string[] lines = File.ReadAllLines(fileName);
-Manager.cs (190) : Profile currentProfile = null;
-Manager.cs (191) : string currentTable = null;
-Manager.cs (193) : foreach (string line in lines)
-Manager.cs (194) : {
-Manager.cs (195) : if (string.IsNullOrWhiteSpace(line))
-Manager.cs (196) : continue;
-Manager.cs (198) : if (line.StartsWith("Profile: "))
-Manager.cs (199) : {
-Manager.cs (200) : currentTable = null;
-Manager.cs (202) : string profileName = line.Substring("Profile: ".Length).Trim();
-Manager.cs (204) : currentProfile = new Profile()
-Manager.cs (205) : {
-Manager.cs (206) : Name = profileName
-Manager.cs (207) : };
-Manager.cs (209) : manager.Profiles.Add(currentProfile);
-Manager.cs (210) : }
-Manager.cs (211) : else if (line.StartsWith("User: "))
-Manager.cs (212) : {
-Manager.cs (213) : if (currentProfile == null)
-Manager.cs (214) : continue;
-Manager.cs (216) : string content = line.Substring("User: ".Length);
-Manager.cs (217) : string[] parts = content.Split(',');
-Manager.cs (219) : if (parts.Length < 2)
-Manager.cs (220) : continue;
-Manager.cs (222) : string usernamePart = parts[0].Trim();
-Manager.cs (223) : string passwordPart = parts[1].Trim();
-Manager.cs (225) : string userName = usernamePart;
-Manager.cs (226) : string password = passwordPart.Replace("Password: ", "").Trim();
-Manager.cs (228) : currentProfile.Users.Add(new User()
-Manager.cs (229) : {
-Manager.cs (230) : Username = userName,
-Manager.cs (231) : EncryptedPassword = password
-Manager.cs (232) : });
-Manager.cs (233) : }
-Manager.cs (234) : else if (line.StartsWith("Table: "))
-Manager.cs (235) : {
-Manager.cs (236) : currentTable = line.Substring("Table: ".Length).Trim();
-Manager.cs (237) : }
-Manager.cs (238) : else if (line.StartsWith("Privilege: "))
-Manager.cs (239) : {
-Manager.cs (240) : if (currentProfile == null)
-Manager.cs (241) : continue;
-Manager.cs (242) : if (string.IsNullOrWhiteSpace(currentTable)) //HAU KENDU LEIKE goiku ---> WIYHOUT table null testa kendute ra
-Manager.cs (243) : continue;
-Manager.cs (244) : string privilegeStr = line.Substring("Privilege: ".Length).Trim();
-Manager.cs (246) : if (Enum.TryParse(privilegeStr, out Privilege privilege))
-Manager.cs (247) : {
-Manager.cs (248) : currentProfile.GrantPrivilege(currentTable, privilege);
-Manager.cs (249) : }
-Manager.cs (250) : }
-Manager.cs (251) : }
-Manager.cs (252) : if (manager.ProfileByName("admin") == null)
-Manager.cs (253) : {
-Manager.cs (254) : Profile adminProfile = new Profile() { Name = "admin" };
-Manager.cs (255) : adminProfile.Users.Add(new User("admin", "admin"));
-Manager.cs (256) : manager.Profiles.Add(adminProfile);
-Manager.cs (257) : }
-Manager.cs (259) : return manager;
+Manager.cs (188) : {
+Manager.cs (189) : Profile adminProfile = new Profile()
+Manager.cs (190) : {
+Manager.cs (191) : Name = "admin"
+Manager.cs (192) : };
+Manager.cs (193) : adminProfile.Users.Add(new User("admin", "admin"));
+Manager.cs (194) : manager.Profiles.Add(adminProfile);
+Manager.cs (195) : return manager;
+Manager.cs (196) : }
+Manager.cs (197) : string[] lines = File.ReadAllLines(fileName);
+Manager.cs (198) : Profile currentProfile = null;
+Manager.cs (199) : string currentTable = null;
+Manager.cs (201) : foreach (string linea in lines)
+Manager.cs (202) : {
+Manager.cs (203) : string line = linea.Trim();
+Manager.cs (204) : if (string.IsNullOrWhiteSpace(line))
+Manager.cs (205) : continue;
+Manager.cs (207) : if (line.StartsWith("Profile: "))
+Manager.cs (208) : {
+Manager.cs (209) : currentTable = null;
+Manager.cs (211) : string profileName = line.Substring("Profile: ".Length).Trim();
+Manager.cs (213) : currentProfile = new Profile()
+Manager.cs (214) : {
+Manager.cs (215) : Name = profileName
+Manager.cs (216) : };
+Manager.cs (218) : manager.Profiles.Add(currentProfile);
+Manager.cs (219) : }
+Manager.cs (220) : else if (line.StartsWith("User: "))
+Manager.cs (221) : {
+Manager.cs (222) : if (currentProfile == null)
+Manager.cs (223) : continue;
+Manager.cs (225) : string content = line.Substring("User: ".Length);
+Manager.cs (226) : string[] parts = content.Split(',');
+Manager.cs (228) : if (parts.Length < 2)
+Manager.cs (229) : continue;
+Manager.cs (231) : string usernamePart = parts[0].Trim();
+Manager.cs (232) : string passwordPart = parts[1].Trim();
+Manager.cs (234) : string userName = usernamePart;
+Manager.cs (235) : string password = passwordPart.Replace("Password: ", "").Trim();
+Manager.cs (237) : currentProfile.Users.Add(new User()
+Manager.cs (238) : {
+Manager.cs (239) : Username = userName,
+Manager.cs (240) : EncryptedPassword = password
+Manager.cs (241) : });
+Manager.cs (242) : }
+Manager.cs (243) : else if (line.StartsWith("Table: "))
+Manager.cs (244) : {
+Manager.cs (245) : currentTable = line.Substring("Table: ".Length).Trim();
+Manager.cs (246) : }
+Manager.cs (247) : else if (line.StartsWith("Privilege: "))
+Manager.cs (248) : {
+Manager.cs (249) : if (currentProfile == null)
+Manager.cs (250) : continue;
+Manager.cs (251) : if (string.IsNullOrWhiteSpace(currentTable)) //HAU KENDU LEIKE goiku ---> WIYHOUT table null testa kendute ra
+Manager.cs (252) : continue;
+Manager.cs (253) : string privilegeStr = line.Substring("Privilege: ".Length).Trim();
+Manager.cs (255) : if (Enum.TryParse(privilegeStr, out Privilege privilege))
+Manager.cs (256) : {
+Manager.cs (257) : currentProfile.GrantPrivilege(currentTable, privilege);
+Manager.cs (258) : }
+Manager.cs (259) : }
+Manager.cs (260) : }
+Manager.cs (261) : if (manager.ProfileByName("admin") == null)
+Manager.cs (262) : {
+Manager.cs (263) : Profile adminProfile = new Profile() { Name = "admin" };
+Manager.cs (264) : adminProfile.Users.Add(new User("admin", "admin"));
+Manager.cs (265) : manager.Profiles.Add(adminProfile);
+Manager.cs (266) : }
+Manager.cs (268) : return manager;
 Profile.cs (20) : string tableName = table.ToUpper();
 Profile.cs (26) : if (!PrivilegesOn.ContainsKey(tableName))
 Profile.cs (28) : PrivilegesOn[tableName] = new List<Privilege>();

@@ -161,6 +161,44 @@ Table.cs (272) : }
 Table.cs (273) : }
 Table.cs (274) : }
 Table.cs (275) : return true;
+Client.cs (106) : try
+Client.cs (107) : {
+Client.cs (108) : string command = XmlSerializer.CreateDatabase(database, username, password);
+Client.cs (109) : string response = SendString(command);
+Client.cs (110) : if(response==null)
+Client.cs (111) : {
+Client.cs (112) : error = "Server error.";
+Client.cs (113) : return false;
+Client.cs (114) : }
+Client.cs (115) : return XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (116) : }
+Client.cs (117) : catch
+Client.cs (118) : {
+Client.cs (119) : error = "Connection error.";
+Client.cs (121) : }
+XmlDeserializer.cs (111) : if(string.IsNullOrEmpty(answer))
+XmlDeserializer.cs (112) : {
+XmlDeserializer.cs (113) : return false;
+XmlDeserializer.cs (114) : }
+XmlDeserializer.cs (115) : string pattern= @"^<Query>(?<Query>[\s\S]*)</Query>$";
+XmlDeserializer.cs (116) : Regex regex= new Regex(pattern, RegexOptions.IgnoreCase);
+XmlDeserializer.cs (117) : Match match = regex.Match(answer);
+XmlDeserializer.cs (118) : if (match.Success)
+XmlDeserializer.cs (119) : {
+XmlDeserializer.cs (120) : query=match.Groups["query"].Value;
+XmlDeserializer.cs (121) : return true;
+XmlDeserializer.cs (122) : }
+XmlDeserializer.cs (134) : if (string.IsNullOrEmpty(answer))
+XmlDeserializer.cs (135) : {
+XmlDeserializer.cs (138) : string patternError = @"^<Error>(?<Error>[\s\S]*)</Error>$";
+XmlDeserializer.cs (139) : Regex regexError = new Regex(patternError, RegexOptions.IgnoreCase);
+XmlDeserializer.cs (140) : Match matchError = regexError.Match(answer);
+XmlDeserializer.cs (141) : if (matchError.Success)
+XmlDeserializer.cs (142) : {
+XmlDeserializer.cs (143) : answerContent = matchError.Groups["Error"].Value;
+XmlDeserializer.cs (146) : answerContent = answer;
+XmlDeserializer.cs (147) : return true;
+XmlDeserializer.cs (148) : }
 Delete.cs (16) : this.Table = table;
 Delete.cs (17) : this.Where = where;
 Delete.cs (26) : if (database == null)
@@ -185,15 +223,23 @@ Grant.cs (38) : {
 Grant.cs (39) : return Constants.SecurityProfileDoesNotExistError;
 Grant.cs (40) : }
 Grant.cs (41) : DbManager.Security.Privilege privilege;
-Grant.cs (60) : {
-Grant.cs (61) : return Constants.PrivilegeDoesNotExistError;
-Grant.cs (62) : }
-Grant.cs (64) : if (database.SecurityManager.IsGrantedPrivilege(ProfileName, TableName, privilege))
+Grant.cs (43) : string select = "SELECT";
+Grant.cs (44) : string insert = "INSERT";
+Grant.cs (45) : string update = "UPDATE";
+Grant.cs (46) : string delete = "DELETE";
+Grant.cs (48) : if (upperPrivilege == select)
+Grant.cs (52) : else if (upperPrivilege == insert)
+Grant.cs (56) : else if (upperPrivilege == update)
+Grant.cs (60) : else if (upperPrivilege == delete)
 Grant.cs (65) : {
-Grant.cs (66) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (66) : return Constants.PrivilegeDoesNotExistError;
 Grant.cs (67) : }
-Grant.cs (68) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
-Grant.cs (69) : return Constants.GrantPrivilegeSuccess;
+Grant.cs (69) : if (database.SecurityManager.IsGrantedPrivilege(ProfileName, TableName, privilege))
+Grant.cs (70) : {
+Grant.cs (71) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (72) : }
+Grant.cs (73) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
+Grant.cs (74) : return Constants.GrantPrivilegeSuccess;
 SetValue.cs (17) : ColumnName = column;
 SetValue.cs (18) : Value = value;
 Update.cs (16) : this.Table = table;
