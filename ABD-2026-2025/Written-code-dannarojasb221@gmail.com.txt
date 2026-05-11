@@ -111,23 +111,47 @@ MiniSQLParser.cs (10) : private const string Asterisk = "*";
 MiniSQLParser.cs (11) : private const string StringType = "TEXT";
 MiniSQLParser.cs (13) : private const string IntType = "INT";
 MiniSQLParser.cs (14) : private const string DoubleType = "DOUBLE";
-MiniSQLParser.cs (26) : @"^\s*INSERT\s+INTO\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+" +
-MiniSQLParser.cs (31) : @"^\s*DROP\s+TABLE\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*\z";
-MiniSQLParser.cs (43) : @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)('-?\d+(\.\d+)?'|'[^']+')$";
-MiniSQLParser.cs (46) : @"^\s*CREATE\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
-MiniSQLParser.cs (49) : @"^\s*DROP\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
-MiniSQLParser.cs (52) : @"^\s*GRANT\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
-MiniSQLParser.cs (55) : @"^\s*REVOKE\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
-MiniSQLParser.cs (180) : values.Add(Unquote(current.Trim()));
-MiniSQLParser.cs (181) : current = "";
-MiniSQLParser.cs (243) : if (tokens.Length != 2)
-MiniSQLParser.cs (246) : string nameText = tokens[0].Trim();
-MiniSQLParser.cs (247) : string typeText = tokens[1].Trim().ToUpper();
-MiniSQLParser.cs (250) : if (typeText == StringType) dt = ColumnDefinition.DataType.String;
-MiniSQLParser.cs (251) : else if (typeText == IntType) dt = ColumnDefinition.DataType.Int;
-MiniSQLParser.cs (252) : else if (typeText == DoubleType) dt = ColumnDefinition.DataType.Double;
-MiniSQLParser.cs (257) : if (cols.Count == 0)
-MiniSQLParser.cs (258) : return null;
+MiniSQLParser.cs (23) : const string selectPattern =@"^SELECT\s+(\*|[a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*)\s+FROM\s+([a-zA-Z0-9]+)$";
+MiniSQLParser.cs (24) : const string selectWherePattern = @"^SELECT\s+(\*|[a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*)\s+FROM\s+([a-zA-Z0-9]+)\s+WHERE\s+([a-zA-Z0-9]+)(=|<|>)('[-]?\d+(\.\d+)?'|'[^']+'|'[-]?\d+(\.\d+)?)$";
+MiniSQLParser.cs (25) : const string insertPattern =@"^INSERT\s+INTO\s+(\w+)\s+VALUES\s*\((('[-]?\d+(\.\d+)?'|'[^']+')(?:,('[-]?\d+(\.\d+)?'|'[^']+'))*)\)$";
+MiniSQLParser.cs (26) : const string dropTablePattern = @" ^\s*DROP\s+TABLE\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*\z";
+MiniSQLParser.cs (30) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(\w+=('[-]?\d+(\.\d+)?'|'[^']+')(?:,(\w+=('[-]?\d+(\.\d+)?'|'[^']+'))*)?)\s+WHERE\s+(\w+)(=|<|>)('[-]?\d+(\.\d+)?'|'[^']+')$";
+MiniSQLParser.cs (32) : @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<|>)('-?\d+(\.\d+)?'|'[^']+')$";
+MiniSQLParser.cs (35) : @"^\s*CREATE\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
+MiniSQLParser.cs (38) : @"^\s*DROP\s+SECURITY\s+PROFILE\s+(?<profile>[a-zA-Z][a-zA-Z0-9_]*)\s*;?\s*$";
+MiniSQLParser.cs (41) : @"^\s*GRANT\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (44) : @"^\s*REVOKE\s+(?<privilege>DELETE|INSERT|SELECT|UPDATE)\s+ON\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+TO\s+(?<profile>[A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (55) : Match mSelect = Regex.Match(miniSQLQuery, selectPattern);
+MiniSQLParser.cs (60) : Match mSelectWhere = Regex.Match(miniSQLQuery, selectWherePattern);
+MiniSQLParser.cs (69) : if (valor.Contains(" ") && !valor.StartsWith("'")) return null;
+MiniSQLParser.cs (70) : return new Select(tableName, columns, new Condition(col, operador, valor.Trim('\'')));
+MiniSQLParser.cs (75) : Match mInsert = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (77) : {
+MiniSQLParser.cs (78) : var values = ParseInsertValues(mInsert.Groups[2].Value);
+MiniSQLParser.cs (79) : if (values == null) return null;
+MiniSQLParser.cs (80) : return new Insert(mInsert.Groups[1].Value.Trim(), values);
+MiniSQLParser.cs (82) : }
+MiniSQLParser.cs (95) : Match mUpdate = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (98) : var setValues = ParseSetValues(mUpdate.Groups[2].Value);
+MiniSQLParser.cs (100) : var condition = new Condition(mUpdate.Groups[8].Value, mUpdate.Groups[9].Value, mUpdate.Groups[10].Value.Trim('\''));
+MiniSQLParser.cs (101) : return new Update(mUpdate.Groups[1].Value, setValues, condition);
+MiniSQLParser.cs (160) : static List<string> ParseInsertValues(string text)
+MiniSQLParser.cs (162) : string[] textParts = text.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+MiniSQLParser.cs (163) : List<string> result = new List<string>();
+MiniSQLParser.cs (164) : foreach (string v in textParts)
+MiniSQLParser.cs (166) : string val = v.Trim();
+MiniSQLParser.cs (167) : if (val.Contains(" ") && !val.StartsWith("'")) return null; // Falla si hay espacios sin comillas
+MiniSQLParser.cs (168) : if ((val.StartsWith("'") && !val.EndsWith("'")) || (!val.StartsWith("'") && val.EndsWith("'"))) return null;
+MiniSQLParser.cs (169) : result.Add(val.Trim('\''));
+MiniSQLParser.cs (171) : return result;
+MiniSQLParser.cs (227) : if (tokens.Length != 2)
+MiniSQLParser.cs (230) : string nameText = tokens[0].Trim();
+MiniSQLParser.cs (231) : string typeText = tokens[1].Trim().ToUpper();
+MiniSQLParser.cs (234) : if (typeText == StringType) dt = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (235) : else if (typeText == IntType) dt = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (236) : else if (typeText == DoubleType) dt = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (241) : if (cols.Count == 0)
+MiniSQLParser.cs (242) : return null;
 Select.cs (28) : Table result = database.Select(this.Table, this.Columns, this.Where);
 Select.cs (32) : return result.ToString();
 Update.cs (3) : using System.Data.Common;

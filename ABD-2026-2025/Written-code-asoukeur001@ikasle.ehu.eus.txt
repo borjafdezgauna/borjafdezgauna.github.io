@@ -78,58 +78,39 @@ CreateTable.cs (29) : return Constants.CreateTableSuccess;
 CreateTable.cs (30) : }
 CreateTable.cs (31) : return database.LastErrorMessage;
 Delete.cs (35) : //return null;
-MiniSQLParser.cs (23) : const string selectPattern =@"^SELECT\s+(\*|[a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*)\s+FROM\s+([a-zA-Z0-9]+)\s*;?\s*$";
-MiniSQLParser.cs (27) : @"VALUES\s*\(\s*(?<vals>('[^']*'|-?[0-9.]+)(?:\s*,\s*('[^']*'|-?[0-9.]+))*)\s*\)\s*;?\s*$";
-MiniSQLParser.cs (34) : const string createTablePattern = @"^CREATE\s+TABLE\s+(\w+)\s+\((\w+\s+(?:INT|DOUBLE|TEXT)(?:,\w+\s+(?:INT|DOUBLE|TEXT))*)?\)\s*;?\s*$";
-MiniSQLParser.cs (38) : @"^\s*UPDATE\s+(?<table>[a-zA-Z][a-zA-Z0-9_]*)\s+" +
-MiniSQLParser.cs (39) : @"SET\s+(?<set>[a-zA-Z][a-zA-Z0-9_]*\s*=\s*(?:'[^']*'|-?[0-9.]+)(?:\s*,\s*[a-zA-Z][a-zA-Z0-9_]*\s*=\s*(?:'[^']*'|-?[0-9.]+))*)\s+" +
-MiniSQLParser.cs (40) : @"WHERE\s+(?<wcol>[a-zA-Z][a-zA-Z0-9_]*)\s*(?<wop>=|!=|<=|>=|<|>)\s*(?<wval>'[^']*'|-?[0-9.]+)\s*;?\s*\z";
-MiniSQLParser.cs (64) : const string selectWherePattern = @"^SELECT\s+(\*|[a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*)\s+FROM\s+([a-zA-Z0-9]+)\s+WHERE\s+([a-zA-Z0-9]+)(>=|<=|!=|=|<|>)('[-]?\d+(\.\d+)?'|'[^']+'|-?\d+(\.\d+)?)\s*;?\s*$";
-MiniSQLParser.cs (67) : var mSelect = Regex.Match(input, selectPattern);
-MiniSQLParser.cs (68) : if (mSelect.Success)
-MiniSQLParser.cs (69) : {
-MiniSQLParser.cs (70) : return new Select(mSelect.Groups[2].Value, CommaSeparatedNames(mSelect.Groups[1].Value));
-MiniSQLParser.cs (71) : }
-MiniSQLParser.cs (72) : var mSelectWhere = Regex.Match(input, selectWherePattern);
-MiniSQLParser.cs (73) : if (mSelectWhere.Success)
-MiniSQLParser.cs (74) : {
-MiniSQLParser.cs (75) : string tableName = mSelectWhere.Groups[2].Value;
-MiniSQLParser.cs (76) : List<string> columns = CommaSeparatedNames(mSelectWhere.Groups[1].Value);
-MiniSQLParser.cs (77) : string col = mSelectWhere.Groups[3].Value;
-MiniSQLParser.cs (78) : string operador = mSelectWhere.Groups[4].Value;
-MiniSQLParser.cs (79) : string valor = mSelectWhere.Groups[5].Value;
-MiniSQLParser.cs (81) : if (valor.Contains(" ") && !valor.StartsWith("'"))
-MiniSQLParser.cs (82) : return null;
-MiniSQLParser.cs (84) : string valorLimpio = valor.Trim('\'');
-MiniSQLParser.cs (85) : Condition condicion = new Condition(col, operador, valorLimpio);
-MiniSQLParser.cs (86) : return new Select(tableName, columns, condicion);
-MiniSQLParser.cs (87) : }
-MiniSQLParser.cs (89) : var mInsert = Regex.Match(input, insertPattern);
-MiniSQLParser.cs (90) : if (mInsert.Success)
-MiniSQLParser.cs (91) : return new Insert(mInsert.Groups["table"].Value, CommaSeparatedValues(mInsert.Groups["vals"].Value));
-MiniSQLParser.cs (93) : var mDropTable = Regex.Match(input, dropTablePattern);
-MiniSQLParser.cs (94) : if (mDropTable.Success) return new DropTable(mDropTable.Groups["table"].Value);
-MiniSQLParser.cs (96) : var mCreateTable = Regex.Match(input, createTablePattern);
-MiniSQLParser.cs (97) : if (mCreateTable.Success)
-MiniSQLParser.cs (98) : {
-MiniSQLParser.cs (99) : var columns = ParseCreateTableColumns(mCreateTable.Groups[2].Value);
-MiniSQLParser.cs (100) : return new CreateTable(mCreateTable.Groups[1].Value, columns);
-MiniSQLParser.cs (101) : }
-MiniSQLParser.cs (103) : var mUpdate = Regex.Match(input, updateTablePattern);
-MiniSQLParser.cs (104) : if (mUpdate.Success)
-MiniSQLParser.cs (105) : {
-MiniSQLParser.cs (106) : var setValues = ParseSetValues(mUpdate.Groups["set"].Value);
-MiniSQLParser.cs (107) : if (setValues == null || setValues.Count == 0) return null;
-MiniSQLParser.cs (108) : var condition = new Condition(mUpdate.Groups["wcol"].Value, mUpdate.Groups["wop"].Value, Unquote(mUpdate.Groups["wval"].Value));
-MiniSQLParser.cs (109) : return new Update(mUpdate.Groups["table"].Value, setValues, condition);
+MiniSQLParser.cs (27) : const string createTablePattern = @"^CREATE\s+TABLE\s+(\w+)\s+\((\w+\s+(?:INT|DOUBLE|TEXT)(?:,\w+\s+(?:INT|DOUBLE|TEXT))*)?\)\s*;?\s*$";
+MiniSQLParser.cs (56) : if (mSelect.Success)
+MiniSQLParser.cs (57) : {
+MiniSQLParser.cs (58) : return new Select(mSelect.Groups[2].Value, CommaSeparatedNames(mSelect.Groups[1].Value));
+MiniSQLParser.cs (59) : }
+MiniSQLParser.cs (61) : if (mSelectWhere.Success)
+MiniSQLParser.cs (62) : {
+MiniSQLParser.cs (63) : string tableName = mSelectWhere.Groups[2].Value;
+MiniSQLParser.cs (64) : List<string> columns = CommaSeparatedNames(mSelectWhere.Groups[1].Value);
+MiniSQLParser.cs (65) : string col = mSelectWhere.Groups[3].Value;
+MiniSQLParser.cs (66) : string operador = mSelectWhere.Groups[4].Value;
+MiniSQLParser.cs (67) : string valor = mSelectWhere.Groups[5].Value;
+MiniSQLParser.cs (73) : }
+MiniSQLParser.cs (76) : if (mInsert.Success)
+MiniSQLParser.cs (85) : var mDropTable = Regex.Match(input, dropTablePattern);
+MiniSQLParser.cs (86) : if (mDropTable.Success) return new DropTable(mDropTable.Groups["table"].Value);
+MiniSQLParser.cs (88) : var mCreateTable = Regex.Match(input, createTablePattern);
+MiniSQLParser.cs (89) : if (mCreateTable.Success)
+MiniSQLParser.cs (90) : {
+MiniSQLParser.cs (91) : var columns = ParseCreateTableColumns(mCreateTable.Groups[2].Value);
+MiniSQLParser.cs (92) : return new CreateTable(mCreateTable.Groups[1].Value, columns);
+MiniSQLParser.cs (93) : }
+MiniSQLParser.cs (96) : if (mUpdate.Success)
+MiniSQLParser.cs (97) : {
+MiniSQLParser.cs (99) : if (setValues == null || setValues.Count == 0) return null;
+MiniSQLParser.cs (102) : }
+MiniSQLParser.cs (104) : var mDelete = Regex.Match(input, deletePattern);
+MiniSQLParser.cs (105) : if (mDelete.Success)
+MiniSQLParser.cs (106) : {
+MiniSQLParser.cs (107) : string valorDelete = mDelete.Groups[4].Value.Trim();
+MiniSQLParser.cs (108) : if (valorDelete.Contains(" ") && !valorDelete.StartsWith("'")) return null;
+MiniSQLParser.cs (109) : return new Delete(mDelete.Groups[1].Value.Trim(), new Condition(mDelete.Groups[2].Value.Trim(), mDelete.Groups[3].Value.Trim(), valorDelete.Trim('\'')));
 MiniSQLParser.cs (110) : }
-MiniSQLParser.cs (112) : var mDelete = Regex.Match(input, deletePattern);
-MiniSQLParser.cs (113) : if (mDelete.Success)
-MiniSQLParser.cs (114) : {
-MiniSQLParser.cs (115) : string valorDelete = mDelete.Groups[4].Value.Trim();
-MiniSQLParser.cs (116) : if (valorDelete.Contains(" ") && !valorDelete.StartsWith("'")) return null;
-MiniSQLParser.cs (117) : return new Delete(mDelete.Groups[1].Value.Trim(), new Condition(mDelete.Groups[2].Value.Trim(), mDelete.Groups[3].Value.Trim(), valorDelete.Trim('\'')));
-MiniSQLParser.cs (118) : }
 Manager.cs (23) : //TODO DEADLINE 5: Return true if the user logged-in (m_username) is the admin, false otherwise
 Manager.cs (25) : return false;
 Manager.cs (30) : //TODO DEADLINE 5: Return true if the user's password is correct. The given password should be encrypted before comparing with the saved one

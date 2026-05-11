@@ -53,31 +53,37 @@ Database.cs (6) : using System.Text.Json;
 Database.cs (32) : Tables = new List<Table>();
 Database.cs (33) : m_username = adminUsername;
 Database.cs (34) : SecurityManager = new Manager(adminUsername);
-Database.cs (40) : if (table == null)
-Database.cs (42) : if (TableByName(table.Name) != null)
-Database.cs (43) : return false;
-Database.cs (45) : Tables.Add(table);
-Database.cs (46) : return true;
-Database.cs (53) : if (tableName == null)
-Database.cs (56) : foreach (var table in Tables)
-Database.cs (57) : {
-Database.cs (58) : if (table.Name != null &&
-Database.cs (59) : table.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase))
-Database.cs (60) : return table;
-Database.cs (61) : }
-Database.cs (62) : return null;
-Database.cs (239) : if (string.IsNullOrEmpty(databaseName))
-Database.cs (242) : string filePath = databaseName + ".db";
-Database.cs (263) : return null;
-Database.cs (265) : string filePath = databaseName + ".db";
-Database.cs (267) : if (!File.Exists(filePath))
-Database.cs (268) : return null;
-Database.cs (273) : {
-Database.cs (277) : List<Table> tables = JsonSerializer.Deserialize<List<Table>>(json, options);
-Database.cs (284) : Database db = new Database();
-Database.cs (285) : db.Tables = tables;
-Database.cs (286) : db.m_username = username;
-Database.cs (288) : return db;
+Database.cs (36) : Profile adminProfile = new Profile()
+Database.cs (37) : {
+Database.cs (38) : Name = Profile.AdminProfileName,
+Database.cs (39) : };
+Database.cs (40) : adminProfile.Users.Add(new User(adminUsername, adminPassword));
+Database.cs (41) : SecurityManager.AddProfile(adminProfile);
+Database.cs (47) : if (table == null)
+Database.cs (49) : if (TableByName(table.Name) != null)
+Database.cs (50) : return false;
+Database.cs (52) : Tables.Add(table);
+Database.cs (53) : return true;
+Database.cs (60) : if (tableName == null)
+Database.cs (63) : foreach (var table in Tables)
+Database.cs (64) : {
+Database.cs (65) : if (table.Name != null &&
+Database.cs (66) : table.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase))
+Database.cs (67) : return table;
+Database.cs (68) : }
+Database.cs (69) : return null;
+Database.cs (246) : if (string.IsNullOrEmpty(databaseName))
+Database.cs (249) : string filePath = databaseName + ".db";
+Database.cs (270) : return null;
+Database.cs (272) : string filePath = databaseName + ".db";
+Database.cs (274) : if (!File.Exists(filePath))
+Database.cs (275) : return null;
+Database.cs (280) : {
+Database.cs (284) : List<Table> tables = JsonSerializer.Deserialize<List<Table>>(json, options);
+Database.cs (291) : Database db = new Database();
+Database.cs (292) : db.Tables = tables;
+Database.cs (293) : db.m_username = username;
+Database.cs (295) : return db;
 Row.cs (13) : [System.Text.Json.Serialization.JsonInclude]
 Table.cs (11) : [System.Text.Json.Serialization.JsonInclude]
 Table.cs (12) : private List<ColumnDefinition> ColumnDefinitions = new List<ColumnDefinition>();
@@ -153,33 +159,33 @@ Manager.cs (51) : if (!IsUserAdmin())
 Manager.cs (52) : return;
 Manager.cs (53) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table))
 Manager.cs (54) : return;
-Manager.cs (56) : //if (profile == null) return;
-Manager.cs (86) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table) || privilege == null)
-Manager.cs (87) : return false;
-Manager.cs (274) : string nombreArchivo = databaseName + ".path";
-Manager.cs (275) : string contenidoTotal = "";
-Manager.cs (276) : foreach (var profile in Profiles)
-Manager.cs (277) : {
-Manager.cs (278) : string perfil = $"Profile: {profile.Name}\n";
-Manager.cs (279) : contenidoTotal += perfil;
-Manager.cs (280) : foreach (var user in profile.Users)
-Manager.cs (281) : {
-Manager.cs (282) : string usuario = $"User: {user.Username}, Password: {user.EncryptedPassword}\n";
-Manager.cs (283) : contenidoTotal += usuario;
-Manager.cs (284) : }
-Manager.cs (285) : foreach (var entrada in profile.PrivilegesOn)
-Manager.cs (286) : {
-Manager.cs (287) : string tabla = $"Table: {entrada.Key}\n";
-Manager.cs (288) : contenidoTotal += tabla;
-Manager.cs (289) : foreach (var privilege in entrada.Value)
-Manager.cs (290) : {
-Manager.cs (291) : string privilegio = $"Privilege: {privilege}\n";
-Manager.cs (292) : contenidoTotal += privilegio;
-Manager.cs (293) : }
+Manager.cs (57) : if (profile == null) return;
+Manager.cs (87) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table) || privilege == null)
+Manager.cs (88) : return false;
+Manager.cs (275) : string nombreArchivo = databaseName + ".path";
+Manager.cs (276) : string contenidoTotal = "";
+Manager.cs (277) : foreach (var profile in Profiles)
+Manager.cs (278) : {
+Manager.cs (279) : string perfil = $"Profile: {profile.Name}\n";
+Manager.cs (280) : contenidoTotal += perfil;
+Manager.cs (281) : foreach (var user in profile.Users)
+Manager.cs (282) : {
+Manager.cs (283) : string usuario = $"User: {user.Username}, Password: {user.EncryptedPassword}\n";
+Manager.cs (284) : contenidoTotal += usuario;
+Manager.cs (285) : }
+Manager.cs (286) : foreach (var entrada in profile.PrivilegesOn)
+Manager.cs (287) : {
+Manager.cs (288) : string tabla = $"Table: {entrada.Key}\n";
+Manager.cs (289) : contenidoTotal += tabla;
+Manager.cs (290) : foreach (var privilege in entrada.Value)
+Manager.cs (291) : {
+Manager.cs (292) : string privilegio = $"Privilege: {privilege}\n";
+Manager.cs (293) : contenidoTotal += privilegio;
 Manager.cs (294) : }
-Manager.cs (295) : contenidoTotal += "\n";
-Manager.cs (296) : }
-Manager.cs (297) : File.WriteAllText(nombreArchivo, contenidoTotal);
+Manager.cs (295) : }
+Manager.cs (296) : contenidoTotal += "\n";
+Manager.cs (297) : }
+Manager.cs (298) : File.WriteAllText(nombreArchivo, contenidoTotal);
 Profile.cs (21) : if (string.IsNullOrEmpty(tableName) || privilege == null)
 Profile.cs (22) : {
 Profile.cs (23) : return false;
