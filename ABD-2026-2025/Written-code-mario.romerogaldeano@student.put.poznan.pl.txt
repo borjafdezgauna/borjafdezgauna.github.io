@@ -17,13 +17,18 @@ Database.cs (84) : Tables.Remove(TableByName(tableName));
 Database.cs (85) : LastErrorMessage = Constants.DropTableSuccess;
 Database.cs (86) : return true;
 Database.cs (87) : }
-Database.cs (122) : if (columns == null || columns.Count == 0)
-Database.cs (124) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (125) : return null;
-Database.cs (126) : }
-Database.cs (137) : }
-Database.cs (240) : private const string UserLine = "USER";
-Database.cs (306) : if (line == UserLine) reader.ReadLine();
+Database.cs (93) : if (!SecurityManager.IsGrantedPrivilege(m_username, tableName, Privilege.Insert))
+Database.cs (94) : {
+Database.cs (95) : LastErrorMessage = Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Database.cs (96) : return false;
+Database.cs (97) : }
+Database.cs (127) : if (columns == null || columns.Count == 0)
+Database.cs (129) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (130) : return null;
+Database.cs (131) : }
+Database.cs (142) : }
+Database.cs (245) : private const string UserLine = "USER";
+Database.cs (311) : if (line == UserLine) reader.ReadLine();
 Row.cs (20) : if (columnDefinitions == null || values == null) { return; }
 Row.cs (23) : if (values.Count > columnDefinitions.Count) { return; }
 Row.cs (25) : Values = new List<string>();
@@ -174,6 +179,7 @@ Grant.cs (48) : {
 Grant.cs (49) : return Constants.ProfileAlreadyHasPrivilege;
 Grant.cs (50) : }
 Grant.cs (51) : return Constants.GrantPrivilegeSuccess;
+Insert.cs (1) : using DbManager.Parser;
 MiniSQLParser.cs (14) : const string selectPattern = @"^SELECT\s+([a-zA-Z]\w*(?:,[a-zA-Z]\w*)*)\s+FROM\s+([a-zA-Z]\w*)(?:\s+WHERE\s+([a-zA-Z]\w*)([<=>])'([^']+)')?$";
 MiniSQLParser.cs (16) : const string insertPattern = @"^INSERT\s+INTO\s+([a-zA-Z]\w*)\s+VALUES\s*\(('[^']+'(?:,'[^']+')*)\)$";
 MiniSQLParser.cs (18) : const string dropTablePattern = @"^DROP\s+TABLE\s+([a-zA-Z]\w*)$";

@@ -142,6 +142,39 @@ Table.cs (203) : for (int i = index.Count - 1; i >= 0; i--)
 Table.cs (298) : string colNombre = setValues[j].ColumnName;
 Table.cs (299) : string nuevoValor = setValues[j].Value;
 Table.cs (301) : Rows[i].SetValue(colNombre, nuevoValor);
+Client.cs (83) : bool isSuccess= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (85) : return isSuccess;
+Server.cs (32) : while (running)
+Server.cs (37) : if (bytesRead <= 0) break;
+Server.cs (39) : string clientMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
+Server.cs (42) : if (clientMessage.StartsWith("<Open"))
+Server.cs (43) : {
+Server.cs (51) : }
+Server.cs (54) : response = XmlSerializer.OpenCreateError(Constants.IncorrectLogin);
+Server.cs (58) : else if (clientMessage.StartsWith("<Create"))
+Server.cs (61) : {
+Server.cs (62) : if (XmlDeserializer.ParseCreate(clientMessage, out string database, out string username, out string password))
+Server.cs (71) : response = XmlSerializer.CreateError(Constants.CouldNotCreateDatabase);
+Server.cs (72) : }
+Server.cs (74) : else
+Server.cs (76) : response = XmlSerializer.CreateError(Constants.CouldNotCreateDatabase);
+Server.cs (81) : response = XmlSerializer.CreateError(e.Message);
+Server.cs (85) : else if (clientMessage.StartsWith("<Query"))
+Server.cs (86) : {
+Server.cs (87) : if (XmlDeserializer.ParseQuery(clientMessage, out string query))
+Server.cs (90) : {
+Server.cs (91) : try
+Server.cs (96) : catch (Exception e)
+Server.cs (97) : {
+Server.cs (98) : response = XmlSerializer.ErrorAnswer(e.Message);
+Server.cs (99) : }
+Server.cs (101) : }
+Server.cs (103) : else
+Server.cs (104) : {
+Server.cs (105) : response = XmlSerializer.ErrorAnswer(Constants.NoDatabaseOpen);
+Server.cs (106) : }
+Server.cs (107) : }
+Server.cs (110) : response = XmlSerializer.ErrorAnswer(Constants.NoDatabaseOpen);
 XmlDeserializer.cs (22) : if (string.IsNullOrEmpty(command))
 XmlDeserializer.cs (25) : if (!command.StartsWith("<Open") || !command.EndsWith("/>"))
 XmlDeserializer.cs (26) : return false;
@@ -167,7 +200,7 @@ XmlDeserializer.cs (76) : return false;
 XmlDeserializer.cs (78) : if (!command.StartsWith("<Create") || !command.EndsWith("/>"))
 XmlDeserializer.cs (79) : return false;
 XmlDeserializer.cs (82) : const string createPattern = @"^<Create\sDatabase=""([^""]+)""\sUser=""([^""]+)""\sPassword=""([^""]+)""/>$";
-XmlDeserializer.cs (83) : Match match = Regex.Match(command, createPattern);
+XmlDeserializer.cs (83) : Match match = Regex.Match(command.Trim(), createPattern);
 XmlDeserializer.cs (85) : if (!match.Success)
 XmlDeserializer.cs (89) : database = match.Groups[1].Value;
 XmlDeserializer.cs (90) : username = match.Groups[2].Value;
@@ -176,8 +209,8 @@ XmlDeserializer.cs (93) : return true;
 XmlDeserializer.cs (104) : if (string.IsNullOrEmpty(answer))
 XmlDeserializer.cs (105) : return false;
 XmlDeserializer.cs (107) : if (!answer.StartsWith("<Query>") || !answer.EndsWith("</Query>"))
-XmlDeserializer.cs (110) : const string queryPattern = @"^<Query>(.+)</Query>$";
-XmlDeserializer.cs (111) : Match match = Regex.Match(answer, queryPattern);
+XmlDeserializer.cs (110) : const string queryPattern = @"^<Query>(.+)</Query>\s*$";
+XmlDeserializer.cs (111) : Match match = Regex.Match(answer.Trim(), queryPattern);
 XmlDeserializer.cs (113) : if (!match.Success)
 XmlDeserializer.cs (114) : return false;
 XmlDeserializer.cs (116) : query = match.Groups[1].Value;

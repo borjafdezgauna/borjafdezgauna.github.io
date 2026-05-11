@@ -156,30 +156,54 @@ CreateTable.cs (25) : return Constants.Error;
 CreateTable.cs (26) : Table tabla = database.TableByName(Table);
 CreateTable.cs (27) : if (tabla != null)
 CreateTable.cs (28) : return Constants.TableAlreadyExistsError;
-CreateTable.cs (29) : else if (ColumnsParameters == null || ColumnsParameters.Count == 0)
-CreateTable.cs (30) : return Constants.DatabaseCreatedWithoutColumnsError;
-CreateTable.cs (31) : else if (database.CreateTable(Table, ColumnsParameters))
-CreateTable.cs (32) : return Constants.CreateTableSuccess;
-CreateTable.cs (33) : return Constants.Error;
+CreateTable.cs (34) : return Constants.DatabaseCreatedWithoutColumnsError;
+CreateTable.cs (36) : return Constants.CreateTableSuccess;
+CreateTable.cs (37) : return Constants.Error;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
 Delete.cs (23) : Table tabla = database.TableByName(Table);
 Delete.cs (24) : if (database==null)
 Delete.cs (25) : return Constants.Error;
-Delete.cs (26) : else if (tabla == null)
-Delete.cs (27) : return Constants.TableDoesNotExistError;
-Delete.cs (28) : else if(database.DeleteWhere(Table, Where))
-Delete.cs (29) : return Constants.DeleteSuccess;
-Delete.cs (30) : return Constants.Error;
+Delete.cs (31) : return Constants.TableDoesNotExistError;
+Delete.cs (34) : return Constants.DeleteSuccess;
+Delete.cs (36) : return Constants.Error;
 DropTable.cs (15) : Table = table;
+Grant.cs (5) : using DbManager.Security;
+Grant.cs (28) : if (database == null)
+Grant.cs (29) : {
+Grant.cs (30) : return Constants.Error;
+Grant.cs (31) : }
+Grant.cs (32) : if (!database.IsUserAdmin())
+Grant.cs (33) : {
+Grant.cs (34) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (35) : }
+Grant.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (37) : if (profile == null)
+Grant.cs (38) : {
+Grant.cs (39) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (40) : }
+Grant.cs (41) : Privilege priv;
+Grant.cs (42) : try
+Grant.cs (43) : {
+Grant.cs (44) : priv = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Grant.cs (45) : }
+Grant.cs (46) : catch
+Grant.cs (47) : {
+Grant.cs (48) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (49) : }
+Grant.cs (51) : if (profile.IsGrantedPrivilege(TableName, priv))
+Grant.cs (52) : {
+Grant.cs (53) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (54) : }
+Grant.cs (55) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, priv);
+Grant.cs (56) : return Constants.GrantPrivilegeSuccess;
 Insert.cs (24) : Table tabla = database.TableByName(Table);
 Insert.cs (25) : if (database==null)
 Insert.cs (26) : return Constants.Error;
-Insert.cs (27) : else if (tabla == null)
-Insert.cs (28) : return Constants.TableDoesNotExistError;
-Insert.cs (29) : else if(database.Insert(Table, Values))
-Insert.cs (30) : return Constants.InsertSuccess;
-Insert.cs (31) : return Constants.Error;
+Insert.cs (30) : return Constants.TableDoesNotExistError;
+Insert.cs (31) : else if(database.Insert(Table, Values))
+Insert.cs (32) : return Constants.InsertSuccess;
+Insert.cs (34) : return Constants.Error;
 MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (39) : const string addUserPattern = @"^ADD\s+USER\s+\(\s*([A-Za-z][A-Za-z0-9]*)\s*,\s*([a-zA-Z0-9]+)\s*,\s*([A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$";

@@ -142,6 +142,14 @@ DropSecurityProfile.cs (43) : return Constants.DropSecurityProfileSuccess;
 DropSecurityProfile.cs (44) : }
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
+Insert.cs (27) : if (database.IsUserAdmin())
+Insert.cs (28) : {
+Insert.cs (29) : if (tabla == null)
+Insert.cs (36) : else
+Insert.cs (37) : {
+Insert.cs (38) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Insert.cs (39) : }
+Insert.cs (42) : }
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (4) : using System.Collections.Specialized;
 MiniSQLParser.cs (5) : using System.ComponentModel.DataAnnotations;
@@ -283,33 +291,40 @@ Update.cs (27) : return Constants.Error;
 Update.cs (28) : }
 Update.cs (29) : else
 Update.cs (30) : {
-Update.cs (31) : Table t = database.TableByName(Table);
-Update.cs (32) : if(t == null)
-Update.cs (33) : {
-Update.cs (34) : return Constants.TableDoesNotExistError;
-Update.cs (35) : }
-Update.cs (36) : else
-Update.cs (37) : {
-Update.cs (38) : ColumnDefinition colunm = t.ColumnByName(Where.ColumnName);
-Update.cs (39) : if(colunm == null || Where.ColumnName == null)
-Update.cs (40) : {
-Update.cs (41) : return Constants.ColumnDoesNotExistError;
-Update.cs (42) : }
-Update.cs (44) : foreach(SetValue st in Columns)
-Update.cs (45) : {
-Update.cs (46) : if(st.ColumnName == null || t.ColumnByName(st.ColumnName) == null)
+Update.cs (31) : if (database.IsUserAdmin())
+Update.cs (32) : {
+Update.cs (33) : Table t = database.TableByName(Table);
+Update.cs (34) : if(t == null)
+Update.cs (35) : {
+Update.cs (36) : return Constants.TableDoesNotExistError;
+Update.cs (37) : }
+Update.cs (38) : else
+Update.cs (39) : {
+Update.cs (40) : ColumnDefinition colunm = t.ColumnByName(Where.ColumnName);
+Update.cs (41) : if(colunm == null || Where.ColumnName == null)
+Update.cs (42) : {
+Update.cs (43) : return Constants.ColumnDoesNotExistError;
+Update.cs (44) : }
+Update.cs (46) : foreach(SetValue st in Columns)
 Update.cs (47) : {
-Update.cs (48) : return Constants.ColumnDoesNotExistError;
-Update.cs (49) : }
-Update.cs (50) : }
-Update.cs (51) : bool done =t.Update(Columns, Where);
-Update.cs (52) : if(done)
-Update.cs (53) : {
-Update.cs (54) : return Constants.UpdateSuccess;
-Update.cs (55) : }
-Update.cs (56) : return Constants.SyntaxError;
+Update.cs (48) : if(st.ColumnName == null || t.ColumnByName(st.ColumnName) == null)
+Update.cs (49) : {
+Update.cs (50) : return Constants.ColumnDoesNotExistError;
+Update.cs (51) : }
+Update.cs (52) : }
+Update.cs (53) : bool done =t.Update(Columns, Where);
+Update.cs (54) : if(done)
+Update.cs (55) : {
+Update.cs (56) : return Constants.UpdateSuccess;
 Update.cs (57) : }
 Update.cs (58) : }
+Update.cs (59) : return Constants.SyntaxError;
+Update.cs (60) : }
+Update.cs (61) : else
+Update.cs (62) : {
+Update.cs (63) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Update.cs (64) : }
+Update.cs (66) : }
 Manager.cs (124) : foreach(Profile f in Profiles)
 Manager.cs (125) : {
 Manager.cs (126) : foreach(User u in f.Users)
