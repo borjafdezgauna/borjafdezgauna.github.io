@@ -195,6 +195,82 @@ Table.cs (296) : if (rows.Count != NumRows())
 Client.cs (61) : //DEADLINE 6: Send an Open command to the server using SendString
 Client.cs (71) : //DEADLINE 6: Send a Create command to the server using SendString
 Client.cs (80) : //DEADLINE 6: Send a Query command to the server using SendString
+Server.cs (16) : TcpListener server = null;
+Server.cs (17) : Socket socket = null;
+Server.cs (18) : Database database = null;
+Server.cs (20) : try
+Server.cs (21) : {
+Server.cs (22) : //database = new Database("admin", "adminPassword");
+Server.cs (23) : //Listen on port 1200. Accept connections from any IP address
+Server.cs (24) : server = new TcpListener(IPAddress.Parse("0.0.0.0"), port);
+Server.cs (26) : server.Start();
+Server.cs (28) : Console.WriteLine("Server running and listening on port " + port);
+Server.cs (30) : socket = server.AcceptSocket();
+Server.cs (32) : Console.WriteLine("Connection accepted from " + socket.RemoteEndPoint);
+Server.cs (34) : bool connected = true;
+Server.cs (36) : while(connected == true)
+Server.cs (37) : {
+Server.cs (38) : byte[] buffer = new byte[100];
+Server.cs (39) : int bytesRead = socket.Receive(buffer);
+Server.cs (40) : buffer[bytesRead] = 0;
+Server.cs (41) : ASCIIEncoding encoding = new ASCIIEncoding();
+Server.cs (42) : string clientMessage = encoding.GetString(buffer).Substring(0,bytesRead);
+Server.cs (43) : Console.WriteLine("Message received from client: " + clientMessage);
+Server.cs (45) : string response = "";
+Server.cs (47) : // OPEN BLOCK
+Server.cs (48) : if (XmlDeserializer.ParseOpen(clientMessage, out string openDatabaseName, out string openUser, out string openPassword))
+Server.cs (49) : {
+Server.cs (50) : database = Database.Load(openDatabaseName, openUser, openPassword);
+Server.cs (52) : if (database == null)
+Server.cs (53) : response = XmlSerializer.OpenCreateError(Constants.IncorrectLogin);
+Server.cs (55) : else
+Server.cs (56) : response = XmlSerializer.OpenCreateSuccess;
+Server.cs (57) : }
+Server.cs (59) : // CREATE BLOCK
+Server.cs (60) : else if (XmlDeserializer.ParseCreate(clientMessage, out string createDatabaseName, out string createUser, out string createPassword))
+Server.cs (61) : {
+Server.cs (62) : database = new Database(createDatabaseName, createPassword);
+Server.cs (64) : if (database == null)
+Server.cs (65) : response = XmlSerializer.CreateError(Constants.CouldNotCreateDatabase);
+Server.cs (67) : else
+Server.cs (68) : response = XmlSerializer.CreateSuccess;
+Server.cs (69) : }
+Server.cs (71) : // QUERY BLOCK
+Server.cs (72) : else if (XmlDeserializer.ParseQuery(clientMessage, out string query))
+Server.cs (73) : {
+Server.cs (74) : if (database == null)
+Server.cs (75) : response = XmlSerializer.ErrorAnswer(Constants.NoDatabaseOpen);
+Server.cs (77) : else
+Server.cs (78) : {
+Server.cs (79) : string result = database.ExecuteMiniSQLQuery(query);
+Server.cs (81) : if (result.StartsWith(Constants.Error))
+Server.cs (82) : response = XmlSerializer.ErrorAnswer(result);
+Server.cs (84) : else
+Server.cs (85) : response = XmlSerializer.SucessfulAnswer(result);
+Server.cs (86) : }
+Server.cs (87) : }
+Server.cs (89) : // CLOSE BLOCK
+Server.cs (90) : else if(XmlDeserializer.IsCloseCommand(clientMessage))
+Server.cs (91) : {
+Server.cs (92) : response = XmlSerializer.CloseConnection;
+Server.cs (93) : connected = false;
+Server.cs (94) : }
+Server.cs (96) : byte[] responseBytes = encoding.GetBytes(response);
+Server.cs (97) : socket.Send(responseBytes);
+Server.cs (98) : }
+Server.cs (100) : Task.Delay(2000).Wait();
+Server.cs (101) : }
+Server.cs (103) : catch (Exception e)
+Server.cs (104) : {
+Server.cs (105) : Console.WriteLine("Unhandled error: " + e);
+Server.cs (106) : }
+Server.cs (108) : finally
+Server.cs (109) : {
+Server.cs (110) : socket?.Close();
+Server.cs (111) : server?.Stop();
+Server.cs (113) : Console.WriteLine("Server closed. Press any key to finish...");
+Server.cs (114) : Console.ReadKey();
+Server.cs (115) : }
 XmlDeserializer.cs (16) : //Return true if 'command' is an Open statement, false otherwise. If true, set the value of database, username and password
 XmlDeserializer.cs (33) : //TODO DEADLINE 6: Try to parse the answer to an Open/Create command.
 XmlDeserializer.cs (34) : //Return true if 'command' is equal to XmlSerializer.OpenCreateSuccess
