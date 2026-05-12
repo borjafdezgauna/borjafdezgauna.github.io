@@ -203,10 +203,10 @@ XmlDeserializer.cs (50) : //Return true if 'command' is a Create statement, fals
 XmlDeserializer.cs (67) : //Return true if 'command' is a Query statement, false otherwise. If true, set the value of query with the content of the command
 XmlDeserializer.cs (80) : //Return true if 'command' does not contain an error inside (<Error>...</Error>)
 XmlDeserializer.cs (81) : //If it is an error (<Error>...</Error>), return false and set 'answerContent' with the error message
-AddUser.cs (27) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
-AddUser.cs (28) : return Constants.SecurityProfileDoesNotExistError;
-AddUser.cs (30) : if(!database.IsUserAdmin())
-AddUser.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (27) : if(!database.IsUserAdmin())
+AddUser.cs (28) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+AddUser.cs (30) : if (database.SecurityManager.ProfileByName(ProfileName) == null)
+AddUser.cs (31) : return Constants.SecurityProfileDoesNotExistError;
 AddUser.cs (33) : database.SecurityManager.ProfileByName(ProfileName).Users.Add(new (Username, Password));
 AddUser.cs (35) : return Constants.AddUserSuccess;
 AddUser.cs (36) : }
@@ -218,16 +218,19 @@ CreateSecurityProfile.cs (26) : database.SecurityManager.AddProfile(new() { Name
 CreateSecurityProfile.cs (28) : return Constants.CreateSecurityProfileSuccess;
 Delete.cs (2) : namespace DbManager
 DeleteUser.cs (5) : using DbManager.Security;
-DeleteUser.cs (23) : if (database.SecurityManager.UserByName(Username) == null)
-DeleteUser.cs (24) : return Constants.UserDoesNotExistError;
-DeleteUser.cs (26) : if (!database.IsUserAdmin())
-DeleteUser.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (23) : if (!database.IsUserAdmin())
+DeleteUser.cs (24) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DeleteUser.cs (26) : if (database.SecurityManager.UserByName(Username) == null)
+DeleteUser.cs (27) : return Constants.UserDoesNotExistError;
 DeleteUser.cs (29) : database.SecurityManager.ProfileByUser(Username).Users.Remove(database.SecurityManager.UserByName(Username));
 DeleteUser.cs (31) : return Constants.DeleteUserSuccess;
 DeleteUser.cs (32) : }
+DropSecurityProfile.cs (22) : if (!database.IsUserAdmin())
+DropSecurityProfile.cs (23) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Grant.cs (26) : if(!database.IsUserAdmin())
 Grant.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Grant.cs (32) : catch(Exception)
+Grant.cs (46) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, a);
 MiniSQLParser.cs (12) : const string selectPattern = @"^SELECT\s+(?<columns>(\*|\w+(?:,\w+)*))\s+FROM\s+(?<table>\w+)(\s+WHERE\s+(?<column>\w+)\s*(?<op><=|>=|!=|=|<|>)\s*'(?<value>[\w\.\s]+)')?$";
 MiniSQLParser.cs (14) : const string insertPattern = @"^INSERT\s+INTO\s+(?<table>\w+)\s+VALUES\s*\(\s*(?<values>'[^']*'(?:,'[^']*')*)\s*\)$";
 MiniSQLParser.cs (18) : //Note: The parsing of CREATE TABLE should accept empty columns "()"`
@@ -269,6 +272,7 @@ Revoke.cs (21) : ProfileName = profileName;
 Revoke.cs (26) : if(!database.IsUserAdmin())
 Revoke.cs (27) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 Revoke.cs (32) : catch(Exception)
+Revoke.cs (42) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, a);
 Select.cs (22) : Table result = database.Select(Table, Columns, Where);
 Manager.cs (40) : if (password == null)
 Manager.cs (41) : {
