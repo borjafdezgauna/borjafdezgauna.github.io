@@ -274,13 +274,11 @@ Client.cs (7) : using System.Net;
 Client.cs (9) : using System.Runtime.Serialization.Formatters;
 Client.cs (27) : try
 Client.cs (28) : {
-Client.cs (29) : TcpClient newClient = new TcpClient();
-Client.cs (30) : m_tcpClient.Connect(ipAddress, port);
-Client.cs (31) : return true;
-Client.cs (33) : }catch
+Client.cs (29) : m_tcpClient.Connect(ipAddress, port);
+Client.cs (30) : return true;
 Client.cs (34) : {
 Client.cs (39) : }
-Client.cs (48) : string messageToSend= message;
+Client.cs (48) : string messageToSend = message;
 Client.cs (49) : try
 Client.cs (50) : {
 Client.cs (51) : NetworkStream stream = m_tcpClient.GetStream();
@@ -291,7 +289,7 @@ Client.cs (55) : stream.Write(dataToSend, 0, dataToSend.Length);
 Client.cs (57) : //EL buffer lee la respuesta del servido. EL tamaño es 4096 pero se pyede cambiar dependiendo de la respuesta esperada
 Client.cs (58) : byte[] buffer = new byte[4096];
 Client.cs (59) : int bytesRead = stream.Read(buffer, 0, buffer.Length);
-Client.cs (61) : if(bytesRead==0)
+Client.cs (61) : if (bytesRead == 0)
 Client.cs (62) : {
 Client.cs (63) : return null;
 Client.cs (64) : }
@@ -303,21 +301,20 @@ Client.cs (69) : catch
 Client.cs (70) : {
 Client.cs (71) : return null;
 Client.cs (72) : }
-Client.cs (80) : string request= XmlSerializer.OpenDatabase(database, username, password);
+Client.cs (80) : string request = XmlSerializer.OpenDatabase(database, username, password);
 Client.cs (81) : string response = SendString(request);
-Client.cs (94) : string request= XmlSerializer.CreateDatabase(database, username, password);
+Client.cs (94) : string request = XmlSerializer.CreateDatabase(database, username, password);
 Client.cs (95) : string response = SendString(request);
-Client.cs (97) : bool Error= XmlDeserializer.ParseOpenCreateAnswer(response, out error);
+Client.cs (97) : bool Error = XmlDeserializer.ParseOpenCreateAnswer(response, out error);
 Client.cs (99) : return Error;
-Client.cs (107) : string queryRequest=XmlSerializer.Query(query);
+Client.cs (107) : string queryRequest = XmlSerializer.Query(query);
 Client.cs (108) : string response = SendString(queryRequest);
-Client.cs (111) : if(XmlDeserializer.ParseQueryAnswer(response, out string answerContent))
+Client.cs (111) : if (XmlDeserializer.ParseQueryAnswer(response, out string answerContent))
 Client.cs (112) : {
 Client.cs (113) : return answerContent;
 Client.cs (114) : }
 Client.cs (115) : else
 Client.cs (116) : {
-Client.cs (117) : return "ERROR: " + answerContent;
 Client.cs (118) : }
 Client.cs (125) : SendString(XmlSerializer.CloseConnection);
 Client.cs (126) : m_tcpClient.Close();
@@ -328,51 +325,50 @@ Server.cs (40) : string response = "";
 Server.cs (44) : if (XmlDeserializer.ParseOpen(clientMessage, out string database, out string username, out string password))
 Server.cs (45) : {
 Server.cs (46) : activeDB = Database.Load(database, username, password);
-Server.cs (47) : if (activeDB != null)
-Server.cs (48) : {
-Server.cs (49) : response = XmlSerializer.OpenCreateSuccess;
-Server.cs (50) : }
-Server.cs (52) : else
-Server.cs (53) : {
-Server.cs (55) : }
-Server.cs (56) : }
-Server.cs (59) : {
-Server.cs (60) : try
-Server.cs (63) : {
-Server.cs (64) : activeDB = new Database(username, password);
-Server.cs (65) : if (activeDB.Save(database))
-Server.cs (66) : {
-Server.cs (67) : response = XmlSerializer.OpenCreateSuccess;
-Server.cs (68) : }
-Server.cs (69) : else
-Server.cs (70) : {
+Server.cs (48) : if (activeDB != null)
+Server.cs (49) : {
+Server.cs (50) : response = XmlSerializer.OpenCreateSuccess;
+Server.cs (51) : }
+Server.cs (57) : else
+Server.cs (58) : {
+Server.cs (60) : }
+Server.cs (61) : }
+Server.cs (64) : {
+Server.cs (65) : try
+Server.cs (68) : {
+Server.cs (69) : activeDB = new Database(username, password);
+Server.cs (70) : if (activeDB.Save(database))
+Server.cs (71) : {
+Server.cs (72) : response = XmlSerializer.OpenCreateSuccess;
 Server.cs (73) : }
-Server.cs (77) : }
+Server.cs (74) : else
+Server.cs (75) : {
 Server.cs (78) : }
-Server.cs (79) : catch (Exception e)
-Server.cs (80) : {
 Server.cs (82) : }
 Server.cs (83) : }
-Server.cs (88) : {
-Server.cs (89) : if (activeDB != null)
-Server.cs (92) : {
-Server.cs (93) : string queryResult = activeDB.ExecuteMiniSQLQuery(query);
-Server.cs (94) : response = XmlSerializer.SucessfulAnswer(queryResult);
-Server.cs (111) : }
-Server.cs (114) : else if (XmlDeserializer.IsCloseCommand(clientMessage))
-Server.cs (115) : {
-Server.cs (116) : running = false;
-Server.cs (117) : break;
-Server.cs (120) : else
-Server.cs (121) : {
-Server.cs (122) : response = XmlSerializer.ErrorAnswer("Error: Unrecognized command");
-Server.cs (123) : }
-Server.cs (125) : if (!string.IsNullOrEmpty(response))
-Server.cs (126) : {
-Server.cs (127) : byte[] responseBytes = Encoding.UTF8.GetBytes(response);
-Server.cs (128) : socket.Send(responseBytes);
-Server.cs (129) : }
-Server.cs (130) : }
+Server.cs (84) : catch (Exception e)
+Server.cs (85) : {
+Server.cs (87) : }
+Server.cs (88) : }
+Server.cs (93) : {
+Server.cs (94) : if (activeDB != null)
+Server.cs (95) : {
+Server.cs (96) : string queryResult = activeDB.ExecuteMiniSQLQuery(query);
+Server.cs (115) : }
+Server.cs (118) : else if (XmlDeserializer.IsCloseCommand(clientMessage))
+Server.cs (119) : {
+Server.cs (120) : running = false;
+Server.cs (121) : break;
+Server.cs (124) : else
+Server.cs (125) : {
+Server.cs (126) : response = XmlSerializer.ErrorAnswer("Error: Unrecognized command");
+Server.cs (127) : }
+Server.cs (129) : if (!string.IsNullOrEmpty(response))
+Server.cs (130) : {
+Server.cs (131) : byte[] responseBytes = Encoding.UTF8.GetBytes(response);
+Server.cs (132) : socket.Send(responseBytes);
+Server.cs (133) : }
+Server.cs (134) : }
 AddUser.cs (21) : Username = username;
 AddUser.cs (22) : Password = password;
 AddUser.cs (23) : ProfileName = profileName;

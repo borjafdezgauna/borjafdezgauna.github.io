@@ -1,104 +1,104 @@
 Database.cs (5) : using System.ComponentModel.DataAnnotations.Schema;
 Database.cs (8) : using System.Runtime.InteropServices.Marshalling;
-Database.cs (187) : Table table = TableByName(tableName);
-Database.cs (188) : if(table != null)
-Database.cs (189) : {
-Database.cs (190) : foreach (string column in columns)
-Database.cs (191) : {
-Database.cs (192) : if (table.ColumnByName(column) == null)
-Database.cs (193) : {
-Database.cs (194) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (196) : }
+Database.cs (188) : Table table = TableByName(tableName);
+Database.cs (189) : if(table != null)
+Database.cs (190) : {
+Database.cs (191) : foreach (string column in columns)
+Database.cs (192) : {
+Database.cs (193) : if (table.ColumnByName(column) == null)
+Database.cs (194) : {
+Database.cs (195) : LastErrorMessage = Constants.ColumnDoesNotExistError;
 Database.cs (197) : }
-Database.cs (198) : return table.Select(columns, condition);
-Database.cs (199) : }
-Database.cs (200) : else
-Database.cs (201) : {
-Database.cs (202) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (203) : return null;
-Database.cs (204) : }
-Database.cs (278) : try
-Database.cs (279) : {
-Database.cs (280) : string filename = databaseName + ".db";
-Database.cs (281) : using (StreamWriter w = new StreamWriter(filename))
-Database.cs (282) : {
-Database.cs (283) : w.WriteLine(m_username);
-Database.cs (284) : w.WriteLine(m_password);
-Database.cs (285) : w.WriteLine(Tables.Count);
-Database.cs (287) : //guardo cada tabla
-Database.cs (288) : foreach(Table table in Tables)
-Database.cs (289) : {
-Database.cs (290) : //info tabla
-Database.cs (291) : w.WriteLine(table.Name);
-Database.cs (292) : w.WriteLine(table.NumColumns());
-Database.cs (293) : w.WriteLine(table.NumRows());
-Database.cs (295) : //columnas
-Database.cs (296) : for(int i = 0; i < table.NumColumns(); i++)
-Database.cs (297) : {
-Database.cs (298) : ColumnDefinition column = table.GetColumn(i);
-Database.cs (299) : w.WriteLine(column.AsText());
-Database.cs (300) : }
-Database.cs (302) : //filas
-Database.cs (303) : for (int j = 0; j < table.NumRows() ; j++)
-Database.cs (304) : {
-Database.cs (305) : Row r = table.GetRow(j);
-Database.cs (306) : w.WriteLine(r.AsText());
-Database.cs (307) : }
+Database.cs (198) : }
+Database.cs (199) : return table.Select(columns, condition);
+Database.cs (200) : }
+Database.cs (201) : else
+Database.cs (202) : {
+Database.cs (203) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (204) : return null;
+Database.cs (205) : }
+Database.cs (279) : try
+Database.cs (280) : {
+Database.cs (281) : string filename = databaseName + ".db";
+Database.cs (282) : using (StreamWriter w = new StreamWriter(filename))
+Database.cs (283) : {
+Database.cs (284) : w.WriteLine(m_username);
+Database.cs (285) : w.WriteLine(m_password);
+Database.cs (286) : w.WriteLine(Tables.Count);
+Database.cs (288) : //guardo cada tabla
+Database.cs (289) : foreach(Table table in Tables)
+Database.cs (290) : {
+Database.cs (291) : //info tabla
+Database.cs (292) : w.WriteLine(table.Name);
+Database.cs (293) : w.WriteLine(table.NumColumns());
+Database.cs (294) : w.WriteLine(table.NumRows());
+Database.cs (296) : //columnas
+Database.cs (297) : for(int i = 0; i < table.NumColumns(); i++)
+Database.cs (298) : {
+Database.cs (299) : ColumnDefinition column = table.GetColumn(i);
+Database.cs (300) : w.WriteLine(column.AsText());
+Database.cs (301) : }
+Database.cs (303) : //filas
+Database.cs (304) : for (int j = 0; j < table.NumRows() ; j++)
+Database.cs (305) : {
+Database.cs (306) : Row r = table.GetRow(j);
+Database.cs (307) : w.WriteLine(r.AsText());
 Database.cs (308) : }
 Database.cs (309) : }
-Database.cs (310) : return true;
-Database.cs (311) : }
-Database.cs (312) : catch
-Database.cs (313) : {
-Database.cs (315) : }
-Database.cs (320) : {
-Database.cs (321) : try
-Database.cs (322) : {
-Database.cs (323) : string filename = databaseName + ".db";
-Database.cs (324) : if (filename == null)
-Database.cs (325) : {
-Database.cs (326) : return null;
-Database.cs (327) : }
-Database.cs (328) : using (StreamReader reader = new StreamReader(filename))
-Database.cs (329) : {
-Database.cs (330) : string fileUser = reader.ReadLine();
-Database.cs (331) : string filePass = reader.ReadLine();
-Database.cs (333) : if(fileUser != username || filePass != password)
-Database.cs (334) : {
-Database.cs (335) : return null;
-Database.cs (336) : }
-Database.cs (338) : Database newdb = new Database();
-Database.cs (339) : newdb.m_username = fileUser;
-Database.cs (340) : newdb.m_password = filePass;
-Database.cs (342) : int numTablas = int.Parse(reader.ReadLine());
-Database.cs (344) : for(int t=0; t < numTablas; t++)
-Database.cs (345) : {
-Database.cs (346) : string tableName = reader.ReadLine();
-Database.cs (347) : int numColumns = int.Parse(reader.ReadLine());
-Database.cs (348) : int numRows = int.Parse(reader.ReadLine());
-Database.cs (350) : //reconstruir columnas
-Database.cs (351) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
-Database.cs (352) : for (int c = 0; c < numColumns; c++)
-Database.cs (353) : {
-Database.cs (354) : string colText = reader.ReadLine();
-Database.cs (355) : columns.Add(ColumnDefinition.Parse(colText));
-Database.cs (356) : }
-Database.cs (357) : Table newTable = new Table(tableName, columns);
-Database.cs (358) : //reconstruir filas
-Database.cs (359) : for (int r = 0; r < numRows; r++)
-Database.cs (360) : {
-Database.cs (361) : string row = reader.ReadLine();
-Database.cs (362) : Row newRow = Row.Parse(columns, row);
-Database.cs (363) : newTable.Insert(newRow.Values);
-Database.cs (364) : }
-Database.cs (365) : //a�adimos la tabla a la bd
-Database.cs (366) : newdb.Tables.Add(newTable);
-Database.cs (367) : }
-Database.cs (368) : return newdb;
-Database.cs (369) : }
+Database.cs (310) : }
+Database.cs (311) : return true;
+Database.cs (312) : }
+Database.cs (313) : catch
+Database.cs (314) : {
+Database.cs (316) : }
+Database.cs (321) : {
+Database.cs (322) : try
+Database.cs (323) : {
+Database.cs (324) : string filename = databaseName + ".db";
+Database.cs (325) : if (filename == null)
+Database.cs (326) : {
+Database.cs (327) : return null;
+Database.cs (328) : }
+Database.cs (329) : using (StreamReader reader = new StreamReader(filename))
+Database.cs (330) : {
+Database.cs (331) : string fileUser = reader.ReadLine();
+Database.cs (332) : string filePass = reader.ReadLine();
+Database.cs (334) : if(fileUser != username || filePass != password)
+Database.cs (335) : {
+Database.cs (336) : return null;
+Database.cs (337) : }
+Database.cs (339) : Database newdb = new Database();
+Database.cs (340) : newdb.m_username = fileUser;
+Database.cs (341) : newdb.m_password = filePass;
+Database.cs (343) : int numTablas = int.Parse(reader.ReadLine());
+Database.cs (345) : for(int t=0; t < numTablas; t++)
+Database.cs (346) : {
+Database.cs (347) : string tableName = reader.ReadLine();
+Database.cs (348) : int numColumns = int.Parse(reader.ReadLine());
+Database.cs (349) : int numRows = int.Parse(reader.ReadLine());
+Database.cs (351) : //reconstruir columnas
+Database.cs (352) : List<ColumnDefinition> columns = new List<ColumnDefinition>();
+Database.cs (353) : for (int c = 0; c < numColumns; c++)
+Database.cs (354) : {
+Database.cs (355) : string colText = reader.ReadLine();
+Database.cs (356) : columns.Add(ColumnDefinition.Parse(colText));
+Database.cs (357) : }
+Database.cs (358) : Table newTable = new Table(tableName, columns);
+Database.cs (359) : //reconstruir filas
+Database.cs (360) : for (int r = 0; r < numRows; r++)
+Database.cs (361) : {
+Database.cs (362) : string row = reader.ReadLine();
+Database.cs (363) : Row newRow = Row.Parse(columns, row);
+Database.cs (364) : newTable.Insert(newRow.Values);
+Database.cs (365) : }
+Database.cs (366) : //a�adimos la tabla a la bd
+Database.cs (367) : newdb.Tables.Add(newTable);
+Database.cs (368) : }
+Database.cs (369) : return newdb;
 Database.cs (370) : }
-Database.cs (371) : catch
-Database.cs (375) : }
+Database.cs (371) : }
+Database.cs (372) : catch
+Database.cs (376) : }
 Row.cs (123) : result += Delimiter; //cambiado para que sea = en los 2 metodos
 Table.cs (4) : using System.Windows.Markup;
 Table.cs (18) : Name = name;

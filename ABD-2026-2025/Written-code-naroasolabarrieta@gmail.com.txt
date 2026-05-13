@@ -253,121 +253,40 @@ Update.cs (27) : if (result)
 Update.cs (28) : return Constants.UpdateSuccess;
 Update.cs (29) : else
 Update.cs (30) : return database.LastErrorMessage;
-Manager.cs (25) : return m_username.Equals("admin", StringComparison.OrdinalIgnoreCase);
-Manager.cs (31) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-Manager.cs (32) : return false;
-Manager.cs (34) : if (username.Equals("admin", StringComparison.OrdinalIgnoreCase))
-Manager.cs (35) : return password == "admin";
-Manager.cs (37) : User user = UserByName(username);
-Manager.cs (39) : if (user == null)
-Manager.cs (42) : string encryptedPassword = Encryption.Encrypt(password);
-Manager.cs (43) : return user.EncryptedPassword.Equals(encryptedPassword);
-Manager.cs (55) : var profile = ProfileByName(profileName);
-Manager.cs (59) : if (profile.IsGrantedPrivilege(table, privilege))
-Manager.cs (60) : return;
-Manager.cs (62) : profile.GrantPrivilege(table, privilege);
-Manager.cs (63) : }
-Manager.cs (90) : var profile = ProfileByUser(username);
-Manager.cs (91) : if (profile == null) return false;
-Manager.cs (92) : return profile.IsGrantedPrivilege(table, privilege);
-Manager.cs (110) : Profiles.Add(profile);
-Manager.cs (142) : return null;
-Manager.cs (165) : if (!IsUserAdmin())
-Manager.cs (166) : return false;
-Manager.cs (168) : if (string.IsNullOrEmpty(profileName))
-Manager.cs (169) : return false;
-Manager.cs (170) : if (profileName.Equals("admin", StringComparison.OrdinalIgnoreCase))
-Manager.cs (171) : return false;
-Manager.cs (173) : var profile = ProfileByName(profileName);
-Manager.cs (175) : if (profile == null)
-Manager.cs (178) : return Profiles.Remove(profile);
-Manager.cs (185) : string fileName = databaseName + ".path";
-Manager.cs (186) : Manager manager = new Manager(username);
-Manager.cs (187) : if (!File.Exists(fileName))
-Manager.cs (188) : {
-Manager.cs (189) : Profile adminProfile = new Profile()
-Manager.cs (190) : {
-Manager.cs (191) : Name = "admin"
-Manager.cs (192) : };
-Manager.cs (193) : adminProfile.Users.Add(new User("admin", "admin"));
-Manager.cs (194) : manager.Profiles.Add(adminProfile);
-Manager.cs (195) : return manager;
-Manager.cs (196) : }
-Manager.cs (197) : string[] lines = File.ReadAllLines(fileName);
-Manager.cs (198) : Profile currentProfile = null;
-Manager.cs (199) : string currentTable = null;
-Manager.cs (201) : foreach (string linea in lines)
-Manager.cs (202) : {
-Manager.cs (203) : string line = linea.Trim();
-Manager.cs (204) : if (string.IsNullOrWhiteSpace(line))
-Manager.cs (205) : continue;
-Manager.cs (207) : if (line.StartsWith("Profile: "))
-Manager.cs (208) : {
-Manager.cs (209) : currentTable = null;
-Manager.cs (211) : string profileName = line.Substring("Profile: ".Length).Trim();
-Manager.cs (213) : currentProfile = new Profile()
-Manager.cs (214) : {
-Manager.cs (215) : Name = profileName
-Manager.cs (216) : };
-Manager.cs (218) : manager.Profiles.Add(currentProfile);
-Manager.cs (219) : }
-Manager.cs (220) : else if (line.StartsWith("User: "))
-Manager.cs (221) : {
-Manager.cs (222) : if (currentProfile == null)
-Manager.cs (223) : continue;
-Manager.cs (225) : string content = line.Substring("User: ".Length);
-Manager.cs (226) : string[] parts = content.Split(',');
-Manager.cs (228) : if (parts.Length < 2)
-Manager.cs (229) : continue;
-Manager.cs (231) : string usernamePart = parts[0].Trim();
-Manager.cs (232) : string passwordPart = parts[1].Trim();
-Manager.cs (234) : string userName = usernamePart;
-Manager.cs (235) : string password = passwordPart.Replace("Password: ", "").Trim();
-Manager.cs (237) : currentProfile.Users.Add(new User()
-Manager.cs (238) : {
-Manager.cs (239) : Username = userName,
-Manager.cs (240) : EncryptedPassword = password
-Manager.cs (241) : });
-Manager.cs (242) : }
-Manager.cs (243) : else if (line.StartsWith("Table: "))
-Manager.cs (244) : {
-Manager.cs (245) : currentTable = line.Substring("Table: ".Length).Trim();
-Manager.cs (246) : }
-Manager.cs (247) : else if (line.StartsWith("Privilege: "))
-Manager.cs (248) : {
-Manager.cs (249) : if (currentProfile == null)
-Manager.cs (250) : continue;
-Manager.cs (251) : if (string.IsNullOrWhiteSpace(currentTable)) //HAU KENDU LEIKE goiku ---> WIYHOUT table null testa kendute ra
-Manager.cs (252) : continue;
-Manager.cs (253) : string privilegeStr = line.Substring("Privilege: ".Length).Trim();
-Manager.cs (255) : if (Enum.TryParse(privilegeStr, out Privilege privilege))
-Manager.cs (256) : {
-Manager.cs (257) : currentProfile.GrantPrivilege(currentTable, privilege);
-Manager.cs (258) : }
-Manager.cs (259) : }
-Manager.cs (260) : }
-Manager.cs (261) : if (manager.ProfileByName("admin") == null)
-Manager.cs (262) : {
-Manager.cs (263) : Profile adminProfile = new Profile() { Name = "admin" };
-Manager.cs (264) : adminProfile.Users.Add(new User("admin", "admin"));
-Manager.cs (265) : manager.Profiles.Add(adminProfile);
-Manager.cs (266) : }
-Manager.cs (268) : return manager;
-Profile.cs (20) : string tableName = table.ToUpper();
-Profile.cs (26) : if (!PrivilegesOn.ContainsKey(tableName))
-Profile.cs (28) : PrivilegesOn[tableName] = new List<Privilege>();
-Profile.cs (31) : if (!PrivilegesOn[tableName].Contains(privilege))
-Profile.cs (33) : PrivilegesOn[tableName].Add(privilege);
-Profile.cs (39) : public bool IsGrantedPrivilege(string table, Privilege privilege)
-Profile.cs (41) : //TODO DEADLINE 5: Return whether this profile is granted this privilege on this table
-Profile.cs (42) : string tableName = table.ToUpper();
-Profile.cs (47) : if (PrivilegesOn.ContainsKey(tableName))
-Profile.cs (48) : {
-Profile.cs (49) : return PrivilegesOn[tableName].Contains(privilege);
-Profile.cs (50) : }
-Profile.cs (56) : public bool RevokePrivilege(string table, Privilege privilege)
-Profile.cs (58) : //TODO DEADLINE 5: Revoke this privilege on this table. Return false if there is an error, true otherwise
+Manager.cs (35) : User user = UserByName(username);
+Manager.cs (38) : string encryptedPassword = Encryption.Encrypt(password);
+Manager.cs (39) : return user.EncryptedPassword.Equals(encryptedPassword);
+Manager.cs (53) : }
+Manager.cs (83) : Profiles.Add(profile);
+Manager.cs (115) : return null;
+Manager.cs (150) : string fileName = databaseName + ".path";
+Manager.cs (151) : Manager manager = new Manager(username);
+Manager.cs (154) : Profile currentProfile = null;
+Manager.cs (155) : string currentTable = null;
+Manager.cs (158) : {
+Manager.cs (161) : {
+Manager.cs (163) : manager.Profiles.Add(currentProfile);
+Manager.cs (164) : }
+Manager.cs (166) : {
+Manager.cs (170) : }
+Manager.cs (172) : {
+Manager.cs (174) : }
+Manager.cs (176) : {
+Manager.cs (179) : }
+Manager.cs (180) : }
+Manager.cs (181) : return manager;
+Profile.cs (23) : if (!PrivilegesOn.ContainsKey(tableName))
+Profile.cs (25) : PrivilegesOn[tableName] = new List<Privilege>();
+Profile.cs (28) : if (!PrivilegesOn[tableName].Contains(privilege))
+Profile.cs (30) : PrivilegesOn[tableName].Add(privilege);
+Profile.cs (36) : public bool IsGrantedPrivilege(string table, Privilege privilege)
+Profile.cs (38) : //TODO DEADLINE 5: Return whether this profile is granted this privilege on this table
+Profile.cs (41) : string tableName = table.ToUpper();
+Profile.cs (42) : if (PrivilegesOn.ContainsKey(tableName))
+Profile.cs (43) : {
+Profile.cs (44) : return PrivilegesOn[tableName].Contains(privilege);
+Profile.cs (45) : }
+Profile.cs (51) : public bool RevokePrivilege(string table, Privilege privilege)
+Profile.cs (53) : //TODO DEADLINE 5: Revoke this privilege on this table. Return false if there is an error, true otherwise
 User.cs (15) : this.Username = username;
-User.cs (16) : Username = username;
-User.cs (17) : EncryptedPassword = Encryption.Encrypt(password);
-User.cs (18) : }
+User.cs (17) : }

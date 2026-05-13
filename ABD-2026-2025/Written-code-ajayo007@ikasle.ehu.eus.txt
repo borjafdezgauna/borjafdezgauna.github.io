@@ -232,31 +232,83 @@ Select.cs (34) : return database.LastErrorMessage;
 Select.cs (35) : }
 Select.cs (36) : return table.ToString();
 Manager.cs (8) : using System.Xml.Linq;
-Manager.cs (116) : if (string.IsNullOrEmpty(username)) return null;
-Manager.cs (118) : for (int i=0; i<Profiles.Count; i++)
-Manager.cs (119) : {
-Manager.cs (120) : var profile = Profiles[i];
-Manager.cs (121) : for (int j=0; j<profile.Users.Count; j++)
-Manager.cs (122) : {
-Manager.cs (123) : var user = profile.Users[j];
-Manager.cs (124) : if(user.Username.Equals(username)) return user;
-Manager.cs (125) : }
-Manager.cs (126) : }
-Manager.cs (133) : if(string.IsNullOrEmpty(profileName)) return null;
-Manager.cs (135) : //if (profileName.Equals("admin", StringComparison.OrdinalIgnoreCase)) return new Profile { Name = "admin" };
-Manager.cs (137) : for (int i=0; i<Profiles.Count; i++)
-Manager.cs (138) : {
-Manager.cs (139) : var profile = Profiles[i];
-Manager.cs (140) : if(profile.Name.Equals(profileName)) return profile;
-Manager.cs (141) : }
-Manager.cs (148) : if(string.IsNullOrEmpty (username)) return null;
-Manager.cs (150) : for(int i=0; i < Profiles.Count; i++)
-Manager.cs (151) : {
-Manager.cs (152) : var profile= Profiles[i];
-Manager.cs (153) : for(int j=0; j<profile.Users.Count; j++)
-Manager.cs (154) : {
-Manager.cs (155) : var user = profile.Users[j];
-Manager.cs (156) : if (user.Username.Equals(username)) return profile;
-Manager.cs (157) : }
-Manager.cs (158) : }
-Manager.cs (159) : return null;
+Manager.cs (25) : return string.Equals(m_username, "admin");
+Manager.cs (31) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password)) return false;
+Manager.cs (33) : if(username.Equals("admin") && password=="admin") return true;
+Manager.cs (36) : if (user == null) return false;
+Manager.cs (46) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table) || privilege == null) return false;
+Manager.cs (48) : if (!IsUserAdmin()) return;
+Manager.cs (50) : Profile profile = ProfileByName(profileName);
+Manager.cs (52) : if(profile != null) profile.GrantPrivilege(table, privilege);
+Manager.cs (59) : if (string.IsNullOrEmpty(profileName) || string.IsNullOrEmpty(table) || privilege == null) return false;
+Manager.cs (60) : if (!IsUserAdmin()) return;
+Manager.cs (64) : if (profile != null) profile.RevokePrivilege(table, privilege);
+Manager.cs (70) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table) || privilege == null) return false;
+Manager.cs (72) : Profile profile = ProfileByUser(username);
+Manager.cs (73) : return profile != null && profile.IsGrantedPrivilege(table, privilege);
+Manager.cs (79) : if (!IsUserAdmin() || profile == null || string.IsNullOrEmpty(profile.Name)) return;
+Manager.cs (81) : if (ProfileByName(profile.Name) != null) return;
+Manager.cs (89) : if (string.IsNullOrEmpty(username)) return null;
+Manager.cs (91) : for (int i=0; i<Profiles.Count; i++)
+Manager.cs (92) : {
+Manager.cs (93) : var profile = Profiles[i];
+Manager.cs (94) : for (int j=0; j<profile.Users.Count; j++)
+Manager.cs (95) : {
+Manager.cs (96) : var user = profile.Users[j];
+Manager.cs (97) : if(user.Username.Equals(username)) return user;
+Manager.cs (98) : }
+Manager.cs (99) : }
+Manager.cs (106) : if(string.IsNullOrEmpty(profileName)) return null;
+Manager.cs (108) : //if (profileName.Equals("admin", StringComparison.OrdinalIgnoreCase)) return new Profile { Name = "admin" };
+Manager.cs (110) : for (int i=0; i<Profiles.Count; i++)
+Manager.cs (111) : {
+Manager.cs (112) : var profile = Profiles[i];
+Manager.cs (113) : if(profile.Name.Equals(profileName)) return profile;
+Manager.cs (114) : }
+Manager.cs (121) : if(string.IsNullOrEmpty (username)) return null;
+Manager.cs (123) : for(int i=0; i < Profiles.Count; i++)
+Manager.cs (124) : {
+Manager.cs (125) : var profile= Profiles[i];
+Manager.cs (126) : for(int j=0; j<profile.Users.Count; j++)
+Manager.cs (127) : {
+Manager.cs (128) : var user = profile.Users[j];
+Manager.cs (129) : if (user.Username.Equals(username)) return profile;
+Manager.cs (130) : }
+Manager.cs (131) : }
+Manager.cs (132) : return null;
+Manager.cs (138) : if (!IsUserAdmin() || string.IsNullOrEmpty(profileName)) return false;
+Manager.cs (139) : if (profileName.Equals("admin")) return false;
+Manager.cs (141) : Profile profile = ProfileByName(profileName);
+Manager.cs (143) : return profile!=null && Profiles.Remove(profile);
+Manager.cs (152) : if (!File.Exists(fileName)) return manager;
+Manager.cs (157) : foreach (string line in File.ReadAllLines(fileName))
+Manager.cs (159) : string trimmed = line.Trim();
+Manager.cs (160) : if (trimmed.StartsWith("Profile: "))
+Manager.cs (162) : currentProfile = new Profile { Name = trimmed.Substring(9) };
+Manager.cs (165) : else if (trimmed.StartsWith("User: ") && currentProfile != null)
+Manager.cs (167) : var parts = trimmed.Substring(6).Split(new[] { ", Password: " }, StringSplitOptions.None);
+Manager.cs (168) : if (parts.Length == 2)
+Manager.cs (169) : currentProfile.Users.Add(new User { Username = parts[0], EncryptedPassword = parts[1] });
+Manager.cs (171) : else if (trimmed.StartsWith("Table: "))
+Manager.cs (173) : currentTable = trimmed.Substring(7);
+Manager.cs (175) : else if (trimmed.StartsWith("Privilege: ") && currentProfile != null && currentTable != null)
+Manager.cs (177) : if (Enum.TryParse(trimmed.Substring(11), out Privilege priv))
+Manager.cs (178) : currentProfile.GrantPrivilege(currentTable, priv);
+Manager.cs (188) : string fileName = databaseName + ".path";
+Manager.cs (189) : List<string> lines = new List<string>();
+Manager.cs (192) : lines.Add($"Profile: {profile.Name}");
+Manager.cs (194) : lines.Add($"User: {user.Username}, Password: {user.EncryptedPassword}");
+Manager.cs (195) : foreach (var entry in profile.PrivilegesOn)
+Manager.cs (197) : lines.Add($"Table: {entry.Key}");
+Manager.cs (198) : foreach (var priv in entry.Value)
+Manager.cs (199) : lines.Add($"Privilege: {priv}");
+Manager.cs (202) : File.WriteAllLines(fileName, lines);
+Profile.cs (20) : if(string.IsNullOrEmpty(table) || privilege==null) return false;
+Profile.cs (22) : string tableName = table.ToUpper();
+Profile.cs (39) : if (string.IsNullOrEmpty(table) || privilege == null) return false;
+Profile.cs (54) : if (string.IsNullOrEmpty(table)) return false;
+Profile.cs (58) : if (PrivilegesOn.ContainsKey(tableName))
+Profile.cs (59) : {
+Profile.cs (63) : return false;
+Profile.cs (64) : }
+User.cs (16) : this.EncryptedPassword = Encryption.Encrypt(password);
