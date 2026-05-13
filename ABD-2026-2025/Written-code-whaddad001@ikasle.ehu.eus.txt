@@ -152,37 +152,41 @@ Server.cs (37) : if (bytesRead <= 0) break;
 Server.cs (39) : string clientMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
 Server.cs (42) : if (clientMessage.StartsWith("<Open"))
 Server.cs (43) : {
-Server.cs (52) : else
-Server.cs (53) : {
-Server.cs (54) : response = XmlSerializer.OpenCreateError(Constants.IncorrectLogin);
-Server.cs (55) : }
-Server.cs (56) : }
+Server.cs (45) : if (!XmlDeserializer.ParseOpen(clientMessage, out string database, out string username, out string password))
+Server.cs (46) : {
+Server.cs (47) : response = XmlSerializer.OpenCreateError(Constants.SyntaxError);
+Server.cs (48) : }
+Server.cs (49) : else
+Server.cs (57) : else
+Server.cs (58) : {
 Server.cs (59) : response = XmlSerializer.OpenCreateError(Constants.IncorrectLogin);
-Server.cs (63) : else if (clientMessage.StartsWith("<Create"))
-Server.cs (66) : {
-Server.cs (67) : if (XmlDeserializer.ParseCreate(clientMessage, out string database, out string username, out string password))
-Server.cs (76) : response = XmlSerializer.CreateError(Constants.CouldNotCreateDatabase);
-Server.cs (77) : }
-Server.cs (79) : else
-Server.cs (81) : response = XmlSerializer.CreateError(Constants.CouldNotCreateDatabase);
-Server.cs (86) : response = XmlSerializer.CreateError(e.Message);
-Server.cs (90) : else if (clientMessage.StartsWith("<Query"))
-Server.cs (91) : {
-Server.cs (92) : if (XmlDeserializer.ParseQuery(clientMessage, out string query))
-Server.cs (98) : if (queryResult.StartsWith("ERROR"))
-Server.cs (99) : {
-Server.cs (100) : response = XmlSerializer.ErrorAnswer(queryResult);
-Server.cs (102) : else
-Server.cs (103) : {
-Server.cs (104) : response = XmlSerializer.SucessfulAnswer(queryResult);
-Server.cs (105) : }
+Server.cs (60) : }
+Server.cs (61) : }
+Server.cs (64) : else if (clientMessage.StartsWith("<Create"))
+Server.cs (67) : {
+Server.cs (68) : if (XmlDeserializer.ParseCreate(clientMessage, out string database, out string username, out string password))
+Server.cs (77) : response = XmlSerializer.CreateError(Constants.CouldNotCreateDatabase);
+Server.cs (78) : }
+Server.cs (80) : else
+Server.cs (82) : response = XmlSerializer.CreateError(Constants.CouldNotCreateDatabase);
+Server.cs (87) : response = XmlSerializer.CreateError(e.Message);
+Server.cs (91) : else if (clientMessage.StartsWith("<Query"))
+Server.cs (92) : {
+Server.cs (93) : if (XmlDeserializer.ParseQuery(clientMessage, out string query))
+Server.cs (99) : if (queryResult != null && queryResult.StartsWith("ERROR"))
+Server.cs (100) : {
+Server.cs (101) : response = XmlSerializer.ErrorAnswer(queryResult);
+Server.cs (103) : else
+Server.cs (104) : {
+Server.cs (105) : response = XmlSerializer.SucessfulAnswer(queryResult);
 Server.cs (106) : }
-Server.cs (107) : else
-Server.cs (108) : {
-Server.cs (109) : response = XmlSerializer.ErrorAnswer(Constants.NoDatabaseOpen);
-Server.cs (110) : }
+Server.cs (107) : }
+Server.cs (108) : else
+Server.cs (109) : {
+Server.cs (110) : response = XmlSerializer.ErrorAnswer(Constants.NoDatabaseOpen);
 Server.cs (111) : }
-Server.cs (114) : response = XmlSerializer.ErrorAnswer(Constants.SyntaxError);
+Server.cs (112) : }
+Server.cs (115) : response = XmlSerializer.ErrorAnswer(Constants.SyntaxError);
 XmlDeserializer.cs (22) : if (string.IsNullOrEmpty(command))
 XmlDeserializer.cs (25) : if (!command.StartsWith("<Open") || !command.EndsWith("/>"))
 XmlDeserializer.cs (26) : return false;
