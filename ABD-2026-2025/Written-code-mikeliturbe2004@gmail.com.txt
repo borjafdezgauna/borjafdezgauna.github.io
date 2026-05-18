@@ -109,6 +109,10 @@ DeleteUser.cs (43) : return Constants.DeleteUserSuccess;
 DropTable.cs (15) : Table = table;
 DropTable.cs (23) : database.DropTable(Table);
 DropTable.cs (24) : return database.LastErrorMessage;
+Grant.cs (28) : if (database == null || database.SecurityManager == null)
+Grant.cs (29) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (31) : if (!database.SecurityManager.IsUserAdmin())
+Grant.cs (32) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (18) : const string dropTablePattern = @"^DROP\s+TABLE\s+(\w+)\s*$";
 MiniSQLParser.cs (22) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z]\w*)\s+\((.*)\)$";
@@ -212,19 +216,28 @@ Manager.cs (5) : using System.Runtime.CompilerServices;
 Manager.cs (6) : using System.Text;
 Manager.cs (7) : using System.Threading.Tasks;
 Manager.cs (62) : Profile profile = ProfileByName(profileName);
-Manager.cs (185) : string content = line.Substring("User: ".Length).Trim();
-Manager.cs (187) : string[] parts = content.Split(
-Manager.cs (188) : new[] { ", Password: " },
-Manager.cs (189) : StringSplitOptions.None
-Manager.cs (190) : );
-Manager.cs (192) : if (parts.Length != 2)
-Manager.cs (193) : continue;
-Manager.cs (195) : string userName = parts[0].Trim();
-Manager.cs (196) : string password = parts[1].Trim();
-Manager.cs (213) : if (string.IsNullOrWhiteSpace(currentTable))
-Manager.cs (240) : {
-Manager.cs (242) : }
-Manager.cs (249) : {
+Manager.cs (70) : if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(table))
+Manager.cs (71) : return false;
+Manager.cs (73) : if (username.Equals("admin", StringComparison.OrdinalIgnoreCase))
+Manager.cs (74) : return true;
+Manager.cs (78) : if (profile == null)
+Manager.cs (79) : return false;
+Manager.cs (81) : if (profile.Name.Equals(Profile.AdminProfileName, StringComparison.OrdinalIgnoreCase))
+Manager.cs (82) : return true;
+Manager.cs (84) : return profile.IsGrantedPrivilege(table, privilege);
+Manager.cs (196) : string content = line.Substring("User: ".Length).Trim();
+Manager.cs (198) : string[] parts = content.Split(
+Manager.cs (199) : new[] { ", Password: " },
+Manager.cs (200) : StringSplitOptions.None
+Manager.cs (201) : );
+Manager.cs (203) : if (parts.Length != 2)
+Manager.cs (204) : continue;
+Manager.cs (206) : string userName = parts[0].Trim();
+Manager.cs (207) : string password = parts[1].Trim();
+Manager.cs (224) : if (string.IsNullOrWhiteSpace(currentTable))
+Manager.cs (251) : {
 Manager.cs (253) : }
+Manager.cs (260) : {
+Manager.cs (264) : }
 Profile.cs (60) : return PrivilegesOn[tableName].Remove(privilege);
 User.cs (19) : public User() {}
