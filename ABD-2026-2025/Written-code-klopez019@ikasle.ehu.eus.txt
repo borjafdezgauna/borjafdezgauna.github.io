@@ -82,12 +82,13 @@ Database.cs (310) : }
 Database.cs (311) : writer.Close();
 Database.cs (312) : }
 Database.cs (313) : }
-Database.cs (314) : return true;
-Database.cs (315) : }
-Database.cs (316) : catch (Exception e)
-Database.cs (317) : {
-Database.cs (318) : return false;
-Database.cs (319) : }
+Database.cs (314) : SecurityManager.Save(databaseName);
+Database.cs (315) : return true;
+Database.cs (316) : }
+Database.cs (317) : catch (Exception e)
+Database.cs (318) : {
+Database.cs (319) : return false;
+Database.cs (320) : }
 Database.cs (330) : try
 Database.cs (331) : {
 Database.cs (332) : if (databaseName != null && !databaseName.Equals(""))
@@ -118,46 +119,48 @@ Database.cs (358) : }
 Database.cs (360) : db.AddTable(t);
 Database.cs (361) : reader.Close();
 Database.cs (362) : }
-Database.cs (363) : if(!db.SecurityManager.IsPasswordCorrect(username, password))
-Database.cs (364) : {
-Database.cs (365) : return null;
-Database.cs (366) : }
-Database.cs (367) : else
-Database.cs (368) : {
-Database.cs (369) : return db;
-Database.cs (370) : }
+Database.cs (363) : db.SecurityManager = Manager.Load(databaseName, username);
+Database.cs (364) : db.m_username = username;
+Database.cs (365) : if (db.SecurityManager == null || !db.SecurityManager.IsPasswordCorrect(username, password))
+Database.cs (366) : {
+Database.cs (367) : return null;
+Database.cs (368) : }
+Database.cs (369) : else
+Database.cs (370) : {
+Database.cs (371) : return db;
 Database.cs (372) : }
-Database.cs (373) : }
-Database.cs (374) : catch (Exception e)
-Database.cs (375) : {
-Database.cs (376) : return null;
-Database.cs (377) : }
-Database.cs (435) : public static bool AreEqual(Database db1, Database db2)
-Database.cs (436) : {
-Database.cs (437) : if (db1 == null || db2 == null) { return false; }
-Database.cs (438) : if (db1.Tables.Count != db2.Tables.Count) { return false; }
-Database.cs (439) : for (int i = 0; i < db1.Tables.Count; i++) //IMPORTA EL ORDEN (para el save and load da igual, si se hace uso de este metodo comprobar ese matiz)
-Database.cs (440) : {
-Database.cs (441) : Table t1 = db1.Tables[i];
-Database.cs (442) : Table t2 = db2.Tables[i];
-Database.cs (444) : if (t1 == null || t2 == null) { return false; }
-Database.cs (445) : if (t1.NumColumns() != t2.NumColumns()) { return false; }
-Database.cs (446) : for (int j = 0; j < t1.NumColumns(); j++)
-Database.cs (447) : {
-Database.cs (448) : if (t1.GetColumn(j).AsText() != t2.GetColumn(j).AsText())
+Database.cs (374) : }
+Database.cs (375) : }
+Database.cs (376) : catch (Exception e)
+Database.cs (377) : {
+Database.cs (378) : return null;
+Database.cs (379) : }
+Database.cs (437) : public static bool AreEqual(Database db1, Database db2)
+Database.cs (438) : {
+Database.cs (439) : if (db1 == null || db2 == null) { return false; }
+Database.cs (440) : if (db1.Tables.Count != db2.Tables.Count) { return false; }
+Database.cs (441) : for (int i = 0; i < db1.Tables.Count; i++) //IMPORTA EL ORDEN (para el save and load da igual, si se hace uso de este metodo comprobar ese matiz)
+Database.cs (442) : {
+Database.cs (443) : Table t1 = db1.Tables[i];
+Database.cs (444) : Table t2 = db2.Tables[i];
+Database.cs (446) : if (t1 == null || t2 == null) { return false; }
+Database.cs (447) : if (t1.NumColumns() != t2.NumColumns()) { return false; }
+Database.cs (448) : for (int j = 0; j < t1.NumColumns(); j++)
 Database.cs (449) : {
-Database.cs (450) : return false;
-Database.cs (451) : }
-Database.cs (452) : }
-Database.cs (454) : if (t1.NumRows() != t2.NumRows()) { return false; }
-Database.cs (455) : for (int z = 0; z < t1.NumRows(); z++)
-Database.cs (456) : {
-Database.cs (457) : if (t1.GetRow(z).AsText() != t2.GetRow(z).AsText())
-Database.cs (458) : { return false; }
-Database.cs (459) : }
-Database.cs (460) : }
-Database.cs (461) : return true;
+Database.cs (450) : if (t1.GetColumn(j).AsText() != t2.GetColumn(j).AsText())
+Database.cs (451) : {
+Database.cs (452) : return false;
+Database.cs (453) : }
+Database.cs (454) : }
+Database.cs (456) : if (t1.NumRows() != t2.NumRows()) { return false; }
+Database.cs (457) : for (int z = 0; z < t1.NumRows(); z++)
+Database.cs (458) : {
+Database.cs (459) : if (t1.GetRow(z).AsText() != t2.GetRow(z).AsText())
+Database.cs (460) : { return false; }
+Database.cs (461) : }
 Database.cs (462) : }
+Database.cs (463) : return true;
+Database.cs (464) : }
 Table.cs (113) : if (ColumnDefinitions != null && ColumnDefinitions.Count > 0)
 Table.cs (114) : {
 Table.cs (116) : ColumnDefinition last = ColumnDefinitions[ColumnDefinitions.Count - 1];
@@ -235,7 +238,7 @@ Insert.cs (26) : database.Insert(Table, Values);
 Insert.cs (27) : return database.LastErrorMessage;
 MiniSQLParser.cs (15) : const string insertPattern = @"INSERT\s+INTO\s+(\w+)\s+VALUES\s+\(((?:'([^']*)',)*(?:'([^']*)'))\)"; //kaiet
 MiniSQLParser.cs (26) : const string deletePattern = @"DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(<|>|=)'([^']*)'"; //kaiet
-MiniSQLParser.cs (39) : const string addUserPattern = @"ADD\s+USER\s+\(([A-Za-z]+),([A-Za-z]+),([A-Za-z]+)\)"; //kaiet
+MiniSQLParser.cs (39) : const string addUserPattern = @"ADD\s+USER\s+\(([A-Za-z]+),([A-Za-z0-9]+),([A-Za-z]+)\)"; //kaiet
 MiniSQLParser.cs (41) : const string deleteUserPattern = @"DELETE\s+USER\s+([A-Za-z]+)"; //kaiet
 MiniSQLParser.cs (101) : match = Regex.Match(miniSQLQuery, selectPattern);
 MiniSQLParser.cs (102) : if (match.Success)
@@ -365,126 +368,128 @@ Manager.cs (171) : try
 Manager.cs (172) : {
 Manager.cs (173) : if (databaseName != null && !databaseName.Equals(""))
 Manager.cs (174) : {
-Manager.cs (175) : string[] files = Directory.GetFiles(databaseName, "*.txt");
-Manager.cs (176) : Manager mg = new Manager(username);
-Manager.cs (177) : String fileNoExtension;
-Manager.cs (178) : foreach (string file in files)
-Manager.cs (179) : {
-Manager.cs (180) : fileNoExtension = System.IO.Path.GetFileNameWithoutExtension(file);
-Manager.cs (181) : bool exists = System.IO.File.Exists(file); //checks that the file exists
-Manager.cs (182) : if (!exists) { return null; }
-Manager.cs (184) : TextReader reader = System.IO.File.OpenText(file); //opens an existing file
-Manager.cs (186) : Profile p = new Profile();
-Manager.cs (187) : String line = reader.ReadLine();
-Manager.cs (188) : p.Name = line;
-Manager.cs (190) : String tName;
-Manager.cs (192) : line=reader.ReadLine();
-Manager.cs (193) : while (line != null && !line.Equals(""))
-Manager.cs (194) : {
-Manager.cs (195) : string[] splited = line.Split("%");
-Manager.cs (196) : tName = splited[0];
-Manager.cs (197) : string[] privs = splited[1].Split(",");
-Manager.cs (198) : for(int i=0; i < privs.Length - 1; i++)
-Manager.cs (199) : {
-Manager.cs (200) : p.GrantPrivilege(tName, Enum.Parse<Privilege>(privs[i]));
-Manager.cs (201) : }
-Manager.cs (202) : line = reader.ReadLine();
-Manager.cs (203) : }
-Manager.cs (205) : line = reader.ReadLine();
-Manager.cs (207) : List<User> usrs = new List<User>();
-Manager.cs (208) : User u;
-Manager.cs (209) : while (line != null && !line.Equals(""))
-Manager.cs (210) : {
-Manager.cs (211) : u = new User();
-Manager.cs (212) : string[] a = line.Split(",");
-Manager.cs (213) : u.Username = a[0];
-Manager.cs (214) : u.EncryptedPassword = a[1];
-Manager.cs (215) : usrs.Add(u);
-Manager.cs (216) : line = reader.ReadLine();
-Manager.cs (217) : }
-Manager.cs (218) : p.Users = usrs;
-Manager.cs (219) : mg.Profiles.Add(p);
-Manager.cs (220) : reader.Close();
-Manager.cs (222) : }
-Manager.cs (223) : return mg;
-Manager.cs (224) : }
-Manager.cs (225) : else { return null; }
-Manager.cs (226) : }
-Manager.cs (227) : catch (Exception e)
-Manager.cs (228) : {
-Manager.cs (230) : }
-Manager.cs (238) : try
-Manager.cs (239) : {
-Manager.cs (240) : if (databaseName == null || databaseName.Equals("")) { return; }
-Manager.cs (242) : if (!Directory.Exists(databaseName))
-Manager.cs (243) : {
-Manager.cs (244) : Directory.CreateDirectory(databaseName);
-Manager.cs (245) : }
-Manager.cs (247) : if (Profiles != null && Profiles.Count != 0)
-Manager.cs (248) : {
-Manager.cs (249) : foreach (Profile p in Profiles)
-Manager.cs (250) : {
-Manager.cs (251) : TextWriter writer = System.IO.File.CreateText(databaseName + "\\" + p.Name + ".txt"); //creates a new text file
-Manager.cs (252) : writer.WriteLine(p.Name);
-Manager.cs (253) : var keys = p.PrivilegesOn.Keys;
-Manager.cs (254) : foreach(String x in keys)
-Manager.cs (255) : {
-Manager.cs (256) : writer.Write(x + "%");
-Manager.cs (257) : if(p.PrivilegesOn != null && p.PrivilegesOn.Count != 0)
+Manager.cs (175) : string carpeta = databaseName + "\\ArchivosSecurity";
+Manager.cs (176) : string[] files = Directory.GetFiles(carpeta, "*.txt");
+Manager.cs (177) : Manager mg = new Manager(username);
+Manager.cs (178) : String fileNoExtension;
+Manager.cs (179) : foreach (string file in files)
+Manager.cs (180) : {
+Manager.cs (181) : fileNoExtension = System.IO.Path.GetFileNameWithoutExtension(file);
+Manager.cs (182) : bool exists = System.IO.File.Exists(file); //checks that the file exists
+Manager.cs (183) : if (!exists) { return null; }
+Manager.cs (185) : TextReader reader = System.IO.File.OpenText(file); //opens an existing file
+Manager.cs (187) : Profile p = new Profile();
+Manager.cs (188) : String line = reader.ReadLine();
+Manager.cs (189) : p.Name = line;
+Manager.cs (191) : String tName;
+Manager.cs (193) : line=reader.ReadLine();
+Manager.cs (194) : while (line != null && !line.Equals(""))
+Manager.cs (195) : {
+Manager.cs (196) : string[] splited = line.Split("%");
+Manager.cs (197) : tName = splited[0];
+Manager.cs (198) : string[] privs = splited[1].Split(",");
+Manager.cs (199) : for(int i=0; i < privs.Length - 1; i++)
+Manager.cs (200) : {
+Manager.cs (201) : p.GrantPrivilege(tName, Enum.Parse<Privilege>(privs[i]));
+Manager.cs (202) : }
+Manager.cs (203) : line = reader.ReadLine();
+Manager.cs (204) : }
+Manager.cs (206) : line = reader.ReadLine();
+Manager.cs (208) : List<User> usrs = new List<User>();
+Manager.cs (209) : User u;
+Manager.cs (210) : while (line != null && !line.Equals(""))
+Manager.cs (211) : {
+Manager.cs (212) : u = new User();
+Manager.cs (213) : string[] a = line.Split(",");
+Manager.cs (214) : u.Username = a[0];
+Manager.cs (215) : u.EncryptedPassword = a[1];
+Manager.cs (216) : usrs.Add(u);
+Manager.cs (217) : line = reader.ReadLine();
+Manager.cs (218) : }
+Manager.cs (219) : p.Users = usrs;
+Manager.cs (220) : mg.Profiles.Add(p);
+Manager.cs (221) : reader.Close();
+Manager.cs (223) : }
+Manager.cs (224) : return mg;
+Manager.cs (225) : }
+Manager.cs (226) : else { return null; }
+Manager.cs (227) : }
+Manager.cs (228) : catch (Exception e)
+Manager.cs (229) : {
+Manager.cs (231) : }
+Manager.cs (239) : try
+Manager.cs (240) : {
+Manager.cs (241) : if (databaseName == null || databaseName.Equals("")) { return; }
+Manager.cs (243) : string carpeta = databaseName + "\\ArchivosSecurity";
+Manager.cs (245) : if (!Directory.Exists(carpeta))
+Manager.cs (246) : {
+Manager.cs (247) : Directory.CreateDirectory(carpeta);
+Manager.cs (248) : }
+Manager.cs (250) : if (Profiles != null && Profiles.Count != 0)
+Manager.cs (251) : {
+Manager.cs (252) : foreach (Profile p in Profiles)
+Manager.cs (253) : {
+Manager.cs (254) : TextWriter writer = System.IO.File.CreateText(carpeta + "\\" + p.Name + ".txt"); //creates a new text file
+Manager.cs (255) : writer.WriteLine(p.Name);
+Manager.cs (256) : var keys = p.PrivilegesOn.Keys;
+Manager.cs (257) : foreach(String x in keys)
 Manager.cs (258) : {
-Manager.cs (259) : foreach(Privilege pr in p.PrivilegesOn[x])
-Manager.cs (260) : {
-Manager.cs (261) : writer.Write(pr+",");
-Manager.cs (262) : }
-Manager.cs (263) : writer.WriteLine();
-Manager.cs (264) : }
+Manager.cs (259) : writer.Write(x + "%");
+Manager.cs (260) : if(p.PrivilegesOn != null && p.PrivilegesOn.Count != 0)
+Manager.cs (261) : {
+Manager.cs (262) : foreach(Privilege pr in p.PrivilegesOn[x])
+Manager.cs (263) : {
+Manager.cs (264) : writer.Write(pr+",");
 Manager.cs (265) : }
 Manager.cs (266) : writer.WriteLine();
-Manager.cs (267) : foreach(User u in p.Users)
-Manager.cs (268) : {
-Manager.cs (269) : writer.WriteLine(u.Username + "," + u.EncryptedPassword);
-Manager.cs (270) : }
-Manager.cs (271) : writer.Close();
-Manager.cs (272) : }
+Manager.cs (267) : }
+Manager.cs (268) : }
+Manager.cs (269) : writer.WriteLine();
+Manager.cs (270) : foreach(User u in p.Users)
+Manager.cs (271) : {
+Manager.cs (272) : writer.WriteLine(u.Username + "," + u.EncryptedPassword);
 Manager.cs (273) : }
-Manager.cs (274) : }
-Manager.cs (275) : catch (Exception e)
-Manager.cs (276) : {
-Manager.cs (277) : return;
-Manager.cs (278) : }
-Manager.cs (281) : public static bool AreEqual(Manager m1, Manager m2)
-Manager.cs (282) : {
-Manager.cs (283) : if(m1 == null || m2 == null || !m1.m_username.Equals(m2.m_username)) {  return false; }
-Manager.cs (285) : List<Profile> p1 = m1.Profiles, p2 = m2.Profiles;
-Manager.cs (286) : if (p1 == null || p2 == null) { return false; }
-Manager.cs (287) : if (p1.Count == p2.Count)
-Manager.cs (288) : {
-Manager.cs (289) : String toCompare1 = toStringProfiles(p1), toCompare2 = toStringProfiles(p2);
-Manager.cs (290) : return (toCompare1.Equals(toCompare2));
-Manager.cs (291) : }
-Manager.cs (292) : return false;
-Manager.cs (293) : }
-Manager.cs (295) : public static string toStringProfiles (List<Profile> Profiles)
-Manager.cs (296) : {
-Manager.cs (297) : string result = "";
-Manager.cs (298) : foreach (Profile p in Profiles)
+Manager.cs (274) : writer.Close();
+Manager.cs (275) : }
+Manager.cs (276) : }
+Manager.cs (277) : }
+Manager.cs (278) : catch (Exception e)
+Manager.cs (279) : {
+Manager.cs (280) : return;
+Manager.cs (281) : }
+Manager.cs (284) : public static bool AreEqual(Manager m1, Manager m2)
+Manager.cs (285) : {
+Manager.cs (286) : if(m1 == null || m2 == null || !m1.m_username.Equals(m2.m_username)) {  return false; }
+Manager.cs (288) : List<Profile> p1 = m1.Profiles, p2 = m2.Profiles;
+Manager.cs (289) : if (p1 == null || p2 == null) { return false; }
+Manager.cs (290) : if (p1.Count == p2.Count)
+Manager.cs (291) : {
+Manager.cs (292) : String toCompare1 = toStringProfiles(p1), toCompare2 = toStringProfiles(p2);
+Manager.cs (293) : return (toCompare1.Equals(toCompare2));
+Manager.cs (294) : }
+Manager.cs (295) : return false;
+Manager.cs (296) : }
+Manager.cs (298) : public static string toStringProfiles (List<Profile> Profiles)
 Manager.cs (299) : {
-Manager.cs (300) : result += p.Name;
-Manager.cs (301) : var keys = p.PrivilegesOn.Keys;
-Manager.cs (302) : foreach (String x in keys)
-Manager.cs (303) : {
-Manager.cs (304) : result += x + "%";
-Manager.cs (305) : foreach (Privilege pr in p.PrivilegesOn[x])
+Manager.cs (300) : string result = "";
+Manager.cs (301) : foreach (Profile p in Profiles)
+Manager.cs (302) : {
+Manager.cs (303) : result += p.Name;
+Manager.cs (304) : var keys = p.PrivilegesOn.Keys;
+Manager.cs (305) : foreach (String x in keys)
 Manager.cs (306) : {
-Manager.cs (307) : result += pr + ",";
-Manager.cs (308) : }
-Manager.cs (309) : result += "\n";
-Manager.cs (310) : }
-Manager.cs (311) : result += "\n";
-Manager.cs (312) : foreach (User u in p.Users)
-Manager.cs (313) : {
-Manager.cs (314) : result += u.Username + "," + u.EncryptedPassword;
-Manager.cs (315) : }
-Manager.cs (316) : }
-Manager.cs (317) : return result;
+Manager.cs (307) : result += x + "%";
+Manager.cs (308) : foreach (Privilege pr in p.PrivilegesOn[x])
+Manager.cs (309) : {
+Manager.cs (310) : result += pr + ",";
+Manager.cs (311) : }
+Manager.cs (312) : result += "\n";
+Manager.cs (313) : }
+Manager.cs (314) : result += "\n";
+Manager.cs (315) : foreach (User u in p.Users)
+Manager.cs (316) : {
+Manager.cs (317) : result += u.Username + "," + u.EncryptedPassword;
 Manager.cs (318) : }
+Manager.cs (319) : }
+Manager.cs (320) : return result;
+Manager.cs (321) : }
