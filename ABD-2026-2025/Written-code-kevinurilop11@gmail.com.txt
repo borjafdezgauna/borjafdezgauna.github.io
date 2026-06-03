@@ -26,36 +26,36 @@ ColumnDefinition.cs (78) : tipo = DataType.Double;
 ColumnDefinition.cs (79) : }
 ColumnDefinition.cs (80) : return new ColumnDefinition(tipo , nombre);
 Database.cs (32) : m_username = adminUsername;
-Database.cs (69) : bool found = false ;
-Database.cs (70) : int i = 0;
-Database.cs (72) : if(String.IsNullOrEmpty(tableName))
-Database.cs (73) : {
-Database.cs (74) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (75) : return false;
-Database.cs (76) : }
-Database.cs (77) : else if (ColumnDefinition.Count == 0 || ColumnDefinition == null)
-Database.cs (78) : {
-Database.cs (79) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (81) : }
-Database.cs (82) : while (i< Tables.Count && !found)
-Database.cs (83) : {
-Database.cs (84) : if(Tables[i].Name == tableName)
-Database.cs (85) : {
-Database.cs (86) : found = true;
-Database.cs (87) : }
-Database.cs (88) : i++;
+Database.cs (77) : bool found = false ;
+Database.cs (78) : int i = 0;
+Database.cs (80) : if(String.IsNullOrEmpty(tableName))
+Database.cs (81) : {
+Database.cs (82) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (83) : return false;
+Database.cs (84) : }
+Database.cs (85) : else if (ColumnDefinition.Count == 0 || ColumnDefinition == null)
+Database.cs (86) : {
+Database.cs (87) : LastErrorMessage = Constants.TableAlreadyExistsError;
 Database.cs (89) : }
-Database.cs (92) : if (!found)
+Database.cs (90) : while (i< Tables.Count && !found)
+Database.cs (91) : {
+Database.cs (92) : if(Tables[i].Name == tableName)
 Database.cs (93) : {
-Database.cs (94) : Table nTable = new Table(tableName, ColumnDefinition);
-Database.cs (95) : Tables.Add(nTable);
-Database.cs (96) : LastErrorMessage = Constants. CreateTableSuccess;
-Database.cs (97) : return true;
-Database.cs (98) : }
-Database.cs (99) : else
-Database.cs (100) : {
-Database.cs (101) : LastErrorMessage = Constants.TableAlreadyExistsError;
-Database.cs (103) : }
+Database.cs (94) : found = true;
+Database.cs (95) : }
+Database.cs (96) : i++;
+Database.cs (97) : }
+Database.cs (100) : if (!found)
+Database.cs (101) : {
+Database.cs (102) : Table nTable = new Table(tableName, ColumnDefinition);
+Database.cs (103) : Tables.Add(nTable);
+Database.cs (104) : LastErrorMessage = Constants. CreateTableSuccess;
+Database.cs (105) : return true;
+Database.cs (106) : }
+Database.cs (107) : else
+Database.cs (108) : {
+Database.cs (109) : LastErrorMessage = Constants.TableAlreadyExistsError;
+Database.cs (111) : }
 Table.cs (4) : using System.Reflection.Metadata.Ecma335;
 Table.cs (137) : if(row>=0 && row< Rows.Count)
 Table.cs (138) : {
@@ -80,18 +80,16 @@ AddUser.cs (29) : if(database == null)
 AddUser.cs (30) : {
 AddUser.cs (31) : return Constants.Error;
 AddUser.cs (32) : }
-AddUser.cs (34) : else if (database.IsUserAdmin() == false)
 AddUser.cs (35) : {
 AddUser.cs (36) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 AddUser.cs (37) : }
-AddUser.cs (38) : Profile p = database.SecurityManager.ProfileByName(ProfileName);
-AddUser.cs (39) : if (p == null)
-AddUser.cs (40) : {
-AddUser.cs (41) : return Constants.SecurityProfileDoesNotExistError;
-AddUser.cs (42) : }
-AddUser.cs (43) : User newUser = new User(Username,Password);
-AddUser.cs (44) : p.Users.Add(newUser);
-AddUser.cs (45) : return Constants.AddUserSuccess;
+AddUser.cs (39) : Profile p = database.SecurityManager.ProfileByName(ProfileName);
+AddUser.cs (40) : if (p == null)
+AddUser.cs (41) : {
+AddUser.cs (42) : return Constants.SecurityProfileDoesNotExistError;
+AddUser.cs (43) : }
+AddUser.cs (55) : User newUser = new User(Username, Password);
+AddUser.cs (56) : p.Users.Add(newUser);
 CreateSecurityProfile.cs (23) : if(database == null)
 CreateSecurityProfile.cs (24) : {
 CreateSecurityProfile.cs (25) : return Constants.Error;
@@ -106,26 +104,54 @@ CreateSecurityProfile.cs (33) : database.SecurityManager.Profiles.Add(new Securi
 CreateSecurityProfile.cs (34) : return Constants.CreateSecurityProfileSuccess;
 CreateSecurityProfile.cs (35) : }
 DeleteUser.cs (5) : using DbManager.Security;
-DeleteUser.cs (24) : if(database == null)
+DeleteUser.cs (24) : if (database == null)
 DeleteUser.cs (25) : {
 DeleteUser.cs (26) : return Constants.Error;
 DeleteUser.cs (27) : }
-DeleteUser.cs (28) : if(database.IsUserAdmin() == false)
 DeleteUser.cs (29) : {
 DeleteUser.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
 DeleteUser.cs (31) : }
 DeleteUser.cs (32) : User u = database.SecurityManager.UserByName(Username);
-DeleteUser.cs (33) : if(u == null)
+DeleteUser.cs (33) : if (u == null)
 DeleteUser.cs (34) : {
 DeleteUser.cs (35) : return Constants.UserDoesNotExistError;
 DeleteUser.cs (36) : }
 DeleteUser.cs (37) : else
 DeleteUser.cs (38) : {
-DeleteUser.cs (39) : database.SecurityManager.ProfileByName(Username).Users.Remove(u);
-DeleteUser.cs (40) : return Constants.DeleteUserSuccess;
-DeleteUser.cs (41) : }
+DeleteUser.cs (43) : return Constants.DeleteUserSuccess;
+DeleteUser.cs (44) : }
+DropSecurityProfile.cs (5) : using DbManager.Security;
+DropSecurityProfile.cs (24) : if(database == null)
+DropSecurityProfile.cs (25) : {
+DropSecurityProfile.cs (26) : return Constants.Error;
+DropSecurityProfile.cs (27) : }
+DropSecurityProfile.cs (30) : {
+DropSecurityProfile.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropSecurityProfile.cs (32) : }
+DropSecurityProfile.cs (34) : Profile p = database.SecurityManager.ProfileByName(ProfileName);
+DropSecurityProfile.cs (35) : if (p == null)
+DropSecurityProfile.cs (36) : {
+DropSecurityProfile.cs (37) : return Constants.SecurityProfileDoesNotExistError;
+DropSecurityProfile.cs (38) : }
+DropSecurityProfile.cs (40) : bool result = database.SecurityManager.RemoveProfile(ProfileName);
+DropSecurityProfile.cs (41) : if (result == true)
+DropSecurityProfile.cs (42) : {
+DropSecurityProfile.cs (43) : return Constants.DropSecurityProfileSuccess;
+DropSecurityProfile.cs (44) : }
+DropTable.cs (29) : if(!database.IsUserAdmin())
+DropTable.cs (30) : {
+DropTable.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+DropTable.cs (32) : }
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
+Insert.cs (27) : if (database.IsUserAdmin())
+Insert.cs (28) : {
+Insert.cs (29) : if (tabla == null)
+Insert.cs (36) : else
+Insert.cs (37) : {
+Insert.cs (38) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Insert.cs (39) : }
+Insert.cs (42) : }
 MiniSQLParser.cs (2) : using System;
 MiniSQLParser.cs (4) : using System.Collections.Specialized;
 MiniSQLParser.cs (5) : using System.ComponentModel.DataAnnotations;
@@ -149,111 +175,115 @@ MiniSQLParser.cs (59) : {
 MiniSQLParser.cs (60) : string condcloumn = match.Groups["colName"].Value;
 MiniSQLParser.cs (61) : string op = match.Groups["operator"].Value;
 MiniSQLParser.cs (62) : string values = match.Groups["Value"].Value;
-MiniSQLParser.cs (63) : if (Regex.IsMatch(values, @"^'.*'$"))
-MiniSQLParser.cs (64) : {
-MiniSQLParser.cs (65) : values = values.Trim('\'');
-MiniSQLParser.cs (66) : }
-MiniSQLParser.cs (67) : Condition cond = new Condition(condcloumn, op, values);
-MiniSQLParser.cs (69) : return new Select(tableName, columnslist, cond);
-MiniSQLParser.cs (70) : }
-MiniSQLParser.cs (72) : return new Select(tableName, columnslist, null);
-MiniSQLParser.cs (74) : }
-MiniSQLParser.cs (75) : else if (Regex.IsMatch(miniSQLQuery, insertPattern))
-MiniSQLParser.cs (76) : {
-MiniSQLParser.cs (77) : Match match = Regex.Match(miniSQLQuery, insertPattern);
-MiniSQLParser.cs (78) : string tableName = match.Groups["table"].Value;
-MiniSQLParser.cs (79) : string values = match.Groups["values"].Value;
-MiniSQLParser.cs (80) : List<string> listvalues = CommaSeparatedNames(values);
-MiniSQLParser.cs (90) : {
-MiniSQLParser.cs (96) : if (Regex.IsMatch(listvalues[i], @"^'.*'$"))
-MiniSQLParser.cs (97) : {
-MiniSQLParser.cs (98) : listvalues[i] = listvalues[i].Trim('\'');
-MiniSQLParser.cs (99) : }
-MiniSQLParser.cs (100) : }
-MiniSQLParser.cs (102) : return new Insert(tableName, listvalues);
-MiniSQLParser.cs (103) : }
-MiniSQLParser.cs (104) : else if (Regex.IsMatch(miniSQLQuery, dropTablePattern))
-MiniSQLParser.cs (105) : {
-MiniSQLParser.cs (106) : Match match = Regex.Match(miniSQLQuery, dropTablePattern);
-MiniSQLParser.cs (107) : string tableName = match.Groups["table"].Value;
-MiniSQLParser.cs (108) : return new DropTable(tableName);
+MiniSQLParser.cs (64) : if (!values.StartsWith("'") || !values.EndsWith("'"))
+MiniSQLParser.cs (65) : {
+MiniSQLParser.cs (66) : return null;
+MiniSQLParser.cs (67) : }
+MiniSQLParser.cs (69) : if (Regex.IsMatch(values, @"^'.*'$"))
+MiniSQLParser.cs (70) : {
+MiniSQLParser.cs (71) : values = values.Trim('\'');
+MiniSQLParser.cs (72) : }
+MiniSQLParser.cs (73) : Condition cond = new Condition(condcloumn, op, values);
+MiniSQLParser.cs (75) : return new Select(tableName, columnslist, cond);
+MiniSQLParser.cs (76) : }
+MiniSQLParser.cs (78) : return new Select(tableName, columnslist, null);
+MiniSQLParser.cs (80) : }
+MiniSQLParser.cs (81) : else if (Regex.IsMatch(miniSQLQuery, insertPattern))
+MiniSQLParser.cs (82) : {
+MiniSQLParser.cs (83) : Match match = Regex.Match(miniSQLQuery, insertPattern);
+MiniSQLParser.cs (84) : string tableName = match.Groups["table"].Value;
+MiniSQLParser.cs (85) : string values = match.Groups["values"].Value;
+MiniSQLParser.cs (86) : List<string> listvalues = CommaSeparatedNames(values);
+MiniSQLParser.cs (96) : {
+MiniSQLParser.cs (102) : if (Regex.IsMatch(listvalues[i], @"^'.*'$"))
+MiniSQLParser.cs (103) : {
+MiniSQLParser.cs (104) : listvalues[i] = listvalues[i].Trim('\'');
+MiniSQLParser.cs (105) : }
+MiniSQLParser.cs (106) : }
+MiniSQLParser.cs (108) : return new Insert(tableName, listvalues);
 MiniSQLParser.cs (109) : }
-MiniSQLParser.cs (110) : else if (Regex.IsMatch(miniSQLQuery, createTablePattern))
+MiniSQLParser.cs (110) : else if (Regex.IsMatch(miniSQLQuery, dropTablePattern))
 MiniSQLParser.cs (111) : {
-MiniSQLParser.cs (112) : Match match = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (112) : Match match = Regex.Match(miniSQLQuery, dropTablePattern);
 MiniSQLParser.cs (113) : string tableName = match.Groups["table"].Value;
-MiniSQLParser.cs (114) : string columns = match.Groups["column_defs"].Value;
-MiniSQLParser.cs (116) : List<ColumnDefinition> cd = new List<ColumnDefinition>();
-MiniSQLParser.cs (117) : ColumnDefinition.DataType t = ColumnDefinition.DataType.String;
-MiniSQLParser.cs (118) : string name = null;
-MiniSQLParser.cs (120) : {
-MiniSQLParser.cs (121) : List<string> separetec = CommaSeparatedNames(columns);
-MiniSQLParser.cs (129) : for (int i = 0; i < separetec.Count; i++)
-MiniSQLParser.cs (130) : {
-MiniSQLParser.cs (131) : string[] type = separetec[i].Split(" ");
-MiniSQLParser.cs (133) : {
-MiniSQLParser.cs (134) : t = ColumnDefinition.DataType.String;
-MiniSQLParser.cs (135) : name = type[0];
-MiniSQLParser.cs (136) : }
-MiniSQLParser.cs (138) : {
-MiniSQLParser.cs (139) : t = ColumnDefinition.DataType.Int;
-MiniSQLParser.cs (140) : name = type[0];
-MiniSQLParser.cs (141) : }
-MiniSQLParser.cs (143) : {
-MiniSQLParser.cs (144) : t = ColumnDefinition.DataType.Double;
-MiniSQLParser.cs (145) : name = type[0];
-MiniSQLParser.cs (146) : }
-MiniSQLParser.cs (147) : cd.Add(new ColumnDefinition(t, name));
-MiniSQLParser.cs (148) : }
-MiniSQLParser.cs (150) : }
-MiniSQLParser.cs (153) : return new CreateTable(tableName,cd);
+MiniSQLParser.cs (114) : return new DropTable(tableName);
+MiniSQLParser.cs (115) : }
+MiniSQLParser.cs (116) : else if (Regex.IsMatch(miniSQLQuery, createTablePattern))
+MiniSQLParser.cs (117) : {
+MiniSQLParser.cs (118) : Match match = Regex.Match(miniSQLQuery, createTablePattern);
+MiniSQLParser.cs (119) : string tableName = match.Groups["table"].Value;
+MiniSQLParser.cs (120) : string columns = match.Groups["column_defs"].Value;
+MiniSQLParser.cs (122) : List<ColumnDefinition> cd = new List<ColumnDefinition>();
+MiniSQLParser.cs (123) : ColumnDefinition.DataType t = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (124) : string name = null;
+MiniSQLParser.cs (126) : {
+MiniSQLParser.cs (127) : List<string> separetec = CommaSeparatedNames(columns);
+MiniSQLParser.cs (135) : for (int i = 0; i < separetec.Count; i++)
+MiniSQLParser.cs (136) : {
+MiniSQLParser.cs (137) : string[] type = separetec[i].Split(" ");
+MiniSQLParser.cs (139) : {
+MiniSQLParser.cs (140) : t = ColumnDefinition.DataType.String;
+MiniSQLParser.cs (141) : name = type[0];
+MiniSQLParser.cs (142) : }
+MiniSQLParser.cs (144) : {
+MiniSQLParser.cs (145) : t = ColumnDefinition.DataType.Int;
+MiniSQLParser.cs (146) : name = type[0];
+MiniSQLParser.cs (147) : }
+MiniSQLParser.cs (149) : {
+MiniSQLParser.cs (150) : t = ColumnDefinition.DataType.Double;
+MiniSQLParser.cs (151) : name = type[0];
+MiniSQLParser.cs (152) : }
+MiniSQLParser.cs (153) : cd.Add(new ColumnDefinition(t, name));
 MiniSQLParser.cs (154) : }
-MiniSQLParser.cs (155) : else if (Regex.IsMatch(miniSQLQuery, updateTablePattern))
-MiniSQLParser.cs (156) : {
-MiniSQLParser.cs (157) : Match match = Regex.Match(miniSQLQuery, updateTablePattern);
-MiniSQLParser.cs (158) : string tableName = match.Groups["table"].Value;
-MiniSQLParser.cs (159) : string updateColumns = match.Groups["set_columns"].Value;
-MiniSQLParser.cs (160) : List<string> toUpdateColumns = CommaSeparatedNames(updateColumns);
-MiniSQLParser.cs (161) : string cdcolumn = match.Groups["columnName"].Value;
-MiniSQLParser.cs (162) : string op = match.Groups["operator"].Value;
-MiniSQLParser.cs (163) : string value = match.Groups["value"].Value;
-MiniSQLParser.cs (164) : List<SetValue> setValue = new List<SetValue>();
-MiniSQLParser.cs (165) : for (int i = 0; i < toUpdateColumns.Count; i++)
-MiniSQLParser.cs (166) : {
-MiniSQLParser.cs (167) : string[] partes = toUpdateColumns[i].Split("=");
-MiniSQLParser.cs (168) : string column = partes[0];
-MiniSQLParser.cs (169) : string value2 = partes[1];
-MiniSQLParser.cs (170) : if (Regex.IsMatch(value2, @"^'.*'$"))
-MiniSQLParser.cs (171) : {
-MiniSQLParser.cs (172) : value2 = value2.Trim('\'');
-MiniSQLParser.cs (173) : }
-MiniSQLParser.cs (174) : setValue.Add(new SetValue(column, value2));
-MiniSQLParser.cs (175) : }
-MiniSQLParser.cs (176) : if (Regex.IsMatch(value, @"^'.*'$"))
+MiniSQLParser.cs (156) : }
+MiniSQLParser.cs (159) : return new CreateTable(tableName,cd);
+MiniSQLParser.cs (160) : }
+MiniSQLParser.cs (161) : else if (Regex.IsMatch(miniSQLQuery, updateTablePattern))
+MiniSQLParser.cs (162) : {
+MiniSQLParser.cs (163) : Match match = Regex.Match(miniSQLQuery, updateTablePattern);
+MiniSQLParser.cs (164) : string tableName = match.Groups["table"].Value;
+MiniSQLParser.cs (165) : string updateColumns = match.Groups["set_columns"].Value;
+MiniSQLParser.cs (166) : List<string> toUpdateColumns = CommaSeparatedNames(updateColumns);
+MiniSQLParser.cs (167) : string cdcolumn = match.Groups["columnName"].Value;
+MiniSQLParser.cs (168) : string op = match.Groups["operator"].Value;
+MiniSQLParser.cs (169) : string value = match.Groups["value"].Value;
+MiniSQLParser.cs (170) : List<SetValue> setValue = new List<SetValue>();
+MiniSQLParser.cs (171) : for (int i = 0; i < toUpdateColumns.Count; i++)
+MiniSQLParser.cs (172) : {
+MiniSQLParser.cs (173) : string[] partes = toUpdateColumns[i].Split("=");
+MiniSQLParser.cs (174) : string column = partes[0];
+MiniSQLParser.cs (175) : string value2 = partes[1];
+MiniSQLParser.cs (176) : if (Regex.IsMatch(value2, @"^'.*'$"))
 MiniSQLParser.cs (177) : {
-MiniSQLParser.cs (178) : value = value.Trim('\'');
+MiniSQLParser.cs (178) : value2 = value2.Trim('\'');
 MiniSQLParser.cs (179) : }
-MiniSQLParser.cs (180) : return new Update(tableName, setValue, new Condition(cdcolumn, op, value));
-MiniSQLParser.cs (182) : }
-MiniSQLParser.cs (183) : else if (Regex.IsMatch(miniSQLQuery, deletePattern))
-MiniSQLParser.cs (184) : {
-MiniSQLParser.cs (185) : Match match = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (186) : string tableName = match.Groups["table"].Value;
-MiniSQLParser.cs (187) : string column = match.Groups["columnName"].Value;
-MiniSQLParser.cs (188) : string op = match.Groups["operator"].Value;
-MiniSQLParser.cs (189) : string literalValue = match.Groups["literalValue"].Value;
-MiniSQLParser.cs (190) : if (Regex.IsMatch(literalValue, @"^'.*'$"))
-MiniSQLParser.cs (191) : {
-MiniSQLParser.cs (192) : literalValue = literalValue.Trim('\'');
-MiniSQLParser.cs (193) : }
-MiniSQLParser.cs (195) : return new Delete(tableName, new Condition(column, op, literalValue));
-MiniSQLParser.cs (197) : }
-MiniSQLParser.cs (239) : else if (Regex.IsMatch(miniSQLQuery, deleteUserPattern))
-MiniSQLParser.cs (240) : {
-MiniSQLParser.cs (241) : Match match = Regex.Match(miniSQLQuery, deleteUserPattern);
-MiniSQLParser.cs (242) : string user = match.Groups["user"].Value;
-MiniSQLParser.cs (243) : return new DeleteUser(user);
-MiniSQLParser.cs (244) : }
+MiniSQLParser.cs (180) : setValue.Add(new SetValue(column, value2));
+MiniSQLParser.cs (181) : }
+MiniSQLParser.cs (182) : if (Regex.IsMatch(value, @"^'.*'$"))
+MiniSQLParser.cs (183) : {
+MiniSQLParser.cs (184) : value = value.Trim('\'');
+MiniSQLParser.cs (185) : }
+MiniSQLParser.cs (186) : return new Update(tableName, setValue, new Condition(cdcolumn, op, value));
+MiniSQLParser.cs (188) : }
+MiniSQLParser.cs (189) : else if (Regex.IsMatch(miniSQLQuery, deletePattern))
+MiniSQLParser.cs (190) : {
+MiniSQLParser.cs (191) : Match match = Regex.Match(miniSQLQuery, deletePattern);
+MiniSQLParser.cs (192) : string tableName = match.Groups["table"].Value;
+MiniSQLParser.cs (193) : string column = match.Groups["columnName"].Value;
+MiniSQLParser.cs (194) : string op = match.Groups["operator"].Value;
+MiniSQLParser.cs (195) : string literalValue = match.Groups["literalValue"].Value;
+MiniSQLParser.cs (196) : if (Regex.IsMatch(literalValue, @"^'.*'$"))
+MiniSQLParser.cs (197) : {
+MiniSQLParser.cs (198) : literalValue = literalValue.Trim('\'');
+MiniSQLParser.cs (199) : }
+MiniSQLParser.cs (201) : return new Delete(tableName, new Condition(column, op, literalValue));
+MiniSQLParser.cs (203) : }
+MiniSQLParser.cs (245) : else if (Regex.IsMatch(miniSQLQuery, deleteUserPattern))
+MiniSQLParser.cs (246) : {
+MiniSQLParser.cs (247) : Match match = Regex.Match(miniSQLQuery, deleteUserPattern);
+MiniSQLParser.cs (248) : string user = match.Groups["user"].Value;
+MiniSQLParser.cs (249) : return new DeleteUser(user);
+MiniSQLParser.cs (250) : }
 Update.cs (15) : Table = table ;
 Update.cs (16) : Columns =columnNames ;
 Update.cs (17) : Where = where;
@@ -263,33 +293,40 @@ Update.cs (27) : return Constants.Error;
 Update.cs (28) : }
 Update.cs (29) : else
 Update.cs (30) : {
-Update.cs (31) : Table t = database.TableByName(Table);
-Update.cs (32) : if(t == null)
-Update.cs (33) : {
-Update.cs (34) : return Constants.TableDoesNotExistError;
-Update.cs (35) : }
-Update.cs (36) : else
-Update.cs (37) : {
-Update.cs (38) : ColumnDefinition colunm = t.ColumnByName(Where.ColumnName);
-Update.cs (39) : if(colunm == null || Where.ColumnName == null)
-Update.cs (40) : {
-Update.cs (41) : return Constants.ColumnDoesNotExistError;
-Update.cs (42) : }
-Update.cs (44) : foreach(SetValue st in Columns)
-Update.cs (45) : {
-Update.cs (46) : if(st.ColumnName == null || t.ColumnByName(st.ColumnName) == null)
+Update.cs (31) : if (database.IsUserAdmin())
+Update.cs (32) : {
+Update.cs (33) : Table t = database.TableByName(Table);
+Update.cs (34) : if(t == null)
+Update.cs (35) : {
+Update.cs (36) : return Constants.TableDoesNotExistError;
+Update.cs (37) : }
+Update.cs (38) : else
+Update.cs (39) : {
+Update.cs (40) : ColumnDefinition colunm = t.ColumnByName(Where.ColumnName);
+Update.cs (41) : if(colunm == null || Where.ColumnName == null)
+Update.cs (42) : {
+Update.cs (43) : return Constants.ColumnDoesNotExistError;
+Update.cs (44) : }
+Update.cs (46) : foreach(SetValue st in Columns)
 Update.cs (47) : {
-Update.cs (48) : return Constants.ColumnDoesNotExistError;
-Update.cs (49) : }
-Update.cs (50) : }
-Update.cs (51) : bool done =t.Update(Columns, Where);
-Update.cs (52) : if(done)
-Update.cs (53) : {
-Update.cs (54) : return Constants.UpdateSuccess;
-Update.cs (55) : }
-Update.cs (56) : return Constants.SyntaxError;
+Update.cs (48) : if(st.ColumnName == null || t.ColumnByName(st.ColumnName) == null)
+Update.cs (49) : {
+Update.cs (50) : return Constants.ColumnDoesNotExistError;
+Update.cs (51) : }
+Update.cs (52) : }
+Update.cs (53) : bool done =t.Update(Columns, Where);
+Update.cs (54) : if(done)
+Update.cs (55) : {
+Update.cs (56) : return Constants.UpdateSuccess;
 Update.cs (57) : }
 Update.cs (58) : }
+Update.cs (59) : return Constants.SyntaxError;
+Update.cs (60) : }
+Update.cs (61) : else
+Update.cs (62) : {
+Update.cs (63) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Update.cs (64) : }
+Update.cs (66) : }
 Manager.cs (124) : foreach(Profile f in Profiles)
 Manager.cs (125) : {
 Manager.cs (126) : foreach(User u in f.Users)
