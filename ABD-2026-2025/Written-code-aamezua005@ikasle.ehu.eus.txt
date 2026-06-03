@@ -1,89 +1,103 @@
 Condition.cs (18) : ColumnName = column;
 Condition.cs (19) : Operator = op;
 Condition.cs (20) : LiteralValue = literalValue;
-Condition.cs (32) : if (type == ColumnDefinition.DataType.String)
+Condition.cs (32) : switch (type)
 Condition.cs (33) : {
-Condition.cs (34) : switch (Operator)
-Condition.cs (35) : {
-Condition.cs (36) : case "=":
-Condition.cs (37) : return value == LiteralValue;
-Condition.cs (38) : case ">":
-Condition.cs (39) : return value.CompareTo(LiteralValue) > 0;
-Condition.cs (40) : case "<":
-Condition.cs (41) : return value.CompareTo(LiteralValue) < 0;
-Condition.cs (42) : default:
-Condition.cs (43) : return false;
-Condition.cs (44) : }
-Condition.cs (46) : }
-Condition.cs (47) : if (type == ColumnDefinition.DataType.Int)
-Condition.cs (48) : {
-Condition.cs (49) : int a = int.Parse(value);
-Condition.cs (50) : int b = int.Parse(LiteralValue);
-Condition.cs (52) : switch (Operator)
-Condition.cs (53) : {
-Condition.cs (54) : case "=":
-Condition.cs (55) : return a == b;
-Condition.cs (56) : case ">":
-Condition.cs (57) : return a > b;
-Condition.cs (58) : case "<":
-Condition.cs (59) : return a < b;
-Condition.cs (60) : default:
-Condition.cs (61) : return false;
-Condition.cs (63) : }
-Condition.cs (64) : }
-Condition.cs (65) : if (type == ColumnDefinition.DataType.Double)
-Condition.cs (66) : {
-Condition.cs (67) : double a = double.Parse(value);
-Condition.cs (68) : double b = double.Parse(LiteralValue);
-Condition.cs (70) : switch (Operator)
-Condition.cs (71) : {
-Condition.cs (72) : case "=":
-Condition.cs (73) : return a == b;
-Condition.cs (74) : case ">":
-Condition.cs (75) : return a > b;
-Condition.cs (76) : case "<":
-Condition.cs (77) : return a < b;
-Condition.cs (78) : default:
-Condition.cs (79) : return false;
-Condition.cs (80) : }
-Condition.cs (81) : }
-Condition.cs (82) : return false;
-Condition.cs (84) : }
-Database.cs (6) : using System.Text.Json;
-Database.cs (32) : Tables = new List<Table>();
-Database.cs (33) : m_username = adminUsername;
-Database.cs (34) : SecurityManager = new Manager(adminUsername);
-Database.cs (36) : Profile adminProfile = new Profile()
-Database.cs (37) : {
-Database.cs (38) : Name = Profile.AdminProfileName,
-Database.cs (39) : };
-Database.cs (40) : adminProfile.Users.Add(new User(adminUsername, adminPassword));
-Database.cs (41) : SecurityManager.AddProfile(adminProfile);
-Database.cs (47) : if (table == null)
-Database.cs (49) : if (TableByName(table.Name) != null)
-Database.cs (50) : return false;
-Database.cs (52) : Tables.Add(table);
-Database.cs (53) : return true;
-Database.cs (60) : if (tableName == null)
-Database.cs (63) : foreach (var table in Tables)
-Database.cs (64) : {
-Database.cs (65) : if (table.Name != null &&
-Database.cs (66) : table.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase))
-Database.cs (67) : return table;
-Database.cs (68) : }
-Database.cs (69) : return null;
-Database.cs (246) : if (string.IsNullOrEmpty(databaseName))
-Database.cs (249) : string filePath = databaseName + ".db";
-Database.cs (270) : return null;
-Database.cs (272) : string filePath = databaseName + ".db";
-Database.cs (274) : if (!File.Exists(filePath))
-Database.cs (275) : return null;
-Database.cs (280) : {
-Database.cs (284) : List<Table> tables = JsonSerializer.Deserialize<List<Table>>(json, options);
-Database.cs (291) : Database db = new Database();
-Database.cs (292) : db.Tables = tables;
-Database.cs (293) : db.m_username = username;
-Database.cs (295) : return db;
+Condition.cs (34) : case ColumnDefinition.DataType.String:
+Condition.cs (35) : return ComparaStrings(value, LiteralValue);
+Condition.cs (37) : case ColumnDefinition.DataType.Int:
+Condition.cs (38) : int intValue = int.Parse(value, CultureInfo.InvariantCulture);
+Condition.cs (39) : int intLiteral = int.Parse(LiteralValue, CultureInfo.InvariantCulture);
+Condition.cs (40) : return ComparaNumeros(intValue, intLiteral);
+Condition.cs (42) : case ColumnDefinition.DataType.Double:
+Condition.cs (43) : double doubleValue = double.Parse(value, CultureInfo.InvariantCulture);
+Condition.cs (44) : double doubleLiteral = double.Parse(LiteralValue, CultureInfo.InvariantCulture);
+Condition.cs (45) : return ComparaNumeros(doubleValue, doubleLiteral);
+Condition.cs (47) : default:
+Condition.cs (49) : }
+Condition.cs (51) : }
+Condition.cs (53) : private bool ComparaStrings(string a, string b)
+Condition.cs (54) : {
+Condition.cs (55) : int cmp = string.Compare(a, b, StringComparison.Ordinal);
+Condition.cs (57) : return Operator switch
+Condition.cs (58) : {
+Condition.cs (59) : "="  => cmp == 0,
+Condition.cs (60) : "!=" => cmp != 0,
+Condition.cs (61) : "<"  => cmp < 0,
+Condition.cs (62) : "<=" => cmp <= 0,
+Condition.cs (63) : ">"  => cmp > 0,
+Condition.cs (64) : ">=" => cmp >= 0,
+Condition.cs (65) : _ => false
+Condition.cs (66) : };
+Condition.cs (69) : private bool ComparaNumeros<T>(T a, T b) where T : IComparable<T>
+Condition.cs (70) : {
+Condition.cs (71) : int cmp = a.CompareTo(b);
+Condition.cs (73) : return Operator switch
+Condition.cs (74) : {
+Condition.cs (75) : "="  => cmp == 0,
+Condition.cs (76) : "!=" => cmp != 0,
+Condition.cs (77) : "<"  => cmp < 0,
+Condition.cs (78) : "<=" => cmp <= 0,
+Condition.cs (79) : ">"  => cmp > 0,
+Condition.cs (80) : ">=" => cmp >= 0,
+Condition.cs (81) : _ => false
+Condition.cs (82) : };
+Condition.cs (83) : }
+Database.cs (8) : using System.Text.Json;
+Database.cs (31) : Tables = new List<Table>();
+Database.cs (32) : m_username = adminUsername;
+Database.cs (33) : SecurityManager = new Manager(adminUsername);
+Database.cs (39) : if (table == null)
+Database.cs (41) : if (TableByName(table.Name) != null)
+Database.cs (42) : return false;
+Database.cs (44) : Tables.Add(table);
+Database.cs (45) : return true;
+Database.cs (52) : if (tableName == null)
+Database.cs (55) : foreach (var table in Tables)
+Database.cs (56) : {
+Database.cs (57) : if (table.Name != null &&
+Database.cs (58) : table.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase))
+Database.cs (59) : return table;
+Database.cs (60) : }
+Database.cs (61) : return null;
+Database.cs (234) : try
+Database.cs (235) : {
+Database.cs (236) : if (string.IsNullOrEmpty(databaseName))
+Database.cs (239) : string filePath = databaseName + ".db";
+Database.cs (240) : var options = new JsonSerializerOptions
+Database.cs (241) : {
+Database.cs (242) : IncludeFields = true
+Database.cs (243) : };
+Database.cs (244) : string json = JsonSerializer.Serialize(Tables, options);
+Database.cs (245) : File.WriteAllText(filePath, json);
+Database.cs (246) : return true;
+Database.cs (247) : }
+Database.cs (248) : catch
+Database.cs (249) : {
+Database.cs (250) : return false;
+Database.cs (251) : }
+Database.cs (260) : try
+Database.cs (261) : {
+Database.cs (262) : string filePath = databaseName + ".db";
+Database.cs (264) : if (!File.Exists(filePath))
+Database.cs (265) : return null;
+Database.cs (266) : var options = new JsonSerializerOptions
+Database.cs (267) : {
+Database.cs (268) : IncludeFields = true
+Database.cs (269) : };
+Database.cs (270) : string json = File.ReadAllText(filePath);
+Database.cs (271) : List<Table> tables = JsonSerializer.Deserialize<List<Table>>(json, options);
+Database.cs (273) : if (tables == null)
+Database.cs (276) : Database db = new Database();
+Database.cs (277) : db.Tables = tables;
+Database.cs (278) : db.m_username = username;
+Database.cs (279) : db.SecurityManager = new Manager(username);
+Database.cs (280) : return db;
+Database.cs (281) : }
+Database.cs (282) : catch
+Database.cs (283) : {
+Database.cs (284) : return null;
+Database.cs (285) : }
 Row.cs (13) : [System.Text.Json.Serialization.JsonInclude]
 Table.cs (11) : [System.Text.Json.Serialization.JsonInclude]
 Table.cs (12) : private List<ColumnDefinition> ColumnDefinitions = new List<ColumnDefinition>();
@@ -113,61 +127,25 @@ Table.cs (133) : listaIndices.Add(i);
 Table.cs (134) : }
 Table.cs (135) : }
 Table.cs (136) : return listaIndices;
-Table.cs (214) : return true;
-CreateSecurityProfile.cs (5) : using DbManager.Security;
-CreateSecurityProfile.cs (17) : ProfileName = profileName;
-CreateSecurityProfile.cs (23) : bool esAdmin = database.SecurityManager.IsUserAdmin();
-CreateSecurityProfile.cs (24) : if (esAdmin == false)
-CreateSecurityProfile.cs (25) : {
-CreateSecurityProfile.cs (26) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-CreateSecurityProfile.cs (28) : Profile profile = new Profile
-CreateSecurityProfile.cs (29) : {
-CreateSecurityProfile.cs (30) : Name = ProfileName
-CreateSecurityProfile.cs (31) : };
-CreateSecurityProfile.cs (32) : database.SecurityManager.AddProfile(profile);
-CreateSecurityProfile.cs (33) : return Constants.CreateSecurityProfileSuccess;
-CreateSecurityProfile.cs (37) : }
+Table.cs (207) : return true;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
 Delete.cs (23) : bool success = database.DeleteWhere(Table, Where);
 Delete.cs (24) : return success ? Constants.DeleteSuccess : database.LastErrorMessage;
-MiniSQLParser.cs (24) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)(<=|>=|<>|=|<|>)('[^']+'|\d+))?\s*$";
-MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)(=|<>|<=|>=|<|>)('[^']+')\s*$";
-MiniSQLParser.cs (28) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([a-zA-Z0-9]+)\s*$";
-MiniSQLParser.cs (219) : //DELETE
-MiniSQLParser.cs (220) : match = Regex.Match(miniSQLQuery, deletePattern);
-MiniSQLParser.cs (221) : if (match.Success)
-MiniSQLParser.cs (222) : {
-MiniSQLParser.cs (223) : string table = match.Groups[1].Value;
-MiniSQLParser.cs (225) : Condition where = new Condition(
-MiniSQLParser.cs (226) : match.Groups[2].Value,
-MiniSQLParser.cs (227) : match.Groups[3].Value,
-MiniSQLParser.cs (228) : match.Groups[4].Value.Trim('\'')
-MiniSQLParser.cs (229) : );
-MiniSQLParser.cs (231) : return new Delete(table, where);
-MiniSQLParser.cs (232) : }
-MiniSQLParser.cs (249) : if (match.Success)
-MiniSQLParser.cs (250) : {
-MiniSQLParser.cs (251) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (252) : return new CreateSecurityProfile(profileName);
-MiniSQLParser.cs (253) : }
-MiniSQLParser.cs (266) : if (match.Success)
-MiniSQLParser.cs (267) : {
-MiniSQLParser.cs (268) : string profileName = match.Groups[1].Value;
-MiniSQLParser.cs (270) : }
-Manager.cs (246) : foreach (var profile in Profiles)
-Manager.cs (247) : {
-Manager.cs (250) : foreach (var user in profile.Users)
-Manager.cs (256) : {
-Manager.cs (262) : }
-Manager.cs (263) : }
-Profile.cs (20) : if(string.IsNullOrEmpty(table)) return false;
-Profile.cs (22) : string tableName = table;
-Profile.cs (24) : {
-Profile.cs (26) : }
-Profile.cs (29) : {
-Profile.cs (31) : return true;
-Profile.cs (32) : }
-Profile.cs (39) : if (string.IsNullOrEmpty(table)) return false;
-Profile.cs (41) : string tableName = table;
-Profile.cs (56) : string tableName = table;
+MiniSQLParser.cs (26) : const string deletePattern = @"^DELETE\s+FROM\s+(\w+)\s+WHERE\s+(\w+)\s*(=|<>|!=|<=|>=|<|>)\s*'?([^']+)'?\s*$";
+MiniSQLParser.cs (172) : //DELETE
+MiniSQLParser.cs (173) : match = Regex.Match(miniSQLQuery, deletePattern, RegexOptions.IgnoreCase);
+MiniSQLParser.cs (174) : if (match.Success)
+MiniSQLParser.cs (175) : {
+MiniSQLParser.cs (176) : string table = match.Groups[1].Value;
+MiniSQLParser.cs (177) : Condition where = null;
+MiniSQLParser.cs (178) : if (match.Groups[2].Success)
+MiniSQLParser.cs (179) : {
+MiniSQLParser.cs (180) : where = new Condition(
+MiniSQLParser.cs (181) : match.Groups[2].Value,
+MiniSQLParser.cs (182) : match.Groups[3].Value,
+MiniSQLParser.cs (183) : match.Groups[4].Value
+MiniSQLParser.cs (184) : );
+MiniSQLParser.cs (185) : }
+MiniSQLParser.cs (186) : return new Delete(table, where);
+MiniSQLParser.cs (187) : }

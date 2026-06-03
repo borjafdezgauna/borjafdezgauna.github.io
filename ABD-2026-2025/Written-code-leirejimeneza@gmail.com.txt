@@ -21,33 +21,31 @@ Condition.cs (16) : public string Operator { get; private set; } // >/>/=
 Condition.cs (32) : //"ab" < "cd" --> se compara la primera letra solo
 Condition.cs (36) : //int.parse() --> string en int
 Condition.cs (37) : //double.parse() --> string en double
-Database.cs (40) : User adminUser = new User(adminUsername, adminPassword);
-Database.cs (41) : adminProfile.Users.Add(adminUser);
-Database.cs (243) : Table table = TableByName(tableName);
-Database.cs (244) : if (table == null)
-Database.cs (245) : {
-Database.cs (246) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (247) : return false;
-Database.cs (248) : }
-Database.cs (250) : foreach (SetValue setValue in columnNames)
+Database.cs (233) : Table table = TableByName(tableName);
+Database.cs (234) : if (table == null)
+Database.cs (235) : {
+Database.cs (236) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (237) : return false;
+Database.cs (238) : }
+Database.cs (240) : foreach (SetValue setValue in columnNames)
+Database.cs (241) : {
+Database.cs (242) : if (table.ColumnIndexByName(setValue.ColumnName) == -1)
+Database.cs (243) : {
+Database.cs (244) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (245) : return false;
+Database.cs (246) : }
+Database.cs (247) : }
+Database.cs (249) : //Column in the condition exist?
+Database.cs (250) : if (columnCondition != null)
 Database.cs (251) : {
-Database.cs (252) : if (table.ColumnIndexByName(setValue.ColumnName) == -1)
+Database.cs (252) : if (table.ColumnIndexByName(columnCondition.ColumnName) == -1)
 Database.cs (253) : {
 Database.cs (254) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (255) : return false;
 Database.cs (256) : }
 Database.cs (257) : }
-Database.cs (259) : //Column in the condition exist?
-Database.cs (260) : if (columnCondition != null)
-Database.cs (261) : {
-Database.cs (262) : if (table.ColumnIndexByName(columnCondition.ColumnName) == -1)
-Database.cs (263) : {
-Database.cs (264) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (266) : }
-Database.cs (267) : }
-Database.cs (269) : table.Update(columnNames, columnCondition);
-Database.cs (270) : return true;
-Database.cs (271) : }
+Database.cs (259) : table.Update(columnNames, columnCondition);
+Database.cs (260) : return true;
+Database.cs (261) : }
 Row.cs (8) : using System.Xml.Schema;
 Row.cs (20) : this.ColumnDefinitions = columnDefinitions;
 Row.cs (21) : this.Values = values;
@@ -119,33 +117,34 @@ Table.cs (281) : return true;
 DropTable.cs (15) : Table = table;
 Grant.cs (1) : using DbManager.Parser;
 Grant.cs (2) : using DbManager.Security;
-Grant.cs (19) : PrivilegeName = privilegeName;
-Grant.cs (20) : TableName = tableName;
-Grant.cs (21) : ProfileName = profileName;
-Grant.cs (28) : if (!database.SecurityManager.IsUserAdmin())
-Grant.cs (29) : {
-Grant.cs (30) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Grant.cs (31) : }
-Grant.cs (33) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
-Grant.cs (34) : if (profile == null || string.IsNullOrEmpty(TableName))
-Grant.cs (35) : {
-Grant.cs (36) : return Constants.SecurityProfileDoesNotExistError;
-Grant.cs (37) : }
-Grant.cs (39) : Privilege privilege;
-Grant.cs (40) : try
-Grant.cs (41) : {
-Grant.cs (42) : privilege = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
-Grant.cs (43) : }
-Grant.cs (44) : catch (Exception)
-Grant.cs (45) : {
-Grant.cs (46) : return Constants.PrivilegeDoesNotExistError;
-Grant.cs (47) : }
-Grant.cs (49) : if (profile.IsGrantedPrivilege(TableName, privilege))
-Grant.cs (50) : {
-Grant.cs (51) : return Constants.ProfileAlreadyHasPrivilege;
-Grant.cs (54) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
-Grant.cs (55) : return Constants.GrantPrivilegeSuccess;
-Grant.cs (56) : }
+Grant.cs (19) : privilegeName = this.PrivilegeName;
+Grant.cs (20) : tableName = this.TableName;
+Grant.cs (21) : profileName = this.ProfileName;
+Grant.cs (29) : /*if (!database.SecurityManager.IsUserAdmin())
+Grant.cs (30) : {
+Grant.cs (31) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
+Grant.cs (32) : }
+Grant.cs (34) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
+Grant.cs (35) : if (profile == null || string.IsNullOrEmpty(TableName))
+Grant.cs (36) : {
+Grant.cs (37) : return Constants.SecurityProfileDoesNotExistError;
+Grant.cs (38) : }
+Grant.cs (40) : Privilege privilege;
+Grant.cs (41) : try
+Grant.cs (42) : {
+Grant.cs (43) : privilege = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
+Grant.cs (44) : }
+Grant.cs (45) : catch (Exception)
+Grant.cs (46) : {
+Grant.cs (47) : return Constants.PrivilegeDoesNotExistError;
+Grant.cs (48) : }
+Grant.cs (50) : if (profile.IsGrantedPrivilege(TableName, privilege))
+Grant.cs (51) : {
+Grant.cs (52) : return Constants.ProfileAlreadyHasPrivilege;
+Grant.cs (55) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, privilege);
+Grant.cs (56) : return Constants.GrantPrivilegeSuccess;*/
+Grant.cs (57) : return null;
+Grant.cs (58) : }
 Insert.cs (16) : Table = table;
 Insert.cs (17) : Values = values;
 Insert.cs (22) : // Verificar que database no es null
@@ -164,13 +163,13 @@ Insert.cs (41) : return database.LastErrorMessage;
 MiniSQLParser.cs (5) : using System.Data.Common;
 MiniSQLParser.cs (15) : const string selectPattern = @"^SELECT\s+([a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*)\s+FROM\s+([a-zA-Z0-9]+)(?:\s+WHERE\s+([a-zA-Z0-9]+)(=|<|>)'(-?[0-9]+(?:\.[0-9]+)?|[a-zA-Z]+(?:\s[a-zA-Z]+)*)')?$";
 MiniSQLParser.cs (20) : //LEIRE --> #16
-MiniSQLParser.cs (21) : const string insertPattern = @"INSERT\s+INTO\s+([\w_]+)\s+VALUES\s+\(('[^',]*'(?:,'(?:[^',]*)')*)\)$";
-MiniSQLParser.cs (27) : const string createTablePattern = @"CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s+\(\s*(.*?)\s*\)";
+MiniSQLParser.cs (21) : const string insertPattern = @"^INSERT\s+INTO\s+([\w_]+)\s+VALUES\s+\(('[^',]*'(?:,'(?:[^',]*)')*)\)$";
+MiniSQLParser.cs (27) : const string createTablePattern = @"^CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s+\(\s*(.*?)\s*\)";
 MiniSQLParser.cs (28) : //const string createTablePattern = @"CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s+\(\s*(.*?)\s*\)";
 MiniSQLParser.cs (29) : //const string createTablePattern = @"CREATE\s+TABLE\s+([a-zA-Z][a-zA-Z0-9]*)\s*\((.*)\)";
 MiniSQLParser.cs (31) : //LEIRE --> #26
-MiniSQLParser.cs (32) : const string updateTablePattern = @"UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*([=<>])\s*('[^']*'))?$";
-MiniSQLParser.cs (41) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+([  A-Za-z][A-Za-z0-9]*)\s+TO\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
+MiniSQLParser.cs (32) : const string updateTablePattern = @"^UPDATE\s+(\w+)\s+SET\s+(.+?)(?:\s+WHERE\s+(\w+)\s*([=<>])\s*('[^']*'))?$";
+MiniSQLParser.cs (41) : const string grantPattern = @"^GRANT\s+(DELETE|INSERT|SELECT|UPDATE)\s+ON\s+([A-Za-z][A-Za-z0-9]*)\s+TO\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (65) : //select
 MiniSQLParser.cs (70) : string column = matchSelect.Groups[1].Value;
 MiniSQLParser.cs (71) : //Separar las columas
@@ -279,49 +278,17 @@ MiniSQLParser.cs (284) : condition = new Condition(whereColumn, whereOp, whereVa
 MiniSQLParser.cs (285) : }
 MiniSQLParser.cs (287) : return new Update(table, setValues, condition);
 MiniSQLParser.cs (288) : }
-MiniSQLParser.cs (346) : //GRANT
-MiniSQLParser.cs (347) : Match matchGrant = Regex.Match(miniSQLQuery, grantPattern);
-MiniSQLParser.cs (348) : if (matchGrant.Success)
-MiniSQLParser.cs (349) : {
-MiniSQLParser.cs (350) : string permission = matchGrant.Groups[1].Value;
-MiniSQLParser.cs (351) : string resource = matchGrant.Groups[2].Value;
-MiniSQLParser.cs (352) : string user = matchGrant.Groups[3].Value;
-MiniSQLParser.cs (354) : if (string.IsNullOrEmpty(permission) || string.IsNullOrEmpty(resource) || string.IsNullOrEmpty(user))
-MiniSQLParser.cs (355) : {
-MiniSQLParser.cs (357) : }
-MiniSQLParser.cs (359) : return new Grant(permission, resource, user);
-MiniSQLParser.cs (360) : }
-MiniSQLParser.cs (362) : return null;
-Revoke.cs (1) : using DbManager.Parser;
-Revoke.cs (2) : using DbManager.Security;
-Revoke.cs (29) : if (database == null)
-Revoke.cs (30) : {
-Revoke.cs (31) : return Constants.Error;
-Revoke.cs (32) : }
-Revoke.cs (34) : if (database.IsUserAdmin() == false)
-Revoke.cs (35) : {
-Revoke.cs (36) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Revoke.cs (37) : }
-Revoke.cs (39) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
-Revoke.cs (40) : if (profile == null || string.IsNullOrEmpty(TableName))
-Revoke.cs (41) : {
-Revoke.cs (42) : return Constants.SecurityProfileDoesNotExistError;
-Revoke.cs (43) : }
-Revoke.cs (45) : Privilege privilege;
-Revoke.cs (46) : try
-Revoke.cs (47) : {
-Revoke.cs (48) : privilege = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
-Revoke.cs (49) : }
-Revoke.cs (50) : catch (Exception)
-Revoke.cs (51) : {
-Revoke.cs (52) : return Constants.PrivilegeDoesNotExistError;
-Revoke.cs (55) : if (!profile.IsGrantedPrivilege(TableName, privilege))
-Revoke.cs (56) : {
-Revoke.cs (57) : return Constants.PrivilegeDoesNotExistError;
-Revoke.cs (58) : }
-Revoke.cs (59) : database.SecurityManager.RevokePrivilege(ProfileName, TableName, privilege);
-Revoke.cs (60) : return Constants.GrantPrivilegeSuccess;
-Revoke.cs (61) : }
+MiniSQLParser.cs (316) : Match matchGrant = Regex.Match(miniSQLQuery, grantPattern);
+MiniSQLParser.cs (317) : if (matchGrant.Success)
+MiniSQLParser.cs (318) : {
+MiniSQLParser.cs (319) : string permission = matchGrant.Groups[1].Value;
+MiniSQLParser.cs (320) : string resource = matchGrant.Groups[2].Value;
+MiniSQLParser.cs (321) : string user = matchGrant.Groups[3].Value;
+MiniSQLParser.cs (323) : if (string.IsNullOrEmpty(permission) || string.IsNullOrEmpty(resource) || string.IsNullOrEmpty(user))
+MiniSQLParser.cs (324) : {
+MiniSQLParser.cs (326) : }
+MiniSQLParser.cs (328) : return new Grant(permission, resource, user);
+MiniSQLParser.cs (329) : }
 Select.cs (18) : Table = table;
 Select.cs (19) : Columns = columns;
 Select.cs (20) : Where = condition;
@@ -415,14 +382,14 @@ Manager.cs (376) : }
 Manager.cs (377) : index++;
 Manager.cs (378) : }
 Manager.cs (379) : }
-Profile.cs (73) : if (table == null || privilege == null)
-Profile.cs (74) : {
-Profile.cs (75) : return false;
-Profile.cs (76) : }
-Profile.cs (77) : if (PrivilegesOn.ContainsKey(table))
-Profile.cs (78) : {
-Profile.cs (79) : return PrivilegesOn[table].Contains(privilege);
-Profile.cs (81) : }
-Profile.cs (82) : else
-Profile.cs (83) : {
-Profile.cs (97) : }
+Profile.cs (72) : if (table == null || privilege == null)
+Profile.cs (73) : {
+Profile.cs (74) : return false;
+Profile.cs (75) : }
+Profile.cs (76) : if (PrivilegesOn.ContainsKey(table))
+Profile.cs (77) : {
+Profile.cs (78) : return PrivilegesOn[table].Contains(privilege);
+Profile.cs (80) : }
+Profile.cs (81) : else
+Profile.cs (82) : {
+Profile.cs (87) : }

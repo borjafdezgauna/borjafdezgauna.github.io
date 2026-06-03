@@ -46,46 +46,40 @@ Condition.cs (75) : default:
 Condition.cs (76) : return false;
 Condition.cs (77) : }
 Condition.cs (78) : }
-Database.cs (33) : SecurityManager = new Manager(m_username);
-Database.cs (35) : Profile adminP = new Profile();
-Database.cs (36) : adminP.Name = Profile.AdminProfileName;
-Database.cs (38) : User adminU = new User(adminUsername, adminPassword);
-Database.cs (39) : adminP.Users.Add(adminU);
-Database.cs (41) : SecurityManager.Profiles.Add(adminP);
-Database.cs (140) : Table table = TableByName(tableName);
-Database.cs (141) : if (table == null)
-Database.cs (142) : {
-Database.cs (143) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (144) : return false;
-Database.cs (145) : }
-Database.cs (146) : if (table.Insert(values))
-Database.cs (147) : {
-Database.cs (148) : LastErrorMessage = Constants.InsertSuccess;
-Database.cs (149) : return true;
-Database.cs (150) : }
-Database.cs (151) : LastErrorMessage = Constants.ColumnCountsDontMatch;
-Database.cs (160) : Table table = TableByName(tableName);
-Database.cs (161) : if (table == null)
-Database.cs (162) : {
-Database.cs (163) : LastErrorMessage = Constants.TableDoesNotExistError;
-Database.cs (165) : }
-Database.cs (166) : if (columns.Count > 0)
-Database.cs (167) : {
-Database.cs (168) : foreach (string column in columns)
-Database.cs (169) : {
-Database.cs (170) : if (table.ColumnByName(column) == null)
-Database.cs (171) : {
-Database.cs (172) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (173) : return null;
-Database.cs (174) : }
-Database.cs (175) : }
-Database.cs (176) : }
-Database.cs (177) : else
-Database.cs (178) : {
-Database.cs (179) : LastErrorMessage = Constants.ColumnDoesNotExistError;
-Database.cs (180) : return null;
-Database.cs (181) : }
-Database.cs (182) : return table.Select(columns, condition);
+Database.cs (132) : Table table = TableByName(tableName);
+Database.cs (133) : if (table == null)
+Database.cs (134) : {
+Database.cs (135) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (136) : return false;
+Database.cs (137) : }
+Database.cs (138) : if (table.Insert(values))
+Database.cs (139) : {
+Database.cs (140) : LastErrorMessage = Constants.InsertSuccess;
+Database.cs (141) : return true;
+Database.cs (142) : }
+Database.cs (143) : LastErrorMessage = Constants.ColumnCountsDontMatch;
+Database.cs (152) : Table table = TableByName(tableName);
+Database.cs (153) : if (table == null)
+Database.cs (154) : {
+Database.cs (155) : LastErrorMessage = Constants.TableDoesNotExistError;
+Database.cs (157) : }
+Database.cs (158) : if (columns.Count > 0)
+Database.cs (159) : {
+Database.cs (160) : foreach (string column in columns)
+Database.cs (161) : {
+Database.cs (162) : if (table.ColumnByName(column) == null)
+Database.cs (163) : {
+Database.cs (164) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (165) : return null;
+Database.cs (166) : }
+Database.cs (167) : }
+Database.cs (168) : }
+Database.cs (169) : else
+Database.cs (170) : {
+Database.cs (171) : LastErrorMessage = Constants.ColumnDoesNotExistError;
+Database.cs (172) : return null;
+Database.cs (173) : }
+Database.cs (174) : return table.Select(columns, condition);
 Row.cs (99) : if (string.IsNullOrEmpty(value))
 Row.cs (100) : {
 Row.cs (101) : return value;
@@ -139,16 +133,6 @@ Table.cs (232) : Rows[rowIndex].Values[columnIndex] = setValue.Value;
 Table.cs (233) : }
 Table.cs (234) : }
 Table.cs (235) : return true;
-AddUser.cs (34) : if (!database.IsUserAdmin())
-AddUser.cs (45) : if (database.SecurityManager.UserByName(Username) != null)
-AddUser.cs (46) : {
-AddUser.cs (47) : return Constants.Error;
-AddUser.cs (48) : }
-AddUser.cs (50) : if (string.IsNullOrEmpty(Password))
-AddUser.cs (51) : {
-AddUser.cs (52) : return Constants.Error;
-AddUser.cs (53) : }
-AddUser.cs (58) : return Constants.AddUserSuccess;
 CreateTable.cs (17) : Table = table;
 CreateTable.cs (18) : ColumnsParameters = columns;
 CreateTable.cs (24) : if (database == null)
@@ -156,54 +140,30 @@ CreateTable.cs (25) : return Constants.Error;
 CreateTable.cs (26) : Table tabla = database.TableByName(Table);
 CreateTable.cs (27) : if (tabla != null)
 CreateTable.cs (28) : return Constants.TableAlreadyExistsError;
-CreateTable.cs (34) : return Constants.DatabaseCreatedWithoutColumnsError;
-CreateTable.cs (36) : return Constants.CreateTableSuccess;
-CreateTable.cs (37) : return Constants.Error;
+CreateTable.cs (29) : else if (ColumnsParameters == null || ColumnsParameters.Count == 0)
+CreateTable.cs (30) : return Constants.DatabaseCreatedWithoutColumnsError;
+CreateTable.cs (31) : else if (database.CreateTable(Table, ColumnsParameters))
+CreateTable.cs (32) : return Constants.CreateTableSuccess;
+CreateTable.cs (33) : return Constants.Error;
 Delete.cs (15) : Table = table;
 Delete.cs (16) : Where = where;
 Delete.cs (23) : Table tabla = database.TableByName(Table);
 Delete.cs (24) : if (database==null)
 Delete.cs (25) : return Constants.Error;
-Delete.cs (31) : return Constants.TableDoesNotExistError;
-Delete.cs (34) : return Constants.DeleteSuccess;
-Delete.cs (36) : return Constants.Error;
+Delete.cs (26) : else if (tabla == null)
+Delete.cs (27) : return Constants.TableDoesNotExistError;
+Delete.cs (28) : else if(database.DeleteWhere(Table, Where))
+Delete.cs (29) : return Constants.DeleteSuccess;
+Delete.cs (30) : return Constants.Error;
 DropTable.cs (15) : Table = table;
-Grant.cs (5) : using DbManager.Security;
-Grant.cs (28) : if (database == null)
-Grant.cs (29) : {
-Grant.cs (30) : return Constants.Error;
-Grant.cs (31) : }
-Grant.cs (32) : if (!database.IsUserAdmin())
-Grant.cs (33) : {
-Grant.cs (34) : return Constants.UsersProfileIsNotGrantedRequiredPrivilege;
-Grant.cs (35) : }
-Grant.cs (36) : Profile profile = database.SecurityManager.ProfileByName(ProfileName);
-Grant.cs (37) : if (profile == null)
-Grant.cs (38) : {
-Grant.cs (39) : return Constants.SecurityProfileDoesNotExistError;
-Grant.cs (40) : }
-Grant.cs (41) : Privilege priv;
-Grant.cs (42) : try
-Grant.cs (43) : {
-Grant.cs (44) : priv = PrivilegeUtils.FromPrivilegeName(PrivilegeName);
-Grant.cs (45) : }
-Grant.cs (46) : catch
-Grant.cs (47) : {
-Grant.cs (48) : return Constants.PrivilegeDoesNotExistError;
-Grant.cs (49) : }
-Grant.cs (51) : if (profile.IsGrantedPrivilege(TableName, priv))
-Grant.cs (52) : {
-Grant.cs (53) : return Constants.ProfileAlreadyHasPrivilege;
-Grant.cs (54) : }
-Grant.cs (55) : database.SecurityManager.GrantPrivilege(ProfileName, TableName, priv);
-Grant.cs (56) : return Constants.GrantPrivilegeSuccess;
 Insert.cs (24) : Table tabla = database.TableByName(Table);
 Insert.cs (25) : if (database==null)
 Insert.cs (26) : return Constants.Error;
-Insert.cs (30) : return Constants.TableDoesNotExistError;
-Insert.cs (31) : else if(database.Insert(Table, Values))
-Insert.cs (32) : return Constants.InsertSuccess;
-Insert.cs (34) : return Constants.Error;
+Insert.cs (27) : else if (tabla == null)
+Insert.cs (28) : return Constants.TableDoesNotExistError;
+Insert.cs (29) : else if(database.Insert(Table, Values))
+Insert.cs (30) : return Constants.InsertSuccess;
+Insert.cs (31) : return Constants.Error;
 MiniSQLParser.cs (31) : const string createSecurityProfilePattern = @"^CREATE\s+SECURITY\s+PROFILE\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (33) : const string dropSecurityProfilePattern = @"^DROP\s+SECURITY\s+PROFILE\s+([A-Za-z][A-Za-z0-9]*)\s*;?\s*$";
 MiniSQLParser.cs (39) : const string addUserPattern = @"^ADD\s+USER\s+\(\s*([A-Za-z][A-Za-z0-9]*)\s*,\s*([a-zA-Z0-9]+)\s*,\s*([A-Za-z][A-Za-z0-9]*)\s*\)\s*;?\s*$";
@@ -237,42 +197,42 @@ Manager.cs (160) : return profile;
 Manager.cs (161) : }
 Manager.cs (162) : }
 Manager.cs (163) : }
-Manager.cs (271) : try
-Manager.cs (272) : {
-Manager.cs (273) : string folder = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
-Manager.cs (274) : Directory.CreateDirectory(folder);
-Manager.cs (276) : string securityFile = Path.Combine(folder, "manager.txt");
-Manager.cs (278) : using (TextWriter tw = File.CreateText(securityFile))
-Manager.cs (279) : {
-Manager.cs (280) : foreach (Profile p in Profiles)
-Manager.cs (281) : {
-Manager.cs (282) : tw.WriteLine(p.Name);
-Manager.cs (284) : foreach (string table in p.PrivilegesOn.Keys)
-Manager.cs (285) : {
-Manager.cs (286) : string privLine = table + "=";
-Manager.cs (287) : bool first = true;
-Manager.cs (288) : foreach (Privilege priv in p.PrivilegesOn[table])
-Manager.cs (289) : {
-Manager.cs (290) : if (!first)
-Manager.cs (291) : privLine += "|";
-Manager.cs (292) : privLine += priv.ToString();
-Manager.cs (293) : first = false;
-Manager.cs (294) : }
-Manager.cs (295) : tw.WriteLine(privLine);
-Manager.cs (296) : }
-Manager.cs (298) : tw.WriteLine("Users:");
-Manager.cs (300) : foreach (User u in p.Users)
-Manager.cs (301) : {
-Manager.cs (302) : tw.WriteLine(u.Username + ":" + u.EncryptedPassword);
+Manager.cs (266) : try
+Manager.cs (267) : {
+Manager.cs (268) : string folder = Path.Combine(Directory.GetCurrentDirectory(), databaseName);
+Manager.cs (269) : Directory.CreateDirectory(folder);
+Manager.cs (271) : string securityFile = Path.Combine(folder, "manager.txt");
+Manager.cs (273) : using (TextWriter tw = File.CreateText(securityFile))
+Manager.cs (274) : {
+Manager.cs (275) : foreach (Profile p in Profiles)
+Manager.cs (276) : {
+Manager.cs (277) : tw.WriteLine(p.Name);
+Manager.cs (279) : foreach (string table in p.PrivilegesOn.Keys)
+Manager.cs (280) : {
+Manager.cs (281) : string privLine = table + "=";
+Manager.cs (282) : bool first = true;
+Manager.cs (283) : foreach (Privilege priv in p.PrivilegesOn[table])
+Manager.cs (284) : {
+Manager.cs (285) : if (!first)
+Manager.cs (286) : privLine += "|";
+Manager.cs (287) : privLine += priv.ToString();
+Manager.cs (288) : first = false;
+Manager.cs (289) : }
+Manager.cs (290) : tw.WriteLine(privLine);
+Manager.cs (291) : }
+Manager.cs (293) : tw.WriteLine("Users:");
+Manager.cs (295) : foreach (User u in p.Users)
+Manager.cs (296) : {
+Manager.cs (297) : tw.WriteLine(u.Username + ":" + u.EncryptedPassword);
+Manager.cs (298) : }
+Manager.cs (300) : tw.WriteLine("-------");
+Manager.cs (301) : }
+Manager.cs (302) : }
 Manager.cs (303) : }
-Manager.cs (305) : tw.WriteLine("-------");
-Manager.cs (306) : }
+Manager.cs (304) : catch
+Manager.cs (305) : {
+Manager.cs (306) : return;
 Manager.cs (307) : }
-Manager.cs (308) : }
-Manager.cs (309) : catch
-Manager.cs (310) : {
-Manager.cs (311) : return;
-Manager.cs (312) : }
 Profile.cs (38) : if (table == null || privilege == null)
 Profile.cs (39) : {
 Profile.cs (41) : }
