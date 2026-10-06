@@ -1,0 +1,1490 @@
+Utils.cs (1) : ﻿using System;
+Utils.cs (2) : using System.Globalization;
+Utils.cs (4) : namespace EDA;
+Utils.cs (6) : public class Utils
+Utils.cs (7) : {
+Utils.cs (8) : public static string ToString(double number, int numMaxDecimalDigits = 0)
+Utils.cs (9) : {
+Utils.cs (10) : double value = number;
+Utils.cs (11) : if (numMaxDecimalDigits > 0)
+Utils.cs (12) : value = Math.Round(value, numMaxDecimalDigits);
+Utils.cs (13) : return value.ToString(CultureInfo.InvariantCulture);
+Utils.cs (14) : }
+Utils.cs (16) : public static int[] Clone(int[] array)
+Utils.cs (17) : {
+Utils.cs (18) : int[] clone = new int[array.Length];
+Utils.cs (19) : for (int i= 0; i< array.Length; i++)
+Utils.cs (20) : clone[i] = array[i];
+Utils.cs (21) : return clone;
+Utils.cs (22) : }
+Utils.cs (23) : public static int[] CreateIntArray(int n)
+Utils.cs (24) : {
+Utils.cs (25) : int[] A = new int[n];
+Utils.cs (26) : Random random = new Random();
+Utils.cs (27) : for (int i = 0; i < n; i++)
+Utils.cs (28) : A[i] = random.Next(0, 100); //Choose a random number in range [0,100]
+Utils.cs (30) : return A; //return the array
+Utils.cs (31) : }
+Utils.cs (33) : public static string AsString(int[] A)
+Utils.cs (34) : {
+Utils.cs (35) : string output = "[";
+Utils.cs (37) : for (int i = 0; i < A.Length; i++)
+Utils.cs (38) : output += A[i] + ",";
+Utils.cs (39) : output = output.TrimEnd(',') + "]";
+Utils.cs (41) : return output;
+Utils.cs (42) : }
+Utils.cs (44) : public static bool IsOrdered(int[] A)
+Utils.cs (45) : {
+Utils.cs (46) : int n = A.Length;
+Utils.cs (47) : for (int i = 0; i < n - 1; i++)
+Utils.cs (48) : if (A[i] > A[i + 1])
+Utils.cs (49) : {
+Utils.cs (50) : Console.WriteLine($"Array not sorted: {AsString(A)}");
+Utils.cs (51) : return false;
+Utils.cs (52) : }
+Utils.cs (54) : return true;
+Utils.cs (55) : }
+Utils.cs (57) : public static bool IsMergeCorrect(int[] A, int[] lessThanPivot, int pivot, int[] greaterThanPivot)
+Utils.cs (58) : {
+Utils.cs (59) : int indexInMergedArray = 0;
+Utils.cs (61) : //check elements in lessThanPivot
+Utils.cs (62) : for (int i = 0; i < lessThanPivot.Length; i++)
+Utils.cs (63) : {
+Utils.cs (64) : if (A[indexInMergedArray] != lessThanPivot[i])
+Utils.cs (65) : {
+Utils.cs (66) : Console.WriteLine($"MergePartitions failed: A[{indexInMergedArray}]={A[indexInMergedArray]}, lessThanPivot[{i}]= {lessThanPivot[i]}");
+Utils.cs (67) : return false;
+Utils.cs (68) : }
+Utils.cs (69) : indexInMergedArray++;
+Utils.cs (70) : }
+Utils.cs (72) : //check pivot
+Utils.cs (73) : if (A[indexInMergedArray] != pivot)
+Utils.cs (74) : {
+Utils.cs (75) : Console.WriteLine($"MergePartitions failed: A[{indexInMergedArray}]={A[indexInMergedArray]}, pivot= {pivot}");
+Utils.cs (76) : return false;
+Utils.cs (77) : }
+Utils.cs (78) : indexInMergedArray++;
+Utils.cs (80) : //check elements in greaterThanPivot
+Utils.cs (81) : for (int i = 0; i < greaterThanPivot.Length; i++)
+Utils.cs (82) : {
+Utils.cs (83) : if (A[indexInMergedArray] != greaterThanPivot[i])
+Utils.cs (84) : {
+Utils.cs (85) : Console.WriteLine($"MergePartitions failed: A[{indexInMergedArray}]={A[indexInMergedArray]}, greaterThanPivot[{i}]= {greaterThanPivot[i]}");
+Utils.cs (86) : return false;
+Utils.cs (87) : }
+Utils.cs (88) : indexInMergedArray++;
+Utils.cs (89) : }
+Utils.cs (91) : return true;
+Utils.cs (92) : }
+Utils.cs (94) : public static bool IsPartitionCorrect(int[] A, int[] partition, int partitionStartIndex, int partitionEndIndex)
+Utils.cs (95) : {
+Utils.cs (96) : int partitionLength = partitionEndIndex - partitionStartIndex + 1;
+Utils.cs (97) : if (partition.Length != partitionLength)
+Utils.cs (98) : {
+Utils.cs (99) : Console.WriteLine($"Wrong partition size: {partition.Length} != {partitionLength}");
+Utils.cs (100) : return false;
+Utils.cs (101) : }
+Utils.cs (102) : int partitionIndex = 0;
+Utils.cs (103) : for (int i = partitionStartIndex; i <= partitionEndIndex; i++)
+Utils.cs (104) : {
+Utils.cs (105) : if (A[i] != partition[partitionIndex])
+Utils.cs (106) : {
+Utils.cs (107) : Console.WriteLine($"Partition failed:");
+Utils.cs (108) : Console.WriteLine($"A= {AsString(A)}");
+Utils.cs (109) : Console.WriteLine($"Partition({partitionStartIndex},{partitionEndIndex})= {AsString(partition)}");
+Utils.cs (110) : return false;
+Utils.cs (111) : }
+Utils.cs (112) : partitionIndex++;
+Utils.cs (113) : }
+Utils.cs (114) : return true;
+Utils.cs (115) : }
+Utils.cs (117) : public static bool IsPartitionCorrect(int[] A, int pivot, int partitionStartIndex, int partitionEndIndex)
+Utils.cs (118) : {
+Utils.cs (119) : for (int i = 0; i < A.Length; i++)
+Utils.cs (120) : {
+Utils.cs (121) : if (i < pivot && A[i] >= A[pivot])
+Utils.cs (122) : {
+Utils.cs (123) : Console.WriteLine($"Partition failed:");
+Utils.cs (124) : Console.WriteLine($"A= {AsString(A)}, Pivot= {pivot}");
+Utils.cs (125) : Console.WriteLine($"A[{i}]= {A[i]}, A[{pivot}] = {A[pivot]}");
+Utils.cs (126) : return false;
+Utils.cs (127) : }
+Utils.cs (128) : else if (i > pivot && A[i] < pivot)
+Utils.cs (129) : {
+Utils.cs (130) : Console.WriteLine($"Partition failed:");
+Utils.cs (131) : Console.WriteLine($"A= {AsString(A)}, Pivot= {pivot}");
+Utils.cs (132) : Console.WriteLine($"A[{i}]= {A[i]}, A[{pivot}] = {A[pivot]}");
+Utils.cs (133) : }
+Utils.cs (134) : }
+Utils.cs (136) : return true;
+Utils.cs (137) : }
+Utils.cs (139) : public static bool IsPartitionCorrect(int[] A, int[] lessThanPivot, int pivot, int[] greaterThanPivot)
+Utils.cs (140) : {
+Utils.cs (141) : if (lessThanPivot.Length + greaterThanPivot.Length + 1 != A.Length)
+Utils.cs (142) : {
+Utils.cs (143) : Console.WriteLine($"Wrong partition size: {lessThanPivot.Length}+{greaterThanPivot.Length}+1 != {A.Length}");
+Utils.cs (144) : return false;
+Utils.cs (145) : }
+Utils.cs (146) : for (int i = 0; i < lessThanPivot.Length; i++)
+Utils.cs (147) : if (A[pivot] <= lessThanPivot[i])
+Utils.cs (148) : {
+Utils.cs (149) : Console.WriteLine($"ElementsLessThan failed: {lessThanPivot[i]} < {A[pivot]}");
+Utils.cs (150) : return false;
+Utils.cs (151) : }
+Utils.cs (152) : for (int i = 0; i < greaterThanPivot.Length; i++)
+Utils.cs (153) : if (A[pivot] > greaterThanPivot[i])
+Utils.cs (154) : {
+Utils.cs (155) : Console.WriteLine($"ElementsGreaterThan failed: {greaterThanPivot[i]} > {A[pivot]}");
+Utils.cs (156) : return false;
+Utils.cs (157) : }
+Utils.cs (158) : Console.WriteLine("OK");
+Utils.cs (159) : return true;
+Utils.cs (160) : }
+Utils.cs (162) : public static void Swap(int[] A, int index1, int index2)
+Utils.cs (163) : {
+Utils.cs (164) : int tmp = A[index1];
+Utils.cs (165) : A[index1] = A[index2];
+Utils.cs (166) : A[index2] = tmp;
+Utils.cs (167) : }
+Utils.cs (169) : public static int Sum(int[] A, int index1, int index2)
+Utils.cs (170) : {
+Utils.cs (171) : int sum = 0;
+Utils.cs (173) : for (int i = index1; i <= index2; i++)
+Utils.cs (174) : sum += A[i];
+Utils.cs (176) : return sum;
+Utils.cs (177) : }
+Utils.cs (178) : }
+BinaryTreeDictionary.cs (2) : using System;
+BinaryTreeDictionary.cs (3) : namespace EDA;
+BinaryTreeDictionary.cs (5) : public class BinaryTreeDictionary<TKey, TValue> : EDA.IDictionary<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTreeDictionary.cs (6) : {
+BinaryTreeDictionary.cs (7) : //TODO #4.1: Add a member variable (attribute) of type BinaryTree and name 'Tree'
+BinaryTreeDictionary.cs (8) : //
+BinaryTreeDictionary.cs (9) : //public [USE BinaryTree HERE] Tree;
+BinaryTreeDictionary.cs (12) : public BinaryTreeDictionary()
+BinaryTreeDictionary.cs (13) : {
+BinaryTreeDictionary.cs (14) : //TODO #4.2: Initialize anything that needs initialization
+BinaryTreeDictionary.cs (16) : }
+BinaryTreeDictionary.cs (18) : public override string ToString()
+BinaryTreeDictionary.cs (19) : {
+BinaryTreeDictionary.cs (20) : //TODO #4.3: Use the implementation of BinaryTree
+BinaryTreeDictionary.cs (21) : return null;
+BinaryTreeDictionary.cs (23) : }
+BinaryTreeDictionary.cs (25) : public int Count()
+BinaryTreeDictionary.cs (26) : {
+BinaryTreeDictionary.cs (27) : //TODO #4.4: Return the number of items
+BinaryTreeDictionary.cs (28) : return 0;
+BinaryTreeDictionary.cs (30) : }
+BinaryTreeDictionary.cs (32) : public TValue Get(TKey key)
+BinaryTreeDictionary.cs (33) : {
+BinaryTreeDictionary.cs (34) : //TODO #4.5: Return the value of the item with that key, default if not found
+BinaryTreeDictionary.cs (36) : return default(TValue);
+BinaryTreeDictionary.cs (38) : }
+BinaryTreeDictionary.cs (40) : public void Add(TKey key, TValue value)
+BinaryTreeDictionary.cs (41) : {
+BinaryTreeDictionary.cs (42) : //TODO #4.6: Add to the tree an item with the given key/value
+BinaryTreeDictionary.cs (44) : }
+BinaryTreeDictionary.cs (46) : public void Remove(TKey key)
+BinaryTreeDictionary.cs (47) : {
+BinaryTreeDictionary.cs (48) : //TODO #4.7: Remove the item with this key
+BinaryTreeDictionary.cs (50) : }
+BinaryTreeDictionary.cs (52) : public TKey[] Keys()
+BinaryTreeDictionary.cs (53) : {
+BinaryTreeDictionary.cs (54) : //TODO #4.8: Return an array with all the keys in the dictionary. The length of the array needs to be equal
+BinaryTreeDictionary.cs (55) : //to the number of elements in the dictionary
+BinaryTreeDictionary.cs (56) : return null;
+BinaryTreeDictionary.cs (58) : }
+BinaryTreeDictionary.cs (60) : public TValue[] Values()
+BinaryTreeDictionary.cs (61) : {
+BinaryTreeDictionary.cs (62) : //TODO #4.9: Return an array with all the values in the dictionary. The length of the array needs to be equal
+BinaryTreeDictionary.cs (63) : //to the number of elements in the dictionary
+BinaryTreeDictionary.cs (64) : return null;
+BinaryTreeDictionary.cs (66) : }
+BinaryTreeDictionary.cs (67) : }
+DictionaryReaderWriter.cs (1) : using System;
+DictionaryReaderWriter.cs (2) : using System.IO;
+DictionaryReaderWriter.cs (3) : using System.Text;
+DictionaryReaderWriter.cs (5) : namespace EDA;
+DictionaryReaderWriter.cs (7) : public class DictionaryReaderWriter
+DictionaryReaderWriter.cs (8) : {
+DictionaryReaderWriter.cs (9) : private string EncodeString(string str) => str.Replace("\n", "[NEW_LINE]");
+DictionaryReaderWriter.cs (10) : private string DecodeString(string str) => str.Replace("[NEW_LINE]", "\n");
+DictionaryReaderWriter.cs (11) : public bool Write<TKey,TValue>(IDictionary<TKey,TValue> dictionary, string filename,
+DictionaryReaderWriter.cs (12) : Func<TKey, string> keyToString, Func<TValue, string> valueToString)
+DictionaryReaderWriter.cs (13) : {
+DictionaryReaderWriter.cs (14) : try
+DictionaryReaderWriter.cs (15) : {
+DictionaryReaderWriter.cs (16) : TextWriter writer = File.CreateText(filename);
+DictionaryReaderWriter.cs (18) : //TODO #4.21: Write in the file the keys and values, one by one: a key in a line, its value on the following line
+DictionaryReaderWriter.cs (19) : //Example: If the dictionary has the key/value pairs 1234->4.25 and 2133->1.35, then the content of the file will be:
+DictionaryReaderWriter.cs (20) : //1234
+DictionaryReaderWriter.cs (21) : //4.25
+DictionaryReaderWriter.cs (22) : //2133
+DictionaryReaderWriter.cs (23) : //1.35
+DictionaryReaderWriter.cs (24) : //Because we don't know what type keys and values are, we need to call keyToString(key) to convert the key to string and
+DictionaryReaderWriter.cs (25) : //valueToString(value) to convert the value to string
+DictionaryReaderWriter.cs (28) : writer.Close();
+DictionaryReaderWriter.cs (30) : return true;
+DictionaryReaderWriter.cs (31) : }
+DictionaryReaderWriter.cs (32) : catch { return false; }
+DictionaryReaderWriter.cs (33) : }
+DictionaryReaderWriter.cs (35) : public bool Read<TKey, TValue>(IDictionary<TKey, TValue> dictionary, string filename,
+DictionaryReaderWriter.cs (36) : Func<string,TKey> stringToKey, Func<string,TValue> valueToKey)
+DictionaryReaderWriter.cs (37) : {
+DictionaryReaderWriter.cs (38) : try
+DictionaryReaderWriter.cs (39) : {
+DictionaryReaderWriter.cs (40) : TextReader reader = File.OpenText(filename);
+DictionaryReaderWriter.cs (42) : //TODO #4.22: Read the keys and values one by one and add them to the given dictionary. Use the same format as the Write() above
+DictionaryReaderWriter.cs (43) : //Once a key is read from the file, it needs to be converted to string using stringToKey(line). For the value, valueToKey(line)
+DictionaryReaderWriter.cs (46) : reader.Close();
+DictionaryReaderWriter.cs (48) : return true;
+DictionaryReaderWriter.cs (49) : }
+DictionaryReaderWriter.cs (50) : catch { return false; }
+DictionaryReaderWriter.cs (51) : }
+DictionaryReaderWriter.cs (52) : }
+HashTableDictionary.cs (2) : using System;
+HashTableDictionary.cs (4) : namespace EDA;
+HashTableDictionary.cs (5) : public class HashTableDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+HashTableDictionary.cs (6) : {
+HashTableDictionary.cs (7) : int DefaultNumEntries = 10000;
+HashTableDictionary.cs (8) : int NumElements = 0;
+HashTableDictionary.cs (9) : //TODO #4.10: Add a member variable (attribute) of type "array of lists of HashTableDictionaryItem<TKey,TValue>" and name 'Entries'
+HashTableDictionary.cs (10) : //[USE List and HashTableDictionaryItem HERE] [] Entries;
+HashTableDictionary.cs (14) : public HashTableDictionary()
+HashTableDictionary.cs (15) : {
+HashTableDictionary.cs (16) : //TODO #4.11: Initialize Entries with an array of size DefaultNumEntries
+HashTableDictionary.cs (18) : }
+HashTableDictionary.cs (20) : public HashTableDictionary(int numEntries)
+HashTableDictionary.cs (21) : {
+HashTableDictionary.cs (22) : //TODO #4.12: Initialize Entries with a specific number of entries (numEntries)
+HashTableDictionary.cs (24) : }
+HashTableDictionary.cs (26) : public override string ToString()
+HashTableDictionary.cs (27) : {
+HashTableDictionary.cs (28) : string output = null;
+HashTableDictionary.cs (30) : //TODO #4.13: Uncomment the code below
+HashTableDictionary.cs (32) : //for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (33) : //{
+HashTableDictionary.cs (34) : //    if (Entries[i] != null)
+HashTableDictionary.cs (35) : //    {
+HashTableDictionary.cs (36) : //        for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (37) : //        {
+HashTableDictionary.cs (38) : //            HashTableDictionaryItem<TKey, TValue> entry = Entries[i].Get(j);
+HashTableDictionary.cs (39) : //            output += entry.ToString();
+HashTableDictionary.cs (40) : //        }
+HashTableDictionary.cs (41) : //    }
+HashTableDictionary.cs (42) : //}
+HashTableDictionary.cs (45) : return output;
+HashTableDictionary.cs (46) : }
+HashTableDictionary.cs (48) : public int Count()
+HashTableDictionary.cs (49) : {
+HashTableDictionary.cs (50) : //TODO #4.14: Return the number of elements (NumElements: make sure this member variable/attribute is updated when the number of elements changes)
+HashTableDictionary.cs (51) : return 0;
+HashTableDictionary.cs (53) : }
+HashTableDictionary.cs (55) : public int PositionOf(TKey key)
+HashTableDictionary.cs (56) : {
+HashTableDictionary.cs (57) : //TODO #4.15:  Calculate in which entry should this key be stored and return it (use key.GetHashCode() to calculate the hash function of the key)
+HashTableDictionary.cs (58) : //          Note:  GetHashCode() returns very large integer numbers, but we need to map this value to the range [0, Entries.Length-1]
+HashTableDictionary.cs (59) : return -1;
+HashTableDictionary.cs (61) : }
+HashTableDictionary.cs (63) : public TValue Get(TKey key)
+HashTableDictionary.cs (64) : {
+HashTableDictionary.cs (65) : //TODO #4.16:  Using PositionOf, calculate where this key should be in the array of entries and, then,
+HashTableDictionary.cs (66) : //          find the item with this key on the list, and return its value
+HashTableDictionary.cs (68) : return default(TValue);
+HashTableDictionary.cs (69) : }
+HashTableDictionary.cs (71) : public void Add(TKey key, TValue value)
+HashTableDictionary.cs (72) : {
+HashTableDictionary.cs (73) : //TODO #4.17:  Using PositionOf, calculate where this key should be in the array of entries. Then, look for the item on the list.
+HashTableDictionary.cs (74) : //          - If the item is not found, add a new item to the list with the given key/value
+HashTableDictionary.cs (75) : //          - If the item is found, just update its value
+HashTableDictionary.cs (77) : }
+HashTableDictionary.cs (79) : public void Remove(TKey key)
+HashTableDictionary.cs (80) : {
+HashTableDictionary.cs (81) : //TODO #4.18: Using Position, calculate where this key should be in the array of entries. Then, look for the item on the list.
+HashTableDictionary.cs (82) : //         - If the item is not found, do nothing
+HashTableDictionary.cs (83) : //         - If the item is found, remove it from the list and return
+HashTableDictionary.cs (85) : }
+HashTableDictionary.cs (87) : public TKey[] Keys()
+HashTableDictionary.cs (88) : {
+HashTableDictionary.cs (89) : //TODO #4.19: Return all the keys (not necessarily ordered) in an array
+HashTableDictionary.cs (90) : //         If there is no element, it should return an empty array (size=0)
+HashTableDictionary.cs (91) : return null;
+HashTableDictionary.cs (93) : }
+HashTableDictionary.cs (95) : public TValue[] Values()
+HashTableDictionary.cs (96) : {
+HashTableDictionary.cs (97) : //TODO #4.20: Return all the values (in the same order as the keys) in an array
+HashTableDictionary.cs (98) : //         If there is no element, it should return an empty array (size=0)
+HashTableDictionary.cs (99) : return null;
+HashTableDictionary.cs (101) : }
+HashTableDictionary.cs (102) : }
+HashTableDictionaryItem.cs (1) : namespace EDA;
+HashTableDictionaryItem.cs (2) : public class HashTableDictionaryItem<TKey, TValue>
+HashTableDictionaryItem.cs (3) : {
+HashTableDictionaryItem.cs (4) : public TKey Key;
+HashTableDictionaryItem.cs (5) : public TValue Value;
+HashTableDictionaryItem.cs (7) : public HashTableDictionaryItem(TKey key, TValue value)
+HashTableDictionaryItem.cs (8) : {
+HashTableDictionaryItem.cs (9) : Key = key;
+HashTableDictionaryItem.cs (10) : Value = value;
+HashTableDictionaryItem.cs (11) : }
+HashTableDictionaryItem.cs (13) : public override string ToString()
+HashTableDictionaryItem.cs (14) : {
+HashTableDictionaryItem.cs (15) : if (!Key.Equals(default(TKey)))
+HashTableDictionaryItem.cs (16) : return $"[{Key}->{Value}]\n";
+HashTableDictionaryItem.cs (17) : else
+HashTableDictionaryItem.cs (18) : return null;
+HashTableDictionaryItem.cs (19) : }
+HashTableDictionaryItem.cs (20) : }
+IDictionary.cs (1) : ﻿using System;
+IDictionary.cs (2) : using System.Text;
+IDictionary.cs (4) : namespace EDA;
+IDictionary.cs (6) : public interface IDictionary<TKey,TValue>
+IDictionary.cs (7) : {
+IDictionary.cs (8) : int Count();
+IDictionary.cs (9) : TValue Get(TKey key);
+IDictionary.cs (10) : void Add(TKey key, TValue value);
+IDictionary.cs (11) : void Remove(TKey key);
+IDictionary.cs (13) : public TKey[] Keys();
+IDictionary.cs (15) : public TValue[] Values();
+IDictionary.cs (16) : }
+BinaryGraphReaderWriter.cs (1) : using System;
+BinaryGraphReaderWriter.cs (2) : using System.IO;
+BinaryGraphReaderWriter.cs (3) : using System.Linq;
+BinaryGraphReaderWriter.cs (5) : namespace EDA
+BinaryGraphReaderWriter.cs (6) : {
+BinaryGraphReaderWriter.cs (7) : public class BinaryGraphReaderWriter
+BinaryGraphReaderWriter.cs (8) : {
+BinaryGraphReaderWriter.cs (10) : public bool Write<TKey, TWeight>(UndirectedGraph<TKey, TWeight> graph, string filename,
+BinaryGraphReaderWriter.cs (11) : Func<TKey, byte[]> keyToByteArray, Func<TWeight, byte[]> weightToByteArray) where TKey : IComparable<TKey>
+BinaryGraphReaderWriter.cs (12) : {
+BinaryGraphReaderWriter.cs (13) : try
+BinaryGraphReaderWriter.cs (14) : {
+BinaryGraphReaderWriter.cs (15) : BinaryWriter writer = new BinaryWriter(File.Open(filename, FileMode.Create));
+BinaryGraphReaderWriter.cs (17) : //TODO #5.27: Write in the following order:
+BinaryGraphReaderWriter.cs (18) : // -The number of vertices
+BinaryGraphReaderWriter.cs (19) : // -Each of the vertex keys (converted to byte[] with keyToByteArray)
+BinaryGraphReaderWriter.cs (20) : // -The number of edges
+BinaryGraphReaderWriter.cs (21) : // -For each of the edges:
+BinaryGraphReaderWriter.cs (22) : //  -The key of the source
+BinaryGraphReaderWriter.cs (23) : //  -The weight of the edge
+BinaryGraphReaderWriter.cs (24) : //  -The key of the destination
+BinaryGraphReaderWriter.cs (25) : //Note: before write an array of bytes representing a key or a value, you need to write the number of bytes
+BinaryGraphReaderWriter.cs (26) : //This way, when you read it back in Read(), you first read the number of bytes and then you know how many bytes to read
+BinaryGraphReaderWriter.cs (29) : writer.Close();
+BinaryGraphReaderWriter.cs (31) : return true;
+BinaryGraphReaderWriter.cs (32) : }
+BinaryGraphReaderWriter.cs (33) : catch (Exception ex)
+BinaryGraphReaderWriter.cs (34) : {
+BinaryGraphReaderWriter.cs (35) : return false;
+BinaryGraphReaderWriter.cs (36) : }
+BinaryGraphReaderWriter.cs (37) : }
+BinaryGraphReaderWriter.cs (39) : public bool Read<TKey, TWeight>(UndirectedGraph<TKey, TWeight> graph, string filename,
+BinaryGraphReaderWriter.cs (40) : Func<byte[], TKey> keyFromByteArray, Func<byte[], TWeight> weightFromByteArray) where TKey : IComparable<TKey>
+BinaryGraphReaderWriter.cs (41) : {
+BinaryGraphReaderWriter.cs (42) : try
+BinaryGraphReaderWriter.cs (43) : {
+BinaryGraphReaderWriter.cs (44) : BinaryReader reader = new BinaryReader(File.Open(filename, FileMode.Open));
+BinaryGraphReaderWriter.cs (46) : //TODO #5.28: Read all the vertices in the same order as we wrote the information in Write:
+BinaryGraphReaderWriter.cs (47) : // -The number of vertices
+BinaryGraphReaderWriter.cs (48) : // -The vertex keys (read with keyFromFileStream)
+BinaryGraphReaderWriter.cs (49) : // -The number of edges
+BinaryGraphReaderWriter.cs (50) : // -For each of the edges:
+BinaryGraphReaderWriter.cs (51) : //  -The key of the source (read with keyFromFileStream)
+BinaryGraphReaderWriter.cs (52) : //  -The weight of the edge (read with weightFromFileStream)
+BinaryGraphReaderWriter.cs (53) : //  -The key of the destination (read with keyFromFileStream)
+BinaryGraphReaderWriter.cs (55) : reader.Close();
+BinaryGraphReaderWriter.cs (57) : return true;
+BinaryGraphReaderWriter.cs (58) : }
+BinaryGraphReaderWriter.cs (59) : catch (Exception ex)
+BinaryGraphReaderWriter.cs (60) : {
+BinaryGraphReaderWriter.cs (61) : return false;
+BinaryGraphReaderWriter.cs (62) : }
+BinaryGraphReaderWriter.cs (63) : }
+BinaryGraphReaderWriter.cs (64) : }
+BinaryGraphReaderWriter.cs (65) : }
+DirectedGraph.cs (1) : using System;
+DirectedGraph.cs (2) : namespace EDA;
+DirectedGraph.cs (4) : public class DirectedGraph<TElement, TWeight> : UndirectedGraph<TElement, TWeight> where TElement : IComparable<TElement>
+DirectedGraph.cs (5) : {
+DirectedGraph.cs (6) : public override void AddEdge(TElement sourceKey, TElement destinationKey, TWeight weight)
+DirectedGraph.cs (7) : {
+DirectedGraph.cs (8) : //TODO #5.20: Add a directed edge from source to destination
+DirectedGraph.cs (10) : }
+DirectedGraph.cs (12) : public override void RemoveVertex(TElement element)
+DirectedGraph.cs (13) : {
+DirectedGraph.cs (14) : //TODO #5.21: Remove the vertex that contains this element and any edge that starts from or ends on that vertex
+DirectedGraph.cs (15) : //Note: You might need to optimize this method later to pass the performance tests
+DirectedGraph.cs (17) : }
+DirectedGraph.cs (19) : public override void RemoveEdge(TElement sourceKey, TElement destKey)
+DirectedGraph.cs (20) : {
+DirectedGraph.cs (21) : //TODO #5.22: Remove the edge from the source vertex to the destination vertex
+DirectedGraph.cs (23) : }
+DirectedGraph.cs (24) : }
+DistanceCalculator.cs (1) : using System;
+DistanceCalculator.cs (2) : namespace EDA;
+DistanceCalculator.cs (5) : public class DistanceCalculator
+DistanceCalculator.cs (6) : {
+DistanceCalculator.cs (7) : //TODO #5.29: Declare a graph as a member-variable/attribute. We will store here the names of the cities and the distances between them
+DistanceCalculator.cs (10) : public DistanceCalculator(bool isUndirected)
+DistanceCalculator.cs (11) : {
+DistanceCalculator.cs (12) : //TODO #5.30: Initialize the graph used to store the cities/distances. If isUndirected, use an undirected graph. Otherwise, a directed
+DistanceCalculator.cs (14) : }
+DistanceCalculator.cs (16) : public void AddCity(string city)
+DistanceCalculator.cs (17) : {
+DistanceCalculator.cs (18) : //TODO #5.31: Add to the graph a vertex with the name of this city. This method will be called several times before calling CalculateDistances()
+DistanceCalculator.cs (20) : }
+DistanceCalculator.cs (22) : public void AddDistance(string fromCity, string toCity, double distance)
+DistanceCalculator.cs (23) : {
+DistanceCalculator.cs (24) : //TODO #5.32: Set the distance between these two cities in the graph. These cities should already be in the graph. This method will be called several times before calling CalculateDistances()
+DistanceCalculator.cs (26) : }
+DistanceCalculator.cs (29) : private string ChooseNextUnvisitedCity(IDictionary<string, bool> visited, IDictionary<string, double> nextCityCandidates)
+DistanceCalculator.cs (30) : {
+DistanceCalculator.cs (31) : //TODO #5.33: Choose the candidate with the minimum distance from nextCityCandidates that hasn't been visited yet
+DistanceCalculator.cs (32) : //We will use this method in CalculateDistances()
+DistanceCalculator.cs (33) : return null;
+DistanceCalculator.cs (35) : }
+DistanceCalculator.cs (37) : private void CheckNeighbours(IDictionary<string, double> distanceToCity, IDictionary<string, bool> visited,
+DistanceCalculator.cs (38) : IDictionary<string, double> nextCityCandidates, string currentCity)
+DistanceCalculator.cs (39) : {
+DistanceCalculator.cs (40) : //TODO #5.34: Add to nextCityCandidates all the neighbours of the currentCity, updating their distances in distanceToCity too
+DistanceCalculator.cs (41) : //We will use this method in CalculateDistances()
+DistanceCalculator.cs (43) : }
+DistanceCalculator.cs (45) : public IDictionary<string, double> CalculateDistances(string fromCity)
+DistanceCalculator.cs (46) : {
+DistanceCalculator.cs (47) : //TODO #5.35: Add one of the two dictionary classes to this project before implementing this method
+DistanceCalculator.cs (48) : //Calculate the distance to each city in the graph from fromCity.The result is a binary tree where the key is the city and the value the distance
+DistanceCalculator.cs (49) : //          a) Initialize variables: distanceToCity<string,double>, visited<string,bool> and nextCityCandidates<string,double>, currentCity
+DistanceCalculator.cs (50) : //          b) While currentyCity != null
+DistanceCalculator.cs (51) : //          b.1)    Find candidates for next step calculating (updating nextCityCandidates) -> USE CheckNeighbours()
+DistanceCalculator.cs (52) : //          b.2)    Select the next city (the one with the min distance in nextCityCandidates) and update currentCity -> USE ChooseNextUnvisitedCity()
+DistanceCalculator.cs (53) : return null;
+DistanceCalculator.cs (55) : }
+DistanceCalculator.cs (56) : }
+GraphReaderWriter.cs (1) : using System;
+GraphReaderWriter.cs (2) : using System.IO;
+GraphReaderWriter.cs (4) : namespace EDA
+GraphReaderWriter.cs (5) : {
+GraphReaderWriter.cs (6) : public class GraphReaderWriter
+GraphReaderWriter.cs (7) : {
+GraphReaderWriter.cs (8) : private string EncodeString(string str)
+GraphReaderWriter.cs (9) : {
+GraphReaderWriter.cs (10) : //TODO #5.23: Replace all separators and special characters used in your file by some improbable tag (i.e, "[NEW_LINE]")
+GraphReaderWriter.cs (12) : return str;
+GraphReaderWriter.cs (14) : }
+GraphReaderWriter.cs (15) : private string DecodeString(string str)
+GraphReaderWriter.cs (16) : {
+GraphReaderWriter.cs (17) : //TODO #5.24: Replace your special tags (i.e, "NEW_LINE") by the original separator before encoding it
+GraphReaderWriter.cs (19) : return str;
+GraphReaderWriter.cs (21) : }
+GraphReaderWriter.cs (22) : public bool Write<TKey, TWeight>(UndirectedGraph<TKey, TWeight> graph, string filename,
+GraphReaderWriter.cs (23) : Func<TKey, string> keyToString, Func<TWeight, string> weightToString) where TKey : IComparable<TKey>
+GraphReaderWriter.cs (24) : {
+GraphReaderWriter.cs (25) : try
+GraphReaderWriter.cs (26) : {
+GraphReaderWriter.cs (27) : TextWriter writer = File.CreateText(filename);
+GraphReaderWriter.cs (29) : //TODO #5.25: Write first all the vertices as strings (one line each), then one empty line, and then each of the edges with the format "A->1->B" (one line each)
+GraphReaderWriter.cs (32) : writer.Close();
+GraphReaderWriter.cs (34) : return true;
+GraphReaderWriter.cs (35) : }
+GraphReaderWriter.cs (36) : catch (Exception ex)
+GraphReaderWriter.cs (37) : {
+GraphReaderWriter.cs (38) : return false;
+GraphReaderWriter.cs (39) : }
+GraphReaderWriter.cs (40) : }
+GraphReaderWriter.cs (42) : public bool Read<TKey, TWeight>(UndirectedGraph<TKey, TWeight> graph, string filename,
+GraphReaderWriter.cs (43) : Func<string, TKey> stringToKey, Func<string, TWeight> stringToWeight) where TKey : IComparable<TKey>
+GraphReaderWriter.cs (44) : {
+GraphReaderWriter.cs (45) : try
+GraphReaderWriter.cs (46) : {
+GraphReaderWriter.cs (47) : TextReader reader = File.OpenText(filename);
+GraphReaderWriter.cs (49) : //TODO #5.26: Read all the vertices first and, when you find an empty line, start reading edges
+GraphReaderWriter.cs (50) : //Edges will have the format "A->1->B", so you need to use line.Split("->") to receive the three different parts in an array
+GraphReaderWriter.cs (52) : reader.Close();
+GraphReaderWriter.cs (54) : return true;
+GraphReaderWriter.cs (55) : }
+GraphReaderWriter.cs (56) : catch (Exception ex)
+GraphReaderWriter.cs (57) : {
+GraphReaderWriter.cs (58) : return false;
+GraphReaderWriter.cs (59) : }
+GraphReaderWriter.cs (60) : }
+GraphReaderWriter.cs (61) : }
+GraphReaderWriter.cs (62) : }
+UnDirectedGraph.cs (1) : using System;
+UnDirectedGraph.cs (2) : namespace EDA;
+UnDirectedGraph.cs (5) : public class UndirectedGraph<TElement, TWeight> where TElement : IComparable<TElement>
+UnDirectedGraph.cs (6) : {
+UnDirectedGraph.cs (7) : //TODO #5.9:  Declare a PROTECTED member variable/attribute called Vertices. Should store vertices of type Vertex<> in a way that a vertex can be quickly
+UnDirectedGraph.cs (8) : //          found given an element. (Look in Vertex.cs for TODO #5.1)
+UnDirectedGraph.cs (9) : //          We want it to be PROTECTED because we only want it to be accessible from the subclass DirectedGraph
+UnDirectedGraph.cs (12) : public override string ToString()
+UnDirectedGraph.cs (13) : {
+UnDirectedGraph.cs (14) : //TODO #5.10: Concatenate all vertices (converted to string) separated by a new line ("\n")
+UnDirectedGraph.cs (15) : string output = null;
+UnDirectedGraph.cs (18) : return output;
+UnDirectedGraph.cs (19) : }
+UnDirectedGraph.cs (21) : public TElement[] Elements()
+UnDirectedGraph.cs (22) : {
+UnDirectedGraph.cs (23) : //TODO #5.11: Return all the elements in this graph (stored inside the vertices) as an array
+UnDirectedGraph.cs (25) : return null;
+UnDirectedGraph.cs (27) : }
+UnDirectedGraph.cs (29) : public void AddVertex(TElement element)
+UnDirectedGraph.cs (30) : {
+UnDirectedGraph.cs (31) : //TODO #5.12: Add a new element storing it as a vertex in this graph
+UnDirectedGraph.cs (33) : }
+UnDirectedGraph.cs (35) : public virtual void AddEdge(TElement source, TElement destination, TWeight weight)
+UnDirectedGraph.cs (36) : {
+UnDirectedGraph.cs (37) : //TODO #5.13: Add a new edge between source and destination with the given weight
+UnDirectedGraph.cs (39) : }
+UnDirectedGraph.cs (41) : public int VertexCount()
+UnDirectedGraph.cs (42) : {
+UnDirectedGraph.cs (43) : //TODO #5.14: Return the number of vertices in this graph
+UnDirectedGraph.cs (44) : //After doing this, you can start running tests to check that what you have done so far is correct
+UnDirectedGraph.cs (46) : return 0;
+UnDirectedGraph.cs (48) : }
+UnDirectedGraph.cs (50) : public int EdgeCount()
+UnDirectedGraph.cs (51) : {
+UnDirectedGraph.cs (52) : //TODO #5.15: Return the number of edges. Edges are stored in each vertex, so vertices need to be traversed to count edges
+UnDirectedGraph.cs (54) : return 0;
+UnDirectedGraph.cs (56) : }
+UnDirectedGraph.cs (58) : public TWeight GetEdgeWeight(TElement source, TElement destination)
+UnDirectedGraph.cs (59) : {
+UnDirectedGraph.cs (60) : //TODO #5.16: Return the number of edges. Edges are stored in each vertex, so vertices need to be traversed to count edges
+UnDirectedGraph.cs (62) : return default;
+UnDirectedGraph.cs (64) : }
+UnDirectedGraph.cs (66) : public virtual void RemoveEdge(TElement source, TElement destination)
+UnDirectedGraph.cs (67) : {
+UnDirectedGraph.cs (68) : //TODO #5.17: Remove any edge from source to destination
+UnDirectedGraph.cs (70) : }
+UnDirectedGraph.cs (72) : public virtual void RemoveVertex(TElement element)
+UnDirectedGraph.cs (73) : {
+UnDirectedGraph.cs (74) : //TODO #5.18: Remove the vertex that contains element and any edge that starts from or ends on that vertex
+UnDirectedGraph.cs (76) : }
+UnDirectedGraph.cs (78) : public Vertex<TElement, TWeight> GetVertex(TElement element)
+UnDirectedGraph.cs (79) : {
+UnDirectedGraph.cs (80) : //TODO #5.19: Return the vertex that contains the given element
+UnDirectedGraph.cs (81) : return default;
+UnDirectedGraph.cs (83) : }
+UnDirectedGraph.cs (84) : }
+Vertex.cs (1) : using System;
+Vertex.cs (2) : namespace EDA;
+Vertex.cs (3) : public class Vertex<TElement, TWeight> where TElement : IComparable<TElement>
+Vertex.cs (4) : {
+Vertex.cs (5) : public TElement Element;
+Vertex.cs (6) : //TODO #5.1: Store edges starting from this vertex. Each edge has a weight and we want to be able to quickly find the edge to any other vertex
+Vertex.cs (9) : public Vertex(TElement element)
+Vertex.cs (10) : {
+Vertex.cs (11) : //TODO #5.2: Initialize the vertex
+Vertex.cs (13) : }
+Vertex.cs (15) : public TElement[] ConnectedElements()
+Vertex.cs (16) : {
+Vertex.cs (17) : //TODO #5.3: Return the target vertices of the edges starting from this vertex
+Vertex.cs (18) : return null;
+Vertex.cs (20) : }
+Vertex.cs (22) : public void AddEdge(TElement targetElement, TWeight weight)
+Vertex.cs (23) : {
+Vertex.cs (24) : //TODO #5.4: Add an edge from this vertex to targetElement with the given weight
+Vertex.cs (26) : }
+Vertex.cs (28) : public int EdgeCount()
+Vertex.cs (29) : {
+Vertex.cs (30) : //TODO #5.5: Return the number of edges starting from this vertex
+Vertex.cs (31) : return 0;
+Vertex.cs (33) : }
+Vertex.cs (35) : public void RemoveEdge(TElement targetElement)
+Vertex.cs (36) : {
+Vertex.cs (37) : //TODO #5.6: Remove the edge connecting this vertex to the vertex containing targetElement
+Vertex.cs (39) : }
+Vertex.cs (41) : public TWeight GetEdgeWeight(TElement targetElement)
+Vertex.cs (42) : {
+Vertex.cs (43) : //TODO #5.7: Return the weight of the edge from this vertex to the vertex containing targetElement
+Vertex.cs (44) : return default(TWeight);
+Vertex.cs (46) : }
+Vertex.cs (49) : public override string ToString()
+Vertex.cs (50) : {
+Vertex.cs (51) : //TODO #5.8:  Represent the edges in this vertex with the following format. In the example, there are three edges (from this -A- vertex to B, C and D):
+Vertex.cs (52) : //
+Vertex.cs (53) : //          A->2.5->B
+Vertex.cs (54) : //          A->-3.2->C
+Vertex.cs (55) : //          A->7.32->D
+Vertex.cs (56) : string output = null;
+Vertex.cs (58) : return output;
+Vertex.cs (59) : }
+Vertex.cs (60) : }
+ArrayList.cs (1) : namespace EDA;
+ArrayList.cs (3) : public class ArrayList<T> : IList<T>
+ArrayList.cs (4) : {
+ArrayList.cs (5) : T[] Values = new T[10];
+ArrayList.cs (6) : int NumElements = 0;
+ArrayList.cs (10) : public ArrayList(int n = 10)
+ArrayList.cs (11) : {
+ArrayList.cs (12) : Values = new T[n];
+ArrayList.cs (13) : Clear();
+ArrayList.cs (14) : }
+ArrayList.cs (15) : public override string ToString()
+ArrayList.cs (16) : {
+ArrayList.cs (18) : string output = "[";
+ArrayList.cs (20) : for (int i = 0; i < Count(); i++)
+ArrayList.cs (21) : output += Values[i].ToString() + ",";
+ArrayList.cs (22) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+ArrayList.cs (24) : return output;
+ArrayList.cs (26) : }
+ArrayList.cs (28) : public int Count()
+ArrayList.cs (29) : {
+ArrayList.cs (30) : //TODO #2.20: return the number of elements on the list
+ArrayList.cs (32) : return 0;
+ArrayList.cs (34) : }
+ArrayList.cs (36) : public T Get(int index)
+ArrayList.cs (37) : {
+ArrayList.cs (38) : //TODO #2.21: return the element on the index-th position. O if the position is out of bounds
+ArrayList.cs (40) : return default(T);
+ArrayList.cs (42) : }
+ArrayList.cs (44) : public void Add(T value)
+ArrayList.cs (45) : {
+ArrayList.cs (46) : //TODO #2.22: add a new integer to the end of the list.
+ArrayList.cs (47) : //[After #11 -> If there is no place, resize (double the size) and add]
+ArrayList.cs (49) : }
+ArrayList.cs (53) : public T Remove(int index)
+ArrayList.cs (54) : {
+ArrayList.cs (55) : //TODO #2.23: remove the element on the index-th position. Do nothing if position is out of bounds
+ArrayList.cs (56) : //Return the removed item, -1 if the position is incorrect
+ArrayList.cs (58) : return default(T);
+ArrayList.cs (60) : }
+ArrayList.cs (62) : public void Clear()
+ArrayList.cs (63) : {
+ArrayList.cs (64) : //TODO #2.24: remove all the elements on the list
+ArrayList.cs (66) : }
+ArrayList.cs (68) : private void Resize(int newSize)
+ArrayList.cs (69) : {
+ArrayList.cs (70) : //TODO #2.25: return the element on the index-th position. O if the position is out of bounds
+ArrayList.cs (71) : //Once done, finish #8
+ArrayList.cs (73) : }
+ArrayList.cs (74) : public System.Collections.IEnumerator GetEnumerator()
+ArrayList.cs (75) : {
+ArrayList.cs (76) : //TODO #2.26 : Return an enumerator using "yield return" for each of the values in this list
+ArrayList.cs (77) : yield return null;
+ArrayList.cs (80) : }
+ArrayList.cs (81) : }
+IIntList.cs (1) : ﻿
+IIntList.cs (2) : namespace EDA;
+IIntList.cs (4) : public interface IIntList : System.Collections.IEnumerable
+IIntList.cs (5) : {
+IIntList.cs (6) : int Count();
+IIntList.cs (8) : int Get(int index);
+IIntList.cs (10) : void Add(int value);
+IIntList.cs (12) : int Remove(int index);
+IIntList.cs (14) : void Clear();
+IIntList.cs (15) : }
+IList.cs (1) : ﻿namespace EDA;
+IList.cs (3) : public interface IList<T> : System.Collections.IEnumerable
+IList.cs (4) : {
+IList.cs (5) : int Count();
+IList.cs (7) : T Get(int index);
+IList.cs (9) : void Add(T value);
+IList.cs (11) : T Remove(int index);
+IList.cs (13) : void Clear();
+IList.cs (14) : }
+IntArrayList.cs (1) : namespace EDA;
+IntArrayList.cs (3) : public class IntArrayList : IIntList
+IntArrayList.cs (4) : {
+IntArrayList.cs (5) : const int InitialSize = 10; //any arbitrary size
+IntArrayList.cs (6) : int[] Values;
+IntArrayList.cs (7) : int NumElements = 0;
+IntArrayList.cs (11) : public IntArrayList(int n)
+IntArrayList.cs (12) : {
+IntArrayList.cs (13) : Values = new int[n];
+IntArrayList.cs (14) : NumElements = 0;
+IntArrayList.cs (15) : }
+IntArrayList.cs (17) : public override string ToString()
+IntArrayList.cs (18) : {
+IntArrayList.cs (19) : string output = "[";
+IntArrayList.cs (21) : for (int i = 0; i < Count(); i++)
+IntArrayList.cs (22) : output += Values[i] + ",";
+IntArrayList.cs (23) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+IntArrayList.cs (25) : return output;
+IntArrayList.cs (26) : }
+IntArrayList.cs (29) : public int Count()
+IntArrayList.cs (30) : {
+IntArrayList.cs (31) : //TODO #2.7: return the number of elements on the list
+IntArrayList.cs (33) : return 0;
+IntArrayList.cs (35) : }
+IntArrayList.cs (38) : public int Get(int index)
+IntArrayList.cs (39) : {
+IntArrayList.cs (40) : //TODO #2.8: return the element on the index-th position. O if the position is out of bounds
+IntArrayList.cs (42) : return 0;
+IntArrayList.cs (44) : }
+IntArrayList.cs (46) : public void Add(int value)
+IntArrayList.cs (47) : {
+IntArrayList.cs (48) : //TODO #2.9: add a new integer to the end of the list.
+IntArrayList.cs (49) : //[After implementing #1.13 -> If there is no room for a new item, resize (double the size) and add]
+IntArrayList.cs (51) : }
+IntArrayList.cs (54) : public int Remove(int index)
+IntArrayList.cs (55) : {
+IntArrayList.cs (56) : //TODO #2.10: remove the element on the index-th position. Do nothing if position is out of bounds
+IntArrayList.cs (57) : //Return the removed item, -1 if the position is incorrect
+IntArrayList.cs (59) : return 0;
+IntArrayList.cs (61) : }
+IntArrayList.cs (64) : public void Clear()
+IntArrayList.cs (65) : {
+IntArrayList.cs (66) : //TODO #2.11: remove all the elements on the list
+IntArrayList.cs (68) : }
+IntArrayList.cs (70) : private void Resize(int newSize)
+IntArrayList.cs (71) : {
+IntArrayList.cs (72) : //TODO #2.12: return the element on the index-th position. O if the position is out of bounds
+IntArrayList.cs (74) : }
+IntArrayList.cs (76) : public System.Collections.IEnumerator GetEnumerator()
+IntArrayList.cs (77) : {
+IntArrayList.cs (78) : //TODO #2.13 : Return an enumerator using "yield return" for each of the values in this list
+IntArrayList.cs (79) : yield return null;
+IntArrayList.cs (82) : }
+IntArrayList.cs (83) : }
+IntList.cs (3) : namespace EDA;
+IntList.cs (5) : public class IntListNode
+IntList.cs (6) : {
+IntList.cs (7) : public int Value;
+IntList.cs (8) : public IntListNode Next = null;
+IntList.cs (10) : public IntListNode(int value)
+IntList.cs (11) : {
+IntList.cs (12) : Value = value;
+IntList.cs (13) : }
+IntList.cs (14) : }
+IntList.cs (16) : public class IntList : IIntList
+IntList.cs (17) : {
+IntList.cs (18) : IntListNode First = null;
+IntList.cs (20) : //This method returns all the elements on the list as a string
+IntList.cs (21) : //Use it as an example on how to access all the elements on the list
+IntList.cs (22) : public override string ToString()
+IntList.cs (23) : {
+IntList.cs (24) : IntListNode node = First;
+IntList.cs (25) : string output = "[";
+IntList.cs (27) : while (node != null)
+IntList.cs (28) : {
+IntList.cs (29) : output += node.Value + ",";
+IntList.cs (30) : node = node.Next;
+IntList.cs (31) : }
+IntList.cs (32) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+IntList.cs (34) : return output;
+IntList.cs (35) : }
+IntList.cs (38) : public int Count()
+IntList.cs (39) : {
+IntList.cs (40) : //TODO #2.1: return the number of elements on the list
+IntList.cs (42) : return 0;
+IntList.cs (44) : }
+IntList.cs (47) : public int Get(int index)
+IntList.cs (48) : {
+IntList.cs (49) : //TODO #2.2: return the element on the index-th position. O if the position is out of bounds
+IntList.cs (51) : return 0;
+IntList.cs (53) : }
+IntList.cs (56) : public void Add(int value)
+IntList.cs (57) : {
+IntList.cs (58) : //TODO #2.3: add a new integer to the end of the list
+IntList.cs (60) : }
+IntList.cs (63) : public int Remove(int index)
+IntList.cs (64) : {
+IntList.cs (65) : //TODO #2.4: remove the element on the index-th position. Do nothing if position is out of bounds
+IntList.cs (66) : //Return the removed item, -1 if the position is incorrect
+IntList.cs (68) : return 0;
+IntList.cs (70) : }
+IntList.cs (73) : public void Clear()
+IntList.cs (74) : {
+IntList.cs (75) : //TODO #2.5: remove all the elements on the list
+IntList.cs (77) : }
+IntList.cs (79) : public System.Collections.IEnumerator GetEnumerator()
+IntList.cs (80) : {
+IntList.cs (81) : //TODO #2.6 : Return an enumerator using "yield return" for each of the values in this list
+IntList.cs (82) : yield return null;
+IntList.cs (85) : }
+IntList.cs (86) : }
+List.cs (1) : namespace EDA;
+List.cs (2) : public class ListNode<T>
+List.cs (3) : {
+List.cs (4) : public T Value;
+List.cs (5) : public ListNode<T> Next = null;
+List.cs (9) : public ListNode(T value)
+List.cs (10) : {
+List.cs (11) : Value = value;
+List.cs (12) : }
+List.cs (14) : public override string ToString()
+List.cs (15) : {
+List.cs (16) : return Value.ToString();
+List.cs (17) : }
+List.cs (18) : }
+List.cs (20) : public class List<T> : IList<T>
+List.cs (21) : {
+List.cs (22) : ListNode<T> First = null;
+List.cs (23) : ListNode<T> Last = null;
+List.cs (24) : int m_numItems = 0;
+List.cs (26) : public override string ToString()
+List.cs (27) : {
+List.cs (28) : ListNode<T> node = First;
+List.cs (29) : string output = "[";
+List.cs (31) : while (node != null)
+List.cs (32) : {
+List.cs (33) : output += node.ToString() + ",";
+List.cs (34) : node = node.Next;
+List.cs (35) : }
+List.cs (36) : output = output.TrimEnd(',') + "] " + Count() + " elements";
+List.cs (38) : return output;
+List.cs (39) : }
+List.cs (41) : public int Count()
+List.cs (42) : {
+List.cs (43) : //TODO #2.14: return the number of elements on the list
+List.cs (45) : return 0;
+List.cs (47) : }
+List.cs (49) : public T Get(int index)
+List.cs (50) : {
+List.cs (51) : //TODO #2.15: return the element on the index-th position. O if the position is out of bounds
+List.cs (53) : return default(T);
+List.cs (55) : }
+List.cs (57) : public void Add(T value)
+List.cs (58) : {
+List.cs (59) : //TODO #2.16: add a new integer to the end of the list
+List.cs (61) : }
+List.cs (63) : public T Remove(int index)
+List.cs (64) : {
+List.cs (65) : //TODO #2.17: remove the element on the index-th position. Do nothing if position is out of bounds
+List.cs (67) : return default(T);
+List.cs (69) : }
+List.cs (71) : public void Clear()
+List.cs (72) : {
+List.cs (73) : //TODO #2.18: remove all the elements on the list
+List.cs (75) : }
+List.cs (77) : public System.Collections.IEnumerator GetEnumerator()
+List.cs (78) : {
+List.cs (79) : //TODO #2.19 : Return an enumerator using "yield return" for each of the values in this list
+List.cs (80) : yield return null;
+List.cs (82) : }
+List.cs (83) : }
+ISortingAlgorithm.cs (1) : ﻿namespace EDA;
+ISortingAlgorithm.cs (3) : public interface ISortingAlgorithm
+ISortingAlgorithm.cs (4) : {
+ISortingAlgorithm.cs (5) : void Sort(int[] A);
+ISortingAlgorithm.cs (6) : }
+MergeSort.cs (1) : using System;
+MergeSort.cs (3) : namespace EDA;
+MergeSort.cs (5) : public class MergeSort : ISortingAlgorithm
+MergeSort.cs (6) : {
+MergeSort.cs (7) : public int[] Partition(int[] A, int startIndex, int endIndex)
+MergeSort.cs (8) : {
+MergeSort.cs (9) : //TODO #1.4: return a new array with all elements in A from index startIndex to endIndex (both included): A[startIndex..endIndex]
+MergeSort.cs (10) : return null;
+MergeSort.cs (12) : }
+MergeSort.cs (14) : public void MergePartitions(int[] A, int[] leftPartition, int[] rightPartition)
+MergeSort.cs (15) : {
+MergeSort.cs (16) : //TODO #1.5: Merge in A the two partitions sorting them
+MergeSort.cs (18) : }
+MergeSort.cs (20) : public void Sort(int[] A)
+MergeSort.cs (21) : {
+MergeSort.cs (22) : //TODO #1.6: Implement MergeSort using the methods above
+MergeSort.cs (24) : }
+MergeSort.cs (25) : }
+QuickSort.cs (1) : using System;
+QuickSort.cs (4) : namespace EDA;
+QuickSort.cs (6) : public class QuickSort : ISortingAlgorithm
+QuickSort.cs (7) : {
+QuickSort.cs (8) : public int Partition(int[] A, int firstIndex, int lastIndex)
+QuickSort.cs (9) : {
+QuickSort.cs (10) : //TODO #1.2: Choose a pivot, move all elements lower than the pivot to the beginning of the array and return the position where the pivot has been moved to
+QuickSort.cs (11) : return 0;
+QuickSort.cs (13) : }
+QuickSort.cs (16) : public void Sort(int[] A, int firstIndex, int lastIndex)
+QuickSort.cs (17) : {
+QuickSort.cs (18) : //TODO #1.3: Implement QuickSort using the methods above
+QuickSort.cs (20) : }
+QuickSort.cs (22) : public void Sort(int[] A)
+QuickSort.cs (23) : {
+QuickSort.cs (24) : Sort(A, 0, A.Length - 1);
+QuickSort.cs (25) : }
+QuickSort.cs (26) : }
+SelectionSort.cs (1) : using System;
+SelectionSort.cs (2) : using System.Collections.Generic;
+SelectionSort.cs (3) : using System.Text;
+SelectionSort.cs (5) : namespace EDA;
+SelectionSort.cs (7) : public class SelectionSort : ISortingAlgorithm
+SelectionSort.cs (8) : {
+SelectionSort.cs (9) : public void Sort(int[] A)
+SelectionSort.cs (10) : {
+SelectionSort.cs (23) : }
+SelectionSort.cs (24) : }
+IPushPop.cs (2) : namespace EDA;
+IPushPop.cs (4) : public interface IPushPop<T>
+IPushPop.cs (5) : {
+IPushPop.cs (6) : int Count();
+IPushPop.cs (7) : void Clear();
+IPushPop.cs (8) : void Push(T value);
+IPushPop.cs (9) : T Pop();
+IPushPop.cs (10) : }
+Queue.cs (1) : namespace EDA;
+Queue.cs (4) : public class Queue<T> : IPushPop<T>
+Queue.cs (5) : {
+Queue.cs (8) : public override string ToString()
+Queue.cs (9) : {
+Queue.cs (11) : return null;
+Queue.cs (13) : }
+Queue.cs (15) : public int Count()
+Queue.cs (16) : {
+Queue.cs (18) : return 0;
+Queue.cs (20) : }
+Queue.cs (22) : public void Clear()
+Queue.cs (23) : {
+Queue.cs (25) : }
+Queue.cs (27) : public void Push(T value)
+Queue.cs (28) : {
+Queue.cs (30) : }
+Queue.cs (32) : public T Pop()
+Queue.cs (33) : {
+Queue.cs (35) : return default(T);
+Queue.cs (37) : }
+Queue.cs (38) : }
+Stack.cs (2) : namespace EDA;
+Stack.cs (4) : public class Stack<T> : IPushPop<T>
+Stack.cs (5) : {
+Stack.cs (8) : public override string ToString()
+Stack.cs (9) : {
+Stack.cs (11) : return null;
+Stack.cs (13) : }
+Stack.cs (15) : public int Count()
+Stack.cs (16) : {
+Stack.cs (18) : return 0;
+Stack.cs (20) : }
+Stack.cs (22) : public void Clear()
+Stack.cs (23) : {
+Stack.cs (25) : }
+Stack.cs (27) : public void Push(T value)
+Stack.cs (28) : {
+Stack.cs (30) : }
+Stack.cs (32) : public T Pop()
+Stack.cs (33) : {
+Stack.cs (35) : return default(T);
+Stack.cs (37) : }
+Stack.cs (38) : }
+BinaryTree.cs (2) : using System;
+BinaryTree.cs (3) : namespace EDA;
+BinaryTree.cs (6) : public class BinaryTree<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTree.cs (7) : {
+BinaryTree.cs (8) : public BinaryTreeNode<TKey, TValue> RootNode;
+BinaryTree.cs (10) : public override string ToString()
+BinaryTree.cs (11) : {
+BinaryTree.cs (12) : if (RootNode == null)
+BinaryTree.cs (13) : return null;
+BinaryTree.cs (14) : else return RootNode.ToString(0);
+BinaryTree.cs (15) : }
+BinaryTree.cs (17) : public int Count()
+BinaryTree.cs (18) : {
+BinaryTree.cs (19) : if (RootNode == null)
+BinaryTree.cs (20) : return 0;
+BinaryTree.cs (21) : return RootNode.Count();
+BinaryTree.cs (22) : }
+BinaryTree.cs (24) : public int Height()
+BinaryTree.cs (25) : {
+BinaryTree.cs (26) : if (RootNode == null)
+BinaryTree.cs (27) : return -1;
+BinaryTree.cs (28) : return RootNode.Height();
+BinaryTree.cs (29) : }
+BinaryTree.cs (31) : public TValue Get(TKey key)
+BinaryTree.cs (32) : {
+BinaryTree.cs (33) : if (RootNode == null)
+BinaryTree.cs (34) : return default;
+BinaryTree.cs (35) : else
+BinaryTree.cs (36) : {
+BinaryTree.cs (37) : return RootNode.Get(key);
+BinaryTree.cs (38) : }
+BinaryTree.cs (39) : }
+BinaryTree.cs (41) : public void Add(TKey key, TValue value)
+BinaryTree.cs (42) : {
+BinaryTree.cs (43) : BinaryTreeNode<TKey, TValue> newNode = new BinaryTreeNode<TKey, TValue>(key, value);
+BinaryTree.cs (44) : if (RootNode == null)
+BinaryTree.cs (45) : RootNode = newNode;
+BinaryTree.cs (46) : else
+BinaryTree.cs (47) : RootNode.Add(newNode);
+BinaryTree.cs (48) : }
+BinaryTree.cs (50) : public void Remove(TKey key)
+BinaryTree.cs (51) : {
+BinaryTree.cs (52) : if (RootNode != null)
+BinaryTree.cs (53) : RootNode = RootNode.Remove(key);
+BinaryTree.cs (54) : }
+BinaryTree.cs (56) : public TKey[] Keys()
+BinaryTree.cs (57) : {
+BinaryTree.cs (58) : if (RootNode == null)
+BinaryTree.cs (59) : return new TKey[0];
+BinaryTree.cs (60) : int count = RootNode.Count();
+BinaryTree.cs (61) : TKey[] keys = new TKey[count];
+BinaryTree.cs (62) : RootNode.KeysToArray(keys, 0);
+BinaryTree.cs (63) : return keys;
+BinaryTree.cs (64) : }
+BinaryTree.cs (66) : public TValue[] Values()
+BinaryTree.cs (67) : {
+BinaryTree.cs (68) : if (RootNode == null)
+BinaryTree.cs (69) : return new TValue[0];
+BinaryTree.cs (70) : int count = RootNode.Count();
+BinaryTree.cs (71) : TValue[] values = new TValue[count];
+BinaryTree.cs (72) : RootNode.ValuesToArray(values, 0);
+BinaryTree.cs (73) : return values;
+BinaryTree.cs (74) : }
+BinaryTree.cs (76) : private BinaryTreeNode<TKey, TValue> AddBalanced(TKey[] keys, TValue[] values, int start, int end)
+BinaryTree.cs (77) : {
+BinaryTree.cs (78) : //TODO #3.16:  Given an array of keys and an array of values, this method must:
+BinaryTree.cs (79) : //          - Create a new tree node with the key/values in the center of the [start,end] section of the arrays
+BinaryTree.cs (80) : //          - Recursive call to AddBalanced with the elements on the left of center [start,center-1]. Add the result to the new node as LeftNode
+BinaryTree.cs (81) : //          - Recursive call to AddBalanced with the elements on the right of center [center+1,end]. Add the result to the new node as RightNode
+BinaryTree.cs (83) : return null;
+BinaryTree.cs (85) : }
+BinaryTree.cs (87) : public void Balance()
+BinaryTree.cs (88) : {
+BinaryTree.cs (89) : if (RootNode == null)
+BinaryTree.cs (90) : return;
+BinaryTree.cs (91) : TKey[] keys = Keys();
+BinaryTree.cs (92) : TValue[] values = Values();
+BinaryTree.cs (94) : RootNode = AddBalanced(keys, values, 0, keys.Length - 1);
+BinaryTree.cs (95) : }
+BinaryTree.cs (96) : }
+BinaryTreeNode.cs (2) : using System;
+BinaryTreeNode.cs (3) : namespace EDA;
+BinaryTreeNode.cs (5) : public class BinaryTreeNode<TKey, TValue> where TKey : IComparable<TKey>
+BinaryTreeNode.cs (6) : {
+BinaryTreeNode.cs (7) : public TKey Key;
+BinaryTreeNode.cs (8) : public TValue Value;
+BinaryTreeNode.cs (9) : public BinaryTreeNode<TKey, TValue> LeftChild;
+BinaryTreeNode.cs (10) : public BinaryTreeNode<TKey, TValue> RightChild;
+BinaryTreeNode.cs (12) : public BinaryTreeNode(TKey key, TValue value)
+BinaryTreeNode.cs (13) : {
+BinaryTreeNode.cs (14) : //TODO #3.10: Initialize member variables/attributes
+BinaryTreeNode.cs (16) : }
+BinaryTreeNode.cs (18) : public string ToString(int depth)
+BinaryTreeNode.cs (19) : {
+BinaryTreeNode.cs (20) : string output = null;
+BinaryTreeNode.cs (22) : string leftSpace = null;
+BinaryTreeNode.cs (23) : for (int i = 0; i < depth; i++) leftSpace += " ";
+BinaryTreeNode.cs (24) : if (leftSpace != null) leftSpace += "->";
+BinaryTreeNode.cs (26) : if (Value != null)
+BinaryTreeNode.cs (27) : output += $"{leftSpace}[{Key.ToString()}-{Value.ToString()}]\n";
+BinaryTreeNode.cs (29) : if (LeftChild != null)
+BinaryTreeNode.cs (30) : output += $"{LeftChild?.ToString(depth + 1)}";
+BinaryTreeNode.cs (32) : if (RightChild != null)
+BinaryTreeNode.cs (33) : output += $"{RightChild?.ToString(depth + 1)}";
+BinaryTreeNode.cs (35) : return output;
+BinaryTreeNode.cs (36) : }
+BinaryTreeNode.cs (38) : public void Add(BinaryTreeNode<TKey, TValue> node)
+BinaryTreeNode.cs (39) : {
+BinaryTreeNode.cs (40) : //TODO #3.11: Add the new node following the order:
+BinaryTreeNode.cs (41) : //          -If the current node (this) has a higher key that the new node (use CompareTo()), the new node should be on this node's left.
+BinaryTreeNode.cs (42) : //              a) If the left child is null, the added node should be this node's left node side
+BinaryTreeNode.cs (43) : //              b) Else, we should ask the LeftChild to add it recursively
+BinaryTreeNode.cs (44) : //          -If the current node has a lower key that the new node (use CompareTo()), the new node should be on this node's right side.
+BinaryTreeNode.cs (45) : //          -If the current node and the new node have the same key, just update this node's value with the new node's value
+BinaryTreeNode.cs (47) : }
+BinaryTreeNode.cs (49) : public int Count()
+BinaryTreeNode.cs (50) : {
+BinaryTreeNode.cs (51) : //TODO #3.12: Return the total number of elements in this tree
+BinaryTreeNode.cs (53) : return 0;
+BinaryTreeNode.cs (55) : }
+BinaryTreeNode.cs (57) : public int Height()
+BinaryTreeNode.cs (58) : {
+BinaryTreeNode.cs (59) : //TODO #3.13: Return the height of this tree
+BinaryTreeNode.cs (60) : //          -If the node has no children, the height will be zero
+BinaryTreeNode.cs (61) : //          -If the node has children, the height will be the maximum height of a child plus 1
+BinaryTreeNode.cs (63) : return 0;
+BinaryTreeNode.cs (65) : }
+BinaryTreeNode.cs (67) : public TValue Get(TKey key)
+BinaryTreeNode.cs (68) : {
+BinaryTreeNode.cs (69) : //TODO #3.14: Find the node that has this key:
+BinaryTreeNode.cs (70) : //          -If the current node (this) has a higher key that the new node (use CompareTo()), the key we are searching for should be on this node's left side.
+BinaryTreeNode.cs (71) : //              a) If the left child is null, return null. We haven't found it
+BinaryTreeNode.cs (72) : //              b) Else, we should ask the LeftChild to find the node recursively. It must be below LeftChild
+BinaryTreeNode.cs (73) : //          -If the current node has a lower key that the new node (use CompareTo()), the key should be on this node's right side. Do the same as before.
+BinaryTreeNode.cs (74) : //          -If the current node and the new node have the same key, just return this node's value. We found it
+BinaryTreeNode.cs (76) : return default;
+BinaryTreeNode.cs (78) : }
+BinaryTreeNode.cs (82) : public BinaryTreeNode<TKey, TValue> Remove(TKey key)
+BinaryTreeNode.cs (83) : {
+BinaryTreeNode.cs (84) : //TODO #3.15: Remove the node that has this key. The parent may need to update one of its children,
+BinaryTreeNode.cs (85) : //so this method returns the node with which this node needs to be replaced. If this node isn't the
+BinaryTreeNode.cs (86) : //one we are looking for, we will return this, so that the parent node can replace LeftChild/RightChild
+BinaryTreeNode.cs (87) : //with the same node it had.
+BinaryTreeNode.cs (89) : return null;
+BinaryTreeNode.cs (91) : }
+BinaryTreeNode.cs (93) : public int KeysToArray(TKey[] keys, int index)
+BinaryTreeNode.cs (94) : {
+BinaryTreeNode.cs (95) : if (LeftChild != null)
+BinaryTreeNode.cs (96) : index = LeftChild.KeysToArray(keys, index);
+BinaryTreeNode.cs (97) : keys[index] = Key;
+BinaryTreeNode.cs (98) : index++;
+BinaryTreeNode.cs (99) : if (RightChild != null)
+BinaryTreeNode.cs (100) : index = RightChild.KeysToArray(keys, index);
+BinaryTreeNode.cs (101) : return index;
+BinaryTreeNode.cs (102) : }
+BinaryTreeNode.cs (104) : public int ValuesToArray(TValue[] values, int index)
+BinaryTreeNode.cs (105) : {
+BinaryTreeNode.cs (106) : if (LeftChild != null)
+BinaryTreeNode.cs (107) : index = LeftChild.ValuesToArray(values, index);
+BinaryTreeNode.cs (108) : values[index] = Value;
+BinaryTreeNode.cs (109) : index++;
+BinaryTreeNode.cs (110) : if (RightChild != null)
+BinaryTreeNode.cs (111) : index = RightChild.ValuesToArray(values, index);
+BinaryTreeNode.cs (112) : return index;
+BinaryTreeNode.cs (113) : }
+BinaryTreeNode.cs (114) : }
+Tree.cs (1) : namespace EDA;
+Tree.cs (4) : public class Tree<T>
+Tree.cs (5) : {
+Tree.cs (6) : public TreeNode<T> RootNode = null;
+Tree.cs (8) : public override string ToString()
+Tree.cs (9) : {
+Tree.cs (10) : if (RootNode == null)
+Tree.cs (11) : return null;
+Tree.cs (12) : else return RootNode.ToString(0, 0);
+Tree.cs (13) : }
+Tree.cs (14) : }
+TreeNode.cs (2) : using System;
+TreeNode.cs (4) : namespace EDA;
+TreeNode.cs (6) : public class TreeNode<T>
+TreeNode.cs (7) : {
+TreeNode.cs (8) : private T Value;
+TreeNode.cs (9) : //TODO #3.1: Declare a member variable called "Children" as a list of TreeNode<T> objects
+TreeNode.cs (12) : public TreeNode(T value)
+TreeNode.cs (13) : {
+TreeNode.cs (14) : //TODO #3.2: Initialize member variables/attributes
+TreeNode.cs (16) : }
+TreeNode.cs (18) : public string ToString(int depth, int index)
+TreeNode.cs (19) : {
+TreeNode.cs (20) : //TODO #3.3: Uncomment the code below
+TreeNode.cs (22) : //string output = null;
+TreeNode.cs (23) : //string leftSpace = null;
+TreeNode.cs (24) : //for (int i = 0; i < depth; i++) leftSpace += " ";
+TreeNode.cs (25) : //if (leftSpace != null) leftSpace += "->";
+TreeNode.cs (27) : //output += $"{leftSpace}[{Value}]\n";
+TreeNode.cs (29) : //for (int childIndex = 0; childIndex < Children.Count(); childIndex++)
+TreeNode.cs (30) : //{
+TreeNode.cs (31) : //    TreeNode<T> child = Children.Get(childIndex);
+TreeNode.cs (32) : //    output += child.ToString(depth + 1, childIndex);
+TreeNode.cs (33) : //}
+TreeNode.cs (34) : //return output;
+TreeNode.cs (36) : return null;
+TreeNode.cs (37) : }
+TreeNode.cs (39) : public TreeNode<T> Add(T value)
+TreeNode.cs (40) : {
+TreeNode.cs (41) : //TODO #3.4: Add a new instance of class GenericTreeNode<T> with Value=value. Return the instance we just created
+TreeNode.cs (43) : return null;
+TreeNode.cs (45) : }
+TreeNode.cs (47) : public int Count()
+TreeNode.cs (48) : {
+TreeNode.cs (49) : //TODO #3.5: Return the total number of elements in this tree
+TreeNode.cs (51) : return 0;
+TreeNode.cs (53) : }
+TreeNode.cs (55) : public int Height()
+TreeNode.cs (56) : {
+TreeNode.cs (57) : //TODO #3.6: Return the height of this tree
+TreeNode.cs (59) : return 0;
+TreeNode.cs (61) : }
+TreeNode.cs (66) : public void Remove(T value)
+TreeNode.cs (67) : {
+TreeNode.cs (68) : //TODO #3.7: Remove the child node that has Value=value. Apply recursively
+TreeNode.cs (70) : }
+TreeNode.cs (72) : public TreeNode<T> Find(T value)
+TreeNode.cs (73) : {
+TreeNode.cs (74) : //TODO #3.8: Return the node that contains this value (it might be this node or a child). Apply recursively
+TreeNode.cs (76) : return null;
+TreeNode.cs (77) : }
+TreeNode.cs (80) : public void Remove(TreeNode<T> node)
+TreeNode.cs (81) : {
+TreeNode.cs (82) : //TODO #3.9: Same as #7, but this method is given the specific node to remove, not the value
+TreeNode.cs (84) : }
+TreeNode.cs (85) : }
+main.cs (1) : using System;
+main.cs (2) : using System.Diagnostics;
+main.cs (3) : using System.Threading.Tasks;
+main.cs (4) : using EDA;
+main.cs (5) : using UnitTests;
+main.cs (6) : class MainClass
+main.cs (7) : {
+main.cs (9) : public static void Main(string[] args)
+main.cs (10) : {
+main.cs (11) : bool success = SortingTestUtils.TestSortingAlgorithm(new SelectionSort(), 20, Console.WriteLine, Console.WriteLine);
+main.cs (12) : if (!success)
+main.cs (13) : {
+main.cs (14) : Console.WriteLine("FAILED");
+main.cs (15) : return;
+main.cs (16) : }
+main.cs (18) : success = SortingTestUtils.TestQuickSortPartition(Console.WriteLine, Console.WriteLine);
+main.cs (19) : if (!success)
+main.cs (20) : {
+main.cs (21) : Console.WriteLine("FAILED");
+main.cs (22) : return;
+main.cs (23) : }
+main.cs (25) : success = SortingTestUtils.TestSortingAlgorithm(new QuickSort(), 20, Console.WriteLine, Console.WriteLine);
+main.cs (26) : if (!success)
+main.cs (27) : {
+main.cs (28) : Console.WriteLine("FAILED");
+main.cs (29) : return;
+main.cs (30) : }
+main.cs (32) : success = SortingTestUtils.TestMergeSortPartition(Console.WriteLine, Console.WriteLine);
+main.cs (33) : if (!success)
+main.cs (34) : {
+main.cs (35) : Console.WriteLine("FAILED");
+main.cs (36) : return;
+main.cs (37) : }
+main.cs (39) : success = SortingTestUtils.TestMergeSortMergePartitions(Console.WriteLine, Console.WriteLine);
+main.cs (40) : if (!success)
+main.cs (41) : {
+main.cs (42) : Console.WriteLine("FAILED");
+main.cs (43) : return;
+main.cs (44) : }
+main.cs (46) : success = SortingTestUtils.TestSortingAlgorithm(new MergeSort(), 20, Console.WriteLine, Console.WriteLine);
+main.cs (47) : if (!success)
+main.cs (48) : {
+main.cs (49) : Console.WriteLine("FAILED");
+main.cs (50) : return;
+main.cs (51) : }
+main.cs (52) : }
+main.cs (53) : }
+main.cs (2) : using System;
+main.cs (3) : using EDA;
+main.cs (4) : using UnitTests;
+main.cs (6) : namespace RunTestsConsoleApp;
+main.cs (8) : public class Program
+main.cs (9) : {
+main.cs (10) : public static void Main(string[] args)
+main.cs (11) : {
+main.cs (12) : Console.WriteLine("## Testing IntList class");
+main.cs (13) : if (!IntListTestUtils.IntListTest(new IntList(), Console.WriteLine, Console.WriteLine))
+main.cs (14) : return;
+main.cs (16) : Console.WriteLine("\n\n## Testing IntArrayList class");
+main.cs (17) : if (!IntListTestUtils.IntListTest(new IntArrayList(1000000), Console.WriteLine, Console.WriteLine))
+main.cs (18) : return;
+main.cs (20) : Console.WriteLine("\n\n## Testing List class");
+main.cs (21) : if (!IntListTestUtils.ListTest(new List<int>(), Console.WriteLine, Console.WriteLine))
+main.cs (22) : return;
+main.cs (24) : bool listPerformancePasses = ListTestUtils.MeasurePerformance<List<int>>(new List<int>(), Console.WriteLine, Console.WriteLine);
+main.cs (26) : Console.WriteLine("\n\n## Testing ArrayList class");
+main.cs (27) : if (!IntListTestUtils.ListTest(new ArrayList<int>(1000000), Console.WriteLine, Console.WriteLine))
+main.cs (28) : return;
+main.cs (30) : bool listArrayPerformancePasses = ListTestUtils.MeasurePerformance<ArrayList<int>>(new ArrayList<int>(), Console.WriteLine, Console.WriteLine);
+main.cs (32) : Console.WriteLine("\n\n## Testing Stack class");
+main.cs (33) : int[] testIntValues = new int[] { 3, 2, 6, 1, 2 };
+main.cs (34) : string[] testStringValues = new string[] { "aB", "0x0", "ro", "123", "hitza" };
+main.cs (36) : if (!StackAndQueuesTests.Test(new Stack<int>(), testIntValues))
+main.cs (37) : return;
+main.cs (39) : if (!StackAndQueuesTests.Test(new Stack<string>(), testStringValues))
+main.cs (40) : return;
+main.cs (42) : bool stackPerformancePasses = StackAndQueuesTests.MeasurePerformance(new Stack<int>(), testIntValues);
+main.cs (45) : Console.WriteLine("\n\n## Testing Queue class");
+main.cs (46) : if (!StackAndQueuesTests.Test(new Queue<int>(), testIntValues, true))
+main.cs (47) : return;
+main.cs (49) : if (!StackAndQueuesTests.Test(new Queue<string>(), testStringValues, true))
+main.cs (50) : return;
+main.cs (52) : bool queuePerformancePasses = StackAndQueuesTests.MeasurePerformance(new Queue<int>(), testIntValues);
+main.cs (54) : if (listPerformancePasses && listArrayPerformancePasses && stackPerformancePasses && queuePerformancePasses)
+main.cs (55) : Console.WriteLine("ASSIGNMENT FINISHED: ALL TESTS PASSED");
+main.cs (56) : else
+main.cs (57) : Console.WriteLine("ALL THE CLASSES WORK PROPERLY BUT DIDN'T PASS THE PERFORMANCE TEST");
+main.cs (58) : }
+main.cs (59) : }
+main.cs (2) : using System;
+main.cs (3) : using EDA;
+main.cs (4) : using UnitTests;
+main.cs (5) : using System.Diagnostics;
+main.cs (6) : class MainClass
+main.cs (7) : {
+main.cs (8) : public static void Main (string[] args)
+main.cs (9) : {
+main.cs (10) : bool success = TreeTestUtils.TestGenericTree(Console.WriteLine, Console.WriteLine);
+main.cs (13) : success = UnitTests.BinaryTreeTestUtils.TestBinaryTree(Console.WriteLine, Console.WriteLine);
+main.cs (14) : if (!success)
+main.cs (15) : return;
+main.cs (17) : Stopwatch stopwatch = Stopwatch.StartNew();
+main.cs (18) : success = UnitTests.BinaryTreeTestUtils.MeasureBinaryTreeSpeed(Console.WriteLine, Console.WriteLine);
+main.cs (19) : if (!success)
+main.cs (20) : {
+main.cs (21) : Console.WriteLine("An error was detected during the speed measurement. Probably something wrong with Add/Get");
+main.cs (22) : return;
+main.cs (23) : }
+main.cs (24) : Console.WriteLine($"All tests passed. Time: {stopwatch.Elapsed.TotalSeconds}s");
+main.cs (25) : }
+main.cs (26) : }
+main.cs (1) : using System;
+main.cs (3) : using EDA;
+main.cs (4) : namespace UnitTests;
+main.cs (5) : class MainClass
+main.cs (6) : {
+main.cs (7) : public static void Main(string[] args)
+main.cs (8) : {
+main.cs (9) : Console.WriteLine("## Testing BinaryTreeDictionary<int,string>:\n");
+main.cs (11) : bool success = DictionaryTestUtils.Test1_AddGetCount(new BinaryTreeDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (12) : if (!success)
+main.cs (13) : return;
+main.cs (15) : success = DictionaryTestUtils.Test2_AddDuplicate(new BinaryTreeDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (16) : if (!success)
+main.cs (17) : return;
+main.cs (19) : success = DictionaryTestUtils.Test3_Remove(new BinaryTreeDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (20) : if (!success)
+main.cs (21) : return;
+main.cs (23) : success = DictionaryTestUtils.Test4_RemoveNonExistent(new BinaryTreeDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (24) : if (!success)
+main.cs (25) : return;
+main.cs (27) : success = DictionaryTestUtils.Test5_KeysValues(new BinaryTreeDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (28) : if (!success)
+main.cs (29) : return;
+main.cs (31) : success = DictionaryTestUtils.TestPerformanceWithTimeout(new BinaryTreeDictionary<int,int>(), Console.WriteLine, Console.WriteLine);
+main.cs (32) : if (!success)
+main.cs (33) : return;
+main.cs (35) : BinaryTreeDictionary<string, int> numbers = new BinaryTreeDictionary<string, int>();
+main.cs (36) : success = DictionaryTestUtils.TestReaderWriterStringInt(numbers, "numbers-dictionary-bin-tree.txt", Console.WriteLine, Console.WriteLine);
+main.cs (37) : if (!success)
+main.cs (38) : return;
+main.cs (40) : BinaryTreeDictionary<int, double> grades = new BinaryTreeDictionary<int, double>();
+main.cs (41) : success = DictionaryTestUtils.TestReaderWriterIntDouble(grades, "grades-dictionary-bin-tree.txt", Console.WriteLine, Console.WriteLine);
+main.cs (42) : if (!success)
+main.cs (43) : return;
+main.cs (45) : Console.WriteLine("## Testing HashTableDictionary<int,string>:\n");
+main.cs (46) : success = DictionaryTestUtils.Test1_AddGetCount(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (47) : if (!success)
+main.cs (48) : return;
+main.cs (50) : success = DictionaryTestUtils.Test2_AddDuplicate(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (51) : if (!success)
+main.cs (52) : return;
+main.cs (54) : success = DictionaryTestUtils.Test3_Remove(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (55) : if (!success)
+main.cs (56) : return;
+main.cs (58) : success = DictionaryTestUtils.Test4_RemoveNonExistent(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (59) : if (!success)
+main.cs (60) : return;
+main.cs (62) : success = DictionaryTestUtils.Test5_KeysValues(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (63) : if (!success)
+main.cs (64) : return;
+main.cs (66) : success = DictionaryTestUtils.TestPerformanceWithTimeout(new HashTableDictionary<int, int>(), Console.WriteLine, Console.WriteLine);
+main.cs (67) : if (!success)
+main.cs (68) : return;
+main.cs (70) : HashTableDictionary<string, int> numbers_s_i = new HashTableDictionary<string, int>();
+main.cs (71) : success = DictionaryTestUtils.TestReaderWriterStringInt(numbers_s_i, "numbers-dictionary-hash-map.txt", Console.WriteLine, Console.WriteLine);
+main.cs (72) : if (!success)
+main.cs (73) : return;
+main.cs (75) : HashTableDictionary<int, double> grades_i_d = new HashTableDictionary<int, double>();
+main.cs (76) : success = DictionaryTestUtils.TestReaderWriterIntDouble(grades_i_d, "grades-dictionary-hash-map.txt", Console.WriteLine, Console.WriteLine);
+main.cs (77) : if (!success)
+main.cs (78) : return;
+main.cs (80) : Console.WriteLine($"All tests passed.");
+main.cs (81) : }
+main.cs (82) : }
+main.cs (1) : using System;
+main.cs (2) : using System.Diagnostics;
+main.cs (3) : using EDA;
+main.cs (4) : namespace UnitTests;
+main.cs (5) : class MainClass
+main.cs (6) : {
+main.cs (7) : public static void Main(string[] args)
+main.cs (8) : {
+main.cs (9) : Console.WriteLine("## Testing basic functionalities of undirected graphs...");
+main.cs (10) : if (!GraphTests.Test1_Add_Get_Vertex_Count(Console.WriteLine, Console.WriteLine, true))
+main.cs (11) : return;
+main.cs (13) : if (!GraphTests.Test2_Add_Edge_Count(Console.WriteLine, Console.WriteLine, true))
+main.cs (14) : return;
+main.cs (16) : if (!GraphTests.Test3_GetEdgeWeight(Console.WriteLine, Console.WriteLine, true))
+main.cs (17) : return;
+main.cs (19) : if (!GraphTests.Test4_RemoveEdge(Console.WriteLine, Console.WriteLine, true))
+main.cs (20) : return;
+main.cs (22) : if (!GraphTests.Test5_Get_Remove_Vertex(Console.WriteLine, Console.WriteLine, true))
+main.cs (23) : return;
+main.cs (25) : if (!GraphTests.Test6_Performance(Console.WriteLine, Console.WriteLine, true))
+main.cs (26) : return;
+main.cs (28) : Console.WriteLine("\n\n## Testing basic functionalities of directed graphs...");
+main.cs (29) : if (!GraphTests.Test1_Add_Get_Vertex_Count(Console.WriteLine, Console.WriteLine, false))
+main.cs (30) : return;
+main.cs (32) : if (!GraphTests.Test2_Add_Edge_Count(Console.WriteLine, Console.WriteLine, false))
+main.cs (33) : return;
+main.cs (35) : if (!GraphTests.Test3_GetEdgeWeight(Console.WriteLine, Console.WriteLine, false))
+main.cs (36) : return;
+main.cs (38) : if (!GraphTests.Test4_RemoveEdge(Console.WriteLine, Console.WriteLine, false))
+main.cs (39) : return;
+main.cs (41) : if (!GraphTests.Test5_Get_Remove_Vertex(Console.WriteLine, Console.WriteLine, false))
+main.cs (42) : return;
+main.cs (44) : if (!GraphTests.Test6_Performance(Console.WriteLine, Console.WriteLine, false))
+main.cs (45) : return;
+main.cs (47) : Stopwatch stopwatch = Stopwatch.StartNew();
+main.cs (48) : Console.WriteLine("\n\n## Testing distance calculator...");
+main.cs (49) : bool success = GraphTests.TestDistanceCalculator_1(Console.WriteLine, Console.WriteLine, true);
+main.cs (51) : if (!success)
+main.cs (52) : {
+main.cs (53) : Console.WriteLine("An error was detected testing the distance calculator (Test 1)");
+main.cs (54) : return;
+main.cs (55) : }
+main.cs (57) : Console.WriteLine($"Time: {stopwatch.Elapsed.TotalSeconds}s");
+main.cs (58) : stopwatch.Reset();
+main.cs (60) : success = GraphTests.TestDistanceCalculator_2(Console.WriteLine, Console.WriteLine, true);
+main.cs (62) : if (!success)
+main.cs (63) : {
+main.cs (64) : Console.WriteLine("An error was detected testing the distance calculator (Test 2)");
+main.cs (65) : return;
+main.cs (66) : }
+main.cs (68) : Console.WriteLine($"Time: {stopwatch.Elapsed.TotalSeconds}s");
+main.cs (69) : stopwatch.Reset();
+main.cs (71) : success = GraphTests.TestDistanceCalculator_3(Console.WriteLine, Console.WriteLine, true);
+main.cs (73) : if (!success)
+main.cs (74) : {
+main.cs (75) : Console.WriteLine("An error was detected testing the distance calculator (Test 3)");
+main.cs (76) : return;
+main.cs (77) : }
+main.cs (78) : Console.WriteLine($"Time: {stopwatch.Elapsed.TotalSeconds}s");
+main.cs (80) : Console.WriteLine("\n\n## Testing writing to/reading from disk with undirected graphs...");
+main.cs (82) : success = GraphTests.TestReaderWriter( "directed-graph-test.txt", (word) => word, (number) => number.ToString(),
+main.cs (83) : (wordString) => wordString, (numberString) => double.Parse(numberString),
+main.cs (84) : (onErrorMessage) => { Console.WriteLine(onErrorMessage); },
+main.cs (85) : (onNonErrorMessage) => { Console.WriteLine(onNonErrorMessage); }, false, false);
+main.cs (86) : if (!success)
+main.cs (87) : return;
+main.cs (89) : success = GraphTests.TestReaderWriter( "directed-graph-special-test.txt", (word) => word, (number) => number.ToString(),
+main.cs (90) : (wordString) => wordString, (numberString) => double.Parse(numberString),
+main.cs (91) : (onErrorMessage) => { Console.WriteLine(onErrorMessage); },
+main.cs (92) : (onNonErrorMessage) => { Console.WriteLine(onNonErrorMessage); }, false, true);
+main.cs (93) : if (!success)
+main.cs (94) : return;
+main.cs (96) : Console.WriteLine("\n\n## Testing writing to/reading from disk with directed graphs...");
+main.cs (98) : success = GraphTests.TestReaderWriter( "directed-graph-test.txt", (word) => word, (number) => number.ToString(),
+main.cs (99) : (wordString) => wordString, (numberString) => double.Parse(numberString),
+main.cs (100) : (onErrorMessage) => { Console.WriteLine(onErrorMessage); },
+main.cs (101) : (onNonErrorMessage) => { Console.WriteLine(onNonErrorMessage); }, true, false);
+main.cs (102) : if (!success)
+main.cs (103) : return;
+main.cs (105) : success = GraphTests.TestReaderWriter( "directed-graph-special-test.txt", (word) => word, (number) => number.ToString(),
+main.cs (106) : (wordString) => wordString, (numberString) => double.Parse(numberString),
+main.cs (107) : (onErrorMessage) => { Console.WriteLine(onErrorMessage); },
+main.cs (108) : (onNonErrorMessage) => { Console.WriteLine(onNonErrorMessage); }, true, true);
+main.cs (109) : if (!success)
+main.cs (110) : return;
+main.cs (112) : Console.WriteLine("\nAll tests passed");
+main.cs (113) : }
+main.cs (114) : }
+main.cs (1) : using System;
+main.cs (2) : using EDA;
+main.cs (4) : namespace UnitTests;
+main.cs (6) : class MainClass
+main.cs (7) : {
+main.cs (8) : public static void Main(string[] args)
+main.cs (9) : {
+main.cs (10) : Console.WriteLine("Testing HashTableDictionary<int,string>:\n");
+main.cs (11) : bool success = UnitTests.DictionaryTests.Test1_AddGetCount(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (12) : if (!success)
+main.cs (13) : return;
+main.cs (15) : success = UnitTests.DictionaryTests.Test2_AddDuplicate(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (16) : if (!success)
+main.cs (17) : return;
+main.cs (19) : success = UnitTests.DictionaryTests.Test3_Remove(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (20) : if (!success)
+main.cs (21) : return;
+main.cs (23) : success = UnitTests.DictionaryTests.Test4_RemoveNonExistent(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (24) : if (!success)
+main.cs (25) : return;
+main.cs (27) : success = UnitTests.DictionaryTests.Test5_KeysValues(new HashTableDictionary<int, string>(), Console.WriteLine, Console.WriteLine);
+main.cs (28) : if (!success)
+main.cs (29) : return;
+main.cs (31) : success = UnitTests.DictionaryTests.TestPerformanceWithTimeout(new HashTableDictionary<int, int>(), Console.WriteLine, Console.WriteLine);
+main.cs (32) : if (!success)
+main.cs (33) : return;
+main.cs (35) : HashTableDictionary<string, int> numbers = new HashTableDictionary<string, int>();
+main.cs (36) : success = UnitTests.DictionaryTests.TestReaderWriterStringInt(numbers, "numbers-dictionary-hash-map.txt", Console.WriteLine, Console.WriteLine);
+main.cs (37) : if (!success)
+main.cs (38) : return;
+main.cs (40) : HashTableDictionary<int, double> grades = new HashTableDictionary<int, double>();
+main.cs (41) : success = UnitTests.DictionaryTests.TestReaderWriterIntDouble(grades, "grades-dictionary-hash-map.txt", Console.WriteLine, Console.WriteLine);
+main.cs (42) : if (!success)
+main.cs (43) : return;
+main.cs (45) : Console.WriteLine($"All tests passed.");
+main.cs (46) : }
+main.cs (47) : }
