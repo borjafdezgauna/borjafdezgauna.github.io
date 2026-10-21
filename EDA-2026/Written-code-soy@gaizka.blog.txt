@@ -1,35 +1,47 @@
-ArrayList.cs (32) : return this.NumElements;
-ArrayList.cs (40) : if (index < 0 || index >= this.Values.Length) {
-ArrayList.cs (42) : }
-ArrayList.cs (44) : return this.Values[index];
-ArrayList.cs (53) : if (this.NumElements + 1 > this.Values.Length)
-ArrayList.cs (54) : {
-ArrayList.cs (55) : this.Resize(this.Values.Length * 2);
-ArrayList.cs (56) : }
-ArrayList.cs (58) : this.Values[this.NumElements] = value;
-ArrayList.cs (59) : this.NumElements++;
-ArrayList.cs (69) : if (index < 0 || index > this.NumElements)
-ArrayList.cs (70) : {
-ArrayList.cs (72) : }
-ArrayList.cs (74) : T value = this.Values[index];
-ArrayList.cs (76) : for (int i = index; i < this.NumElements; i++)
-ArrayList.cs (77) : {
-ArrayList.cs (78) : this.Values[i] = this.Values[i + 1];
-ArrayList.cs (79) : }
-ArrayList.cs (81) : this.NumElements--;
-ArrayList.cs (83) : return value;
-ArrayList.cs (90) : this.Values = new T[this.Values.Length];
-ArrayList.cs (91) : this.NumElements = 0;
-ArrayList.cs (99) : T[] newValues = new T[newSize];
-ArrayList.cs (100) : for (int i = 0; i < this.Values.Length; i++)
-ArrayList.cs (101) : {
-ArrayList.cs (102) : newValues[i] = this.Values[i];
-ArrayList.cs (103) : }
-ArrayList.cs (105) : this.Values = newValues;
-ArrayList.cs (112) : for(int i = 0; i < Values.Length; i++)
+ArrayList.cs (7) : int FirstIndex = 0;
+ArrayList.cs (31) : return this.NumElements;
+ArrayList.cs (39) : if (index < 0 || index >= this.Values.Length) {
+ArrayList.cs (41) : }
+ArrayList.cs (43) : return this.Values[this.FirstIndex + index];
+ArrayList.cs (52) : if (this.FirstIndex + this.NumElements + 1 > this.Values.Length)
+ArrayList.cs (53) : {
+ArrayList.cs (54) : this.Resize(this.Values.Length * 2);
+ArrayList.cs (55) : }
+ArrayList.cs (57) : this.Values[this.FirstIndex + this.NumElements] = value;
+ArrayList.cs (58) : this.NumElements++;
+ArrayList.cs (68) : if (index < 0 || index > this.FirstIndex + this.NumElements)
+ArrayList.cs (69) : {
+ArrayList.cs (71) : }
+ArrayList.cs (73) : if (index == 0)
+ArrayList.cs (74) : {
+ArrayList.cs (75) : // Devolvemos el primer valor y sumamos el first index
+ArrayList.cs (76) : this.NumElements--;
+ArrayList.cs (77) : return this.Values[this.FirstIndex++];
+ArrayList.cs (78) : }
+ArrayList.cs (80) : if (index == this.FirstIndex + this.NumElements - 1)
+ArrayList.cs (81) : {
+ArrayList.cs (82) : // Lo mismo que arriba
+ArrayList.cs (83) : return this.Values[this.NumElements--];
+ArrayList.cs (84) : }
+ArrayList.cs (86) : T value = this.Values[this.FirstIndex + index];
+ArrayList.cs (88) : for (int i = this.FirstIndex + index; i < this.FirstIndex + this.NumElements; i++)
+ArrayList.cs (89) : {
+ArrayList.cs (90) : this.Values[i] = this.Values[i + 1];
+ArrayList.cs (91) : }
+ArrayList.cs (93) : this.NumElements--;
+ArrayList.cs (95) : return value;
+ArrayList.cs (102) : this.Values = new T[this.Values.Length];
+ArrayList.cs (103) : this.NumElements = this.FirstIndex = 0;
+ArrayList.cs (111) : T[] newValues = new T[newSize];
+ArrayList.cs (112) : for (int i = this.FirstIndex; i < this.Values.Length; i++)
 ArrayList.cs (113) : {
-ArrayList.cs (114) : yield return Values[i];
+ArrayList.cs (114) : newValues[i] = this.Values[i];
 ArrayList.cs (115) : }
+ArrayList.cs (117) : this.Values = newValues;
+ArrayList.cs (124) : for(int i = 0; i < Values.Length; i++)
+ArrayList.cs (125) : {
+ArrayList.cs (126) : yield return Values[i];
+ArrayList.cs (127) : }
 IntArrayList.cs (32) : return this.NumElements;
 IntArrayList.cs (41) : if (index < 0 || index >= this.Values.Length) {
 IntArrayList.cs (43) : }
@@ -142,90 +154,118 @@ IntList.cs (167) : {
 IntList.cs (168) : yield return node.Next.Value;
 IntList.cs (170) : node = node.Next;
 IntList.cs (171) : }
-List.cs (44) : return this.m_numItems;
-List.cs (51) : if (index < 0 || index >= this.m_numItems) {
-List.cs (53) : }
-List.cs (55) : if (index == 0)
-List.cs (56) : {
-List.cs (57) : return this.First.Value;
-List.cs (58) : }
-List.cs (60) : if (index == this.m_numItems - 1)
-List.cs (61) : {
-List.cs (62) : return this.Last.Value;
-List.cs (63) : }
-List.cs (65) : ListNode<T> node = this.First;
-List.cs (66) : for (int i = 0; i < index; i++)
+List.cs (7) : public ListNode<T> Prev = null;
+List.cs (45) : return this.m_numItems;
+List.cs (48) : private ListNode<T> GetElement(int index)
+List.cs (50) : if (index < 0 || index >= this.m_numItems) {
+List.cs (51) : return null;
+List.cs (52) : }
+List.cs (54) : if (index == 0)
+List.cs (55) : {
+List.cs (56) : return this.First;
+List.cs (57) : }
+List.cs (59) : if (index == this.m_numItems - 1)
+List.cs (60) : {
+List.cs (61) : return this.Last;
+List.cs (62) : }
+List.cs (64) : ListNode<T> node;
+List.cs (66) : if (this.m_numItems - index > index - this.m_numItems)
 List.cs (67) : {
-List.cs (68) : node = node.Next;
-List.cs (70) : if (node == null)
-List.cs (71) : {
-List.cs (72) : return default(T);
-List.cs (73) : }
-List.cs (74) : }
-List.cs (76) : return node.Value;
-List.cs (84) : ListNode<T> newNode = new ListNode<T>(value);
-List.cs (86) : if (this.Last == null)
-List.cs (87) : {
-List.cs (88) : // Significa que no hay ningún elemento
-List.cs (89) : this.First = this.Last = newNode;
-List.cs (90) : }
-List.cs (91) : else
-List.cs (92) : {
-List.cs (93) : this.Last.Next = newNode;
-List.cs (95) : // actualizamos el nuevo last
-List.cs (96) : this.Last = newNode;
-List.cs (97) : }
-List.cs (99) : this.m_numItems++;
-List.cs (106) : if (index < 0 || index >= this.m_numItems)
-List.cs (107) : {
-List.cs (109) : }
-List.cs (112) : // Actualizamos el número total de elementos, porque sabemos que el nodo que
-List.cs (113) : // queremos eliminar está dentro de nuestros nodos
-List.cs (114) : this.m_numItems--;
-List.cs (116) : T value; // sin más, definir la variable
-List.cs (118) : // Si es el primero
-List.cs (119) : if (index == 0)
-List.cs (120) : {
-List.cs (121) : value = this.First.Value;
-List.cs (123) : this.First = this.First.Next;
-List.cs (125) : // Claro, si no hay primero, tampoco hay último jeje
-List.cs (126) : if (this.First == null)
-List.cs (127) : {
-List.cs (128) : this.Last = null;
-List.cs (129) : }
-List.cs (131) : return value;
-List.cs (132) : }
-List.cs (134) : // Buscamos el nodo anterior
-List.cs (135) : ListNode<T> parent = this.First;
-List.cs (136) : for (int i = 0; i < index - 1; i++)
-List.cs (137) : {
-List.cs (138) : parent = parent.Next;
-List.cs (139) : }
-List.cs (141) : // Si es el último
-List.cs (142) : if (index == this.m_numItems) // no resto -1 porque ya lo he hecho antes
-List.cs (143) : {
-List.cs (144) : value = this.Last.Value;
-List.cs (146) : this.Last = parent; // nuestro último será el padre
-List.cs (147) : this.Last.Next = null; // ahora sí, borramos el último
-List.cs (149) : return value;
-List.cs (150) : }
-List.cs (152) : value = parent.Next.Value;
-List.cs (154) : // Nos saltamos el nodo actual, ya se encargará el GC de borrarlo
-List.cs (155) : // de memoria.
-List.cs (156) : parent.Next = parent.Next.Next;
-List.cs (158) : return value;
-List.cs (165) : this.First = this.Last = null;
-List.cs (166) : this.m_numItems = 0;
-List.cs (173) : ListNode<T> node = this.First;
-List.cs (175) : if (node != null)
-List.cs (176) : {
-List.cs (177) : yield return node.Value;
-List.cs (178) : }
-List.cs (180) : while (node.Next != null)
-List.cs (181) : {
-List.cs (182) : yield return node.Next.Value;
-List.cs (184) : node = node.Next;
-List.cs (185) : }
+List.cs (68) : node = this.First;
+List.cs (69) : for (int i = 0; i < index; i++)
+List.cs (70) : {
+List.cs (71) : node = node.Next;
+List.cs (73) : if (node == null)
+List.cs (74) : {
+List.cs (75) : return null;
+List.cs (76) : }
+List.cs (77) : }
+List.cs (78) : }
+List.cs (79) : else
+List.cs (80) : {
+List.cs (81) : // Está más cerca del final
+List.cs (83) : node = this.Last;
+List.cs (84) : for (int i = this.m_numItems - 1; i > index - this.m_numItems; i--)
+List.cs (85) : {
+List.cs (86) : node = node.Prev;
+List.cs (88) : if (node == null)
+List.cs (89) : {
+List.cs (90) : return null;
+List.cs (91) : }
+List.cs (92) : }
+List.cs (93) : }
+List.cs (95) : return node;
+List.cs (96) : }
+List.cs (98) : public T Get(int index)
+List.cs (99) : {
+List.cs (100) : //TODO #2.15: return the element on the index-th position. O if the position is out of bounds
+List.cs (102) : ListNode<T> node = this.GetElement(index);
+List.cs (104) : return node == null ? default(T) : node.Value;
+List.cs (111) : ListNode<T> newNode = new ListNode<T>(value);
+List.cs (113) : if (this.Last == null)
+List.cs (114) : {
+List.cs (115) : // Significa que no hay ningún elemento
+List.cs (116) : this.First = this.Last = newNode;
+List.cs (117) : }
+List.cs (118) : else
+List.cs (119) : {
+List.cs (120) : this.Last.Next = newNode;
+List.cs (121) : newNode.Prev = this.Last;
+List.cs (123) : // actualizamos el nuevo last
+List.cs (124) : this.Last = newNode;
+List.cs (125) : }
+List.cs (127) : this.m_numItems++;
+List.cs (134) : if (index < 0 || index >= this.m_numItems)
+List.cs (135) : {
+List.cs (137) : }
+List.cs (140) : // Actualizamos el número total de elementos, porque sabemos que el nodo que
+List.cs (141) : // queremos eliminar está dentro de nuestros nodos
+List.cs (142) : this.m_numItems--;
+List.cs (144) : T value; // sin más, definir la variable
+List.cs (146) : // Si es el primero
+List.cs (147) : if (index == 0)
+List.cs (148) : {
+List.cs (149) : value = this.First.Value;
+List.cs (151) : this.First = this.First.Next;
+List.cs (153) : // Claro, si no hay primero, tampoco hay último jeje
+List.cs (154) : if (this.First == null)
+List.cs (155) : {
+List.cs (156) : this.Last = null;
+List.cs (157) : }
+List.cs (158) : else
+List.cs (159) : {
+List.cs (160) : // Si hay First, actualizamos su previo a "ninguno"
+List.cs (161) : this.First.Prev = null;
+List.cs (162) : }
+List.cs (164) : return value;
+List.cs (165) : }
+List.cs (167) : // Si es el último
+List.cs (168) : if (index == this.m_numItems) // no resto -1 porque ya lo he hecho antes
+List.cs (169) : {
+List.cs (170) : value = this.Last.Value;
+List.cs (172) : this.Last = this.Last.Prev; // nuestro último será el padre
+List.cs (173) : this.Last.Next = null;      // ahora sí, borramos el último
+List.cs (175) : return value;
+List.cs (176) : }
+List.cs (178) : // No puede ser nulo porque ya hemos comprobado los límites del index
+List.cs (179) : ListNode<T> node = this.GetElement(index);
+List.cs (181) : value = node.Value;
+List.cs (183) : // Nos saltamos el nodo actual, ya se encargará el GC de borrarlo
+List.cs (184) : // de memoria.
+List.cs (185) : node.Prev = node.Next;
+List.cs (187) : return value;
+List.cs (193) : this.First = this.Last = null;
+List.cs (194) : this.m_numItems = 0;
+List.cs (201) : ListNode<T> node = this.First;
+List.cs (203) : if (node != null)
+List.cs (204) : {
+List.cs (205) : yield return node.Value;
+List.cs (206) : }
+List.cs (208) : while (node.Next != null)
+List.cs (209) : {
+List.cs (210) : yield return node.Next.Value;
+List.cs (212) : node = node.Next;
+List.cs (213) : }
 MergeSort.cs (9) : if (endIndex - startIndex < 0 || startIndex < 0 || endIndex < 0)
 MergeSort.cs (10) : {
 MergeSort.cs (11) : return new int[0]; // array vacío
@@ -350,10 +390,10 @@ SelectionSort.cs (28) : int aux = A[i];
 SelectionSort.cs (29) : A[i] = A[min];
 SelectionSort.cs (30) : A[min] = aux;
 SelectionSort.cs (31) : }
-Queue.cs (5) : private List<T> StackList;
+Queue.cs (5) : private ArrayList<T> StackList;
 Queue.cs (7) : public Queue()
 Queue.cs (8) : {
-Queue.cs (9) : StackList = new List<T>();
+Queue.cs (9) : StackList = new ArrayList<T>();
 Queue.cs (10) : }
 Queue.cs (14) : return StackList.ToString();
 Queue.cs (19) : return StackList.Count();

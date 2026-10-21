@@ -1,26 +1,19 @@
 ArrayList.cs (32) : return NumElements ;
-ArrayList.cs (50) : if (NumElements<Values.Length)
 ArrayList.cs (51) : {
-ArrayList.cs (52) : Values[NumElements]=(value);
 ArrayList.cs (53) : NumElements++;
 ArrayList.cs (54) : }
-ArrayList.cs (55) : else if(NumElements>=Values.Length)
 ArrayList.cs (56) : {
-ArrayList.cs (57) : Resize(NumElements*2);
-ArrayList.cs (58) : Values[NumElements]=(value);
 ArrayList.cs (59) : NumElements++;
 ArrayList.cs (60) : }
-ArrayList.cs (86) : NumElements = 0;
-ArrayList.cs (93) : T [] newValues = new T [newSize];
-ArrayList.cs (94) : for(int i = 0; i < NumElements; i++)
-ArrayList.cs (95) : {
-ArrayList.cs (96) : newValues[i]=Values[i];
-ArrayList.cs (97) : }
-ArrayList.cs (98) : Values = newValues;
+ArrayList.cs (94) : NumElements = 0;
+ArrayList.cs (102) : T [] newValues = new T [newSize];
 ArrayList.cs (103) : for(int i = 0; i < NumElements; i++)
 ArrayList.cs (104) : {
-ArrayList.cs (105) : yield return Values[i];
 ArrayList.cs (106) : }
+ArrayList.cs (107) : Values = newValues;
+ArrayList.cs (113) : for(int i = 0; i < NumElements; i++)
+ArrayList.cs (114) : {
+ArrayList.cs (116) : }
 IntArrayList.cs (1) : using System;
 IntArrayList.cs (35) : return NumElements;
 IntArrayList.cs (43) : if(index>NumElements|| index<0)
@@ -84,48 +77,63 @@ IntList.cs (136) : {
 IntList.cs (137) : yield return node.Value;
 IntList.cs (138) : node = node.Next;
 IntList.cs (142) : }
-List.cs (53) : if(index < 0 || First == null)
-List.cs (54) : return default(T);
-List.cs (56) : ListNode<T> node = First;
-List.cs (57) : for (int i = 0; i < index ; i++)
-List.cs (58) : {
-List.cs (59) : node = node.Next;
-List.cs (60) : }
-List.cs (61) : if(node == null)
-List.cs (64) : return node.Value;
-List.cs (87) : if(index < 0 || First == null)
-List.cs (88) : {
-List.cs (90) : }
-List.cs (91) : if(index == 0)
-List.cs (92) : {
-List.cs (93) : T removed = First.Value;
-List.cs (94) : First = First.Next;
-List.cs (95) : m_numItems--;
-List.cs (96) : return removed;
-List.cs (97) : }
-List.cs (98) : else
-List.cs (99) : {
-List.cs (100) : ListNode<T> node = First;
-List.cs (101) : for (int i = 0; i < index - 1; i++)
-List.cs (102) : {
-List.cs (103) : node = node.Next;
-List.cs (104) : if( node == null || node.Next == null)
-List.cs (105) : return default(T);
-List.cs (106) : }
-List.cs (107) : T value = node.Next.Value;
-List.cs (108) : node.Next = node.Next.Next;
-List.cs (109) : m_numItems--;
-List.cs (110) : return value;
-List.cs (111) : }
-List.cs (117) : First=null;
-List.cs (118) : Last=null;
-List.cs (119) : m_numItems=0;
-List.cs (125) : ListNode<T> node = First;
-List.cs (126) : while(node != null)
-List.cs (127) : {
-List.cs (128) : yield return node.Value;
-List.cs (129) : node = node.Next;
-List.cs (130) : }
+List.cs (1) : using System.Globalization;
+List.cs (2) : using System.Linq.Expressions;
+List.cs (11) : public ListNode<T> Previous = null;
+List.cs (55) : if(index < 0 || First == null)
+List.cs (56) : return default(T);
+List.cs (58) : ListNode<T> node = First;
+List.cs (59) : for (int i = 0; i < index ; i++)
+List.cs (60) : {
+List.cs (61) : node = node.Next;
+List.cs (62) : }
+List.cs (63) : if(node == null)
+List.cs (66) : return node.Value;
+List.cs (81) : node.Previous =Last;
+List.cs (90) : if(index < 0 || First == null)
+List.cs (93) : T removed=default(T);
+List.cs (94) : if(index == 0)
+List.cs (95) : {
+List.cs (96) : removed = First.Value;
+List.cs (97) : First = First.Next;
+List.cs (98) : if(First == null)
+List.cs (99) : Last = null;
+List.cs (100) : else
+List.cs (101) : First.Previous = null;
+List.cs (103) : }
+List.cs (104) : else if(index == m_numItems-1)
+List.cs (105) : {
+List.cs (106) : removed = Last.Value;
+List.cs (107) : Last=Last.Previous;
+List.cs (108) : Last.Next = null;
+List.cs (109) : }
+List.cs (110) : else
+List.cs (111) : {
+List.cs (112) : ListNode<T> node = First;
+List.cs (113) : for (int i = 0; i < index; i++)
+List.cs (114) : {
+List.cs (115) : node = node.Next;
+List.cs (116) : if( node == null || node.Next == null)
+List.cs (117) : {
+List.cs (118) : node.Previous= null;
+List.cs (119) : return default(T);
+List.cs (120) : }
+List.cs (121) : }
+List.cs (122) : removed = node.Value;
+List.cs (123) : node.Previous.Next = node.Next;
+List.cs (124) : node.Next.Previous = node.Previous;
+List.cs (125) : }
+List.cs (126) : m_numItems--;
+List.cs (127) : return removed;
+List.cs (133) : First=null;
+List.cs (134) : Last=null;
+List.cs (135) : m_numItems=0;
+List.cs (141) : ListNode<T> node = First;
+List.cs (142) : while(node != null)
+List.cs (143) : {
+List.cs (144) : yield return node.Value;
+List.cs (145) : node = node.Next;
+List.cs (146) : }
 MergeSort.cs (10) : int longitud = endIndex-startIndex+1;
 MergeSort.cs (11) : int [] resultado = new int[longitud];
 MergeSort.cs (13) : for(int i=0; i<longitud;i++)
@@ -176,8 +184,9 @@ SelectionSort.cs (22) : }
 SelectionSort.cs (23) : }
 SelectionSort.cs (24) : }
 Queue.cs (1) : using System.Collections;
-Queue.cs (8) : IList<T> m_list= new List<T>();
+Queue.cs (8) : IList<T> m_list= new List<T>(); // Necesitamos crear esa linea para poder usar el m_list. Ademas, hay que inicializarlo  da igual si es con List o con ArrayList -> IList<T> m_list= new ArrayList<T>(); Para Stack es igual
 Queue.cs (19) : return m_list.Count();
 Queue.cs (24) : m_list.Clear();
 Queue.cs (29) : m_list.Add(value);
 Queue.cs (34) : return m_list.Remove(0);
+Stack.cs (6) : IList<T> m_list = new ArrayList<T>(); // Necesitamos crear esa linea para poder usar el m_list. Ademas, hay que inicializarlo  da igual si es con List o con ArrayList -> IList<T> m_list= new List<T>(); Para Queue es igual
