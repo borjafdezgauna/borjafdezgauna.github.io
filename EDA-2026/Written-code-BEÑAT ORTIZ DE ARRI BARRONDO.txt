@@ -1,29 +1,44 @@
-ArrayList.cs (2) : using System.Linq;
-ArrayList.cs (33) : return NumElements;
-ArrayList.cs (40) : if (index >= NumElements)
-ArrayList.cs (41) : return default;
-ArrayList.cs (42) : return Values[index];
-ArrayList.cs (50) : if (NumElements < Values.Length)
-ArrayList.cs (51) : Values[NumElements] = value;
-ArrayList.cs (52) : else
-ArrayList.cs (53) : {
-ArrayList.cs (54) : Resize(2 * Values.Length);
-ArrayList.cs (55) : Values[NumElements] = value;
-ArrayList.cs (56) : }
-ArrayList.cs (57) : NumElements++;
-ArrayList.cs (65) : //Return the removed item, -1 if the position is incorrec
-ArrayList.cs (66) : T valor = Values[index];
-ArrayList.cs (67) : if (index >= NumElements)
-ArrayList.cs (68) : return default;
-ArrayList.cs (69) : for (int i = index; i < NumElements - 1; i++)
-ArrayList.cs (70) : Values[i] = Values[i + 1];
-ArrayList.cs (71) : NumElements--;
-ArrayList.cs (72) : return valor;
-ArrayList.cs (78) : NumElements = 0;
+ArrayList.cs (2) : using System.Collections.Concurrent;
+ArrayList.cs (3) : using System.Linq;
+ArrayList.cs (10) : int LastIndex = 0;
+ArrayList.cs (11) : public int FirstIndex = 0;
+ArrayList.cs (34) : return LastIndex - FirstIndex;
+ArrayList.cs (39) : if (index < 0 || index >= Count())
+ArrayList.cs (40) : return default;
+ArrayList.cs (41) : return Values[index + FirstIndex];
+ArrayList.cs (46) : if (LastIndex < Values.Length)
+ArrayList.cs (47) : Values[LastIndex] = value;
+ArrayList.cs (48) : else
+ArrayList.cs (49) : {
+ArrayList.cs (50) : Resize(2 * Values.Length);
+ArrayList.cs (51) : Values[LastIndex] = value;
+ArrayList.cs (52) : }
+ArrayList.cs (53) : LastIndex++;
+ArrayList.cs (60) : if (index < 0 || index >= Count())
+ArrayList.cs (61) : return default;
+ArrayList.cs (62) : T valor = Values[index + FirstIndex];
+ArrayList.cs (63) : if (index == 0)
+ArrayList.cs (64) : {
+ArrayList.cs (65) : Values[FirstIndex] = default;
+ArrayList.cs (66) : FirstIndex++;
+ArrayList.cs (67) : return valor;
+ArrayList.cs (68) : }
+ArrayList.cs (69) : LastIndex--;
+ArrayList.cs (70) : for (int i = index + FirstIndex; i < LastIndex; i++)
+ArrayList.cs (71) : Values[i] = Values[i + 1];
+ArrayList.cs (72) : Values[LastIndex] = default;
+ArrayList.cs (73) : return valor;
+ArrayList.cs (78) : LastIndex = 0;
+ArrayList.cs (79) : FirstIndex = 0;
+ArrayList.cs (84) : int cuenta = Count();
 ArrayList.cs (85) : T[] nuevo = new T[newSize];
-ArrayList.cs (86) : for (int i = 0; i < Values.Length; i++)
-ArrayList.cs (87) : nuevo[i] = Values[i];
+ArrayList.cs (86) : for (int i = FirstIndex; i < LastIndex; i++)
+ArrayList.cs (87) : nuevo[i - FirstIndex] = Values[i];
 ArrayList.cs (88) : Values = nuevo;
+ArrayList.cs (89) : FirstIndex = 0;
+ArrayList.cs (90) : LastIndex = cuenta;
+ArrayList.cs (94) : for(int i = FirstIndex; i < LastIndex; i++)
+ArrayList.cs (95) : yield return Values[i];
 IntList.cs (3) : using System.Globalization;
 IntList.cs (4) : using System.Xml;
 IntList.cs (44) : IntListNode nodo = First;
