@@ -38,7 +38,7 @@ ArrayList.cs (113) : {
 ArrayList.cs (114) : newValues[i] = this.Values[i];
 ArrayList.cs (115) : }
 ArrayList.cs (117) : this.Values = newValues;
-ArrayList.cs (124) : for(int i = 0; i < Values.Length; i++)
+ArrayList.cs (124) : for(int i = FirstIndex; i < NumElements; i++)
 ArrayList.cs (125) : {
 ArrayList.cs (126) : yield return Values[i];
 ArrayList.cs (127) : }
@@ -259,15 +259,11 @@ List.cs (188) : return value;
 List.cs (194) : this.First = this.Last = null;
 List.cs (195) : this.m_numItems = 0;
 List.cs (202) : ListNode<T> node = this.First;
-List.cs (204) : if (node != null)
+List.cs (204) : while (node != null)
 List.cs (205) : {
 List.cs (206) : yield return node.Value;
-List.cs (207) : }
-List.cs (209) : while (node.Next != null)
-List.cs (210) : {
-List.cs (211) : yield return node.Next.Value;
-List.cs (213) : node = node.Next;
-List.cs (214) : }
+List.cs (208) : node = node.Next;
+List.cs (209) : }
 MergeSort.cs (9) : if (endIndex - startIndex < 0 || startIndex < 0 || endIndex < 0)
 MergeSort.cs (10) : {
 MergeSort.cs (11) : return new int[0]; // array vacío
@@ -411,3 +407,102 @@ Stack.cs (21) : return StackList.Count();
 Stack.cs (26) : StackList.Clear();
 Stack.cs (31) : StackList.Add(value);
 Stack.cs (36) : return StackList.Remove(StackList.Count() - 1);
+TreeNode.cs (10) : private List<TreeNode<T>> Children;
+TreeNode.cs (17) : Value = value;
+TreeNode.cs (18) : Children = new List<TreeNode<T>>();
+TreeNode.cs (25) : string output = null;
+TreeNode.cs (26) : string leftSpace = null;
+TreeNode.cs (27) : for (int i = 0; i < depth; i++) leftSpace += " ";
+TreeNode.cs (28) : if (leftSpace != null) leftSpace += "->";
+TreeNode.cs (30) : output += $"{leftSpace}[{Value}]\n";
+TreeNode.cs (32) : for (int childIndex = 0; childIndex < Children.Count(); childIndex++)
+TreeNode.cs (33) : {
+TreeNode.cs (34) : TreeNode<T> child = Children.Get(childIndex);
+TreeNode.cs (35) : output += child.ToString(depth + 1, childIndex);
+TreeNode.cs (36) : }
+TreeNode.cs (37) : return output;
+TreeNode.cs (44) : TreeNode<T> newNode = new TreeNode<T>(value);
+TreeNode.cs (46) : Children.Add(newNode);
+TreeNode.cs (48) : return newNode;
+TreeNode.cs (56) : int count = 1; // Este nodo ya cuenta como 1
+TreeNode.cs (58) : foreach (TreeNode<T> child in Children)
+TreeNode.cs (59) : {
+TreeNode.cs (60) : count += child.Count();
+TreeNode.cs (61) : }
+TreeNode.cs (63) : return count + 1;
+TreeNode.cs (70) : int maxHeight = 0;
+TreeNode.cs (72) : foreach (TreeNode<T> child in Children)
+TreeNode.cs (73) : {
+TreeNode.cs (74) : int height = child.Height();
+TreeNode.cs (75) : if (height > maxHeight)
+TreeNode.cs (76) : {
+TreeNode.cs (77) : maxHeight = height;
+TreeNode.cs (78) : }
+TreeNode.cs (81) : // Después de contar el alto máximo de los nodos (si es que los hay), si este arbol tiene
+TreeNode.cs (82) : // hijos, significa que su altura suma 1 (porque el resto de alturas las suman los hijos)
+TreeNode.cs (83) : if (Children.Count() > 0)
+TreeNode.cs (84) : {
+TreeNode.cs (85) : maxHeight++;
+TreeNode.cs (86) : }
+TreeNode.cs (88) : return maxHeight;
+TreeNode.cs (89) : }
+TreeNode.cs (95) : // Uso un arraylist por usarlo, sin más
+TreeNode.cs (96) : ArrayList<int> toRemove = new ArrayList<int>();
+TreeNode.cs (97) : int i = 0;
+TreeNode.cs (99) : // No itero con for (int i = 0; ...) porque a la hora de eliminarlo me cambiaría los índices.
+TreeNode.cs (100) : // Mismo motivo para la existencia del toRemove. Es MUY mala práctica modificar el tamaño de
+TreeNode.cs (101) : // una lista mientras se usa.
+TreeNode.cs (102) : // Además, en listas, el Get() es demasiado lento como para usarlo en iteraciones.
+TreeNode.cs (103) : foreach (TreeNode<T> child in Children)
+TreeNode.cs (104) : {
+TreeNode.cs (105) : if (child.Value.Equals(value))
+TreeNode.cs (106) : {
+TreeNode.cs (107) : toRemove.Add(i);
+TreeNode.cs (108) : }
+TreeNode.cs (109) : else
+TreeNode.cs (110) : {
+TreeNode.cs (111) : child.Remove(value);
+TreeNode.cs (112) : }
+TreeNode.cs (114) : i++;
+TreeNode.cs (115) : }
+TreeNode.cs (117) : // Elimianr los nodos marcados para eliminar
+TreeNode.cs (118) : foreach (int index in toRemove)
+TreeNode.cs (119) : {
+TreeNode.cs (120) : Children.Remove(index);
+TreeNode.cs (121) : }
+TreeNode.cs (122) : }
+TreeNode.cs (124) : public void Remove(TreeNode<T> node)
+TreeNode.cs (125) : {
+TreeNode.cs (126) : //TODO #3.9: Same as #7, but this method is given the specific node to remove, not the value
+TreeNode.cs (128) : int i = -1;
+TreeNode.cs (129) : foreach (TreeNode<T> child in Children)
+TreeNode.cs (130) : {
+TreeNode.cs (131) : i++;
+TreeNode.cs (133) : if (child.Equals(node))
+TreeNode.cs (134) : {
+TreeNode.cs (135) : break;
+TreeNode.cs (136) : }
+TreeNode.cs (137) : }
+TreeNode.cs (139) : if (i > -1)
+TreeNode.cs (140) : {
+TreeNode.cs (141) : Children.Remove(i);
+TreeNode.cs (142) : }
+TreeNode.cs (149) : if (Value.Equals(value))
+TreeNode.cs (150) : {
+TreeNode.cs (151) : return this;
+TreeNode.cs (154) : foreach (TreeNode<T> child in Children)
+TreeNode.cs (155) : {
+TreeNode.cs (156) : if (child.Value.Equals(value))
+TreeNode.cs (157) : {
+TreeNode.cs (158) : return child;
+TreeNode.cs (159) : }
+TreeNode.cs (160) : else
+TreeNode.cs (161) : {
+TreeNode.cs (162) : TreeNode<T> found = child.Find(value);
+TreeNode.cs (164) : // Solo lo devolvemos si lo encontramos
+TreeNode.cs (165) : if (found != null)
+TreeNode.cs (167) : return found;
+TreeNode.cs (168) : }
+TreeNode.cs (169) : }
+TreeNode.cs (170) : }
+TreeNode.cs (172) : return null;
