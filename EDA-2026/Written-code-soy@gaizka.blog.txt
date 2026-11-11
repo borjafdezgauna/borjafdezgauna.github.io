@@ -407,6 +407,144 @@ Stack.cs (21) : return StackList.Count();
 Stack.cs (26) : StackList.Clear();
 Stack.cs (31) : StackList.Add(value);
 Stack.cs (36) : return StackList.Remove(StackList.Count() - 1);
+BinaryTree.cs (83) : // Quitamos rangos imposibles: end anterior a start o start posterior a end (que viene a ser lo mismo)
+BinaryTree.cs (84) : if (start > end)
+BinaryTree.cs (85) : {
+BinaryTree.cs (86) : // Devolvemos null para que el LeftChild o RightChild que toque sea null (hasta este punto llega el árbol)
+BinaryTree.cs (88) : }
+BinaryTree.cs (90) : // (end - start) -> Cuántos elementos hay
+BinaryTree.cs (91) : // (end - start) / 2 -> La mitad de elementos que hay
+BinaryTree.cs (92) : // start + (end - start) / 2 -> El elemento en la mitad entre start y end
+BinaryTree.cs (93) : int middle = start + (end - start) / 2;
+BinaryTree.cs (95) : BinaryTreeNode<TKey, TValue> node = new BinaryTreeNode<TKey, TValue>(keys[middle], values[middle]);
+BinaryTree.cs (97) : // Fíjate que evitamos apuntar a middle porque ya lo "consumimos" por decirlo de alguna forma en node
+BinaryTree.cs (98) : node.LeftChild = AddBalanced(keys, values, start, middle - 1);
+BinaryTree.cs (99) : node.RightChild = AddBalanced(keys, values, middle + 1, end);
+BinaryTree.cs (101) : return node;
+BinaryTreeNode.cs (16) : Key = key;
+BinaryTreeNode.cs (17) : Value = value;
+BinaryTreeNode.cs (49) : // Si pones el ratón encima de la función A.CompareTo(B), el VSCode te muetsra su documentación:
+BinaryTreeNode.cs (50) : //  - Si devuelve 0 -> Son iguales
+BinaryTreeNode.cs (51) : //  - Si devuelve algo MAYOR a 0 es que B es mayor. (recuerda A.CompareTo(B))
+BinaryTreeNode.cs (52) : //  - Si devuelve algo MENOR 0 0 es que A es mayor (A es menor).
+BinaryTreeNode.cs (53) : int comp = Key.CompareTo(node.Key);
+BinaryTreeNode.cs (55) : if (comp > 0)
+BinaryTreeNode.cs (56) : {
+BinaryTreeNode.cs (57) : // Ahhhggg!! Me duelen los ojos, un if dentro de un if ahhhhgg
+BinaryTreeNode.cs (58) : if (RightChild == null)
+BinaryTreeNode.cs (59) : {
+BinaryTreeNode.cs (60) : RightChild = node;
+BinaryTreeNode.cs (61) : }
+BinaryTreeNode.cs (62) : else
+BinaryTreeNode.cs (63) : {
+BinaryTreeNode.cs (64) : RightChild.Add(node);
+BinaryTreeNode.cs (65) : }
+BinaryTreeNode.cs (66) : }
+BinaryTreeNode.cs (67) : else if (comp < 0)
+BinaryTreeNode.cs (68) : {
+BinaryTreeNode.cs (69) : // Noooooo, otra vez :(((((((
+BinaryTreeNode.cs (70) : if (LeftChild == null)
+BinaryTreeNode.cs (71) : {
+BinaryTreeNode.cs (72) : LeftChild = node;
+BinaryTreeNode.cs (73) : }
+BinaryTreeNode.cs (74) : else
+BinaryTreeNode.cs (75) : {
+BinaryTreeNode.cs (76) : LeftChild.Add(node);
+BinaryTreeNode.cs (77) : }
+BinaryTreeNode.cs (78) : }
+BinaryTreeNode.cs (79) : else
+BinaryTreeNode.cs (80) : {
+BinaryTreeNode.cs (81) : Value = node.Value;
+BinaryTreeNode.cs (82) : }
+BinaryTreeNode.cs (89) : // Este nodo ya cuenta como 1
+BinaryTreeNode.cs (90) : int count = 1;
+BinaryTreeNode.cs (92) : if (LeftChild != null)
+BinaryTreeNode.cs (93) : {
+BinaryTreeNode.cs (94) : count += LeftChild.Count();
+BinaryTreeNode.cs (95) : }
+BinaryTreeNode.cs (97) : if (RightChild != null)
+BinaryTreeNode.cs (98) : {
+BinaryTreeNode.cs (99) : count += RightChild.Count();
+BinaryTreeNode.cs (100) : }
+BinaryTreeNode.cs (102) : return count;
+BinaryTreeNode.cs (111) : if (LeftChild == null && RightChild == null)
+BinaryTreeNode.cs (112) : {
+BinaryTreeNode.cs (114) : }
+BinaryTreeNode.cs (116) : int leftHeight = LeftChild != null ? LeftChild.Height() : 0;
+BinaryTreeNode.cs (117) : int rightHeight = RightChild != null ? RightChild.Height() : 0;
+BinaryTreeNode.cs (119) : int height = leftHeight > rightHeight ? leftHeight : rightHeight;
+BinaryTreeNode.cs (121) : return height + 1;
+BinaryTreeNode.cs (133) : int comp = Key.CompareTo(key);
+BinaryTreeNode.cs (135) : if (comp > 0)
+BinaryTreeNode.cs (136) : {
+BinaryTreeNode.cs (137) : // Esto gusta un poco más porque es una ternaria y se lee mejor
+BinaryTreeNode.cs (138) : return RightChild == null ? default(TValue) : RightChild.Get(key);
+BinaryTreeNode.cs (139) : }
+BinaryTreeNode.cs (140) : else if (comp < 0)
+BinaryTreeNode.cs (141) : {
+BinaryTreeNode.cs (142) : return LeftChild == null ? default(TValue) : LeftChild.Get(key);
+BinaryTreeNode.cs (143) : }
+BinaryTreeNode.cs (144) : else
+BinaryTreeNode.cs (145) : {
+BinaryTreeNode.cs (146) : return Value;
+BinaryTreeNode.cs (147) : }
+BinaryTreeNode.cs (158) : // Como explica el comentario TODO, al eliminar un nodo del árbol, tienes que sustituír ese nodo que eliminas
+BinaryTreeNode.cs (159) : // con uno de sus hijos porque si no estos se pierden.
+BinaryTreeNode.cs (160) : //
+BinaryTreeNode.cs (161) : // Entonces, si este nodo NO ES el que buscamos (por la key), tenemos que sustituír uno de los hijos (left o right)
+BinaryTreeNode.cs (162) : // en función de la comparación.
+BinaryTreeNode.cs (163) : //
+BinaryTreeNode.cs (164) : // Fíjate que nos dice que si este nodo NO ES devolvamos this. De ahí el `return this;` al final de esta función.
+BinaryTreeNode.cs (165) : //
+BinaryTreeNode.cs (166) : // Por ese motivo también sustituímos el LeftChild o RightChild por lo que devuelva su .Remove(), porque puede ser
+BinaryTreeNode.cs (167) : // null, el propio Left/RightChild o un nuevo child que poner como Left o Right.
+BinaryTreeNode.cs (169) : int comp = Key.CompareTo(key);
+BinaryTreeNode.cs (171) : if (comp > 0)
+BinaryTreeNode.cs (172) : {
+BinaryTreeNode.cs (173) : // El "?." significa "haz si existe, sino null": haz RightChild.Remove si RightChild existe, si no existe LeftChuld = null.
+BinaryTreeNode.cs (174) : RightChild = RightChild?.Remove(key);
+BinaryTreeNode.cs (176) : // if (RightChild == null)
+BinaryTreeNode.cs (177) : // {
+BinaryTreeNode.cs (178) : //     RightChild = null;
+BinaryTreeNode.cs (179) : // }
+BinaryTreeNode.cs (180) : // else
+BinaryTreeNode.cs (181) : // {
+BinaryTreeNode.cs (182) : //     RightChild = RightChild.Remove(key);
+BinaryTreeNode.cs (183) : // }
+BinaryTreeNode.cs (184) : }
+BinaryTreeNode.cs (185) : else if (comp < 0)
+BinaryTreeNode.cs (186) : {
+BinaryTreeNode.cs (187) : // Lo mimso que arriba
+BinaryTreeNode.cs (188) : LeftChild = LeftChild?.Remove(key);
+BinaryTreeNode.cs (189) : }
+BinaryTreeNode.cs (190) : else
+BinaryTreeNode.cs (191) : {
+BinaryTreeNode.cs (192) : // Esto es lo más complicado de entender del Remove. Llegados a este punto sabemos que ESTE ES EL NODO QUE HAY QUE BORRAR.
+BinaryTreeNode.cs (193) : // Entonces: ¿Este nodo tiene hijos?
+BinaryTreeNode.cs (194) : // No: entonces este nodo no se sustituye por nada, hasta aquí ha llegado el árbol, devolvemos null.
+BinaryTreeNode.cs (195) : if (LeftChild == null && RightChild == null)
+BinaryTreeNode.cs (196) : {
+BinaryTreeNode.cs (198) : }
+BinaryTreeNode.cs (199) : // Sí: tenemos ambos hijos, tanto Left como Right
+BinaryTreeNode.cs (200) : else if (LeftChild != null && RightChild != null)
+BinaryTreeNode.cs (201) : {
+BinaryTreeNode.cs (202) : // De las opciones que nos explicó Borja en clase, cogemos una de las dos:
+BinaryTreeNode.cs (203) : //  - O Metemos el Left dentro del Right y devolvemos el Right (que es la actual)
+BinaryTreeNode.cs (204) : //  - O metemos el Right dentro del Left y devolvemos el Left.
+BinaryTreeNode.cs (205) : //
+BinaryTreeNode.cs (206) : // ¿Por qué esto es así? Porque solo podemos devolver UN nodo, y como tenemos dos hijos
+BinaryTreeNode.cs (207) : // no nos queda de otra que meter uno de los hijos dentro del otro. De ahí las dos opciones.
+BinaryTreeNode.cs (209) : RightChild.Add(LeftChild);
+BinaryTreeNode.cs (211) : return RightChild;
+BinaryTreeNode.cs (212) : }
+BinaryTreeNode.cs (213) : // Sí: pero tenemos uno de los dos hijos
+BinaryTreeNode.cs (214) : else
+BinaryTreeNode.cs (215) : {
+BinaryTreeNode.cs (216) : // Si LeftChild no es nulo, entonces RightChild tiene que ser null, si no al revés
+BinaryTreeNode.cs (217) : return LeftChild != null ? LeftChild : RightChild;
+BinaryTreeNode.cs (218) : }
+BinaryTreeNode.cs (219) : }
+BinaryTreeNode.cs (221) : return this;
 TreeNode.cs (10) : private List<TreeNode<T>> Children;
 TreeNode.cs (17) : Value = value;
 TreeNode.cs (18) : Children = new List<TreeNode<T>>();
@@ -429,7 +567,7 @@ TreeNode.cs (58) : foreach (TreeNode<T> child in Children)
 TreeNode.cs (59) : {
 TreeNode.cs (60) : count += child.Count();
 TreeNode.cs (61) : }
-TreeNode.cs (63) : return count + 1;
+TreeNode.cs (63) : return count;
 TreeNode.cs (70) : int maxHeight = 0;
 TreeNode.cs (72) : foreach (TreeNode<T> child in Children)
 TreeNode.cs (73) : {
