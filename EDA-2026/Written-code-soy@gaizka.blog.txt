@@ -1,3 +1,133 @@
+BinaryTreeDictionary.cs (9) : public BinaryTree<TKey, TValue> Tree;
+BinaryTreeDictionary.cs (15) : Tree = new BinaryTree<TKey, TValue>();
+BinaryTreeDictionary.cs (21) : return Tree.ToString();
+BinaryTreeDictionary.cs (27) : return Tree.Count();
+BinaryTreeDictionary.cs (33) : return Tree.Get(key);
+BinaryTreeDictionary.cs (39) : Tree.Add(key, value);
+BinaryTreeDictionary.cs (45) : Tree.Remove(key);
+BinaryTreeDictionary.cs (53) : return Tree.Keys();
+BinaryTreeDictionary.cs (60) : return Tree.Values();
+HashTableDictionary.cs (11) : public List<HashTableDictionaryItem<TKey, TValue>>[] Entries;
+HashTableDictionary.cs (16) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[DefaultNumEntries];
+HashTableDictionary.cs (22) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[numEntries];
+HashTableDictionary.cs (31) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (32) : {
+HashTableDictionary.cs (33) : if (Entries[i] != null)
+HashTableDictionary.cs (34) : {
+HashTableDictionary.cs (35) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (36) : {
+HashTableDictionary.cs (37) : HashTableDictionaryItem<TKey, TValue> entry = Entries[i].Get(j);
+HashTableDictionary.cs (38) : output += entry.ToString();
+HashTableDictionary.cs (39) : }
+HashTableDictionary.cs (40) : }
+HashTableDictionary.cs (41) : }
+HashTableDictionary.cs (49) : return NumElements;
+HashTableDictionary.cs (57) : // Es posible que el hash sea negativo
+HashTableDictionary.cs (58) : int hash = key.GetHashCode();
+HashTableDictionary.cs (59) : if (hash < 0)
+HashTableDictionary.cs (60) : {
+HashTableDictionary.cs (61) : hash *= -1;
+HashTableDictionary.cs (62) : }
+HashTableDictionary.cs (64) : return hash % Entries.Length; // Por defecto de la operación matemática nos dará [0, Entries.Length - 1]
+HashTableDictionary.cs (72) : int position = PositionOf(key);
+HashTableDictionary.cs (74) : if (Entries[position] == null)
+HashTableDictionary.cs (75) : {
+HashTableDictionary.cs (76) : return default(TValue);
+HashTableDictionary.cs (77) : }
+HashTableDictionary.cs (79) : foreach (HashTableDictionaryItem<TKey, TValue> item in Entries[position])
+HashTableDictionary.cs (80) : {
+HashTableDictionary.cs (81) : if (item.Key.Equals(key))
+HashTableDictionary.cs (82) : {
+HashTableDictionary.cs (83) : return item.Value;
+HashTableDictionary.cs (84) : }
+HashTableDictionary.cs (85) : }
+HashTableDictionary.cs (96) : int position = PositionOf(key);
+HashTableDictionary.cs (98) : if (Entries[position] == null)
+HashTableDictionary.cs (99) : {
+HashTableDictionary.cs (100) : Entries[position] = new List<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (101) : }
+HashTableDictionary.cs (103) : // Si resulta que acabamos de crear la lista (lo del if anterior) esto simplemente se "ignora"
+HashTableDictionary.cs (104) : foreach (HashTableDictionaryItem<TKey, TValue> elem in Entries[position])
+HashTableDictionary.cs (105) : {
+HashTableDictionary.cs (106) : // Comprobamos si ya existe un elemento con este array
+HashTableDictionary.cs (107) : if (elem.Key.Equals(key))
+HashTableDictionary.cs (108) : {
+HashTableDictionary.cs (109) : elem.Value = value;
+HashTableDictionary.cs (110) : // Al actualizarlo, salimos de la función
+HashTableDictionary.cs (111) : return;
+HashTableDictionary.cs (112) : }
+HashTableDictionary.cs (113) : }
+HashTableDictionary.cs (115) : // Si, por el motivo que sea, no existía un elemento con esta key en la List, lo creamos y lo metemos
+HashTableDictionary.cs (116) : HashTableDictionaryItem<TKey, TValue> item = new HashTableDictionaryItem<TKey, TValue>(key, value);
+HashTableDictionary.cs (117) : Entries[position].Add(item);
+HashTableDictionary.cs (118) : NumElements++;
+HashTableDictionary.cs (127) : int position = PositionOf(key);
+HashTableDictionary.cs (129) : if (Entries[position] == null)
+HashTableDictionary.cs (130) : {
+HashTableDictionary.cs (131) : return;
+HashTableDictionary.cs (132) : }
+HashTableDictionary.cs (134) : int index = 0;
+HashTableDictionary.cs (135) : // Si iteramos todos los elementos y aún así NO hemos encontrado un elemento con esta key, index valdrá el
+HashTableDictionary.cs (136) : // índice del último momento, y esto no es correcto. De ahí la variable found
+HashTableDictionary.cs (137) : bool found = false;
+HashTableDictionary.cs (138) : foreach (HashTableDictionaryItem<TKey, TValue> item in Entries[position])
+HashTableDictionary.cs (139) : {
+HashTableDictionary.cs (140) : if (item.Key.Equals(key))
+HashTableDictionary.cs (141) : {
+HashTableDictionary.cs (142) : found = true;
+HashTableDictionary.cs (143) : break;
+HashTableDictionary.cs (144) : }
+HashTableDictionary.cs (146) : index++;
+HashTableDictionary.cs (147) : }
+HashTableDictionary.cs (149) : if (found)
+HashTableDictionary.cs (150) : {
+HashTableDictionary.cs (151) : Entries[position].Remove(index);
+HashTableDictionary.cs (152) : NumElements--;
+HashTableDictionary.cs (153) : }
+HashTableDictionary.cs (161) : if (NumElements == 0)
+HashTableDictionary.cs (162) : {
+HashTableDictionary.cs (163) : return [];
+HashTableDictionary.cs (164) : }
+HashTableDictionary.cs (166) : TKey[] keys = new TKey[NumElements];
+HashTableDictionary.cs (167) : int index = 0;
+HashTableDictionary.cs (169) : foreach (List<HashTableDictionaryItem<TKey, TValue>> list in Entries)
+HashTableDictionary.cs (170) : {
+HashTableDictionary.cs (171) : if (list == null)
+HashTableDictionary.cs (172) : {
+HashTableDictionary.cs (173) : continue;
+HashTableDictionary.cs (174) : }
+HashTableDictionary.cs (176) : foreach (HashTableDictionaryItem<TKey, TValue> item in list)
+HashTableDictionary.cs (177) : {
+HashTableDictionary.cs (178) : // Date cuenta que index++ suma 1 a index DESPUÉS de usarlo
+HashTableDictionary.cs (179) : keys[index++] = item.Key;
+HashTableDictionary.cs (181) : // Sería lo mismo que
+HashTableDictionary.cs (182) : // keys[index] = item.Key;
+HashTableDictionary.cs (183) : // index++;
+HashTableDictionary.cs (184) : }
+HashTableDictionary.cs (185) : }
+HashTableDictionary.cs (187) : return keys;
+HashTableDictionary.cs (195) : if (NumElements == 0)
+HashTableDictionary.cs (196) : {
+HashTableDictionary.cs (197) : return [];
+HashTableDictionary.cs (198) : }
+HashTableDictionary.cs (200) : TValue[] values = new TValue[NumElements];
+HashTableDictionary.cs (201) : int index = 0;
+HashTableDictionary.cs (203) : foreach (List<HashTableDictionaryItem<TKey, TValue>> list in Entries)
+HashTableDictionary.cs (204) : {
+HashTableDictionary.cs (205) : if (list == null)
+HashTableDictionary.cs (206) : {
+HashTableDictionary.cs (207) : continue;
+HashTableDictionary.cs (208) : }
+HashTableDictionary.cs (210) : foreach (HashTableDictionaryItem<TKey, TValue> item in list)
+HashTableDictionary.cs (211) : {
+HashTableDictionary.cs (212) : // Date cuenta que index++ suma 1 a index DESPUÉS de usarlo
+HashTableDictionary.cs (213) : values[index++] = item.Value;
+HashTableDictionary.cs (215) : // Sería lo mismo que
+HashTableDictionary.cs (216) : // keys[index] = item.Key;
+HashTableDictionary.cs (217) : // index++;
+HashTableDictionary.cs (218) : }
+HashTableDictionary.cs (219) : }
+HashTableDictionary.cs (221) : return values;
 ArrayList.cs (7) : int FirstIndex = 0;
 ArrayList.cs (31) : return this.NumElements;
 ArrayList.cs (39) : if (index < 0 || index >= this.Values.Length) {
