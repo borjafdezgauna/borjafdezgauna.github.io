@@ -10,10 +10,30 @@ BinaryTreeDictionary.cs (47) : Tree.Add(key, value);
 BinaryTreeDictionary.cs (53) : Tree.Remove(key);
 BinaryTreeDictionary.cs (61) : return Tree.Keys();
 BinaryTreeDictionary.cs (68) : return Tree.Values();
+DictionaryReaderWriter.cs (26) : TKey[] keysArray = dictionary.Keys();
+DictionaryReaderWriter.cs (27) : TValue[] valuesArray = dictionary.Values();
+DictionaryReaderWriter.cs (29) : for (int i = 0; i < keysArray.Length; i++)
+DictionaryReaderWriter.cs (30) : {
+DictionaryReaderWriter.cs (31) : string keyString = EncodeString(keyToString(keysArray[i]));
+DictionaryReaderWriter.cs (32) : string valueString = EncodeString(valueToString(valuesArray[i]));
+DictionaryReaderWriter.cs (34) : writer.WriteLine(keyString);
+DictionaryReaderWriter.cs (35) : writer.WriteLine(valueString);
+DictionaryReaderWriter.cs (36) : }
+DictionaryReaderWriter.cs (55) : string keysLine;
+DictionaryReaderWriter.cs (56) : while ((keysLine = reader.ReadLine()) != null)
+DictionaryReaderWriter.cs (57) : {
+DictionaryReaderWriter.cs (58) : string valuesLine = reader.ReadLine();
+DictionaryReaderWriter.cs (59) : if (valuesLine != null)
+DictionaryReaderWriter.cs (60) : {
+DictionaryReaderWriter.cs (61) : TKey key = stringToKey(DecodeString(keysLine));
+DictionaryReaderWriter.cs (62) : TValue value = valueToKey(DecodeString(valuesLine));
+DictionaryReaderWriter.cs (64) : dictionary.Add(key, value);
+DictionaryReaderWriter.cs (65) : }
+DictionaryReaderWriter.cs (67) : }
 HashTableDictionary.cs (3) : using System.Linq;
-HashTableDictionary.cs (11) : HashTableDictionary<TKey, TValue>[] Entries;
-HashTableDictionary.cs (18) : Entries = new HashTableDictionary<TKey, TValue>[DefaultNumEntries];
-HashTableDictionary.cs (24) : Entries = new HashTableDictionary<TKey, TValue>[numEntries];
+HashTableDictionary.cs (11) : List<HashTableDictionaryItem<TKey, TValue>>[] Entries;
+HashTableDictionary.cs (18) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[DefaultNumEntries];
+HashTableDictionary.cs (24) : Entries = new List<HashTableDictionaryItem<TKey, TValue>>[numEntries];
 HashTableDictionary.cs (33) : for (int i = 0; i < Entries.Length; i++)
 HashTableDictionary.cs (34) : {
 HashTableDictionary.cs (35) : if (Entries[i] != null)
@@ -26,20 +46,79 @@ HashTableDictionary.cs (41) : }
 HashTableDictionary.cs (42) : }
 HashTableDictionary.cs (43) : }
 HashTableDictionary.cs (52) : return NumElements;
-HashTableDictionary.cs (60) : if (NumElements > Entries.Length)
-HashTableDictionary.cs (61) : return key.GetHashCode() % Entries.Length;
-HashTableDictionary.cs (63) : return key.GetHashCode();
-HashTableDictionary.cs (70) : int pos = PositionOf(key);
-HashTableDictionary.cs (71) : if (Entries[pos] != null)
-HashTableDictionary.cs (72) : {
-HashTableDictionary.cs (73) : for (int i = 0; i < Entries[pos].Count(); i++)
-HashTableDictionary.cs (74) : {
-HashTableDictionary.cs (75) : HashTableDictionaryItem<TKey, TValue> element = Entries[pos].Get(i);
-HashTableDictionary.cs (76) : if (element.Key.Equals(key))
-HashTableDictionary.cs (77) : return element.Value;
-HashTableDictionary.cs (78) : }
-HashTableDictionary.cs (79) : }
-HashTableDictionary.cs (88) : TValue itemValue = Get(key);
+HashTableDictionary.cs (60) : return Math.Abs(key.GetHashCode()) % Entries.Length;
+HashTableDictionary.cs (67) : int pos = PositionOf(key);
+HashTableDictionary.cs (68) : if (pos >= 0 && pos < Entries.Length && Entries[pos] != null)
+HashTableDictionary.cs (69) : {
+HashTableDictionary.cs (70) : for (int i = 0; i < Entries[pos].Count(); i++)
+HashTableDictionary.cs (71) : {
+HashTableDictionary.cs (72) : HashTableDictionaryItem<TKey, TValue> element = Entries[pos].Get(i);
+HashTableDictionary.cs (73) : if (element.Key.Equals(key))
+HashTableDictionary.cs (74) : return element.Value;
+HashTableDictionary.cs (75) : }
+HashTableDictionary.cs (76) : }
+HashTableDictionary.cs (85) : int pos = PositionOf(key);
+HashTableDictionary.cs (86) : if (Entries[pos] == null)
+HashTableDictionary.cs (87) : {
+HashTableDictionary.cs (88) : Entries[pos] = new List<HashTableDictionaryItem<TKey, TValue>>();
+HashTableDictionary.cs (89) : Entries[pos].Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (90) : NumElements++;
+HashTableDictionary.cs (91) : }
+HashTableDictionary.cs (92) : else
+HashTableDictionary.cs (93) : {
+HashTableDictionary.cs (94) : int i = 0;
+HashTableDictionary.cs (95) : while (i < Entries[pos].Count() && !Entries[pos].Get(i).Key.Equals(key))
+HashTableDictionary.cs (96) : i++;
+HashTableDictionary.cs (98) : if (i == Entries[pos].Count())
+HashTableDictionary.cs (99) : {
+HashTableDictionary.cs (100) : Entries[pos].Add(new HashTableDictionaryItem<TKey, TValue>(key, value));
+HashTableDictionary.cs (101) : NumElements++;
+HashTableDictionary.cs (102) : }
+HashTableDictionary.cs (103) : else
+HashTableDictionary.cs (104) : {
+HashTableDictionary.cs (105) : Entries[pos].Get(i).Value = value;
+HashTableDictionary.cs (106) : }
+HashTableDictionary.cs (107) : }
+HashTableDictionary.cs (115) : int pos = PositionOf(key);
+HashTableDictionary.cs (116) : if (Entries[pos] != null)
+HashTableDictionary.cs (117) : {
+HashTableDictionary.cs (118) : int i = 0;
+HashTableDictionary.cs (119) : while (i < Entries[pos].Count() && !Entries[pos].Get(i).Key.Equals(key))
+HashTableDictionary.cs (120) : i++;
+HashTableDictionary.cs (122) : if (i != Entries[pos].Count())
+HashTableDictionary.cs (123) : {
+HashTableDictionary.cs (124) : Entries[pos] = null;
+HashTableDictionary.cs (125) : NumElements--;
+HashTableDictionary.cs (126) : }
+HashTableDictionary.cs (127) : }
+HashTableDictionary.cs (134) : TKey[] keysArray = new TKey[NumElements];
+HashTableDictionary.cs (135) : int index = 0;
+HashTableDictionary.cs (136) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (137) : {
+HashTableDictionary.cs (138) : if (Entries[i] != null)
+HashTableDictionary.cs (139) : {
+HashTableDictionary.cs (140) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (141) : {
+HashTableDictionary.cs (142) : keysArray[index] = Entries[i].Get(j).Key;
+HashTableDictionary.cs (143) : index++;
+HashTableDictionary.cs (144) : }
+HashTableDictionary.cs (145) : }
+HashTableDictionary.cs (146) : }
+HashTableDictionary.cs (147) : return keysArray;
+HashTableDictionary.cs (155) : TValue[] valuesArray = new TValue[NumElements];
+HashTableDictionary.cs (156) : int index = 0;
+HashTableDictionary.cs (157) : for (int i = 0; i < Entries.Length; i++)
+HashTableDictionary.cs (158) : {
+HashTableDictionary.cs (159) : if (Entries[i] != null)
+HashTableDictionary.cs (160) : {
+HashTableDictionary.cs (161) : for (int j = 0; j < Entries[i].Count(); j++)
+HashTableDictionary.cs (162) : {
+HashTableDictionary.cs (163) : valuesArray[index] = Entries[i].Get(j).Value;
+HashTableDictionary.cs (164) : index++;
+HashTableDictionary.cs (165) : }
+HashTableDictionary.cs (166) : }
+HashTableDictionary.cs (167) : }
+HashTableDictionary.cs (168) : return valuesArray;
 ArrayList.cs (8) : int FirstIndex = 0;
 ArrayList.cs (31) : return NumElements;
 ArrayList.cs (38) : if (index < 0 || index >= NumElements)
