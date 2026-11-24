@@ -72,77 +72,88 @@ List.cs (2) : using System.Diagnostics;
 List.cs (3) : using System.Xml;
 List.cs (10) : public ListNode<T> Previous = null;
 List.cs (48) : return m_numItems;
-List.cs (54) : if (index < 0 || index >= m_numItems || First == null)
-List.cs (55) : {
-List.cs (56) : return default;
-List.cs (57) : }
-List.cs (59) : ListNode<T> node = First;
-List.cs (60) : int count = 0;
-List.cs (62) : while (count < index && node != null)
-List.cs (63) : {
-List.cs (64) : node = node.Next;
-List.cs (65) : count++;
-List.cs (66) : }
+List.cs (54) : // Posicion fuera de rango: valor por defecto
+List.cs (55) : if (index < 0 || index >= m_numItems)
+List.cs (56) : {
+List.cs (57) : return default;
+List.cs (58) : }
+List.cs (60) : // Si es el ultimo lo tenemos directo. Si no, recorremos desde el principio
+List.cs (61) : ListNode<T> node = First;
+List.cs (62) : if (index == m_numItems - 1)
+List.cs (63) : node = Last;
+List.cs (64) : else
+List.cs (65) : for (int i = 0; i < index; i++)
+List.cs (66) : node = node.Next;
 List.cs (68) : return node.Value;
-List.cs (75) : ListNode<T> newNode = new ListNode<T>(value);
+List.cs (74) : ListNode<T> newNode = new ListNode<T>(value);
 List.cs (76) : if (First == null)
 List.cs (77) : {
-List.cs (78) : First = newNode;
-List.cs (79) : m_numItems++;
-List.cs (80) : return;
-List.cs (81) : }
-List.cs (83) : ListNode<T> node = First;
-List.cs (85) : while (node.Next != null)
-List.cs (86) : {
-List.cs (87) : node = node.Next;
-List.cs (88) : }
-List.cs (90) : node.Next = newNode;
-List.cs (91) : m_numItems++;
-List.cs (99) : ListNode<T> node = First;
-List.cs (100) : int count = 0;
-List.cs (102) : if (index == 0)
-List.cs (103) : {
-List.cs (104) : First = node.Next;
-List.cs (105) : m_numItems--;
-List.cs (106) : }
-List.cs (108) : while (node != null && count < index)
-List.cs (109) : {
-List.cs (110) : node = node.Next;
-List.cs (111) : count++;
-List.cs (112) : if (count == index - 1)
-List.cs (113) : {
-List.cs (114) : node.Next = node.Next.Next;
-List.cs (115) : m_numItems--;
-List.cs (116) : }
-List.cs (117) : }
-List.cs (118) : return default;
-List.cs (125) : First = null;
-List.cs (126) : Last = null;
-List.cs (127) : m_numItems = 0;
-List.cs (133) : ListNode<T> node = First;
-List.cs (135) : while (node != null)
-List.cs (136) : {
-List.cs (137) : yield return node.Value;
-List.cs (138) : node = node.Next;
-List.cs (139) : }
+List.cs (78) : First = newNode;            // lista vacia: es el primero
+List.cs (79) : }
+List.cs (80) : else
+List.cs (81) : {
+List.cs (82) : newNode.Previous = Last;    // el nuevo mira atras al último
+List.cs (83) : Last.Next = newNode;        // el último mira adelante al nuevo
+List.cs (84) : }
+List.cs (86) : Last = newNode;                 // el nuevo pasa a ser el último
+List.cs (87) : m_numItems++;
+List.cs (93) : // Posicion fuera de rango: no hacemos nada
+List.cs (94) : if (index < 0 || index >= m_numItems)
+List.cs (95) : {
+List.cs (96) : return default;
+List.cs (97) : }
+List.cs (99) : // Buscamos el nodo (el ultimo es directo)
+List.cs (100) : ListNode<T> node = First;
+List.cs (101) : if (index == m_numItems - 1)
+List.cs (102) : {
+List.cs (103) : node = Last;
+List.cs (104) : }
+List.cs (105) : else
+List.cs (106) : for (int i = 0; i < index; i++)
+List.cs (107) : {
+List.cs (108) : node = node.Next;
+List.cs (109) : }
+List.cs (110) : // Unimos el anterior con el siguiente, saltandonos el nodo
+List.cs (111) : if (node.Previous != null)
+List.cs (112) : {
+List.cs (113) : node.Previous.Next = node.Next;
+List.cs (114) : }
+List.cs (115) : else
+List.cs (116) : {
+List.cs (117) : First = node.Next;         // era el primero
+List.cs (118) : }
+List.cs (119) : if (node.Next != null)
+List.cs (120) : {
+List.cs (121) : node.Next.Previous = node.Previous;
+List.cs (122) : }
+List.cs (124) : else
+List.cs (125) : {
+List.cs (126) : Last = node.Previous;      // era el último
+List.cs (129) : m_numItems--;
+List.cs (130) : return node.Value;
+List.cs (131) : }
+List.cs (139) : // Vaciamos la lista: sin primero, sin último y contador a 0
+List.cs (140) : First = null;
+List.cs (141) : Last = null;
+List.cs (142) : m_numItems = 0;
+List.cs (148) : ListNode<T> node = First;
+List.cs (150) : while (node != null)
+List.cs (151) : {
+List.cs (152) : yield return node.Value;
+List.cs (153) : node = node.Next;
+List.cs (154) : }
 Stack.cs (6) : IList<T> lista = new List<T>();
 Stack.cs (11) : return lista.ToString();
 Stack.cs (18) : return lista.Count();
 Stack.cs (24) : lista.Clear();
 Stack.cs (29) : lista.Add(value);
-Stack.cs (34) : int ultimo = lista.Count() - 1;
-Stack.cs (35) : T borrado = lista.Get(ultimo);
-Stack.cs (37) : List<T> nueva = new List<T>();
-Stack.cs (38) : for (int i = 0; i < ultimo; i++)
-Stack.cs (39) : {
-Stack.cs (40) : nueva.Add(lista.Get(i));
-Stack.cs (41) : }
-Stack.cs (42) : lista.Clear();
-Stack.cs (43) : for (int i = 0; i < nueva.Count(); i++)
-Stack.cs (44) : {
-Stack.cs (45) : lista.Add(nueva.Get(i));
-Stack.cs (46) : }
-Stack.cs (48) : return borrado;
+Stack.cs (34) : // Si la pila está vacía, no hay nada que sacar
+Stack.cs (35) : if (lista.Count() == 0)
+Stack.cs (36) : {
+Stack.cs (37) : return default;
+Stack.cs (38) : }
+Stack.cs (40) : // Desapilar = borrar el último elemento y devolverlo.
+Stack.cs (41) : return lista.Remove(lista.Count() - 1);
 BinaryTreeNode.cs (94) : int left = 0;
 BinaryTreeNode.cs (95) : int right = 0;
 BinaryTreeNode.cs (97) : if (LeftChild != null)
@@ -157,7 +168,6 @@ BinaryTreeNode.cs (120) : //              b) En caso contrario, debemos pedirle 
 BinaryTreeNode.cs (121) : //          -Si el nodo actual tiene una clave menor que la del nuevo nodo (usa CompareTo()), la clave debería estar a la derecha de este nodo. Haz lo mismo que antes.
 BinaryTreeNode.cs (122) : //          -Si el nodo actual y el nuevo nodo tienen la misma clave, simplemente devuelve el valor de este nodo. Lo hemos encontrado
 BinaryTreeNode.cs (123) : int comparador = this.Key.CompareTo(key);
-BinaryTreeNode.cs (125) : if (comparador < 0)
 BinaryTreeNode.cs (126) : {
 BinaryTreeNode.cs (127) : if (LeftChild == null)
 BinaryTreeNode.cs (128) : {
@@ -169,7 +179,6 @@ BinaryTreeNode.cs (133) : return LeftChild.Get(key);
 BinaryTreeNode.cs (134) : }
 BinaryTreeNode.cs (135) : }
 BinaryTreeNode.cs (136) : else
-BinaryTreeNode.cs (137) : if (comparador > 0)
 BinaryTreeNode.cs (138) : {
 BinaryTreeNode.cs (139) : if (RightChild == null)
 BinaryTreeNode.cs (140) : {
